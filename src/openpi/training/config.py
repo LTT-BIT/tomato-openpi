@@ -23,6 +23,7 @@ import openpi.policies.droid_policy as droid_policy
 import openpi.policies.fr3_wuji_policy as fr3_wuji_policy
 import openpi.policies.libero_policy as libero_policy
 import openpi.shared.download as _download
+import openpi.shared.nnx_utils as nnx_utils
 import openpi.shared.normalize as _normalize
 import openpi.training.droid_rlds_dataset as droid_rlds_dataset
 import openpi.training.misc.polaris_config as polaris_config
@@ -1133,6 +1134,79 @@ _CONFIGS.append(
             ),
         ),
         wandb_enabled=False,
+    )
+)
+
+# Keep the pretrained vision encoder and dense 2B VLM frozen, adapt the VLM
+# through LoRA, and fully fine-tune the 300M action expert. This reuses the
+# exact 0918/20 Hz data mixture and normalization for a controlled comparison.
+_fr3_wuji_20hz = _CONFIGS[-1]
+_fr3_wuji_20hz_vlm_lora_expert_full_model = pi0_config.Pi0Config(
+    pi05=True,
+    action_dim=54,
+    action_horizon=50,
+    max_token_len=256,
+    paligemma_variant="gemma_2b_lora",
+    action_expert_variant="gemma_300m",
+)
+_CONFIGS.append(
+    dataclasses.replace(
+        _fr3_wuji_20hz,
+        name="pi05_fr3_wuji_20hz_vlm_lora_expert_full",
+        model=_fr3_wuji_20hz_vlm_lora_expert_full_model,
+        data=dataclasses.replace(
+            _fr3_wuji_20hz.data,
+            assets=AssetsConfig(
+                assets_dir="./assets/pi05_fr3_wuji_20hz",
+                asset_id="fr3_wuji/0918_20hz",
+            ),
+        ),
+        weight_loader=weight_loaders.PartialCheckpointWeightLoader(
+            "gs://openpi-assets/checkpoints/pi05_base/params"
+        ),
+        freeze_filter=nnx.Any(
+            _fr3_wuji_20hz_vlm_lora_expert_full_model.get_freeze_filter(),
+            nnx_utils.PathRegex(".*PaliGemma/img.*"),
+        ),
+        lr_schedule=_optimizer.CosineDecaySchedule(
+            warmup_steps=1_000,
+            peak_lr=5e-6,
+            decay_steps=20_000,
+            decay_lr=5e-7,
+        ),
+        batch_size=4,
+        ema_decay=None,
+        wandb_enabled=False,
+    )
+)
+
+_FR3_WUJI_0924_ROOT = "/home/descfly/lpy/Convert_data/outputs/fr3_wuji/0924-250ep"
+_fr3_wuji_0924_config = _CONFIGS[-1]
+_CONFIGS.append(
+    dataclasses.replace(
+        _fr3_wuji_0924_config,
+        name="pi05_fr3_wuji_0924_30hz_vlm_lora_expert_full",
+        data=dataclasses.replace(
+            _fr3_wuji_0924_config.data,
+            repo_id="fr3_wuji/0924_30hz",
+            action_hz=30.0,
+            assets=AssetsConfig(
+                assets_dir="./assets/pi05_fr3_wuji_0924_30hz",
+                asset_id="fr3_wuji/0924_30hz",
+            ),
+            lerobot_datasets=(
+                LeRobotDatasetSpec(
+                    repo_id="fr3_wuji/0924_A",
+                    root=f"{_FR3_WUJI_0924_ROOT}/A",
+                    weight=0.7,
+                ),
+                LeRobotDatasetSpec(
+                    repo_id="fr3_wuji/0924_B",
+                    root=f"{_FR3_WUJI_0924_ROOT}/B",
+                    weight=0.3,
+                ),
+            ),
+        ),
     )
 )
 

@@ -1,4 +1,4 @@
-"""Prepare long prompts and 20 Hz Pi0.5 normalization for the 0918 datasets."""
+"""Prepare prompts and action-rate normalization for FR3/Wuji datasets (20 Hz by default)."""
 
 from __future__ import annotations
 
@@ -19,7 +19,6 @@ from openpi.shared import normalize
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = Path("/home/descfly/lpy/Convert_data/outputs/fr3_wuji/0918")
-DATASETS = (DATA_ROOT / "tomato_A_cleaned", DATA_ROOT / "tomato_B_cleaned")
 OUTPUT = ROOT / "assets/pi05_fr3_wuji_20hz/fr3_wuji/0918_20hz"
 PROMPT = (
     "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand "
@@ -55,21 +54,30 @@ def rewrite_prompts(dataset: Path) -> None:
     _atomic_jsonl(episodes_path, episodes)
 
 
-def input_fingerprint(datasets: tuple[Path, ...]) -> str:
+def input_fingerprint(datasets: tuple[Path, ...], *, action_hz: float = ACTION_HZ, rewrite_prompt: bool = True) -> str:
     digest = hashlib.sha256()
     for dataset in datasets:
         for relative in ("meta/info.json", "meta/tasks.jsonl", "meta/episodes.jsonl"):
             digest.update((dataset / relative).read_bytes())
-    digest.update(f"{ACTION_HZ}:{ACTION_HORIZON}".encode())
+    digest.update(f"{action_hz:g}:{ACTION_HORIZON}".encode())
+    if not rewrite_prompt:
+        digest.update(b":keep_prompts")
     return digest.hexdigest()
 
 
-def compute_stats(datasets: tuple[Path, ...], output: Path, batch_size: int) -> None:
+def compute_stats(
+    datasets: tuple[Path, ...],
+    output: Path,
+    batch_size: int,
+    *,
+    action_hz: float = ACTION_HZ,
+    rewrite_prompt: bool = True,
+) -> None:
     infos = [json.loads((dataset / "meta/info.json").read_text()) for dataset in datasets]
     source_fps = infos[0]["fps"]
-    if source_fps < ACTION_HZ or any(info["fps"] != source_fps for info in infos):
-        raise ValueError("The two datasets must share a source FPS of at least 20 Hz")
-    offsets = np.rint(np.arange(ACTION_HORIZON) * source_fps / ACTION_HZ).astype(np.int64)
+    if source_fps < action_hz or any(info["fps"] != source_fps for info in infos):
+        raise ValueError(f"The two datasets must share a source FPS of at least {action_hz:g} Hz")
+    offsets = np.rint(np.arange(ACTION_HORIZON) * source_fps / action_hz).astype(np.int64)
     delta = transforms.DeltaActions(transforms.make_bool_mask(7, -20, 7, -20))
     stats = {key: normalize.RunningStats() for key in ("state", "actions")}
     total_episodes = sum(info["total_episodes"] for info in infos)
@@ -94,21 +102,31 @@ def compute_stats(datasets: tuple[Path, ...], output: Path, batch_size: int) -> 
                 for key, accumulator in stats.items():
                     accumulator.update(batch[key].astype(np.float64))
             completed += 1
-            print(f"20 Hz stats: episode {completed}/{total_episodes}", flush=True)
+            print(f"{action_hz:g} Hz stats: episode {completed}/{total_episodes}", flush=True)
 
     result = {key: accumulator.get_statistics() for key, accumulator in stats.items()}
     output.mkdir(parents=True, exist_ok=True)
     normalize.save(output, result)
+    prompts = sorted(
+        {
+            task["task"]
+            for dataset in datasets
+            for line in (dataset / "meta/tasks.jsonl").read_text().splitlines()
+            if (task := json.loads(line))
+        }
+    )
     provenance = {
         "datasets": [str(path) for path in datasets],
         "source_hz": source_fps,
-        "action_hz": ACTION_HZ,
+        "action_hz": action_hz,
         "action_horizon": ACTION_HORIZON,
-        "trajectory_seconds": ACTION_HORIZON / ACTION_HZ,
+        "trajectory_seconds": ACTION_HORIZON / action_hz,
         "nearest_source_frame_offsets": offsets.tolist(),
-        "prompt": PROMPT,
-        "input_fingerprint": input_fingerprint(datasets),
-        "method": "all rows; nearest 30 Hz source frames on a 20 Hz action grid; episode-clipped; arm delta",
+        "prompt": prompts[0] if len(prompts) == 1 else None,
+        "dataset_prompts": prompts,
+        "input_fingerprint": input_fingerprint(datasets, action_hz=action_hz, rewrite_prompt=rewrite_prompt),
+        "prompt_rewritten": rewrite_prompt,
+        "method": f"all rows; nearest source frames on a {action_hz:g} Hz action grid; episode-clipped; arm delta",
     }
     (output / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
 
@@ -117,27 +135,44 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--batch-size", type=int, default=256)
+    parser.add_argument("--action-hz", type=float, default=ACTION_HZ)
+    parser.add_argument("--data-root", type=Path, default=DATA_ROOT)
+    parser.add_argument("--dataset-names", nargs=2, default=("tomato_A_cleaned", "tomato_B_cleaned"))
+    parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--keep-prompts", action="store_true")
     args = parser.parse_args()
     if args.batch_size < 1:
         parser.error("--batch-size must be positive")
+    if not np.isfinite(args.action_hz) or args.action_hz <= 0:
+        parser.error("--action-hz must be a positive finite number")
 
-    datasets = tuple(path.resolve() for path in DATASETS)
+    datasets = tuple((args.data_root / name).resolve() for name in args.dataset_names)
+    for dataset in datasets:
+        for relative in ("meta/info.json", "meta/tasks.jsonl", "meta/episodes.jsonl"):
+            if not (dataset / relative).is_file():
+                parser.error(f"Missing dataset file: {dataset / relative}")
+    output = args.output.resolve()
     with ExitStack() as locks:
         for dataset in sorted(datasets):
-            lock = locks.enter_context((dataset / "conversion/lock").open("r"))
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        for dataset in datasets:
-            rewrite_prompts(dataset)
+            lock_path = dataset / "conversion/lock"
+            if not lock_path.is_file() and not args.keep_prompts:
+                parser.error(f"Missing conversion lock: {lock_path}")
+            if lock_path.is_file():
+                lock = locks.enter_context(lock_path.open("r"))
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        if not args.keep_prompts:
+            for dataset in datasets:
+                rewrite_prompts(dataset)
 
-        provenance_path = OUTPUT / "provenance.json"
-        fingerprint = input_fingerprint(datasets)
-        if not args.force and provenance_path.is_file() and (OUTPUT / "norm_stats.json").is_file():
+        provenance_path = output / "provenance.json"
+        fingerprint = input_fingerprint(datasets, action_hz=args.action_hz, rewrite_prompt=not args.keep_prompts)
+        if not args.force and provenance_path.is_file() and (output / "norm_stats.json").is_file():
             provenance = json.loads(provenance_path.read_text())
             if provenance.get("input_fingerprint") == fingerprint:
-                print(f"20 Hz assets already current: {OUTPUT}")
+                print(f"{args.action_hz:g} Hz assets already current: {output}")
                 return
-        compute_stats(datasets, OUTPUT, args.batch_size)
-        print(f"Prepared 20 Hz assets: {OUTPUT}")
+        compute_stats(datasets, output, args.batch_size, action_hz=args.action_hz, rewrite_prompt=not args.keep_prompts)
+        print(f"Prepared {args.action_hz:g} Hz assets: {output}")
 
 
 if __name__ == "__main__":
