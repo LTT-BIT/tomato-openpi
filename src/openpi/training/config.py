@@ -1098,6 +1098,52 @@ _fr3_wuji_base = next(config for config in _CONFIGS if config.name == "pi05_fr3_
 _CONFIGS.append(
     dataclasses.replace(
         _fr3_wuji_base,
+        name="pi05_fr3_wuji_1002_subtasks_detailed_30hz",
+        data=dataclasses.replace(
+            _fr3_wuji_base.data,
+            repo_id="fr3_wuji/1002_subtasks_detailed",
+            assets=AssetsConfig(assets_dir="/home/descfly/data-clean", asset_id="1002_subtasks_detailed"),
+            action_hz=30.0,
+            video_backend="pyav",
+            lerobot_datasets=(
+                LeRobotDatasetSpec(
+                    repo_id="fr3_wuji/1002_subtasks_detailed",
+                    root="/home/descfly/data-clean/1002_subtasks_detailed",
+                    weight=1.0,
+                ),
+            ),
+        ),
+        log_interval=10,
+        wandb_enabled=False,
+    )
+)
+# Subtask-only 1001 data, excluding full-task examples and segments shorter than
+# one action horizon. Norms are recomputed with these exact episode boundaries.
+_CONFIGS.append(
+    dataclasses.replace(
+        _fr3_wuji_base,
+        name="pi05_fr3_wuji_1001_subtasks_30hz",
+        data=dataclasses.replace(
+            _fr3_wuji_base.data,
+            repo_id="fr3_wuji/1001_subtasks",
+            assets=AssetsConfig(assets_dir="/home/descfly/data-clean", asset_id="1001_subtasks"),
+            action_hz=30.0,
+            video_backend="pyav",
+            lerobot_datasets=(
+                LeRobotDatasetSpec(
+                    repo_id="fr3_wuji/1001_subtasks",
+                    root="/home/descfly/data-clean/1001_subtasks",
+                    weight=1.0,
+                ),
+            ),
+        ),
+        log_interval=10,
+        wandb_enabled=False,
+    )
+)
+_CONFIGS.append(
+    dataclasses.replace(
+        _fr3_wuji_base,
         name="pi05_fr3_wuji_60ep",
         data=dataclasses.replace(
             _fr3_wuji_base.data,

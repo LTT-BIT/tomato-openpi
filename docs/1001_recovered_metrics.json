@@ -1,0 +1,20 @@
+{
+  "source": "Codex app terminal retained buffer; recovered 2026-10-02",
+  "training_date": "2026-10-01",
+  "history_complete": false,
+  "precision": "Rounded to four decimals by original stdout logger",
+  "metrics": [
+    {
+      "step": 19980,
+      "grad_norm": 0.7448,
+      "loss": 0.0221,
+      "param_norm": 1804.8047
+    },
+    {
+      "step": 19990,
+      "grad_norm": 0.8589,
+      "loss": 0.026,
+      "param_norm": 1804.8049
+    }
+  ]
+}
