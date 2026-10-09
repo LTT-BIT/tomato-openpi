@@ -147,7 +147,10 @@ def train_step(
     def loss_fn(
         model: _model.BaseModel, rng: at.KeyArrayLike, observation: _model.Observation, actions: _model.Actions
     ):
-        chunked_loss = model.compute_loss(rng, observation, actions, train=True)
+        kwargs = {}
+        if config.augmentation_seed is not None:
+            kwargs["augmentation_rng"] = jax.random.fold_in(jax.random.key(config.augmentation_seed), state.step)
+        chunked_loss = model.compute_loss(rng, observation, actions, train=True, **kwargs)
         return jnp.mean(chunked_loss)
 
     train_rng = jax.random.fold_in(rng, state.step)
@@ -204,6 +207,8 @@ def main(config: _config.TrainConfig):
 
     rng = jax.random.key(config.seed)
     train_rng, init_rng = jax.random.split(rng)
+    if config.model_seed is not None:
+        init_rng = jax.random.key(config.model_seed)
 
     mesh = sharding.make_mesh(config.fsdp_devices)
     data_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS))
@@ -215,23 +220,17 @@ def main(config: _config.TrainConfig):
         overwrite=config.overwrite,
         resume=config.resume,
     )
-    init_wandb(config, resuming=resuming, enabled=config.wandb_enabled)
-
     data_loader = _data_loader.create_data_loader(
         config,
         sharding=data_sharding,
         shuffle=True,
     )
-    data_iter = iter(data_loader)
-    batch = next(data_iter)
-    logging.info(f"Initialized data loader:\n{training_utils.array_tree_to_info(batch)}")
-
-    # Log images from first batch to sanity check.
-    images_to_log = [
-        wandb.Image(np.concatenate([np.array(img[i]) for img in batch[0].images.values()], axis=1))
-        for i in range(min(5, len(next(iter(batch[0].images.values())))))
-    ]
-    wandb.log({"camera_views": images_to_log}, step=0)
+    sampling_summary = None
+    if config.sampling_mode == "epoch_shuffle":
+        sampling_summary = data_loader.prepare_reproducibility(config, resuming=resuming)
+    init_wandb(config, resuming=resuming, enabled=config.wandb_enabled)
+    if sampling_summary is not None:
+        wandb.run.summary.update({f"sampling/{key}": value for key, value in sampling_summary.items()})
 
     train_state, train_state_sharding = init_train_state(config, init_rng, mesh, resume=resuming)
     jax.block_until_ready(train_state)
@@ -240,6 +239,25 @@ def main(config: _config.TrainConfig):
     if resuming:
         train_state = _checkpoints.restore_state(checkpoint_manager, train_state, data_loader)
 
+    start_step = int(train_state.step)
+    if start_step >= config.num_train_steps:
+        logging.info("Training already completed: %d steps", start_step)
+        checkpoint_manager.wait_until_finished()
+        return
+    if config.sampling_mode == "epoch_shuffle":
+        data_loader.seek(start_step)
+        logging.info(
+            "Sampling resumes at completed step %d / sample position %d", start_step, start_step * config.batch_size
+        )
+    data_iter = iter(data_loader)
+    batch = next(data_iter)
+    logging.info(f"Initialized data loader:\n{training_utils.array_tree_to_info(batch)}")
+    images_to_log = [
+        wandb.Image(np.concatenate([np.array(img[i]) for img in batch[0].images.values()], axis=1))
+        for i in range(min(5, len(next(iter(batch[0].images.values())))))
+    ]
+    wandb.log({"camera_views": images_to_log}, step=start_step)
+
     ptrain_step = jax.jit(
         functools.partial(train_step, config),
         in_shardings=(replicated_sharding, train_state_sharding, data_sharding),
@@ -247,7 +265,6 @@ def main(config: _config.TrainConfig):
         donate_argnums=(1,),
     )
 
-    start_step = int(train_state.step)
     pbar = tqdm.tqdm(
         range(start_step, config.num_train_steps),
         initial=start_step,
@@ -263,17 +280,38 @@ def main(config: _config.TrainConfig):
         if step % config.log_interval == 0:
             stacked_infos = common_utils.stack_forest(infos)
             reduced_info = jax.device_get(jax.tree.map(jnp.mean, stacked_infos))
+            if sampling_summary is not None:
+                consumed = (step + 1) * config.batch_size
+                frames = sampling_summary["dataset_frames"]
+                reduced_info.update(
+                    {
+                        "sampling/consumed_samples": consumed,
+                        "sampling/consumed_unique_frames": min(consumed, frames),
+                        "sampling/consumed_coverage": min(consumed, frames) / frames,
+                    }
+                )
             info_str = ", ".join(f"{k}={v:.4f}" for k, v in reduced_info.items())
             pbar.write(f"Step {step}: {info_str}")
             wandb.log(reduced_info, step=step)
             infos = []
-        batch = next(data_iter)
+        if step + 1 < config.num_train_steps:
+            batch = next(data_iter)
 
         if (step % config.save_interval == 0 and step > start_step) or step == config.num_train_steps - 1:
             _checkpoints.save_state(checkpoint_manager, train_state, data_loader, step)
 
     logging.info("Waiting for checkpoint manager to finish")
     checkpoint_manager.wait_until_finished()
+    if sampling_summary is not None:
+        consumed = config.num_train_steps * config.batch_size
+        frames = sampling_summary["dataset_frames"]
+        wandb.run.summary.update(
+            {
+                "sampling/consumed_samples": consumed,
+                "sampling/consumed_unique_frames": min(consumed, frames),
+                "sampling/consumed_coverage": min(consumed, frames) / frames,
+            }
+        )
 
 
 if __name__ == "__main__":

@@ -586,6 +586,13 @@ class TrainConfig:
 
     # Random seed that will be used by random generators during training.
     seed: int = 42
+    # Optional independent JAX streams. None preserves the historical seed behavior.
+    model_seed: int | None = None
+    data_seed: int | None = None
+    augmentation_seed: int | None = None
+    # epoch_shuffle: one LeRobot dataset, shuffled without replacement, full fixed-size batches.
+    # Legacy configurations retain their existing weighted/random sampler.
+    sampling_mode: Literal["legacy", "epoch_shuffle"] = "legacy"
     # Global batch size.
     batch_size: int = 32
     # Number of workers to use for the data loader. Increasing this number will speed up data loading but
@@ -638,6 +645,16 @@ class TrainConfig:
     def __post_init__(self) -> None:
         if self.resume and self.overwrite:
             raise ValueError("Cannot resume and overwrite at the same time.")
+        for name in ("seed", "model_seed", "data_seed", "augmentation_seed"):
+            value = getattr(self, name)
+            if value is not None and not 0 <= value < 2**32:
+                raise ValueError(f"{name} must be in [0, 2**32), got {value}")
+        if self.sampling_mode not in ("legacy", "epoch_shuffle"):
+            raise ValueError(f"Unknown sampling mode: {self.sampling_mode}")
+        if self.batch_size <= 0 or self.num_train_steps <= 0:
+            raise ValueError("batch_size and num_train_steps must be positive")
+        if self.augmentation_seed is not None and not isinstance(self.model, pi0_config.Pi0Config):
+            raise ValueError("Independent augmentation_seed is supported only by JAX Pi0/Pi05")
 
 
 # Use `get_config` if you need to get a config by name in your code.
@@ -1207,9 +1224,7 @@ _CONFIGS.append(
                 asset_id="fr3_wuji/0918_20hz",
             ),
         ),
-        weight_loader=weight_loaders.PartialCheckpointWeightLoader(
-            "gs://openpi-assets/checkpoints/pi05_base/params"
-        ),
+        weight_loader=weight_loaders.PartialCheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"),
         freeze_filter=nnx.Any(
             _fr3_wuji_20hz_vlm_lora_expert_full_model.get_freeze_filter(),
             nnx_utils.PathRegex(".*PaliGemma/img.*"),

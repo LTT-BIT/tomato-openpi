@@ -1,6 +1,6 @@
 # 文档索引
 
-2026-10-09 新增：[完整任务 C0 简明训练教程](../training_baseline/训练教程_完整任务C0.md)，配套`training_baseline/pi05_fr3_wuji_fulltask_c0_train.py`，沿用 1002 参数但不使用分阶段子任务数据与指令。
+2026-10-09 更新：[完整任务 C0 v2 多人协作训练说明](../training_baseline/训练教程_完整任务C0.md)，配套 `training_baseline/pi05_fr3_wuji_fulltask_c0_train.py`。使用全部完整任务数据，无放回采样、独立随机种子和可审计续训；不划分训练/验证集，需使用完整配套仓库。
 
 整理日期：2026-09-29
 

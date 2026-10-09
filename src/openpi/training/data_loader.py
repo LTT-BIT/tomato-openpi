@@ -18,6 +18,7 @@ import torch
 import openpi.models.model as _model
 import openpi.training.config as _config
 from openpi.training.droid_rlds_dataset import DroidRldsDataset
+import openpi.training.sampling as _sampling
 import openpi.transforms as _transforms
 
 T_co = TypeVar("T_co", covariant=True)
@@ -45,6 +46,12 @@ class IterableDataset(Protocol[T_co]):
 
 class DataLoader(Protocol[T_co]):
     """Interface for a data loader."""
+
+    def seek(self, completed_steps: int) -> None:
+        """Position an opt-in deterministic loader before creating its iterator."""
+
+    def prepare_reproducibility(self, config: _config.TrainConfig, *, resuming: bool) -> dict:
+        """Save or verify the deterministic sampling contract."""
 
     def data_config(self) -> _config.DataConfig:
         """Get the data config for this data loader."""
@@ -245,7 +252,11 @@ def _create_local_dataset(data_config: _config.DataConfig, action_horizon: int) 
 
 
 def create_torch_dataset(
-    data_config: _config.DataConfig, action_horizon: int, model_config: _model.BaseModelConfig
+    data_config: _config.DataConfig,
+    action_horizon: int,
+    model_config: _model.BaseModelConfig,
+    *,
+    sampling_mode: str = "legacy",
 ) -> Dataset:
     """Create a dataset for training."""
     repo_id = data_config.repo_id
@@ -253,6 +264,12 @@ def create_torch_dataset(
         raise ValueError("Repo ID is not set. Cannot create dataset.")
     if repo_id == "fake":
         return FakeDataset(model_config, num_samples=1024)
+    if sampling_mode == "epoch_shuffle" and (
+        data_config.local_dataset_loader is not None
+        or len(data_config.lerobot_datasets) != 1
+        or data_config.lerobot_datasets[0].root is None
+    ):
+        raise ValueError("epoch_shuffle requires exactly one standard LeRobot dataset with an explicit local root")
     if data_config.local_dataset_loader is not None and data_config.lerobot_datasets:
         raise ValueError("Weighted LeRobot datasets do not support local_dataset_loader")
     if data_config.local_dataset_loader is not None:
@@ -287,6 +304,8 @@ def create_torch_dataset(
 
     datasets_and_meta = [create_one(spec.repo_id, spec.root) for spec in data_config.lerobot_datasets]
     datasets = [item[0] for item in datasets_and_meta]
+    if sampling_mode == "epoch_shuffle":
+        return datasets[0]
     metas = [item[1] for item in datasets_and_meta]
     reference = metas[0]
     required_keys = {"observation.state", *data_config.action_sequence_keys, *reference.camera_keys}
@@ -403,6 +422,11 @@ def create_data_loader(
     data_config = config.data.create(config.assets_dirs, config.model)
     logging.info(f"data_config: {data_config}")
 
+    if config.sampling_mode == "epoch_shuffle" and (framework != "jax" or data_config.rlds_data_dir is not None):
+        raise ValueError("epoch_shuffle currently supports the JAX training entry point with a LeRobot dataset")
+    if framework != "jax" and (config.model_seed is not None or config.augmentation_seed is not None):
+        raise ValueError("Independent model/augmentation seeds currently require the JAX training entry point")
+
     if data_config.rlds_data_dir is not None:
         return create_rlds_data_loader(
             data_config,
@@ -423,9 +447,11 @@ def create_data_loader(
         shuffle=shuffle,
         num_batches=num_batches,
         num_workers=config.num_workers,
-        seed=config.seed,
+        seed=config.seed if config.data_seed is None else config.data_seed,
         skip_norm_stats=skip_norm_stats,
         framework=framework,
+        sampling_mode=config.sampling_mode,
+        num_train_steps=config.num_train_steps,
     )
 
 
@@ -442,6 +468,8 @@ def create_torch_data_loader(
     num_workers: int = 0,
     seed: int = 0,
     framework: str = "jax",
+    sampling_mode: str = "legacy",
+    num_train_steps: int | None = None,
 ) -> DataLoader[tuple[_model.Observation, _model.Actions]]:
     """Create a data loader for training.
 
@@ -459,8 +487,11 @@ def create_torch_data_loader(
         num_workers: The number of worker processes to use. If zero, the data loader will
             execute in the main process.
         seed: The seed to use for shuffling the data.
+        sampling_mode: Legacy sampling or a finite stream of shuffled epochs with no dropped tail.
+        num_train_steps: Total plan budget; required for epoch_shuffle, independent of num_batches.
     """
-    dataset = create_torch_dataset(data_config, action_horizon, model_config)
+    dataset = create_torch_dataset(data_config, action_horizon, model_config, sampling_mode=sampling_mode)
+    source_dataset = dataset
     sample_weights = getattr(dataset, "sample_weights", None)
     dataset = transform_dataset(dataset, data_config, skip_norm_stats=skip_norm_stats)
 
@@ -495,9 +526,11 @@ def create_torch_data_loader(
         num_workers=num_workers,
         seed=seed,
         framework=framework,
+        sampling_mode=sampling_mode,
+        num_train_steps=num_train_steps,
     )
 
-    return DataLoaderImpl(data_config, data_loader)
+    return DataLoaderImpl(data_config, data_loader, source_dataset=source_dataset)
 
 
 def create_rlds_data_loader(
@@ -557,6 +590,8 @@ class TorchDataLoader:
         num_workers: int = 0,
         seed: int = 0,
         framework: str = "jax",
+        sampling_mode: str = "legacy",
+        num_train_steps: int | None = None,
     ):
         """Create a PyTorch data loader.
 
@@ -572,11 +607,13 @@ class TorchDataLoader:
             num_workers: The number of worker processes to use. If zero, the data loader will
                 execute in the main process.
             seed: The seed to use for shuffling the data.
+            sampling_mode: epoch_shuffle builds a finite plan and supports seeking by completed steps.
+            num_train_steps: Total batch budget of that plan, including already completed steps on resume.
         """
         if jax.process_count() > 1:
             raise NotImplementedError("Data loading with multiple processes is not supported.")
 
-        if len(dataset) < local_batch_size:
+        if len(dataset) < local_batch_size and sampling_mode == "legacy":
             raise ValueError(f"Local batch size ({local_batch_size}) is larger than the dataset size ({len(dataset)}).")
 
         # Store sharding - None for PyTorch, JAX sharding for JAX
@@ -588,6 +625,8 @@ class TorchDataLoader:
                 jax.sharding.PartitionSpec("B"),
             )
         self._num_batches = num_batches
+        self._local_batch_size = local_batch_size
+        self.plan_sampler = None
 
         mp_context = None
         if num_workers > 0:
@@ -595,7 +634,16 @@ class TorchDataLoader:
 
         generator = torch.Generator()
         generator.manual_seed(seed)
-        if sample_weights is not None:
+        if sampling_mode == "epoch_shuffle":
+            if sampler is not None or sample_weights is not None or num_train_steps is None:
+                raise ValueError("epoch_shuffle requires num_train_steps and cannot be combined with weighted sampling")
+            self.plan_sampler = _sampling.PlanSampler(
+                _sampling.epoch_shuffle_indices(len(dataset), seed=seed, num_samples=num_train_steps * local_batch_size)
+            )
+            sampler = self.plan_sampler
+        elif sampling_mode != "legacy":
+            raise ValueError(f"Unknown sampling mode: {sampling_mode}")
+        elif sample_weights is not None:
             if sampler is not None:
                 raise NotImplementedError("Weighted LeRobot sampling with distributed PyTorch is not supported")
             sampler = torch.utils.data.WeightedRandomSampler(
@@ -614,7 +662,7 @@ class TorchDataLoader:
             persistent_workers=num_workers > 0,
             collate_fn=_collate_fn,
             worker_init_fn=_worker_init_fn,
-            drop_last=True,
+            drop_last=self.plan_sampler is None,
             generator=generator,
         )
 
@@ -639,6 +687,13 @@ class TorchDataLoader:
                     yield jax.tree.map(lambda x: jax.make_array_from_process_local_data(self._sharding, x), batch)
                 else:
                     yield jax.tree.map(torch.as_tensor, batch)
+            if self.plan_sampler is not None:
+                return
+
+    def seek(self, completed_steps: int) -> None:
+        if self.plan_sampler is None:
+            raise ValueError("Exact sample-position resume requires epoch_shuffle")
+        self.plan_sampler.seek(completed_steps * self._local_batch_size)
 
 
 def _collate_fn(items):
@@ -701,9 +756,16 @@ class RLDSDataLoader:
 
 
 class DataLoaderImpl(DataLoader):
-    def __init__(self, data_config: _config.DataConfig, data_loader: TorchDataLoader | RLDSDataLoader):
+    def __init__(
+        self,
+        data_config: _config.DataConfig,
+        data_loader: TorchDataLoader | RLDSDataLoader,
+        *,
+        source_dataset: Dataset | None = None,
+    ):
         self._data_config = data_config
         self._data_loader = data_loader
+        self._source_dataset = source_dataset
 
     def data_config(self) -> _config.DataConfig:
         return self._data_config
@@ -711,3 +773,21 @@ class DataLoaderImpl(DataLoader):
     def __iter__(self):
         for batch in self._data_loader:
             yield _model.Observation.from_dict(batch), batch["actions"]
+
+    def seek(self, completed_steps: int) -> None:
+        if not isinstance(self._data_loader, TorchDataLoader):
+            raise ValueError("Exact sample-position resume requires TorchDataLoader")
+        self._data_loader.seek(completed_steps)
+
+    def prepare_reproducibility(self, config: _config.TrainConfig, *, resuming: bool) -> dict:
+        from openpi.training import reproducibility
+
+        loader = self._data_loader
+        if not isinstance(loader, TorchDataLoader) or loader.plan_sampler is None:
+            raise ValueError("Sampling audit requires epoch_shuffle")
+        source = self._source_dataset
+        while isinstance(source, TransformedDataset):
+            source = source._dataset  # noqa: SLF001 -- unwrap our length-preserving transforms
+        return reproducibility.prepare_run(
+            config, self._data_config, source, loader.plan_sampler.indices, resuming=resuming
+        )

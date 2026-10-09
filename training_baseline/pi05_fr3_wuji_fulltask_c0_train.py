@@ -1,9 +1,10 @@
-"""1002 派生的完整任务 C0 基准：双 LoRA / 30 Hz / 54 维 / 20k。
+# ruff: noqa: RUF002, RUF003
+"""完整任务 C0 v2：双 LoRA / 30 Hz / 54 维 / 20k / 可复现无放回采样。
 
 使用方式见同目录的训练教程；在仓库根目录通过 python -m training_baseline.pi05_fr3_wuji_fulltask_c0_train 运行。
 这是可执行的训练配置，不是独立于仓库的模型实现；无需注册到 config.py。
-只替换数据、归一化资产和完整任务指令；模型与优化参数沿用 1002。
-使用已经准备好的完整任务数据和归一化统计，不执行额外的数据校验或改写。
+模型与优化参数沿用 1002，v2 显式启用独立随机流、采样审计及精确数据位置恢复。
+使用已准备好的全部数据和统计，不划分训练/验证集；启动时记录文件指纹，不改写数据。
 """
 
 from __future__ import annotations
@@ -17,7 +18,8 @@ if TYPE_CHECKING:
 
 
 CONFIG_NAME = "pi05_fr3_wuji_fulltask_c0_30hz"
-DEFAULT_EXP_NAME = "tomato_fulltask_c0_30hz_s42"
+BASELINE_VERSION = "fulltask_c0_v2"
+DEFAULT_EXP_NAME = "tomato_fulltask_c0_v2_30hz_s42"
 # 指令示例，仅供参考；实际训练读取准备好的数据中的 task 文本。
 FULL_TASK_PROMPT = (
     "Pick up a tomato truss with the right hand and hold it steady between both hands, "
@@ -101,9 +103,7 @@ def build_config(
             action_sequence_keys=("action",),
             action_hz=30.0,
             video_backend="pyav",
-            lerobot_datasets=(
-                cfg.LeRobotDatasetSpec(repo_id=repo_id, root=dataset_root, weight=1.0),
-            ),
+            lerobot_datasets=(cfg.LeRobotDatasetSpec(repo_id=repo_id, root=dataset_root, weight=1.0),),
         ),
         lr_schedule=optimizer.CosineDecaySchedule(
             warmup_steps=1_000,
@@ -120,6 +120,10 @@ def build_config(
         ),
         ema_decay=None,
         seed=42,
+        model_seed=42,
+        data_seed=42001,
+        augmentation_seed=42002,
+        sampling_mode="epoch_shuffle",
         batch_size=8,
         num_workers=8,
         num_train_steps=20_000,
@@ -131,7 +135,7 @@ def build_config(
         checkpoint_base_dir="./checkpoints",
         resume=False,
         overwrite=False,
-        wandb_enabled=False,
+        wandb_enabled=True,
         pytorch_weight_path=None,
         pytorch_training_precision="bfloat16",
         policy_metadata=None,
