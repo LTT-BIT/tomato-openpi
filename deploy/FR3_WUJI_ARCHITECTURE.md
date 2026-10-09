@@ -17,7 +17,7 @@
 | 方案 | 命令 | 默认模型 | 核心参数 |
 | --- | --- | --- | --- |
 | 慢 | `bash deploy/fr3_wuji_slow/run.sh --check` | 19999，`:8001` | `--minimum-time-scale 2.5`、`--continuous`、`--rounds 50`、`--replan-steps 20`、结束 `hold` |
-| 中 | `bash deploy/fr3_wuji_medium/run.sh --check` | 30000，`:8002` | `--model`、`--minimum-time-scale 0.625`、`--slow-after-seconds 25`、结束 `hold` |
+| 中 | `bash deploy/fr3_wuji_medium/run.sh --check` | `64-lora-30hz`（原 30000），`:8002` | `--model`、`--minimum-time-scale 0.625`、`--slow-after-seconds 25`、结束 `hold` |
 | 快 | `bash deploy/fr3_wuji_fast/run.sh --check` | 19999，`:8001` | `--broker-mode rtg/serial`、`--trigger-fraction 0.5`、`--guidance-steps 3`、`--rounds 50`、结束 `disable` |
 
 三个入口都可设 `--left-arm-ip`、`--right-arm-ip`、`--wuji-left-address`、`--wuji-right-address`、`--checkpoint`、`--uri`、`--output`、`--start-cameras`、`--finish-policy`。默认设备地址分别是 `172.16.0.2`、`172.16.1.2`、`192.168.1.110:7447`、`192.168.2.111:7447`。`--check` 仅生成配置；`--read-only` 读取设备反馈；真机下发必须显式 `--execute` 并使用 `--qualification` 或 `--supervised-trial`。慢、中另有 `--hand-control slider/strict`；快固定 slider。三种方案共用 `.deployment/oneshot-owner.lock`，不能同时占用真机。
@@ -30,7 +30,12 @@
 | 25000 | 8004 | `checkpoints/25000` | 15 Hz | `model_25000/` |
 | 25000-single | 8005 | `checkpoints/25000-single` | 15 Hz | `model_25000_single/` |
 
-上述 checkpoint 是代码默认或相对路径；以现场真实文件为准，模型服务和执行端必须使用相同权重。中速支持全部五种模型；慢速原入口和快速主入口是 19999。其他权重与速度的组合以各模型包装脚本和契约为准。
+上述 checkpoint 是代码默认或相对路径；以现场真实文件为准，模型服务和执行端必须使用相同权重。
+中速用 `--model 54` 选择表中的 19999；64 维分别使用 `64-lora-30hz`（30000）、
+`64-full-30hz`（30000v2）、`64-full-15hz-ab`（25000）、`64-full-15hz-a`（25000-single）。
+旧参数仍兼容；`64` 仅作为 `64-lora-30hz` 的别名。另支持 `--model 20hz`（20 Hz、默认端口 8006）。
+慢速原入口和快速主入口仍使用原生 54 维适配。
+其他权重与速度的组合以各模型包装脚本和契约为准。
 
 ## 轨迹与边界参数
 
@@ -46,6 +51,6 @@
 
 ## 相机与移交
 
-头部相机由用户确认是 435，IP 为 `192.168.35.35`；两台腕部是 305。当前相机链路由参考遥操仓库按序列号启动并发布 ROS `cam0/1/2`，OpenPI 订阅图像；本仓库没有这三台现场序列号。当前参考启动配置按三台 435Le 写成，腕部 305 的启动驱动仍需按实际子型号核对。详细接口、现场缺项和同事移交条件见仓库根目录 `部署.md`。
+头部相机由用户确认是 435，IP 为 `192.168.35.35`；两台腕部是 305。当前相机链路由参考遥操仓库按序列号启动并发布 ROS `cam0/1/2`，OpenPI 订阅图像；本仓库没有这三台现场序列号。当前参考启动配置按三台 435Le 写成，腕部 305 的启动驱动仍需按实际子型号核对。详细接口、现场缺项和同事移交条件见`docs/部署_2026-09-29.md`。
 
 只复制本仓库即可继续改离线代码；要运行部署还需参考遥操仓库、ROS/SDK 环境、控制器 overlay、相机配置和 checkpoint。公共运行层目前保留原工作站的绝对路径与 CPU 集，需要在另一台工作站部署前核对。

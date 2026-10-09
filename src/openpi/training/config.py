@@ -1256,6 +1256,39 @@ _CONFIGS.append(
     )
 )
 
+# Ablation against the 0924/30 Hz run: train the vision encoder as well,
+# while keeping the VLM LoRA, full action expert, data, and optimizer unchanged.
+_fr3_wuji_0924_30hz_vlm_lora_expert_full = _CONFIGS[-1]
+_CONFIGS.append(
+    dataclasses.replace(
+        _fr3_wuji_0924_30hz_vlm_lora_expert_full,
+        name="pi05_fr3_wuji_0924_30hz_vlm_lora_expert_full_vision_trainable",
+        freeze_filter=_fr3_wuji_20hz_vlm_lora_expert_full_model.get_freeze_filter(),
+    )
+)
+
+_fr3_wuji_0924_30hz_vision_trainable = _CONFIGS[-1]
+_FR3_WUJI_0924_A_OVERFIT_ROOT = pathlib.Path(__file__).resolve().parents[3] / "data/fr3_wuji/0924_A_ep93_96"
+_CONFIGS.append(
+    dataclasses.replace(
+        _fr3_wuji_0924_30hz_vision_trainable,
+        name="pi05_fr3_wuji_0924_A_ep93_96_30hz_vision_trainable_overfit",
+        data=dataclasses.replace(
+            _fr3_wuji_0924_30hz_vision_trainable.data,
+            repo_id="fr3_wuji/0924_A_ep93_96",
+            lerobot_datasets=(
+                LeRobotDatasetSpec(
+                    repo_id="fr3_wuji/0924_A_ep93_96",
+                    root=str(_FR3_WUJI_0924_A_OVERFIT_ROOT),
+                ),
+            ),
+        ),
+        num_train_steps=4_000,
+        save_interval=1_000,
+        keep_period=1_000,
+    )
+)
+
 # Joint training on all 65 previous episodes and the 60 curated new episodes.
 _CONFIGS.append(
     dataclasses.replace(
