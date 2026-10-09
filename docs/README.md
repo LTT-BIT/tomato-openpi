@@ -1,6 +1,6 @@
 # 文档索引
 
-2026-10-09 新增：[完整任务 C0 从零训练教程](训练教程_完整任务C0.md)，配套根目录 `pi05_fr3_wuji_fulltask_c0_train.py`，沿用 1002 参数但不使用分阶段子任务数据与指令。
+2026-10-09 新增：[完整任务 C0 简明训练教程](../training_baseline/训练教程_完整任务C0.md)，配套`training_baseline/pi05_fr3_wuji_fulltask_c0_train.py`，沿用 1002 参数但不使用分阶段子任务数据与指令。
 
 整理日期：2026-09-29
 
