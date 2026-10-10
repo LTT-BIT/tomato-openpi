@@ -1,6 +1,6 @@
 # 文档索引
 
-2026-10-09 更新：[完整任务 C0 v2 多人协作训练说明](../training_baseline/训练教程_完整任务C0.md)，配套 `training_baseline/pi05_fr3_wuji_fulltask_c0_train.py`。使用全部完整任务数据，无放回采样、独立随机种子和可审计续训；不划分训练/验证集，需使用完整配套仓库。
+2026-10-10 更新：[完整任务 C0 v3 全参数微调说明](../training_baseline/训练教程_完整任务C0.md)，配套 `training_baseline/pi05_fr3_wuji_fulltask_c0_train.py`。三套完整任务数据合并后使用非 LoRA 模型做全参数微调，保留无放回采样、独立随机种子和可审计续训；不划分训练/验证集，需使用完整配套仓库。
 
 整理日期：2026-09-29
 

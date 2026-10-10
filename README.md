@@ -8,7 +8,7 @@
 
 ## 完整任务训练基准
 
-新建完整任务实验使用 `training_baseline/pi05_fr3_wuji_fulltask_c0_train.py`，参见 [完整任务 C0 v2 多人协作训练说明](training_baseline/训练教程_完整任务C0.md)。该配置沿用 1002 模型与优化参数，使用全部准备好的完整轨迹，不划分训练/验证集；新增无放回洗牌、独立随机种子、采样审计和数据位置恢复。交付需包含配套仓库代码，历史 1002 子任务配置保留原采样行为。
+新建完整任务实验使用 `training_baseline/pi05_fr3_wuji_fulltask_c0_train.py`，参见 [完整任务 C0 v3 全参数微调说明](training_baseline/训练教程_完整任务C0.md)。当前版本使用非 LoRA 的 VLM 与 Action Expert，视觉编码器和所有模型参数均参与训练；合并 `0925/A`、`0925/B`、`1002_AB_190/full`，保留无放回洗牌、独立随机种子、采样审计和数据位置恢复，不划分训练/验证集。环境、缓存与 checkpoint 默认放在 `/home/zhiwei/pi05-runtime`。交付需包含配套仓库代码，历史 1002 子任务配置保留原采样行为。
 
 ## 快速开始
 

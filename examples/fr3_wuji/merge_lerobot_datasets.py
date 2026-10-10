@@ -122,7 +122,7 @@ def merge(sources: list[Path], output: Path, repo_id: str | None = None) -> None
     if schema.names != columns:
         raise ValueError("Parquet schema columns do not match meta/info.json")
 
-    staging.mkdir()
+    staging.mkdir(parents=True)
     episodes = []
     episode_stats = []
     mapping = []

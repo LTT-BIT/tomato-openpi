@@ -1,14 +1,16 @@
 # ruff: noqa: RUF002, RUF003
-"""完整任务 C0 v2：双 LoRA / 30 Hz / 54 维 / 20k / 可复现无放回采样。
+"""完整任务 C0 v3：全参数微调 / 30 Hz / 54 维 / 可复现无放回采样。
 
 使用方式见同目录的训练教程；在仓库根目录通过 python -m training_baseline.pi05_fr3_wuji_fulltask_c0_train 运行。
 这是可执行的训练配置，不是独立于仓库的模型实现；无需注册到 config.py。
-模型与优化参数沿用 1002，v2 显式启用独立随机流、采样审计及精确数据位置恢复。
+模型使用非 LoRA 变体，VLM、视觉编码器、Action Expert 和投影层全部训练。
 使用已准备好的全部数据和统计，不划分训练/验证集；启动时记录文件指纹，不改写数据。
 """
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import tyro
@@ -17,22 +19,26 @@ if TYPE_CHECKING:
     from openpi.training.config import TrainConfig
 
 
-CONFIG_NAME = "pi05_fr3_wuji_fulltask_c0_30hz"
-BASELINE_VERSION = "fulltask_c0_v2"
-DEFAULT_EXP_NAME = "tomato_fulltask_c0_v2_30hz_s42"
+CONFIG_NAME = "pi05_fr3_wuji_fulltask_fullft_30hz"
+BASELINE_VERSION = "fulltask_c0_v3_fullft"
+DEFAULT_EXP_NAME = "tomato_all_full_fullft_30hz_s42"
 # 指令示例，仅供参考；实际训练读取准备好的数据中的 task 文本。
 FULL_TASK_PROMPT = (
-    "Pick up a tomato truss with the right hand and hold it steady between both hands, "
-    "then pick a single cherry tomato from the truss with the left hand "
-    "and place the picked tomato into the plate on the left."
+    "Pick up a tomato truss with the right hand, then pick a cherry tomato "
+    "with the left hand and place it in the left basket."
 )
 
 
-# 填写已经准备好的数据与归一化路径；相对路径以仓库根目录为基准。
-DATASET_REPO_ID = "fr3_wuji/tomato_fulltask_v1"
-DATASET_ROOT = "./data/fr3_wuji/tomato_fulltask_v1"
-NORM_ASSETS_DIR = "./assets/fulltask_c0"
-NORM_ASSET_ID = "tomato_fulltask_v1_30hz"
+# 数据仍在共享工作区；环境、缓存、统计和权重默认使用容量充足的本机根盘。
+WORKSPACE_ROOT = Path(__file__).resolve().parents[3]
+RUNTIME_ROOT = Path(os.environ.get("PI05_RUNTIME_DIR", "/home/zhiwei/pi05-runtime"))
+DATASET_SOURCES = tuple(
+    WORKSPACE_ROOT / "data/harvest-tomato" / relative for relative in ("0925/A", "0925/B", "1002_AB_190/full")
+)
+DATASET_REPO_ID = "fr3_wuji/tomato_all_full_v1"
+DATASET_ROOT = str(RUNTIME_ROOT / "data/tomato_all_full_v1")
+NORM_ASSETS_DIR = str(RUNTIME_ROOT / "assets")
+NORM_ASSET_ID = "tomato_all_full_v1_30hz"
 
 
 def build_config(
@@ -43,6 +49,7 @@ def build_config(
     dataset_root: str = DATASET_ROOT,
     assets_dir: str = NORM_ASSETS_DIR,
     asset_id: str = NORM_ASSET_ID,
+    initial_params_path: str = "gs://openpi-assets/checkpoints/pi05_base/params",
 ) -> TrainConfig:
     """构造显式展开的统一 C0 配置。"""
     from openpi.models import gemma
@@ -58,19 +65,15 @@ def build_config(
         "dataset_root": dataset_root,
         "assets_dir": assets_dir,
         "asset_id": asset_id,
+        "initial_params_path": initial_params_path,
     }
     for key, value in values.items():
         if not isinstance(value, str) or not value.strip():
             raise ValueError(f"{key} 必须为非空字符串")
 
-    # 固定双 LoRA 实现, 避免同名 variant 被修改后基准静默漂移。
-    for variant, expected_rank in (("gemma_2b_lora", 16), ("gemma_300m_lora", 32)):
-        adapters = gemma.get_config(variant).lora_configs
-        if adapters is None or set(adapters) != {"attn", "ffn"}:
-            raise ValueError(f"{variant} 的 LoRA 模块与 1002 基线不一致")
-        for adapter in adapters.values():
-            if adapter.rank != expected_rank or adapter.alpha != float(expected_rank):
-                raise ValueError(f"{variant} 的 LoRA rank/alpha 与 1002 基线不一致")
+    for variant in ("gemma_2b", "gemma_300m"):
+        if gemma.get_config(variant).lora_configs:
+            raise ValueError(f"全参数微调要求 {variant} 不含 LoRA")
 
     model = pi0_config.Pi0Config(
         pi05=True,
@@ -79,8 +82,8 @@ def build_config(
         action_horizon=50,
         max_token_len=256,
         discrete_state_input=True,
-        paligemma_variant="gemma_2b_lora",
-        action_expert_variant="gemma_300m_lora",
+        paligemma_variant="gemma_2b",
+        action_expert_variant="gemma_300m",
         pytorch_compile_mode="max-autotune",
     )
 
@@ -90,7 +93,7 @@ def build_config(
         exp_name=exp_name,
         model=model,
         weight_loader=weight_loaders.PartialCheckpointWeightLoader(
-            params_path="gs://openpi-assets/checkpoints/pi05_base/params",
+            params_path=initial_params_path,
             skip_on_mismatch_regex=".*(action_in_proj|action_out_proj|state_proj).*",
         ),
         freeze_filter=model.get_freeze_filter(),
@@ -126,19 +129,28 @@ def build_config(
         sampling_mode="epoch_shuffle",
         batch_size=8,
         num_workers=8,
-        num_train_steps=20_000,
+        num_train_steps=60_153,
         fsdp_devices=1,
         log_interval=10,
         save_interval=2_000,
         keep_period=10_000,
         assets_base_dir="./assets",
-        checkpoint_base_dir="./checkpoints",
+        checkpoint_base_dir=str(RUNTIME_ROOT / "checkpoints"),
         resume=False,
         overwrite=False,
         wandb_enabled=True,
         pytorch_weight_path=None,
         pytorch_training_precision="bfloat16",
-        policy_metadata=None,
+        policy_metadata={
+            "baseline_version": BASELINE_VERSION,
+            "finetuning": "full_parameters",
+            "dataset_repo_id": repo_id,
+            "dataset_root": dataset_root,
+            "source_datasets": (
+                [str(source) for source in DATASET_SOURCES] if dataset_root == DATASET_ROOT else [dataset_root]
+            ),
+            "prompt": FULL_TASK_PROMPT,
+        },
     )
 
 

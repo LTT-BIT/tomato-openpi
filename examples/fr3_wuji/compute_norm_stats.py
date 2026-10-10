@@ -10,6 +10,7 @@ Example:
 """
 
 import json
+from pathlib import Path
 
 from lerobot.common.constants import HF_LEROBOT_HOME
 import numpy as np
@@ -38,9 +39,13 @@ def transform_vectors(state, actions, rows, horizon, transform):
 
 
 def main(config_name: str = "pi05_fr3_wuji_125ep", batch_size: int = 512):
+    compute(training_config.get_config(config_name), batch_size=batch_size)
+
+
+def compute(config: training_config.TrainConfig, *, batch_size: int = 512):
+    """Compute statistics for registered or standalone training configurations."""
     if batch_size <= 0:
         raise ValueError("batch_size must be positive")
-    config = training_config.get_config(config_name)
     if not isinstance(config.data, training_config.LeRobotFr3WujiDataConfig):
         raise ValueError("Only LeRobotFr3WujiDataConfig is supported")
     data_config = config.data.create(config.assets_dirs, config.model)
@@ -53,14 +58,18 @@ def main(config_name: str = "pi05_fr3_wuji_125ep", batch_size: int = 512):
         for t in data_config.data_transforms.inputs
     ):
         raise ValueError("Unsupported transforms: image-dependent transforms cannot use vector-only statistics")
-    output = config.assets_dirs / data_config.asset_id
+    if data_config.asset_id is None:
+        raise ValueError("A normalization asset_id is required")
+    output = Path(config.data.assets.assets_dir or config.assets_dirs) / data_config.asset_id
     if (output / "norm_stats.json").exists():
         raise FileExistsError(f"Norm stats already exist at {output}; refusing to overwrite")
     dataset_specs = data_config.lerobot_datasets or (training_config.LeRobotDatasetSpec(repo_id=data_config.repo_id),)
     sources = []
     for spec in dataset_specs:
-        root = HF_LEROBOT_HOME / spec.repo_id
+        root = Path(spec.root) if spec.root is not None else HF_LEROBOT_HOME / spec.repo_id
         info = json.loads((root / "meta/info.json").read_text())
+        if data_config.action_hz is not None and data_config.action_hz != info["fps"]:
+            raise ValueError("Vector-only statistics currently require action_hz to match source FPS")
         episodes = [json.loads(line) for line in (root / "meta/episodes.jsonl").read_text().splitlines() if line]
         sources.append((spec, root, info, episodes))
     transform = transforms.compose([*data_config.repack_transforms.inputs, *data_config.data_transforms.inputs])
@@ -118,7 +127,7 @@ def main(config_name: str = "pi05_fr3_wuji_125ep", batch_size: int = 512):
     (output / "norm_metadata.json").write_text(
         json.dumps(
             {
-                "config_name": config_name,
+                "config_name": config.name,
                 "repo_id": data_config.repo_id,
                 "datasets": [
                     {
