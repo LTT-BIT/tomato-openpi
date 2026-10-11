@@ -1,6 +1,6 @@
 """1002 派生的完整任务 C0 基准：双 LoRA / 30 Hz / 54 维 / 20k。
 
-使用方式见同目录的训练教程；在仓库根目录通过 python -m training_baseline.pi05_fr3_wuji_fulltask_c0_train 运行。
+使用方式见同目录的训练教程；在仓库根目录通过 python -m training_baseline.lora_base_v1.pi05_fr3_wuji_fulltask_c0_train 运行。
 这是可执行的训练配置，不是独立于仓库的模型实现；无需注册到 config.py。
 只替换数据、归一化资产和完整任务指令；模型与优化参数沿用 1002。
 使用已经准备好的完整任务数据和归一化统计，不执行额外的数据校验或改写。

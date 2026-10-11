@@ -1,7 +1,7 @@
 # ruff: noqa: RUF002, RUF003
 """完整任务 C0 v2：双 LoRA / 30 Hz / 54 维 / 20k / 可复现无放回采样。
 
-使用方式见同目录的训练教程；在仓库根目录通过 python -m training_baseline.pi05_fr3_wuji_fulltask_c0_train 运行。
+使用方式见同目录的训练教程；在仓库根目录通过 python -m training_baseline.lora_base_v2.pi05_fr3_wuji_fulltask_c0_train 运行。
 这是可执行的训练配置，不是独立于仓库的模型实现；无需注册到 config.py。
 模型与优化参数沿用 1002，v2 显式启用独立随机流、采样审计及精确数据位置恢复。
 使用已准备好的全部数据和统计，不划分训练/验证集；启动时记录文件指纹，不改写数据。
