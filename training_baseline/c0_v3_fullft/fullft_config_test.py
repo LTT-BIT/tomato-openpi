@@ -5,8 +5,8 @@ import jax
 import numpy as np
 
 from openpi.models import gemma
-from training_baseline.pi05_fr3_wuji_fulltask_c0_train import DATASET_SOURCES
-from training_baseline.pi05_fr3_wuji_fulltask_c0_train import build_config
+from training_baseline.c0_v3_fullft.pi05_fr3_wuji_fulltask_fullft_30hz_train import DATASET_SOURCES
+from training_baseline.c0_v3_fullft.pi05_fr3_wuji_fulltask_fullft_30hz_train import build_config
 
 
 def test_full_model_parameters_are_trainable():

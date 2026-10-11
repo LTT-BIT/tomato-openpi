@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 BASELINE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-cd "$BASELINE_DIR/.."
+cd "$BASELINE_DIR/../.."
 source "$BASELINE_DIR/env.sh"
 SYNC_OPTIONS=()
 if [[ -d "$PI05_RUNTIME_DIR/locked-wheels" ]]; then

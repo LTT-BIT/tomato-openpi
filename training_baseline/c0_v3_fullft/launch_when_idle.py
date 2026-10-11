@@ -63,7 +63,7 @@ def main() -> None:
     parser.add_argument("--interval", type=int, default=30)
     args = parser.parse_args()
     runtime = Path(os.environ.get("PI05_RUNTIME_DIR", "/home/zhiwei/pi05-runtime"))
-    repository = Path(__file__).resolve().parent.parent
+    repository = Path(__file__).resolve().parents[2]
     status = runtime / f"{args.experiment}-launch-status.json"
     output = runtime / f"{args.experiment}-launcher.log"
     checkpoint = runtime / "checkpoints/pi05_fr3_wuji_fulltask_fullft_30hz" / args.experiment
@@ -72,7 +72,9 @@ def main() -> None:
     while not destination.is_dir():
         if download_complete(runtime):
             subprocess.run(
-                [sys.executable, "-m", "training_baseline.verify_base_weights"], cwd=repository, check=True
+                [sys.executable, "-m", "training_baseline.c0_v3_fullft.verify_base_weights"],
+                cwd=repository,
+                check=True,
             )
             break
         if not any(process_alive(pid) for pid in args.download_pid):
@@ -94,7 +96,7 @@ def main() -> None:
     record(status, "launching", checkpoint=str(checkpoint), wandb_mode="offline")
     with output.open("w") as stream:
         process = subprocess.Popen(
-            ["bash", "training_baseline/train_all_full.sh"],
+            ["bash", "training_baseline/c0_v3_fullft/train_all_full.sh"],
             cwd=repository,
             env=environment,
             stdout=stream,
