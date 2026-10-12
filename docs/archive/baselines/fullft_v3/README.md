@@ -2,7 +2,7 @@
 
 # 全参数微调 v3
 
-本目录的 [训练配置](../../../../training_baseline/fullft_v3/pi05_fr3_wuji_fulltask_fullft_30hz_train.py) 对应已完成的实验 `tomato_all_full_fullft_30hz_s42_run01`。实际参数见 [参数与约束](本次实验_参数与约束.md)，操作步骤见 [训练教程](训练教程_完整任务C0.md)，换机及权重导出见 [交接文档](跨服务器交接_完整任务C0.md)。
+本目录的 训练配置（历史源码 `training_baseline/fullft_v3/pi05_fr3_wuji_fulltask_fullft_30hz_train.py`，见原仓库 Git 历史） 对应已完成的实验 `tomato_all_full_fullft_30hz_s42_run01`。实际参数见 [参数与约束](本次实验_参数与约束.md)，操作步骤见 [训练教程](训练教程_完整任务C0.md)，换机及权重导出见 [交接文档](跨服务器交接_完整任务C0.md)。
 
 `scripts/` 是本版本的辅助程序，不是额外训练配置：
 

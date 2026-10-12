@@ -79,7 +79,7 @@ def _inventory(root: pathlib.Path, files: list[pathlib.Path]) -> dict[str, str]:
 def _code_inventory() -> dict[str, str]:
     root = pathlib.Path(__file__).resolve().parents[3]
     files = [root / "uv.lock", root / "pyproject.toml"]
-    for directory in (root / "src/openpi", root / "training_baseline", root / "training_configs", root / "scripts"):
+    for directory in (root / "src/openpi", root / "training_configs", root / "scripts"):
         files.extend(
             path
             for path in directory.rglob("*.py")

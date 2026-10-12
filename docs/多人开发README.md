@@ -12,7 +12,7 @@
 | 本体维度、顺序或动作语义变化 | `training_configs/embodiments/` 及对应适配器 | 新规格版本，验证完整输入变换 |
 | 训练循环、采样或恢复改进 | `src/openpi/training/` | 独立 PR，说明影响并跑回归 |
 
-公共版本的 bug 修复可以修改原文件，但必须记录影响与 commit；版本名称不能替代源码身份。历史实验使用原 commit 和最终配置快照。`training_baseline/` 用于核对，不把新实验改写成旧实验。
+公共版本的 bug 修复可以修改原文件，但必须记录影响与 commit；版本名称不能替代源码身份。历史实验使用原 commit 和最终配置快照。参数回归使用 `tests/fixtures/baselines/` 的原基准静态快照，旧代码从 Git 历史查询，不把新实验改写成旧实验。
 
 ## 新建个人实验
 
@@ -86,7 +86,7 @@ source scripts/training_env.sh
 ```bash
 PYTHONNOUSERSITE=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 JAX_PLATFORMS=cpu \
   "$UV_PROJECT_ENVIRONMENT/bin/python" -m pytest \
-  tests training_baseline/fullft_v3/tests \
+  tests \
   src/openpi/training/sampling_test.py src/openpi/training/reproducibility_test.py \
   src/openpi/training/weight_loaders_test.py src/openpi/training/data_loader_test.py \
   src/openpi/policies/fr3_wuji_policy_test.py src/openpi/transforms_test.py \

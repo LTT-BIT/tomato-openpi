@@ -1,0 +1,180 @@
+{
+  "config_fields": {
+    "augmentation_seed": 42002,
+    "batch_size": 8,
+    "data": {
+      "fields": {
+        "action_hz": 30.0,
+        "action_sequence_keys": [
+          "action"
+        ],
+        "assets": {
+          "fields": {
+            "asset_id": "tomato_fulltask_v1_30hz",
+            "assets_dir": "<ASSETS_DIR>"
+          },
+          "type": "openpi.training.config.AssetsConfig"
+        },
+        "base_config": {
+          "fields": {
+            "action_hz": null,
+            "action_sequence_keys": [
+              "actions"
+            ],
+            "action_space": null,
+            "asset_id": null,
+            "data_transforms": {
+              "fields": {
+                "inputs": [],
+                "outputs": []
+              },
+              "type": "openpi.transforms.Group"
+            },
+            "datasets": [],
+            "lerobot_datasets": [],
+            "local_dataset_loader": null,
+            "local_dataset_video_keys": [],
+            "model_transforms": {
+              "fields": {
+                "inputs": [],
+                "outputs": []
+              },
+              "type": "openpi.transforms.Group"
+            },
+            "norm_stats": null,
+            "prompt_from_task": true,
+            "repack_transforms": {
+              "fields": {
+                "inputs": [],
+                "outputs": []
+              },
+              "type": "openpi.transforms.Group"
+            },
+            "repo_id": null,
+            "rlds_data_dir": null,
+            "use_quantile_norm": false,
+            "video_backend": null
+          },
+          "type": "openpi.training.config.DataConfig"
+        },
+        "extra_delta_transform": true,
+        "lerobot_datasets": [
+          {
+            "fields": {
+              "repo_id": "fr3_wuji/tomato_fulltask_v1",
+              "root": "<DATASET_ROOT>",
+              "weight": 1.0
+            },
+            "type": "openpi.training.config.LeRobotDatasetSpec"
+          }
+        ],
+        "repo_id": "fr3_wuji/tomato_fulltask_v1",
+        "video_backend": "pyav"
+      },
+      "type": "openpi.training.config.LeRobotFr3WujiDataConfig"
+    },
+    "data_seed": 42001,
+    "ema_decay": null,
+    "exp_name": "tomato_fulltask_c0_v2_30hz_s42",
+    "freeze_filter": {
+      "state": {
+        "predicates": [
+          {
+            "fields": {
+              "pattern": {
+                "flags": 32,
+                "pattern": ".*llm.*"
+              },
+              "sep": "/"
+            },
+            "type": "openpi.shared.nnx_utils.PathRegex"
+          },
+          {
+            "state": {
+              "predicate": {
+                "fields": {
+                  "pattern": {
+                    "flags": 32,
+                    "pattern": ".*lora.*"
+                  },
+                  "sep": "/"
+                },
+                "type": "openpi.shared.nnx_utils.PathRegex"
+              }
+            },
+            "type": "flax.nnx.filterlib.Not"
+          }
+        ]
+      },
+      "type": "flax.nnx.filterlib.All"
+    },
+    "fsdp_devices": 1,
+    "keep_period": 10000,
+    "log_interval": 10,
+    "lr_schedule": {
+      "fields": {
+        "decay_lr": 2.5e-06,
+        "decay_steps": 30000,
+        "peak_lr": 2.5e-05,
+        "warmup_steps": 1000
+      },
+      "type": "openpi.training.optimizer.CosineDecaySchedule"
+    },
+    "model": {
+      "fields": {
+        "action_dim": 54,
+        "action_expert_variant": "gemma_300m_lora",
+        "action_horizon": 50,
+        "discrete_state_input": true,
+        "dtype": "bfloat16",
+        "max_token_len": 256,
+        "paligemma_variant": "gemma_2b_lora",
+        "pi05": true,
+        "pytorch_compile_mode": "max-autotune"
+      },
+      "type": "openpi.models.pi0_config.Pi0Config"
+    },
+    "model_seed": 42,
+    "name": "pi05_fr3_wuji_fulltask_c0_30hz",
+    "num_train_steps": 20000,
+    "num_workers": 8,
+    "optimizer": {
+      "fields": {
+        "b1": 0.9,
+        "b2": 0.95,
+        "clip_gradient_norm": 1.0,
+        "eps": 1e-08,
+        "weight_decay": 1e-10
+      },
+      "type": "openpi.training.optimizer.AdamW"
+    },
+    "overwrite": false,
+    "project_name": "openpi",
+    "pytorch_training_precision": "bfloat16",
+    "pytorch_weight_path": null,
+    "resume": false,
+    "sampling_mode": "epoch_shuffle",
+    "save_interval": 2000,
+    "seed": 42,
+    "wandb_enabled": true,
+    "weight_loader": {
+      "fields": {
+        "params_path": "gs://openpi-assets/checkpoints/pi05_base/params",
+        "skip_on_mismatch_regex": ".*(action_in_proj|action_out_proj|state_proj).*"
+      },
+      "type": "openpi.training.weight_loaders.PartialCheckpointWeightLoader"
+    }
+  },
+  "excluded_fields": [
+    "assets_base_dir",
+    "checkpoint_base_dir",
+    "policy_metadata"
+  ],
+  "path_placeholders": {
+    "assets_dir": "<ASSETS_DIR>",
+    "dataset_root": "<DATASET_ROOT>"
+  },
+  "source_commit": "8007c1e3ae9a4d7ab811088c811bf2c1fd2a4045",
+  "source_path": "training_baseline/lora_base_v2/pi05_fr3_wuji_fulltask_c0_train.py",
+  "source_sha256": "c5f60a4aec25b530bb926e7610d1bd4e11ed2556326094a1c289e42a6f04a827"
+}

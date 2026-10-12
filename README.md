@@ -14,7 +14,7 @@
 | `scripts/run_training.py` | 统一 JAX 启动、检查、日志与并发保护 | 公共启动功能 |
 | `examples/` | 训练数据转换、合并、统计工具 | 准备训练输入 |
 | `packages/openpi-client/` | 训练所需的图像工具子集 | 共享图像处理 |
-| `training_baseline/` | 原始 v1/v2/v3 配置及历史训练辅助程序 | 历史核对 |
+| `tests/fixtures/baselines/` | 从原 v2/v3 配置生成的参数快照及来源指纹 | 基准回归核对 |
 | `docs/archive/` | 历史教程及实验记录 | 查询历史事实 |
 
 现有部署目录、服务端、机器人执行器、客户端运行时、部署打包脚本、仿真运行环境及硬件子模块已移出本分支。`src/openpi/policies/` 保留训练需要的数据适配器，模型动作采样方法保留用于模型接口与测试。
@@ -47,6 +47,8 @@ CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_tr
 ## 协作与历史
 
 阅读 [多人开发 README](docs/多人开发README.md)。个人调参放在个人实验文件，公共 recipe 显式版本管理；使用短期开发分支，经 PR 合入主线。训练固定 commit 和工作目录，避免运行期间修改源码。
+
+活动配置统一放在 `training_configs/`。旧 `training_baseline/` 目录已删除，旧代码通过原分支与 Git 历史查询；历史文档在归档目录，参数回归使用静态快照，不再导入旧训练入口。
 
 [基准迁移记录](docs/基准迁移与归档.md) 说明参数对应、历史实验状态和导出范围；[归档索引](docs/archive/README.md) 提供旧教程、实际参数和交接记录。
 

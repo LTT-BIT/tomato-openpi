@@ -1,18 +1,18 @@
 {
   "source_commit": "8007c1e3ae9a4d7ab811088c811bf2c1fd2a4045",
-  "notes": "增加归档提示并修复仍保留文件的相对链接；历史实验事实与命令正文保留。",
+  "notes": "增加归档提示并修复仍保留文件的相对链接；已删除旧源码的链接转为历史路径说明，原代码通过源 commit 查询。",
   "documents": [
     {
       "original_path": "training_baseline/fullft_v3/README.md",
       "archived_path": "docs/archive/baselines/fullft_v3/README.md",
       "original_sha256": "91279623e8870f2b782628cbd6f2d137023286ce108d8f12e05eab40453003f2",
-      "archived_sha256": "398ecba4fdf48cd2754f86f53912400c9c14f65d2fbf01b5cf9c9741f66f8a90"
+      "archived_sha256": "8f88796ae2c0dfbdf7b85c78f7a58ff10078fd52739ea15654b46f5ea65e4d13"
     },
     {
       "original_path": "training_baseline/fullft_v3/本次实验_参数与约束.md",
       "archived_path": "docs/archive/baselines/fullft_v3/本次实验_参数与约束.md",
       "original_sha256": "62e925dc1ba8ac8458088bf641185ad8887f41620da1b138cb84a0f8ecc4e158",
-      "archived_sha256": "95e5874f08cecce79cda9c26c0e134c6abbbc322a28db2d5ad9ba7d958d2fd7f"
+      "archived_sha256": "db8bd7d4962224e787376ca75c556544a01aa4d59e00e6e16d0130478cc5715c"
     },
     {
       "original_path": "training_baseline/fullft_v3/训练教程_完整任务C0.md",
@@ -42,7 +42,7 @@
       "original_path": "training_baseline/lora_base_v2/README.md",
       "archived_path": "docs/archive/baselines/lora_base_v2/README.md",
       "original_sha256": "521fd529b82afd6d425e1a0e3de7c962d5e2567b0a6451e3bd39b5405bd080c1",
-      "archived_sha256": "31f3849adb6e4c1ac2eaac3e74e5501b337b8a3935e24d3e91a0a8a4b4764ef9"
+      "archived_sha256": "4c055e496a660d466ab505b732a97e0331d25f6612ca749b7f2f8abebc8e9205"
     },
     {
       "original_path": "training_baseline/lora_base_v2/训练教程_完整任务C0.md",
@@ -66,13 +66,13 @@
       "original_path": "docs/README.md",
       "archived_path": "docs/archive/legacy/README.md",
       "original_sha256": "9605c135ca7590075237110a0e1299365d28648a9a8d32daec548e25c2a1d306",
-      "archived_sha256": "2fca6ba823280f31d58fc85c39ad18523a9ff2e5c3fe881efad5bfc439049153"
+      "archived_sha256": "26fa7fe949d046353ebb996572e24f6e881856ee1058f1723f157ad01fb7774c"
     },
     {
       "original_path": "README.md",
       "archived_path": "docs/archive/legacy/README_root_before_training_only.md",
       "original_sha256": "0f9f26196e9cbbcaaf4e6d4761d926b74e42a02d9a930de9f30a9689f377e4e0",
-      "archived_sha256": "ff76c56db3ddd6d6c01b6c6eb271aade0adb26a96f4f1ba3605222b1938f636d"
+      "archived_sha256": "8cb27a4c234d0b63abbacca818cfa0d95f6ceca523254629a4377b8703aeeb6c"
     },
     {
       "original_path": "docs/README_原版_2026-09-29.md",

@@ -24,7 +24,7 @@ jobs:
           uv run --no-sync ruff format --check training_configs tests scripts/run_training.py scripts/compute_experiment_norm.py
       - name: Verify baselines, data contracts and exact resume
         run: |
-          uv run --no-sync python -m pytest tests training_baseline/fullft_v3/tests \
+          uv run --no-sync python -m pytest tests \
             src/openpi/training/sampling_test.py src/openpi/training/reproducibility_test.py \
             src/openpi/training/weight_loaders_test.py src/openpi/training/data_loader_test.py \
             src/openpi/policies/fr3_wuji_policy_test.py src/openpi/transforms_test.py \
