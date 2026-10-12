@@ -616,7 +616,7 @@ class TrainConfig:
     # If true, will enable wandb logging.
     wandb_enabled: bool = True
 
-    # Used to pass metadata to the policy server.
+    # Training provenance; field name retained for checkpoint/config compatibility.
     policy_metadata: dict[str, Any] | None = None
 
     # If the value is greater than 1, FSDP will be enabled and shard across number of specified devices; overall
@@ -659,88 +659,6 @@ class TrainConfig:
 
 # Use `get_config` if you need to get a config by name in your code.
 _CONFIGS = [
-    #
-    # Inference Aloha configs.
-    #
-    TrainConfig(
-        name="pi0_aloha",
-        model=pi0_config.Pi0Config(),
-        data=LeRobotAlohaDataConfig(
-            assets=AssetsConfig(asset_id="trossen"),
-        ),
-        policy_metadata={"reset_pose": [0, -1.5, 1.5, 0, 0, 0]},
-    ),
-    TrainConfig(
-        name="pi05_aloha",
-        model=pi0_config.Pi0Config(pi05=True),
-        data=LeRobotAlohaDataConfig(
-            assets=AssetsConfig(asset_id="trossen"),
-        ),
-        policy_metadata={"reset_pose": [0, -1.5, 1.5, 0, 0, 0]},
-    ),
-    TrainConfig(
-        name="pi0_aloha_towel",
-        model=pi0_config.Pi0Config(),
-        data=LeRobotAlohaDataConfig(
-            assets=AssetsConfig(asset_id="trossen"),
-            default_prompt="fold the towel",
-        ),
-        policy_metadata={"reset_pose": [0, -1.5, 1.5, 0, 0, 0]},
-    ),
-    TrainConfig(
-        name="pi0_aloha_tupperware",
-        model=pi0_config.Pi0Config(),
-        data=LeRobotAlohaDataConfig(
-            assets=AssetsConfig(asset_id="trossen"),
-            default_prompt="open the tupperware and put the food on the plate",
-        ),
-        policy_metadata={"reset_pose": [0, -1.5, 1.5, 0, 0, 0]},
-    ),
-    #
-    # Inference DROID configs.
-    #
-    TrainConfig(
-        name="pi0_droid",
-        model=pi0_config.Pi0Config(action_horizon=10),
-        data=SimpleDataConfig(
-            assets=AssetsConfig(asset_id="droid"),
-            data_transforms=lambda model: _transforms.Group(
-                inputs=[droid_policy.DroidInputs(model_type=ModelType.PI0)],
-                outputs=[droid_policy.DroidOutputs()],
-            ),
-            base_config=DataConfig(
-                prompt_from_task=True,
-            ),
-        ),
-    ),
-    TrainConfig(
-        name="pi0_fast_droid",
-        model=pi0_fast.Pi0FASTConfig(action_dim=8, action_horizon=10),
-        data=SimpleDataConfig(
-            assets=AssetsConfig(asset_id="droid"),
-            data_transforms=lambda model: _transforms.Group(
-                inputs=[droid_policy.DroidInputs(model_type=ModelType.PI0_FAST)],
-                outputs=[droid_policy.DroidOutputs()],
-            ),
-            base_config=DataConfig(
-                prompt_from_task=True,
-            ),
-        ),
-    ),
-    TrainConfig(
-        name="pi05_droid",
-        model=pi0_config.Pi0Config(action_horizon=15, pi05=True),
-        data=SimpleDataConfig(
-            assets=AssetsConfig(asset_id="droid"),
-            data_transforms=lambda model: _transforms.Group(
-                inputs=[droid_policy.DroidInputs(model_type=ModelType.PI05)],
-                outputs=[droid_policy.DroidOutputs()],
-            ),
-            base_config=DataConfig(
-                prompt_from_task=True,
-            ),
-        ),
-    ),
     #
     # Fine-tuning Libero configs.
     #

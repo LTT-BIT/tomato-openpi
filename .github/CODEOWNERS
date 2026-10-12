@@ -1,16 +1,4 @@
-# The CODEOWNERS file defines individuals or teams that are automatically requested for
-# review when someone opens a pull request that modifies certain code. When a draft pull
-# request is marked as ready for review, code owners are automatically notified.
-#
-# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
-#
-# This is a comment.
-# Each line is a file pattern followed by one or more owners.
-
-# Global owners.
-* @jimmyt857 @Michael-Equi @kvablack
-
-src/openpi/models/ @kvablack
-src/openpi/training/ @kvablack
-
-scripts/ @jimmyt857 @kvablack
+# Fill in your own team handles when creating the new repository.
+# /src/openpi/training/ @your-training-team
+# /training_configs/recipes/ @your-training-team
+# /training_configs/experiments/alice/ @alice

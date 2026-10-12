@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Source from the repository root; override PI05_RUNTIME_DIR per user or server.
+export PI05_RUNTIME_DIR="${PI05_RUNTIME_DIR:-$PWD/.runtime}"
+export UV_PROJECT_ENVIRONMENT="${UV_PROJECT_ENVIRONMENT:-$PI05_RUNTIME_DIR/venv}"
+export UV_CACHE_DIR="${UV_CACHE_DIR:-$PI05_RUNTIME_DIR/uv-cache}"
+export OPENPI_DATA_HOME="${OPENPI_DATA_HOME:-$PI05_RUNTIME_DIR/openpi-cache}"
+export HF_HOME="${HF_HOME:-$PI05_RUNTIME_DIR/huggingface}"
+export WANDB_DIR="${WANDB_DIR:-$PI05_RUNTIME_DIR}"
+export TMPDIR="${TMPDIR:-$PI05_RUNTIME_DIR/tmp}"
+export PYTHONNOUSERSITE=1
+export GIT_LFS_SKIP_SMUDGE=1
+export XLA_PYTHON_CLIENT_PREALLOCATE="${XLA_PYTHON_CLIENT_PREALLOCATE:-false}"
+mkdir -p "$TMPDIR" "$WANDB_DIR"

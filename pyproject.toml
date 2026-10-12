@@ -1,7 +1,7 @@
 [project]
 name = "openpi"
 version = "0.1.0"
-description = "Physical Intelligence open source repo"
+description = "Pi05 training workspace with versioned multi-embodiment experiment configurations"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
@@ -13,7 +13,6 @@ dependencies = [
     "flatbuffers>=24.3.25",
     "flax==0.10.2",
     "fsspec[gcs]>=2024.6.0",
-    "gym-aloha>=0.1.1",
     "imageio>=2.36.1",
     "jax[cuda12]==0.5.3",
     "jaxtyping==0.2.36",
@@ -142,6 +141,9 @@ known-third-party = ["wandb"]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/openpi", "training_configs", "training_baseline", "scripts", "examples"]
+
 [tool.pytest.ini_options]
 markers = ["manual: should be run manually."]
-testpaths = ["src", "scripts", "packages"]
+testpaths = ["src", "scripts", "packages", "tests", "training_baseline/fullft_v3/tests"]

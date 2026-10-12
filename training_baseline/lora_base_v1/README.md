@@ -1,3 +1,5 @@
-# C0 v1 历史配置
+# 历史基准文档
 
-本目录的配置取自 Git `6ba2cf3`，教程保留当时的训练约束，并将模块入口更新为 `training_baseline.lora_base_v1.pi05_fr3_wuji_fulltask_c0_train`。默认数据和统计路径是占位示例，须先填写实际值。
+本文件已归档至 [README.md](../../docs/archive/baselines/lora_base_v1/README.md)。
+
+当前训练入口与配置管理见 [训练说明](../../docs/训练使用说明.md)；历史配置保留用于核对，新增实验请使用 `training_configs/experiments/`。

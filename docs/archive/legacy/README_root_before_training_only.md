@@ -1,0 +1,132 @@
+> 历史归档：原路径、命令和实验状态属于整理前仓库；当前操作见 [训练使用说明](../../训练使用说明.md)。
+
+# OpenPI FR3 与 Wuji 部署
+
+更新日期：2026-09-29
+
+本仓库用于 FR3 双臂与 Wuji 双手的 pi05 番茄采摘任务，包含模型微调、推理服务和机器人执行入口。基于 Physical Intelligence 的 OpenPI 项目，当前操作入口以本页和根目录的使用说明为准。
+
+**完整操作说明：[FR3_Wuji_pi05部署使用说明.docx](FR3_Wuji_pi05部署使用说明.docx)**。文档包括快速指南、各模型启动命令、参数说明、state/action 映射和当前软件阈值。
+
+## 完整任务训练基准
+
+新建完整任务实验使用 `training_baseline/fullft_v3/pi05_fr3_wuji_fulltask_fullft_30hz_train.py`，参见 [完整任务 C0 v3 全参数微调说明](../baselines/fullft_v3/训练教程_完整任务C0.md)。旧版配置和本次训练脚本的目录索引见 [training_baseline/README.md](../../../training_baseline/README.md)。当前版本使用非 LoRA 的 VLM 与 Action Expert，视觉编码器和所有模型参数均参与训练；合并 `0925/A`、`0925/B`、`1002_AB_190/full`，保留无放回洗牌、独立随机种子、采样审计和数据位置恢复，不划分训练/验证集。环境、缓存与 checkpoint 默认放在 `/home/zhiwei/pi05-runtime`。交付需包含配套仓库代码，历史 1002 子任务配置保留原采样行为。
+
+## 快速开始
+
+当前使用效果最好、建议优先使用 **70A_30B** 权重，模型为 **54 维、30 Hz、每次预测 50 步**。权重步骤目录为：
+
+```text
+checkpoints/pi05_fr3_wuji_weighted/tomato_lora_0918_a70_b30/19999
+```
+
+部署提供**慢、中、快三种执行速度**，另有独立 **Home 归位**。先启动模型服务，等待 `ready` / `Warmup OK`，再启动一个机器人控制端。以下示例针对已配置好的本机环境；迁移机器时需按使用说明核对路径、控制器与设备配置。
+
+### 终端一 启动模型服务
+
+```bash
+cd /home/descfly/lpy/openpi
+CKPT="$PWD/checkpoints/pi05_fr3_wuji_weighted/tomato_lora_0918_a70_b30/19999"
+bash deploy/fr3_wuji/run.sh -m experiments.weight_motion_eval.oneshot.policy_server \
+  --checkpoint "$CKPT" --port 8001
+```
+
+### 终端二 选择一种执行速度
+
+先在第二个终端设置同一权重路径：
+
+```bash
+cd /home/descfly/lpy/openpi
+CKPT="$PWD/checkpoints/pi05_fr3_wuji_weighted/tomato_lora_0918_a70_b30/19999"
+```
+
+以下命令包含 `--execute`，会驱动真机；只选择其中一条运行。
+
+**慢速**：默认至少按模型时间轴的 2.5 倍时长播放。
+
+```bash
+bash deploy/fr3_wuji_slow/run.sh \
+  --checkpoint "$CKPT" --uri ws://127.0.0.1:8001 \
+  --execute --supervised-trial --continuous --rounds 50 --replan-steps 20 \
+  --minimum-time-scale 2.5 --start-cameras --finish-policy disable
+```
+
+**中速**：显式使用 `--model 54`；默认约 25 秒后在下一段边界切慢速。全程中速可将 `--slow-after-seconds` 改为 `0`。
+
+```bash
+bash deploy/fr3_wuji_medium/run.sh --model 54 \
+  --checkpoint "$CKPT" --uri ws://127.0.0.1:8001 \
+  --execute --supervised-trial --continuous --rounds 50 --replan-steps 20 \
+  --minimum-time-scale 0.625 --slow-after-seconds 25 \
+  --start-cameras --finish-policy disable
+```
+
+**快速**：采用 30 Hz 模型时间轴和 RTG 异步衔接。
+
+```bash
+bash deploy/fr3_wuji_fast/run.sh \
+  --checkpoint "$CKPT" --uri ws://127.0.0.1:8001 \
+  --execute --supervised-trial --broker-mode rtg --rounds 50 \
+  --start-cameras --finish-policy disable
+```
+
+三种入口均以 100 Hz 下发设备指令，实际运行耗时还受轨迹约束和推理衔接影响。慢/中速的 `--rounds 50 --replan-steps 20` 表示运行 50 轮，每轮预测 50 步、使用前 20 步；快速入口不使用 `--continuous` 或 `--replan-steps`。
+
+### Home 归位
+
+在项目根目录执行：
+
+```bash
+# 只检查配置
+bash deploy/fr3_wuji_home/run.sh --check
+
+# 真机归位：先双臂，再双手，完成后释放退出
+bash deploy/fr3_wuji_home/home.sh
+```
+
+Home 不需要模型服务或相机，不要与其他控制端同时运行。
+
+## State 和 action 映射
+
+硬件接口统一为 54 维，关节位置单位为 rad。索引从 0 开始，区间左闭右开。
+
+| 部件 | 硬件 state / action 索引 | 维度 |
+| --- | --- | --- |
+| 左臂 | `[0:7]` | 7 |
+| 左手 | `[7:27]` | 20 |
+| 右臂 | `[27:34]` | 7 |
+| 右手 | `[34:54]` | 20 |
+
+输入 `observation/state` 为 `(54,)`，服务端输出 `actions` 为 `(50, 54)`，表示未来 50 步的绝对关节目标。70A_30B 服务已经完成反归一化与臂部 delta 还原，控制端不要再次叠加当前 state。
+
+| 模型 | 模型内部 state 顺序 | 模型内部 action 顺序 |
+| --- | --- | --- |
+| 70A_30B / 原生 54 维 | 左臂→左手→右臂→右手 | 左臂→左手→右臂→右手 |
+| 30000 / 30000v2，64 维 | 左臂→右臂→左手→右手→补零 10 维 | 左臂→右臂→左手→右手→末 10 维 |
+| 25000 / 25000-single，64 维 | 左臂→左手→右臂→右手→补零 10 维 | 左臂→右臂→左手→右手→末 10 维 |
+
+64 维模型由配套 server 补零、裁剪并重排，最终也返回硬件顺序的 `(50, 54)` 绝对关节目标。不同微调方式的模型可能需要让 **Codex 单独编写或调整 server 适配**，核对模型结构、输入输出维度、关节顺序、权重自带归一化统计、delta/绝对动作语义和模型频率。
+
+切换权重时，先停止控制端和旧模型服务，再按模型身份同步切换服务入口、`--model`、`--checkpoint` 和端口。54/64 维及 30/20/15 Hz 的完整对应关系见使用说明和[模型适配说明](deploy/fr3_wuji_models/README.md)。
+
+## 目录与文档
+
+根目录的两份主要使用文档为本 README 和 Word 使用说明。历史说明与训练记录集中在 `docs/`；各代码模块的配套 README 保留在所属目录。
+
+| 目录或文件 | 内容 |
+| --- | --- |
+| [FR3_Wuji_pi05部署使用说明.docx](FR3_Wuji_pi05部署使用说明.docx) | 当前部署操作说明，优先阅读 |
+| [docs/README.md](README.md) | 带整理日期的文档索引与历史资料 |
+| `deploy/` | 模型服务、慢/中/快执行入口和 Home 归位 |
+| `src/openpi/` | 模型、策略、数据变换与训练配置 |
+| `scripts/` | 训练、数据准备与辅助工具 |
+| `examples/` | 数据转换及其他机器人平台示例 |
+| `checkpoints/` | 本地模型权重，使用完整步骤目录中的 `params/` 和 `assets/` |
+| `experiments/weight_motion_eval/` | 推理、动作评估与部署相关实现 |
+| `logs/` | 本机运行记录 |
+
+训练与数据转换可从[番茄任务数据训练与部署记录](docs/Codex_番茄任务数据训练与部署记录.md)开始。通用安装、基础模型、其他机器人示例与 PyTorch 使用方式保留在[原 README 归档](README_原版_2026-09-29.md)。历史资料中的机器路径和阶段性状态可能已变化，部署命令优先参考当前使用说明。
+
+## 许可证
+
+项目代码许可证见 [LICENSE](../../../LICENSE)，Gemma 相关条款见 [LICENSE_GEMMA.txt](../../../LICENSE_GEMMA.txt)。贡献流程见[贡献指南归档](CONTRIBUTING_2026-09-29.md)。

@@ -57,6 +57,11 @@ def _json_bytes(value: Any) -> bytes:
     return json.dumps(value, default=_json_default, sort_keys=True, ensure_ascii=False, indent=2).encode("utf-8")
 
 
+def serialize_config(value: Any) -> bytes:
+    """Serialize an effective configuration without building model/tokenizer assets."""
+    return _json_bytes(value)
+
+
 def file_sha256(path: pathlib.Path) -> str:
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
@@ -73,9 +78,13 @@ def _inventory(root: pathlib.Path, files: list[pathlib.Path]) -> dict[str, str]:
 
 def _code_inventory() -> dict[str, str]:
     root = pathlib.Path(__file__).resolve().parents[3]
-    files = [root / "scripts/train.py", root / "uv.lock", root / "pyproject.toml"]
-    for directory in (root / "src/openpi", root / "training_baseline"):
-        files.extend(path for path in directory.rglob("*.py") if not path.name.endswith("_test.py"))
+    files = [root / "uv.lock", root / "pyproject.toml"]
+    for directory in (root / "src/openpi", root / "training_baseline", root / "training_configs", root / "scripts"):
+        files.extend(
+            path
+            for path in directory.rglob("*.py")
+            if not path.name.endswith("_test.py") and not path.name.startswith("test_")
+        )
     return _inventory(root, files)
 
 

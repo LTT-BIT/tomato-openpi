@@ -5,6 +5,11 @@ data/
 wandb/
 replay_checks/
 logs/
+.runtime/
+exports/
+*.safetensors
+*.ckpt
+.training-locks/
 .deployment/
 
 # Byte-compiled / optimized / DLL files
