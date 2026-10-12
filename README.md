@@ -8,9 +8,9 @@
 | --- | --- | --- |
 | `src/openpi/` | 共享模型、训练循环、采样、恢复审计及数据变换 | 公共训练功能开发 |
 | `training_configs/embodiments/` | 本体规格及训练数据适配 | 新本体、关节顺序或相机映射 |
-| `training_configs/datasets/` | 数据版本、来源、本机路径、统计引用和 prompt 来源；不存放实际数据 | 发布新数据版本 |
+| `training_configs/common.py` | Dataset 公共结构及运行目录辅助函数 | 修改公共配置结构 |
 | `training_configs/recipes/` | 带版本的公共 LoRA/全参训练方案 | 发布团队新方案 |
-| `training_configs/experiments/<负责人>/` | 具体组合与个人参数覆盖 | 独立实验与调参 |
+| `training_configs/experiments/<负责人>/` | 本次本体、方案、数据、路径、统计与参数覆盖 | 独立实验与调参 |
 | `scripts/run_training.py` | 统一 JAX 启动、检查、日志与并发保护 | 公共启动功能 |
 | `examples/` | 训练数据转换、合并、统计工具 | 准备训练输入 |
 | `packages/openpi-client/` | 训练所需的图像工具子集 | 共享图像处理 |
@@ -42,13 +42,15 @@ CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_tr
   --exp-name alice_tomato_lora_v1_s42_run01 --wandb-mode online
 ```
 
-默认运行目录为 `.runtime/`，实际数据、统计和初始权重需要自行准备。完整任务数据配置的位置是占位示例；合并完整任务数据配置保留历史数据身份和统计审计哈希，不自动复制旧服务器文件。两套数据分别为 `tomato_fr3_fulltask_v1` 和 `tomato_fr3_all_full_v1`，按数据内容区分，不按训练方案编号。完整步骤见 [训练使用说明](docs/训练使用说明.md)。
+默认运行目录为 `.runtime/`，实际数据、统计和初始权重需要自行准备。数据设置直接写在各自实验文件的 `build_dataset()` 中；LoRA 基准的数据位置是占位示例，全参基准保留合并完整任务数据的历史身份和统计审计哈希。完整步骤见 [训练使用说明](docs/训练使用说明.md)。
 
 ## 协作与历史
 
 阅读 [多人开发 README](docs/多人开发README.md)。个人调参放在个人实验文件，公共 recipe 显式版本管理；使用短期开发分支，经 PR 合入主线。训练固定 commit 和工作目录，避免运行期间修改源码。
 
 活动配置统一放在 `training_configs/`。旧 `training_baseline/` 目录已删除，旧代码通过原分支与 Git 历史查询；历史文档在归档目录，参数回归使用静态快照，不再导入旧训练入口。
+
+`experiments/baselines/` 是两套公共基准示例，`experiments/template/` 是独立个人模板；后续每人建立自己的目录。启动程序只加载指定模块并调用其 `build_config()`，不会运行目录中的其他实验。具体工作流程见多人开发 README。
 
 [基准迁移记录](docs/基准迁移与归档.md) 说明参数对应、历史实验状态和导出范围；[归档索引](docs/archive/README.md) 提供旧教程、实际参数和交接记录。
 

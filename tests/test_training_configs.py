@@ -13,7 +13,7 @@ from openpi.training.reproducibility import serialize_config
 from scripts.run_training import load_experiment
 from scripts.run_training import resolve_experiment
 from scripts.run_training import validate_config
-from training_configs.datasets.tomato_fr3_fulltask_v1 import build_dataset
+from training_configs.experiments.baselines.tomato_fr3_lora_v1 import build_dataset
 from training_configs.recipes.pi05_lora_v1 import build_config as build_lora
 
 BASE = "training_configs.experiments.baselines."
@@ -94,9 +94,15 @@ def test_fullft_selected_data_and_reproducibility_contract(monkeypatch):
     assert config.wandb_enabled
 
 
-def test_personal_override_does_not_mutate_baseline():
+def test_personal_override_does_not_mutate_baseline(monkeypatch):
     baseline = load_experiment(BASE + "tomato_fr3_lora_v1")
+    monkeypatch.setenv("PI05_DATASET_ROOT", "/alice/data/tomato_v1")
+    monkeypatch.setenv("PI05_ASSETS_DIR", "/alice/assets")
     personal = load_experiment("training_configs.experiments.template.tomato_lora_lr1e5")
+    assert personal.data.lerobot_datasets[0].root == "/alice/data/tomato_v1"
+    assert personal.data.assets.assets_dir == "/alice/assets"
+    assert baseline.data.lerobot_datasets[0].root != personal.data.lerobot_datasets[0].root
+    assert load_experiment(BASE + "tomato_fr3_lora_v1").data == baseline.data
     assert personal.lr_schedule.peak_lr == 1e-5
     assert baseline.lr_schedule.peak_lr == 2.5e-5
     assert personal.exp_name != baseline.exp_name

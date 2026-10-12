@@ -8,13 +8,33 @@
 | --- | --- | --- |
 | 个人学习率、batch、步数、seed | `training_configs/experiments/<负责人>/` | 独立文件，通过 dataclasses.replace 覆盖 |
 | 团队训练方案升级 | `training_configs/recipes/` | 建立新 recipe 版本，旧实验继续引用旧版 |
-| 数据及统计变化 | `training_configs/datasets/` | 新版本、新 asset_id，记录来源与统计哈希 |
+| 数据、路径及统计变化 | 同一个个人实验文件的 `build_dataset()` | 新数据建立新版本、新 asset_id，记录来源与统计哈希 |
 | 本体维度、顺序或动作语义变化 | `training_configs/embodiments/` 及对应适配器 | 新规格版本，验证完整输入变换 |
 | 训练循环、采样或恢复改进 | `src/openpi/training/` | 独立 PR，说明影响并跑回归 |
 
-本训练仓库的各类版本独立从 v1 起步：当前公共方案是 pi05_lora_v1 与 pi05_fullft_v1；数据文件按内容命名为 tomato_fr3_fulltask_v1 和 tomato_fr3_all_full_v1。数据版本不跟随 LoRA/全参方案编号，同一数据可被两种方案复用。历史 v2/v3 只表示来源，保留在溯源记录与归档中。
+本训练仓库的各类版本独立从 v1 起步：当前公共方案是 pi05_lora_v1 与 pi05_fullft_v1。数据版本在每个实验文件的 Dataset 中定义，不跟随方案编号，同一数据可被两种方案复用。历史 v2/v3 只表示来源，保留在溯源记录与归档中。
 
 公共版本的 bug 修复可以修改原文件，但必须记录影响与 commit；版本名称不能替代源码身份。历史实验使用原 commit 和最终配置快照。参数回归使用 `tests/fixtures/baselines/` 的原基准静态快照，旧代码从 Git 历史查询，不把新实验改写成旧实验。
+
+## experiments 怎样工作
+
+experiments 是完整实验配置的集合，不是训练结果目录。子目录只是组织文件的约定，启动器不扫描所有目录，也不把它们当作先后阶段。
+
+```text
+training_configs/
+  common.py                      # 统一 Dataset 结构，无具体数据设置
+  embodiments/                   # 公共本体规格与适配
+  recipes/                       # 公共 LoRA v1、全参 v1 方案
+  experiments/
+    baselines/                   # 两套可运行的公共参考示例
+    template/                    # 可复制的独立个人实验模板
+    alice/                       # Alice 自己的实验，按需创建
+    bob/                         # Bob 自己的实验，按需创建
+```
+
+baselines 用于核对公共基准；template 用于复制，已包含自己的数据设置，不依赖基准实验文件。alice/bob 是负责人目录的示例，当前不会自动创建。目录名不是程序要求，只有完整 Python 模块路径需要唯一。
+
+例如指定 `training_configs.experiments.alice.tomato_lora_lr1e5`，启动器就导入 `experiments/alice/tomato_lora_lr1e5.py`，调用它的 build_config()。这个函数先构造本次 Dataset，再选择本体和 recipe，覆盖本次参数，返回完整 TrainConfig；启动器随后应用 CLI 覆盖、检查输入、记录配置并调用共享训练循环。一次命令只执行一个所选实验，其他文件不会一起训练。dry-run 只打印配置，check 只验证输入。
 
 ## 新建个人实验
 
@@ -29,19 +49,38 @@ cp training_configs/experiments/template/tomato_lora_lr1e5.py \
   training_configs/experiments/alice/tomato_lora_lr1e5.py
 ```
 
-修改实验名、owner 和 purpose，按需要覆盖参数：
+在复制后的同一个文件里修改数据、路径、统计身份、prompt 示例、实验名、owner 和 purpose。模板已提供完整结构，核心组合方式如下：
 
 ```python
 from dataclasses import replace
-from training_configs.experiments.baselines.tomato_fr3_lora_v1 import build_config as build_baseline
+import os
+from training_configs.common import Dataset, runtime_root
+from training_configs.embodiments.fr3_wuji import FR3_WUJI
+from training_configs.recipes.pi05_lora_v1 import build_config as build_recipe
 
 def build_config():
-    baseline = build_baseline()
-    return replace(
-        baseline,
+    runtime = runtime_root()
+    root = os.environ.get("PI05_DATASET_ROOT", str(runtime / "data/alice_tomato_v1"))
+    dataset = Dataset(
+        version="alice_tomato_v1_30hz",
+        repo_id="fr3_wuji/alice_tomato_v1",
+        root=root,
+        assets_dir=os.environ.get("PI05_ASSETS_DIR", str(runtime / "assets")),
+        asset_id="alice_tomato_v1_30hz",
+        sources=(root,),
+        prompt_example="Pick a tomato and place it in the basket.",
+        # 完成统计后补填实际 expected_norm_sha256。
+    )
+    config = build_recipe(
+        name="pi05_fr3_wuji_alice_lora_v1_30hz",
         exp_name="alice_tomato_lora_lr1e5_s42_run01",
-        lr_schedule=replace(baseline.lr_schedule, peak_lr=1e-5),
-        policy_metadata={**baseline.policy_metadata, "owner": "alice", "purpose": "compare_learning_rate"},
+        embodiment=FR3_WUJI,
+        dataset=dataset,
+    )
+    return replace(
+        config,
+        lr_schedule=replace(config.lr_schedule, peak_lr=1e-5),
+        policy_metadata={**config.policy_metadata, "owner": "alice", "purpose": "compare_learning_rate"},
     )
 ```
 
@@ -52,7 +91,7 @@ def build_config():
   training_configs.experiments.alice.tomato_lora_lr1e5 --dry-run
 ```
 
-个人实验可以直接引用 recipe、embodiment 和 dataset，避免依赖他人的实验文件。模板引用的是公共基准组合。
+个人实验只需引用公共 recipe、embodiment 和 Dataset 结构，不导入他人的实验文件。配置中的 prompt_example 用于记录，真实训练从数据 task 读取英文指令。
 
 换数据时创建新的 Dataset 和版本，更新 repo_id、来源、prompt 示例、asset_id 与统计哈希；不能仅将新数据放到旧数据路径。同一内容的路径迁移可使用环境变量。
 
@@ -79,7 +118,7 @@ export PI05_RUNTIME_DIR=/你的本地磁盘/pi05-alice-runtime
 source scripts/training_env.sh
 ```
 
-本地路径、数据、权重、日志、W&B 和密钥不提交 Git。配置写稳定身份与环境变量入口，换机器修改环境变量。
+数据、权重、日志、W&B 和密钥不提交 Git。个人实验文件保存数据身份与默认路径，本机绝对路径建议通过个人环境变量覆盖，换电脑不用修改公共方案。同一内容只更换路径不需要新数据版本。
 
 ## 验证与提交
 

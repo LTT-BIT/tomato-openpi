@@ -8,8 +8,8 @@ from openpi.models import pi0_config
 from openpi.training import config as cfg
 from openpi.training import optimizer
 from openpi.training import weight_loaders
-from training_configs.datasets.common import Dataset
-from training_configs.datasets.common import runtime_root
+from training_configs.common import Dataset
+from training_configs.common import runtime_root
 
 
 class Embodiment(Protocol):

@@ -26,7 +26,7 @@ import tyro
 from openpi.shared import normalize
 from openpi.training import config as cfg
 from openpi.training import reproducibility
-from training_configs.datasets.common import runtime_root
+from training_configs.common import runtime_root
 
 
 def load_experiment(module_name: str) -> cfg.TrainConfig:
