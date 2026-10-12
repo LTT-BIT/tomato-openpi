@@ -1,75 +1,141 @@
-# Pi05 训练仓库
+# Tomato OpenPI 训练仓库
 
-集中维护 π0.5 训练、数据准备、本体适配和实验配置。不同本体共用训练框架，在同一主线维护各自配置；新增实验无需修改中央注册表。当前公共方案分别从 **LoRA v1** 和 **全参 v1** 开始编号，历史来源为原仓库 v2 双 LoRA 与 v3 全参数微调。
+基于 OpenPI 的 π0.5 机器人训练框架，支持 LoRA 和全参数微调。不同本体共用模型与训练循环，通过本体适配器和独立实验配置选择数据、动作维度及训练参数。标准训练入口使用 JAX。
 
-## 目录与修改位置
+## 1. 获取代码与安装环境
 
-| 目录 | 内容 | 何时修改 |
-| --- | --- | --- |
-| `src/openpi/` | 共享模型、训练循环、采样、恢复审计及数据变换 | 公共训练功能开发 |
-| `training_configs/embodiments/` | 本体规格及训练数据适配 | 新本体、关节顺序或相机映射 |
-| `training_configs/common.py` | Dataset 公共结构及运行目录辅助函数 | 修改公共配置结构 |
-| `training_configs/recipes/` | 带版本的公共 LoRA/全参训练方案 | 发布团队新方案 |
-| `training_configs/experiments/<负责人>/` | 本次本体、方案、数据、路径、统计与参数覆盖 | 独立实验与调参 |
-| `scripts/run_training.py` | 统一 JAX 启动、检查、日志与并发保护 | 公共启动功能 |
-| `examples/` | 训练数据转换、合并、统计工具 | 准备训练输入 |
-| `packages/openpi-client/` | 训练所需的图像工具子集 | 共享图像处理 |
-| `tests/fixtures/baselines/` | 从原 v2/v3 配置生成的参数快照及来源指纹 | 基准回归核对 |
-| `docs/archive/` | 历史教程及实验记录 | 查询历史事实 |
-
-现有部署目录、服务端、机器人执行器、客户端运行时、部署打包脚本、仿真运行环境及硬件子模块已移出本分支。`src/openpi/policies/` 保留训练需要的数据适配器，模型动作采样方法保留用于模型接口与测试。
-
-## 快速开始
-
-安装 uv，在仓库根目录执行：
+准备 Linux 训练机、Git、uv，以及支持当前 JAX CUDA 12 / PyTorch CUDA 12.8 依赖的 NVIDIA 驱动。安装脚本默认使用 Python 3.11；正式训练所需 GPU 数量和显存取决于方案、batch 和数据。
 
 ```bash
-export PI05_RUNTIME_DIR=/你的本地磁盘/pi05-runtime
+git clone --branch main \
+  ssh://git@gitlab.litchibot.top:2222/fruit-train/harvesting/tomato-openpi.git
+cd tomato-openpi
+
+# 每位训练者使用自己的运行目录，按本机磁盘位置修改。
+export PI05_RUNTIME_DIR=/你的本地磁盘/tomato-openpi-runtime
 bash scripts/setup_training_env.sh
 source scripts/training_env.sh
-
-# 展开配置，无需数据、权重或 GPU。
-"$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.run_training \
-  training_configs.experiments.baselines.tomato_fr3_lora_v1 --dry-run
-
-# 已准备好数据与对应统计后检查。
-"$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.run_training \
-  training_configs.experiments.baselines.tomato_fr3_lora_v1 --check
-
-# 按团队约定分配 GPU，新训练使用独立实验名。
-CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_training \
-  training_configs.experiments.baselines.tomato_fr3_lora_v1 \
-  --exp-name alice_tomato_lora_v1_s42_run01 --wandb-mode online
 ```
 
-默认运行目录为 `.runtime/`，实际数据、统计和初始权重需要自行准备。数据设置直接写在各自实验文件的 `build_dataset()` 中；LoRA 基准的数据位置是占位示例，全参基准保留合并完整任务数据的历史身份和统计审计哈希。完整步骤见 [训练使用说明](docs/训练使用说明.md)。
+安装脚本按 `uv.lock` 安装依赖，并打印 JAX、PyTorch 和设备信息。虚拟环境、缓存、日志及 checkpoint 默认放在运行目录；不设置 `PI05_RUNTIME_DIR` 时使用仓库内 `.runtime/`。新终端需要重新设置运行目录并执行 `source scripts/training_env.sh`。
 
-## 协作与历史
-
-阅读 [多人开发 README](docs/多人开发README.md)。个人调参放在个人实验文件，公共 recipe 显式版本管理；使用短期开发分支，经 PR 合入主线。训练固定 commit 和工作目录，避免运行期间修改源码。
-
-活动配置统一放在 `training_configs/`。旧 `training_baseline/` 目录已删除，旧代码通过原分支与 Git 历史查询；历史文档在归档目录，参数回归使用静态快照，不再导入旧训练入口。
-
-`experiments/baselines/` 是两套公共基准示例，`experiments/template/` 是独立个人模板；后续每人建立自己的目录。启动程序只加载指定模块并调用其 `build_config()`，不会运行目录中的其他实验。具体工作流程见多人开发 README。
-
-[基准迁移记录](docs/基准迁移与归档.md) 说明参数对应、历史实验状态和导出范围；[归档索引](docs/archive/README.md) 提供旧教程、实际参数和交接记录。
-
-本轮完成仓库整理与代码验证，未重跑完整真实数据训练。历史 v3 的训练完成不代表新仓库已重新训练。PyTorch 训练实现保留，新分层配置标准入口为 JAX，不承诺两种后端的采样及恢复行为一致。
-
-## 导出到新仓库
-
-导出已提交的训练代码快照，排除本机数据、权重、缓存和旧 Git 历史：
+可以先展开参考配置，确认环境和入口可用，无需准备数据或权重：
 
 ```bash
-git archive --format=tar.gz --output=/tmp/pi05-training-only.tar.gz HEAD
-mkdir /你的新目录/pi05-training
-tar -xzf /tmp/pi05-training-only.tar.gz -C /你的新目录/pi05-training
-cd /你的新目录/pi05-training
-git init -b main
-git add .
-git commit -m "初始化 Pi05 训练仓库"
+"$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.run_training \
+  training_configs.experiments.baselines.tomato_fr3_lora_v1 --dry-run
 ```
 
-直接推送当前分支到新 remote 会保留旧提交历史，其中仍包含过去的部署代码；希望新仓库从纯训练快照开始时采用上述方式。原 Pi05 分支和本机未跟踪的数据、权重仍保留。
+## 2. 新建自己的实验
 
-本项目基于 Physical Intelligence OpenPI，保留 [LICENSE](LICENSE) 与 [Gemma 许可](LICENSE_GEMMA.txt)。
+每次实验使用独立配置文件和实验名。以下用 `alice` 作示例，替换成自己的负责人名称：
+
+```bash
+git switch -c exp/alice-tomato-lora
+mkdir -p training_configs/experiments/alice
+touch training_configs/experiments/alice/__init__.py
+cp training_configs/experiments/template/tomato_lora_lr1e5.py \
+  training_configs/experiments/alice/tomato_lora_lr1e5.py
+```
+
+编辑复制后的实验文件：
+
+| 修改位置 | 设置内容 |
+| --- | --- |
+| `build_dataset()` | 数据版本、`repo_id`、实际数据路径、原始来源、统计目录和 `asset_id` |
+| `PROMPT` | 本次任务的英文指令示例；训练实际读取数据中的 task |
+| recipe 导入 | `pi05_lora_v1` 或 `pi05_fullft_v1` |
+| `embodiment` | 本体规格和数据适配器；当前提供 FR3/Wuji |
+| `build_config()` | 配置名、唯一 `exp_name`、负责人及实验目的 |
+| `dataclasses.replace` 覆盖 | 学习率、batch、训练步数、seed 等本次实验参数 |
+
+模板支持用环境变量覆盖本机数据和统计位置：
+
+```bash
+export PI05_DATASET_ROOT=/实际路径/你的数据集
+export PI05_ASSETS_DIR=/实际路径/你的统计父目录
+export EXPERIMENT=training_configs.experiments.alice.tomato_lora_lr1e5
+```
+
+数据身份应与实际内容一致：更换来源、筛选规则或变换时更新数据版本、`repo_id`、`asset_id` 和统计；同一数据仅搬迁目录时修改路径即可。个人实验的具体数据设置都在同一个文件中。
+
+## 3. 准备数据、统计与初始权重
+
+数据集和权重需要单独准备。本体适配器决定输入格式；当前 FR3/Wuji 使用本地 LeRobot v2.1 数据，包含 `meta/`、`data/`、`videos/`，30 Hz、54 维 action、54 或 108 维原始 state，以及 cam0/cam1/cam2 图像。真实英文指令来自 `meta/tasks.jsonl`。转换、验证和合并工具位于 `examples/fr3_wuji/`。
+
+先完成实验文件的数据设置，再计算新数据的归一化统计：
+
+```bash
+"$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.compute_experiment_norm \
+  "$EXPERIMENT" --stats-batch-size 512
+```
+
+统计保存在 `<assets_dir>/<asset_id>/norm_stats.json`，已有统计拒绝覆盖。将文件 SHA-256 填入实验 Dataset 的 `expected_norm_sha256`；复用统计时确认对应的数据、动作表示和 horizon 一致。当前统计入口支持 FR3/Wuji，其他本体需补充适配。
+
+公共方案默认加载 `gs://openpi-assets/checkpoints/pi05_base/params`，首次使用需要下载并缓存初始权重；离线训练前须准备好权重及 tokenizer。数据格式、统计校验和权重设置详见 [训练使用说明](docs/训练使用说明.md)。
+
+## 4. 检查与启动训练
+
+```bash
+# 展开最终配置，检查实验名、路径和训练参数。
+"$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.run_training \
+  "$EXPERIMENT" --dry-run
+
+# 检查已准备的数据元信息和归一化统计。
+"$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.run_training \
+  "$EXPERIMENT" --check
+
+# 首次在线使用 W&B 时登录。
+"$UV_PROJECT_ENVIRONMENT/bin/wandb" login
+
+# 按服务器分配选择 GPU；batch 必须能被可见设备数整除。
+CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_training \
+  "$EXPERIMENT" --wandb-mode online
+```
+
+启动器只导入所选实验模块，调用它的 `build_config()`，然后执行输入检查和共享训练流程。可临时使用 `--batch-size 4`、`--num-train-steps 20000` 等 CLI 覆盖；正式实验将参数写入自己的配置并提交。
+
+没有网络时显式改用 `--wandb-mode offline`，恢复联网后同步：
+
+```bash
+"$UV_PROJECT_ENVIRONMENT/bin/wandb" sync \
+  "$PI05_RUNTIME_DIR/wandb/offline-run-实际编号"
+```
+
+## 5. 查看结果与恢复训练
+
+| 输出 | 默认位置 |
+| --- | --- |
+| 本地终端日志及运行清单 | `$PI05_RUNTIME_DIR/logs/<配置名>/<实验名>/` |
+| checkpoint 与恢复审计 | `$PI05_RUNTIME_DIR/checkpoints/<配置名>/<实验名>/` |
+| W&B 运行记录 | `$PI05_RUNTIME_DIR/wandb/` |
+
+运行清单记录 Git commit、最终配置、数据来源、实际英文 prompt、统计摘要和运行结果。已有实验拒绝覆盖，重复训练使用新的 `exp_name`。
+
+恢复未完成的同一实验时，使用原 commit、配置、数据、统计和完整 checkpoint：
+
+```bash
+CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_training \
+  "$EXPERIMENT" --resume --wandb-mode online
+```
+
+训练期间保持 checkout 不变；修改预算、数据或源码后建立新实验。恢复条件及离线日志同步见 [训练使用说明](docs/训练使用说明.md)。
+
+## 目录与团队协作
+
+| 路径 | 用途 |
+| --- | --- |
+| `training_configs/experiments/baselines/` | LoRA v1、全参 v1 公共参考配置 |
+| `training_configs/experiments/template/` | 可复制的个人实验模板 |
+| `training_configs/experiments/<负责人>/` | 个人数据设置与实验参数 |
+| `training_configs/recipes/` | 带版本的公共训练方案 |
+| `training_configs/embodiments/` | 本体规格与数据适配 |
+| `src/openpi/` | 模型、训练循环及共享数据变换 |
+| `scripts/` | 环境、统计计算和统一训练入口 |
+| `examples/fr3_wuji/` | FR3/Wuji 训练数据工具 |
+
+个人实验通过短期分支和合并请求进入 `main`；公共 recipe 或训练功能变更单独评审。每位训练者使用独立 checkout、GPU 分配和输出目录，训练固定已提交的 commit。数据集、权重、日志及密钥不提交 Git。
+
+完整配置示例、版本规则和协作流程见 [多人开发 README](docs/多人开发README.md)。
+
+本项目基于 Physical Intelligence OpenPI，遵循 [LICENSE](LICENSE) 与 [Gemma 许可](LICENSE_GEMMA.txt)。
