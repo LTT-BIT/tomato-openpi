@@ -57,7 +57,7 @@ def validate_config(config: cfg.TrainConfig) -> None:
     if not config.wandb_enabled:
         raise ValueError("Training must log to W&B; use --wandb-mode offline without network")
     if config.sampling_mode != "epoch_shuffle" or len(config.data.lerobot_datasets) != 1:
-        raise ValueError("The v2/v3 workflow requires epoch_shuffle and one explicit local dataset")
+        raise ValueError("The v1 baseline workflow requires epoch_shuffle and one explicit local dataset")
     if config.batch_size <= 0 or config.num_train_steps <= 0 or config.num_workers < 0 or config.fsdp_devices <= 0:
         raise ValueError("batch_size, num_train_steps, fsdp_devices must be positive; num_workers must be nonnegative")
     if any(seed is None for seed in (config.model_seed, config.data_seed, config.augmentation_seed)):

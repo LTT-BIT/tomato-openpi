@@ -1,10 +1,10 @@
-"""Published C0 v3 recipe: all model parameters trainable, 60,153 optimization steps."""
+"""Published full-parameter v1 recipe (derived from historical C0 v3): all model parameters trainable, 60,153 optimization steps."""
 
 from openpi.models import gemma
 from training_configs.recipes.common import Recipe
 
 RECIPE = Recipe(
-    version="pi05_fullft_v3",
+    version="pi05_fullft_v1",
     source_baseline="fulltask_c0_v3_fullft",
     paligemma_variant="gemma_2b",
     action_expert_variant="gemma_300m",

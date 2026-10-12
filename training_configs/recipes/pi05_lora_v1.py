@@ -1,10 +1,10 @@
-"""Published C0 v2 recipe: VLM rank 16, Expert rank 32, vision/projections trainable."""
+"""Published LoRA v1 recipe (derived from historical C0 v2): VLM rank 16, Expert rank 32, vision/projections trainable."""
 
 from openpi.models import gemma
 from training_configs.recipes.common import Recipe
 
 RECIPE = Recipe(
-    version="pi05_lora_v2",
+    version="pi05_lora_v1",
     source_baseline="fulltask_c0_v2",
     paligemma_variant="gemma_2b_lora",
     action_expert_variant="gemma_300m_lora",

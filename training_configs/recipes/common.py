@@ -94,7 +94,8 @@ class Recipe:
             config,
             policy_metadata={
                 "recipe_version": self.version,
-                "baseline_version": self.source_baseline,
+                "baseline_version": self.version,
+                "source_baseline": self.source_baseline,
                 "embodiment_version": embodiment.version,
                 "physical_action_dim": embodiment.action_dim,
                 "raw_state_dims": list(embodiment.raw_state_dims),

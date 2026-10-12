@@ -15,7 +15,7 @@ from scripts import run_training
 @pytest.fixture
 def prepared(tmp_path, monkeypatch):
     monkeypatch.setenv("PI05_RUNTIME_DIR", str(tmp_path / "runtime"))
-    config = run_training.load_experiment("training_configs.experiments.baselines.tomato_fr3_lora_v2")
+    config = run_training.load_experiment("training_configs.experiments.baselines.tomato_fr3_lora_v1")
     root = Path(config.data.lerobot_datasets[0].root)
     (root / "meta").mkdir(parents=True)
     (root / "data").mkdir()

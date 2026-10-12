@@ -1,4 +1,4 @@
-"""Historical C0 v2 data identity: actual data must be prepared separately."""
+"""Tomato full-task dataset v1: actual data must be prepared separately."""
 
 import os
 
@@ -14,12 +14,12 @@ PROMPT = (
 
 def build_dataset() -> Dataset:
     runtime = runtime_root()
-    root = os.environ.get("PI05_V2_DATASET_ROOT", str(runtime / "data/tomato_fulltask_v1"))
+    root = os.environ.get("PI05_FULLTASK_DATASET_ROOT", str(runtime / "data/tomato_fulltask_v1"))
     return Dataset(
         version="tomato_fulltask_v1_30hz",
         repo_id="fr3_wuji/tomato_fulltask_v1",
         root=root,
-        assets_dir=os.environ.get("PI05_V2_ASSETS_DIR", str(runtime / "assets/fulltask_c0")),
+        assets_dir=os.environ.get("PI05_FULLTASK_ASSETS_DIR", str(runtime / "assets/fulltask_c0")),
         asset_id="tomato_fulltask_v1_30hz",
         sources=(root,),
         prompt_example=PROMPT,

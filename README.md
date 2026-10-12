@@ -1,6 +1,6 @@
 # Pi05 训练仓库
 
-集中维护 π0.5 训练、数据准备、本体适配和实验配置。不同本体共用训练框架，在同一主线维护各自配置；新增实验无需修改中央注册表。当前公共基准来自原仓库的 **v2 双 LoRA** 和 **v3 全参数微调**。
+集中维护 π0.5 训练、数据准备、本体适配和实验配置。不同本体共用训练框架，在同一主线维护各自配置；新增实验无需修改中央注册表。当前公共方案分别从 **LoRA v1** 和 **全参 v1** 开始编号，历史来源为原仓库 v2 双 LoRA 与 v3 全参数微调。
 
 ## 目录与修改位置
 
@@ -8,8 +8,8 @@
 | --- | --- | --- |
 | `src/openpi/` | 共享模型、训练循环、采样、恢复审计及数据变换 | 公共训练功能开发 |
 | `training_configs/embodiments/` | 本体规格及训练数据适配 | 新本体、关节顺序或相机映射 |
-| `training_configs/datasets/` | 数据版本、来源、统计引用和 prompt 来源 | 发布新数据版本 |
-| `training_configs/recipes/` | 带版本的公共 v2/v3 训练方案 | 发布团队新方案 |
+| `training_configs/datasets/` | 数据版本、来源、本机路径、统计引用和 prompt 来源；不存放实际数据 | 发布新数据版本 |
+| `training_configs/recipes/` | 带版本的公共 LoRA/全参训练方案 | 发布团队新方案 |
 | `training_configs/experiments/<负责人>/` | 具体组合与个人参数覆盖 | 独立实验与调参 |
 | `scripts/run_training.py` | 统一 JAX 启动、检查、日志与并发保护 | 公共启动功能 |
 | `examples/` | 训练数据转换、合并、统计工具 | 准备训练输入 |
@@ -30,19 +30,19 @@ source scripts/training_env.sh
 
 # 展开配置，无需数据、权重或 GPU。
 "$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.run_training \
-  training_configs.experiments.baselines.tomato_fr3_lora_v2 --dry-run
+  training_configs.experiments.baselines.tomato_fr3_lora_v1 --dry-run
 
 # 已准备好数据与对应统计后检查。
 "$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.run_training \
-  training_configs.experiments.baselines.tomato_fr3_lora_v2 --check
+  training_configs.experiments.baselines.tomato_fr3_lora_v1 --check
 
 # 按团队约定分配 GPU，新训练使用独立实验名。
 CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_training \
-  training_configs.experiments.baselines.tomato_fr3_lora_v2 \
-  --exp-name alice_tomato_lora_v2_s42_run01 --wandb-mode online
+  training_configs.experiments.baselines.tomato_fr3_lora_v1 \
+  --exp-name alice_tomato_lora_v1_s42_run01 --wandb-mode online
 ```
 
-默认运行目录为 `.runtime/`，实际数据、统计和初始权重需要自行准备。v2 的数据位置是占位示例；v3 保留历史数据身份和统计审计哈希，不自动复制旧服务器文件。完整步骤见 [训练使用说明](docs/训练使用说明.md)。
+默认运行目录为 `.runtime/`，实际数据、统计和初始权重需要自行准备。完整任务数据配置的位置是占位示例；合并完整任务数据配置保留历史数据身份和统计审计哈希，不自动复制旧服务器文件。两套数据分别为 `tomato_fr3_fulltask_v1` 和 `tomato_fr3_all_full_v1`，按数据内容区分，不按训练方案编号。完整步骤见 [训练使用说明](docs/训练使用说明.md)。
 
 ## 协作与历史
 

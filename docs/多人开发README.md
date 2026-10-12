@@ -12,6 +12,8 @@
 | 本体维度、顺序或动作语义变化 | `training_configs/embodiments/` 及对应适配器 | 新规格版本，验证完整输入变换 |
 | 训练循环、采样或恢复改进 | `src/openpi/training/` | 独立 PR，说明影响并跑回归 |
 
+本训练仓库的各类版本独立从 v1 起步：当前公共方案是 pi05_lora_v1 与 pi05_fullft_v1；数据文件按内容命名为 tomato_fr3_fulltask_v1 和 tomato_fr3_all_full_v1。数据版本不跟随 LoRA/全参方案编号，同一数据可被两种方案复用。历史 v2/v3 只表示来源，保留在溯源记录与归档中。
+
 公共版本的 bug 修复可以修改原文件，但必须记录影响与 commit；版本名称不能替代源码身份。历史实验使用原 commit 和最终配置快照。参数回归使用 `tests/fixtures/baselines/` 的原基准静态快照，旧代码从 Git 历史查询，不把新实验改写成旧实验。
 
 ## 新建个人实验
@@ -31,7 +33,7 @@ cp training_configs/experiments/template/tomato_lora_lr1e5.py \
 
 ```python
 from dataclasses import replace
-from training_configs.experiments.baselines.tomato_fr3_lora_v2 import build_config as build_baseline
+from training_configs.experiments.baselines.tomato_fr3_lora_v1 import build_config as build_baseline
 
 def build_config():
     baseline = build_baseline()

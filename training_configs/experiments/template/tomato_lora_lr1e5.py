@@ -2,7 +2,7 @@
 
 from dataclasses import replace
 
-from training_configs.experiments.baselines.tomato_fr3_lora_v2 import build_config as build_baseline
+from training_configs.experiments.baselines.tomato_fr3_lora_v1 import build_config as build_baseline
 
 
 def build_config():

@@ -1,4 +1,4 @@
-"""Historical C0 v3 merged data identity, with the recorded normalization digest."""
+"""Tomato merged full-task dataset v1, with the recorded normalization digest."""
 
 import os
 from pathlib import Path
@@ -19,8 +19,8 @@ def build_dataset() -> Dataset:
     return Dataset(
         version="tomato_all_full_v1_30hz",
         repo_id="fr3_wuji/tomato_all_full_v1",
-        root=os.environ.get("PI05_V3_DATASET_ROOT", str(runtime / "data/tomato_all_full_v1")),
-        assets_dir=os.environ.get("PI05_V3_ASSETS_DIR", str(runtime / "assets")),
+        root=os.environ.get("PI05_ALL_FULL_DATASET_ROOT", str(runtime / "data/tomato_all_full_v1")),
+        assets_dir=os.environ.get("PI05_ALL_FULL_ASSETS_DIR", str(runtime / "assets")),
         asset_id="tomato_all_full_v1_30hz",
         sources=tuple(str((source_root / item).resolve()) for item in ("0925/A", "0925/B", "1002_AB_190/full")),
         prompt_example=PROMPT,
