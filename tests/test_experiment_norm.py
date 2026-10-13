@@ -67,6 +67,9 @@ def test_statistics_save_constant_joints_and_bind_to_vectors(tmp_path, monkeypat
     directory = Path(config.data.assets.assets_dir) / config.data.assets.asset_id
     stats = normalize.load(directory)
     recorded = json.loads((directory / "norm_metadata.json").read_text())
+    assert not list(directory.parent.glob(f".{directory.name}.building-*"))
+    with pytest.raises(FileExistsError, match="target already exists"):
+        compute_norm_stats.compute(config, batch_size=3)
     assert recorded["vector_counts"] == {"state": 4, "actions": 12}
     assert recorded["constant_dimensions"]["state"] == list(range(0 if all_constant else 1, 54))
     assert recorded["constant_dimensions"]["actions"] == list(range(0 if all_constant else 1, 54))
@@ -81,3 +84,22 @@ def test_statistics_save_constant_joints_and_bind_to_vectors(tmp_path, monkeypat
     pq.write_table(pa.table({"observation.state": state.tolist(), "action": actions.tolist()}), parquet)
     with pytest.raises(ValueError, match="data or vector transforms differ"):
         run_training.preflight(config)
+    retry_config = replace(
+        config, data=replace(config.data, assets=replace(config.data.assets, asset_id="retry_stats"))
+    )
+    retry_directory = directory.parent / "retry_stats"
+    original_write = Path.write_text
+
+    def fail_metadata(path, *args, **kwargs):
+        if path.name == "norm_metadata.json":
+            raise OSError("simulated metadata write failure")
+        return original_write(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "write_text", fail_metadata)
+    with pytest.raises(OSError, match="metadata write failure"):
+        compute_norm_stats.compute(retry_config, batch_size=3)
+    assert not retry_directory.exists()
+    assert not list(directory.parent.glob(".retry_stats.building-*"))
+    monkeypatch.setattr(Path, "write_text", original_write)
+    compute_norm_stats.compute(retry_config, batch_size=3)
+    assert run_training.preflight(retry_config)["norm_provenance"] == "verified"

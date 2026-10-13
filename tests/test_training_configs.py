@@ -138,3 +138,24 @@ def test_cli_cannot_change_model_without_regenerating_freeze_filter():
 def test_reject_unsafe_experiment_settings(change):
     with pytest.raises(ValueError, match="identifier|W&B|overwriting"):
         validate_config(replace(load_experiment(BASE + "tomato_fr3_lora_v1"), **change))
+
+
+@pytest.mark.parametrize("field", ["log_interval", "save_interval", "keep_period"])
+@pytest.mark.parametrize("value", [0, -1, 0.5, True])
+def test_reject_invalid_training_intervals_before_startup(field, value):
+    with pytest.raises(ValueError, match=f"{field} must be"):
+        replace(load_experiment(BASE + "tomato_fr3_lora_v1"), **{field: value})
+
+
+def test_cli_rejects_zero_save_interval_without_reading_data():
+    from scripts.run_training import main
+
+    with pytest.raises(ValueError, match="save_interval must be"):
+        main([BASE + "tomato_fr3_lora_v1", "--save-interval", "0", "--dry-run"])
+
+
+@pytest.mark.parametrize("value", [0, -1, 1.5, True])
+def test_invalid_horizon_is_rejected_before_model_or_data_loading(value):
+    config = load_experiment(BASE + "tomato_fr3_lora_v1")
+    with pytest.raises(ValueError, match="action_horizon must be"):
+        replace(config, model=replace(config.model, action_horizon=value))

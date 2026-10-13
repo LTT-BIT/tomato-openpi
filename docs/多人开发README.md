@@ -99,6 +99,8 @@ def build_config():
 
 新统计同时保存 norm_stats.json 和 norm_metadata.json，提交实验配置前执行 --check，确认统计与数据文件、输入变换及 horizon 对应。复制统计需保留两个文件；学习率、batch 等训练参数不影响统计复用。常量关节允许生成零方差统计，其维度记录在元数据中。个人新实验不要沿用历史基准的 allow_legacy_norm_stats=True；旧格式兼容必须人工确认来源并固定摘要，具体条件见训练使用说明。
 
+统计计算按目标目录加锁，并在完整写好两个文件后一次发布，已有目录不覆盖；不要预先创建 asset_id 最终目录。多人的不同数据/变换使用各自统计身份，共享盘跨主机仍按团队调度安排计算。log_interval/save_interval/action_horizon 使用正整数，keep_period 使用 None 或正整数。
+
 新本体实现 `recipes/common.py` 的 Embodiment 接口，提供 action_dim、raw_state_dims、action_hz、camera_keys 与 data_config()。当前启动流程要求单个显式本地 LeRobot 数据集，data_config() 需提供对应数据字段；适配器负责关节顺序、单位和动作表示。为归一化绑定检查，数据工厂需提供 create_vector_transforms(model_config)，返回归一化前的 repack/data 两组变换，不能在此加载模型、统计或 tokenizer；实际训练 create() 复用同一变换构造方法，统计计算入口也需对应适配。修改模型内部维度或增加 padding，需配套修改适配、统计检查和权重加载，不能直接修改 FR3 的维度数字。
 
 ## 分支与评审
@@ -112,6 +114,8 @@ PR 说明目的、基准、覆盖参数、数据身份、统计引用、英文 p
 ## 多人训练隔离
 
 运行名建议为 `<负责人>_<任务>_<方案>_s<seed>_run<编号>`，重复运行另用编号。checkpoint 路径为 `<checkpoint_base_dir>/<config.name>/<exp_name>/`，W&B 名称与实验名一致。
+
+每次启动/续训对应独立 W&B run，同一实验使用固定 group 关联；训练状态由 checkpoint 恢复，离线段逐个 sync，云端不会自动拼接历史。续训保留原完整 checkpoint、reproducibility/、wandb_id.txt 和 wandb_sessions/，只有 params 不足以精确恢复；无有效 checkpoint 会报错。迁移机器时同时搬迁未同步日志段，按实际新路径 sync，具体说明见训练使用说明。
 
 使用独立 checkout 或 worktree，运行期间不切分支、不拉新代码。显式分配 CUDA_VISIBLE_DEVICES；每个 checkout 使用自己的 .venv/、.cache/、logs/、checkpoints/ 和 wandb/，数据与统计放在各自仓库的 data/ 和 assets/，发布后不能原地修改。目录锁只提供本机相同输出路径的并发保护，跨主机或共享文件系统还需团队调度和输出目录分配。
 

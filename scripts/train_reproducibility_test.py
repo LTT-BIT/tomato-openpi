@@ -1,5 +1,6 @@
 """Exercise the real JAX loop and Orbax resume with a small CPU-only model."""
 
+from contextlib import contextmanager
 import dataclasses
 
 import flax.nnx as nnx
@@ -37,6 +38,14 @@ class TinyModel(model_lib.BaseModel):
 def test_interrupted_training_matches_uninterrupted(tmp_path, monkeypatch):
     states = {}
     real_save = checkpoints.save_state
+    real_session = train.tracking.session
+    session_starts = []
+
+    @contextmanager
+    def capture_session(cfg, *, resuming, start_step):
+        session_starts.append((resuming, start_step))
+        with real_session(cfg, resuming=resuming, start_step=start_step) as record:
+            yield record
 
     def tiny_init(cfg, init_rng, mesh, *, resume):
         del mesh, resume
@@ -60,6 +69,7 @@ def test_interrupted_training_matches_uninterrupted(tmp_path, monkeypatch):
         states[step] = jax.device_get(state)
 
     monkeypatch.setattr(train, "init_train_state", tiny_init)
+    monkeypatch.setattr(train.tracking, "session", capture_session)
     monkeypatch.setattr(checkpoints, "save_state", capture_save)
     cfg = dataclasses.replace(
         config.get_config("debug"),
@@ -96,6 +106,7 @@ def test_interrupted_training_matches_uninterrupted(tmp_path, monkeypatch):
         train.main(interrupted_cfg)
     monkeypatch.setattr(checkpoints, "save_state", capture_save)
     train.main(dataclasses.replace(interrupted_cfg, resume=True))
+    assert session_starts == [(False, 0), (False, 0), (True, 2)]
     actual = states[3]
     for a, b in zip(jax.tree.leaves(actual.params), jax.tree.leaves(expected.params), strict=True):
         np.testing.assert_array_equal(a, b)
@@ -104,3 +115,4 @@ def test_interrupted_training_matches_uninterrupted(tmp_path, monkeypatch):
     assert int(actual.step) == int(expected.step) == 4
     # A completed finite plan must not attempt to fetch a fifth batch.
     train.main(dataclasses.replace(interrupted_cfg, resume=True))
+    assert session_starts == [(False, 0), (False, 0), (True, 2)]

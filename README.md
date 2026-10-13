@@ -6,6 +6,16 @@
 
 准备 Linux 训练机、Git、uv，以及支持当前 JAX CUDA 12 / PyTorch CUDA 12.8 依赖的 NVIDIA 驱动。安装脚本默认使用 Python 3.11；正式训练所需 GPU 数量和显存取决于方案、batch 和数据。
 
+Ubuntu/Debian 新机器先安装基础工具和视频读取所需系统库，再安装与 CI 一致的 uv。NVIDIA 驱动按机器显卡安装，先确认 `nvidia-smi` 正常；训练依赖中的 CUDA 包由 uv 安装。安装 uv 后重新打开终端并确认 `uv --version` 可用。[uv 安装说明](https://docs.astral.sh/uv/getting-started/installation/)
+
+```bash
+sudo apt-get update
+sudo apt-get install -y git curl ca-certificates openssh-client ffmpeg libgl1 libglib2.0-0
+curl -LsSf https://astral.sh/uv/0.12.10/install.sh | sh
+```
+
+克隆前将本机 SSH 公钥加入 GitLab 账号并取得项目读取权限；可用 `ssh -T -p 2222 git@gitlab.litchibot.top` 检查连接。[GitLab SSH 设置](https://docs.gitlab.com/user/ssh/)
+
 ```bash
 git clone --branch main \
   ssh://git@gitlab.litchibot.top:2222/fruit-train/harvesting/tomato-openpi.git
@@ -61,7 +71,7 @@ cp training_configs/experiments/template/tomato_lora_lr1e5.py \
   training_configs.experiments.alice.tomato_lora_lr1e5 --stats-batch-size 512
 ```
 
-工具在 `<assets_dir>/<asset_id>/` 保存 `norm_stats.json` 和 `norm_metadata.json`，已有统计拒绝覆盖。训练前会核对统计文件、数据身份、元信息与 Parquet 文件摘要、动作维度、horizon 和输入变换；复制统计时保留这两个文件。相同数据搬迁目录或换学习率可复用，数据文件或输入变换变化后需重新计算。也可将统计文件 SHA-256 填入 Dataset 的 `expected_norm_sha256`，固定发布版本。
+工具将 `norm_stats.json` 和 `norm_metadata.json` 成对发布到 `<assets_dir>/<asset_id>/`，同一目标的并发计算会报错，已有目标目录拒绝覆盖（包括空目录）；新统计使用新的 asset_id，不要预先创建其最终目录。计算或写入失败不会留下可被训练读取的半成品。训练前会核对统计文件、数据身份、元信息与 Parquet 文件摘要、动作维度、horizon 和输入变换；复制统计时保留这两个文件。相同数据搬迁目录或换学习率可复用，数据文件或输入变换变化后需重新计算。也可将统计文件 SHA-256 填入 Dataset 的 `expected_norm_sha256`，固定发布版本。
 
 某个关节全程不变时，工具正常保存零方差统计，并在元数据中记录相应维度；归一化使用现有 epsilon 保护。当前统计入口支持 FR3/Wuji，其他本体需补充适配。旧统计缺少数据绑定记录时默认拒绝；已固定摘要的全参历史基准保留明确的兼容设置，详见训练使用说明。
 
@@ -88,12 +98,16 @@ CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
 
 启动器只导入所选实验模块，调用它的 `build_config()`，然后执行输入检查和共享训练流程。可临时使用 `--batch-size 4`、`--num-train-steps 20000` 等 CLI 覆盖；正式实验将参数写入自己的配置并提交。
 
+log_interval、save_interval 必须为正整数，keep_period 为 None 或正整数；非法间隔在配置加载时就报错。准备就绪后提交自己的实验配置，正式训练使用固定 commit，不在运行中修改或拉取代码。
+
 没有网络时显式改用 `--wandb-mode offline`，恢复联网后同步：
 
 ```bash
 .venv/bin/wandb sync \
   wandb/offline-run-实际编号
 ```
+
+每次启动或续训保存一个独立 W&B 日志段，同一实验用固定 group 关联。offline 续训后需要逐段 sync；实际目录和恢复步数记录在本地运行清单及 checkpoint 的 wandb_sessions/ 中，云端显示为同一分组内的多个 run，不自动拼成一条历史曲线。
 
 ## 5. 查看结果与恢复训练
 
@@ -114,6 +128,8 @@ CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
 CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
   training_configs.experiments.alice.tomato_lora_lr1e5 --resume --wandb-mode online
 ```
+
+离线恢复将模式改为 offline 即可；训练状态从 checkpoint 恢复，W&B 创建新的日志段。没有有效 checkpoint 时 --resume 报错；已完成原预算时直接退出。迁移续训须复制完整实验目录及旧日志段，保持相同源码和数据内容。
 
 训练期间保持 checkout 不变；修改预算、数据或源码后建立新实验。恢复条件及离线日志同步见 [训练使用说明](docs/训练使用说明.md)。
 

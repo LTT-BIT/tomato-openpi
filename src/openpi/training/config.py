@@ -660,6 +660,20 @@ class TrainConfig:
             raise ValueError(f"Unknown sampling mode: {self.sampling_mode}")
         if self.batch_size <= 0 or self.num_train_steps <= 0:
             raise ValueError("batch_size and num_train_steps must be positive")
+        for name in ("log_interval", "save_interval"):
+            value = getattr(self, name)
+            if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
+                raise ValueError(f"{name} must be a positive integer")
+        if self.keep_period is not None and (
+            not isinstance(self.keep_period, int) or isinstance(self.keep_period, bool) or self.keep_period <= 0
+        ):
+            raise ValueError("keep_period must be None or a positive integer")
+        if (
+            not isinstance(self.model.action_horizon, int)
+            or isinstance(self.model.action_horizon, bool)
+            or self.model.action_horizon <= 0
+        ):
+            raise ValueError("model.action_horizon must be a positive integer")
         if self.augmentation_seed is not None and not isinstance(self.model, pi0_config.Pi0Config):
             raise ValueError("Independent augmentation_seed is supported only by JAX Pi0/Pi05")
 

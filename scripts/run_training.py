@@ -177,16 +177,18 @@ class Tee:
 
 
 def launch(config: cfg.TrainConfig, *, wandb_mode: str, inputs: dict) -> None:
-    stamp = datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y%m%d_%H%M%S")
+    stamp = datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y%m%d_%H%M%S_%f")
     directory = common.repository_root() / "logs" / config.name / config.exp_name
     directory.mkdir(parents=True, exist_ok=True)
     prefix = directory / f"{stamp}_{os.getpid()}"
     manifest_path = prefix.with_suffix(".json")
     os.environ["WANDB_MODE"] = wandb_mode
     os.environ["WANDB_DIR"] = str(common.repository_root())
+    os.environ["PI05_LAUNCH_ID"] = prefix.name
     revision = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False).stdout.strip()
     manifest = {
         "status": "starting",
+        "launch_id": prefix.name,
         "started_at": stamp,
         "git_commit": revision,
         "wandb_mode": wandb_mode,
@@ -214,6 +216,11 @@ def launch(config: cfg.TrainConfig, *, wandb_mode: str, inputs: dict) -> None:
             else:
                 manifest["status"] = "training_completed"
             finally:
+                session_path = Path(config.checkpoint_dir) / "wandb_latest_session.json"
+                if session_path.exists():
+                    session = json.loads(session_path.read_text())
+                    if session.get("launch_id") == prefix.name:
+                        manifest["wandb_session"] = session
                 manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
 
 

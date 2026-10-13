@@ -23,6 +23,7 @@ import tyro
 from openpi import transforms
 from openpi.policies import fr3_wuji_policy
 from openpi.shared import normalize
+from openpi.shared.local_storage import new_artifact_directory
 from openpi.training import config as training_config
 from openpi.training import data_loader
 from openpi.training import norm_provenance
@@ -52,6 +53,16 @@ def compute(config: training_config.TrainConfig, *, batch_size: int = 512):
         raise ValueError("batch_size must be positive")
     if not isinstance(config.data, training_config.LeRobotFr3WujiDataConfig):
         raise ValueError("Only LeRobotFr3WujiDataConfig is supported")
+    asset_id = config.data.assets.asset_id or config.data.repo_id
+    if asset_id is None:
+        raise ValueError("A normalization asset_id is required")
+    output = Path(config.data.assets.assets_dir or config.assets_dirs) / asset_id
+    with new_artifact_directory(output) as staging:
+        _compute(config, batch_size=batch_size, output=staging)
+    print(f"Normalization bundle published to {output}")
+
+
+def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Path):
     data_config = config.data.create(config.assets_dirs, config.model)
     if data_config.local_dataset_loader is not None or tuple(data_config.action_sequence_keys) != ("action",):
         raise ValueError("Requires standard LeRobot data with the action sequence key 'action'")
@@ -64,9 +75,6 @@ def compute(config: training_config.TrainConfig, *, batch_size: int = 512):
         raise ValueError("Unsupported transforms: image-dependent transforms cannot use vector-only statistics")
     if data_config.asset_id is None:
         raise ValueError("A normalization asset_id is required")
-    output = Path(config.data.assets.assets_dir or config.assets_dirs) / data_config.asset_id
-    if (output / "norm_stats.json").exists():
-        raise FileExistsError(f"Norm stats already exist at {output}; refusing to overwrite")
     dataset_specs = data_config.lerobot_datasets or (training_config.LeRobotDatasetSpec(repo_id=data_config.repo_id),)
     sources = []
     for spec in dataset_specs:
@@ -169,7 +177,7 @@ def compute(config: training_config.TrainConfig, *, batch_size: int = 512):
         )
         + "\n"
     )
-    print(f"PASS: {offset} frames, {checked} LeRobot sample comparisons; norm saved to {output}")
+    print(f"PASS: {offset} frames, {checked} LeRobot sample comparisons; normalization bundle ready to publish")
 
 
 if __name__ == "__main__":

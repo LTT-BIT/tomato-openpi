@@ -21,6 +21,8 @@ def initialize_checkpoint_dir(
     checkpoint_dir: epath.Path | str, *, keep_period: int | None, overwrite: bool, resume: bool
 ) -> tuple[ocp.CheckpointManager, bool]:
     checkpoint_dir = epath.Path(checkpoint_dir).resolve()
+    if resume and not checkpoint_dir.exists():
+        raise FileNotFoundError(f"Cannot resume {checkpoint_dir}: experiment directory does not exist")
     resuming = False
     if checkpoint_dir.exists():
         if overwrite:
@@ -52,12 +54,9 @@ def initialize_checkpoint_dir(
         ),
     )
 
-    # Special case: the checkpoint directory exists and the user requests to resume training, but the training run did
-    # not get to the first checkpoint saved. In this case, we don't actually want the train script to try and restore a
-    # checkpoint, since it will fail.
-    if resuming and tuple(mngr.all_steps()) in [(), (0,)]:
-        logging.info("Checkpoint directory exists, but does not contain any checkpoints. Aborting resume.")
-        resuming = False
+    if resuming and not mngr.all_steps():
+        mngr.close()
+        raise FileNotFoundError(f"Cannot resume {checkpoint_dir}: no saved checkpoint; use a new experiment name")
 
     return mngr, resuming
 

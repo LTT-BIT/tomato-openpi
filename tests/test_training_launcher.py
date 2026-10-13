@@ -126,6 +126,50 @@ def test_launch_writes_local_log_snapshot_and_explicit_offline_mode(prepared, mo
     assert "test trainer output" in Path(manifest["log"]).read_text()
 
 
+@pytest.mark.parametrize("failure", [False, True])
+def test_launch_manifest_includes_actual_logging_segment_and_result(prepared, monkeypatch, failure):
+    from types import SimpleNamespace
+
+    from openpi.training import tracking
+    from scripts import train
+
+    config, _, _ = prepared
+    Path(config.checkpoint_dir).mkdir(parents=True)
+    finishes = []
+    monkeypatch.setattr(
+        tracking.wandb,
+        "init",
+        lambda **kwargs: SimpleNamespace(id=kwargs["id"], entity=None, dir=str(config.checkpoint_dir / "run/files")),
+    )
+    monkeypatch.setattr(tracking.wandb, "finish", lambda **kwargs: finishes.append(kwargs))
+
+    def fake_train(actual):
+        with tracking.session(actual, resuming=False, start_step=0):
+            print("offline attempt")
+            if failure:
+                raise RuntimeError("simulated training failure")
+
+    monkeypatch.setattr(train, "main", fake_train)
+    handlers = list(run_training.logging.getLogger().handlers)
+    try:
+        if failure:
+            with pytest.raises(RuntimeError, match="simulated training failure"):
+                run_training.launch(config, wandb_mode="offline", inputs=run_training.preflight(config))
+        else:
+            run_training.launch(config, wandb_mode="offline", inputs=run_training.preflight(config))
+    finally:
+        run_training.logging.getLogger().handlers = handlers
+    directory = Path(config.checkpoint_base_dir).parent / "logs" / config.name / config.exp_name
+    manifest = json.loads(next(directory.glob("*.json")).read_text())
+    expected_status = "failed" if failure else "training_completed"
+    assert manifest["status"] == expected_status
+    assert manifest["wandb_session"]["status"] == expected_status
+    assert manifest["wandb_session"]["mode"] == "offline"
+    assert manifest["wandb_session"]["start_step"] == 0
+    assert manifest["wandb_session"]["launch_id"] == manifest["launch_id"]
+    assert finishes == [{"exit_code": int(failure)}]
+
+
 @pytest.mark.parametrize("change", ["repo_id", "frames", "episodes", "datasets", "vectors", "transform", "stats"])
 def test_preflight_rejects_wrong_normalization_binding(prepared, change):
     config, root, norm_dir = prepared
