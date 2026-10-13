@@ -1,6 +1,6 @@
 # 番茄-Wuji 训练说明
 
-首次安装从 [仓库 README](../../../README.md) 开始。环境、数据校验、统计、日志与恢复的公共流程见 [训练使用说明](../../../docs/训练使用说明.md)，个人配置的完整写法见 [多人开发 README](../../../docs/多人开发README.md)。本页记录本任务的协议和 baseline。
+安装、数据校验、统计、日志与续训见 [仓库 README](../../../README.md)，个人配置和协作规则见 [多人开发 README](../../../多人开发README.md)。
 
 ## 本体与数据协议
 
@@ -40,42 +40,17 @@
 
 实际英文指令来自数据的 `meta/tasks.jsonl`。
 
-## 使用与新建实验
+## 选择模块并训练
 
-先确认基准参数与路径：
-
-```bash
-.venv/bin/python -m scripts.run_training \
-  training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 --dry-run
-```
-
-数据准备好后，新数据计算统计，再执行 `--check`，通过后用唯一实验名启动。全参将模块尾名换为 `tomato_fr3_fullft_v1`：
+在仓库根目录设置模块，全参将尾名换为 `tomato_fr3_fullft_v1`：
 
 ```bash
-.venv/bin/python -m scripts.compute_experiment_norm \
-  training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 --stats-batch-size 512
-.venv/bin/python -m scripts.run_training \
-  training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 --check
-.venv/bin/wandb login
-CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
-  training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 \
-  --exp-name alice_tomato_wuji_lora_s42_run01 --wandb-mode online
+export MODULE=training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1
+export EXP=alice_tomato_wuji_lora_s42_run01
+.venv/bin/python -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
 ```
 
-已有配套统计时跳过计算，不覆盖已存在的统计目标目录。GPU 数量与 batch 按机器显存调整；无网络显式选择 `--wandb-mode offline` 并在之后逐段 sync。
-
-当前 `template/` 留空。以后新增实验时，复制 baseline 为自己的独立文件：
-
-```bash
-git switch -c exp/alice-tomato-wuji-lora
-mkdir -p training_configs/experiments/tomato_wuji/template/alice
-touch training_configs/experiments/tomato_wuji/template/__init__.py \
-  training_configs/experiments/tomato_wuji/template/alice/__init__.py
-cp training_configs/experiments/tomato_wuji/baseline/tomato_fr3_lora_v1.py \
-  training_configs/experiments/tomato_wuji/template/alice/tomato_lora_lr1e5.py
-```
-
-在复制文件中修改 `build_dataset()`、配置名、唯一 `exp_name`；需要个人参数时改为 `config = build_recipe(...)` 后用 `dataclasses.replace` 返回配置，同时记录 owner / purpose。完整示例见多人开发 README。个人模块为 `training_configs.experiments.tomato_wuji.template.alice.tomato_lora_lr1e5`，执行 dry-run → 新数据统计 → check → 提交并固定 commit → 正式训练。
+按根 README 执行新数据统计 → check → 训练；已有配套统计时跳过计算。修改数据和参数时按多人开发 README 复制为个人配置，再更新 MODULE。当前 template 为空。
 
 ## 原始采集对照校验
 
@@ -93,8 +68,6 @@ cp training_configs/experiments/tomato_wuji/baseline/tomato_fr3_lora_v1.py \
 
 输出 FAIL 会报错退出；OK 表示本次抽样通过。图像比较只排除相同或几乎静止的源帧，discriminability 默认是源图像间平均像素差阈值 2（uint8 范围 0–255），不随目标图像误差增大；重新编码造成的疑似对齐失败仍需人工复核。静止画面等情况无法形成有效邻帧比较时显示 VECTOR_OK_ALIGNMENT_UNVERIFIED，表示向量抽样通过、图像对齐未验证，不能将零次对齐比较当成通过。这个工具不生成或转换训练数据。
 
-## 历史恢复与当前状态
+## 实验记录
 
-历史全参实验 `tomato_all_full_fullft_30hz_s42_run01` 已完成 60,153 步、最终 checkpoint 60152，离线 W&B run `tfnd6rbk` 待联网 sync，实机验证未完成。严格恢复需原训练 commit `4d9b349af63cd2cdd8ffb67d579eff04a30b34e5` 及原配置、数据、统计和完整恢复审计；此轮移动后的模块不用于直接续训旧实验。新实验可引用旧 `60152/params` 初始化并记录父实验。
-
-本轮完成目录整理与 CPU 验证，未启动新的完整 GPU 训练或实机验证。历史来源见 [基准迁移与归档](../../../docs/基准迁移与归档.md)。
+历史完整任务全参实验的训练参数、源码 commit、checkpoint 和 W&B 状态见 [历史实验记录](../../../docs/records/历史实验记录.md)。该记录属于原 v3 运行，不代表当前 v1 配置已重新完成训练。LoRA 完整任务 baseline 尚无训练完成记录。
