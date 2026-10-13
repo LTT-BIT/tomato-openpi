@@ -13,10 +13,10 @@ from openpi.training.reproducibility import serialize_config
 from scripts.run_training import load_experiment
 from scripts.run_training import resolve_experiment
 from scripts.run_training import validate_config
-from training_configs.experiments.baselines.tomato_fr3_lora_v1 import build_dataset
+from training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 import build_dataset
 from training_configs.recipes.pi05_lora_v1 import build_config as build_lora
 
-BASE = "training_configs.experiments.baselines."
+BASE = "training_configs.experiments.tomato_wuji.baseline."
 
 
 @pytest.mark.parametrize("module", ["tomato_fr3_lora_v1", "tomato_fr3_fullft_v1"])
@@ -58,7 +58,8 @@ def test_composition_preserves_baseline_training_semantics(module):
     ],
 )
 def test_actual_model_trainable_scope(module, is_lora):
-    config = load_experiment(BASE + module)
+    task = "tomato_sharpa" if "_sharpa_" in module else "tomato_wuji"
+    config = load_experiment(f"training_configs.experiments.{task}.baseline.{module}")
 
     def shapes():
         return nnx.state(config.model.create(jax.random.key(config.model_seed)), nnx.Param)
@@ -104,11 +105,11 @@ def test_fullft_selected_data_and_reproducibility_contract(monkeypatch):
     assert config.wandb_enabled
 
 
-def test_personal_override_does_not_mutate_baseline(monkeypatch):
+def test_personal_override_does_not_mutate_baseline(monkeypatch, make_personal_experiment):
     baseline = load_experiment(BASE + "tomato_fr3_lora_v1")
     monkeypatch.setenv("PI05_DATASET_ROOT", "/alice/data/tomato_v1")
     monkeypatch.setenv("PI05_ASSETS_DIR", "/alice/assets")
-    personal = load_experiment("training_configs.experiments.template.tomato_lora_lr1e5")
+    personal = load_experiment(make_personal_experiment(BASE + "tomato_fr3_lora_v1", peak_lr=1e-5))
     assert personal.data.lerobot_datasets[0].root == "/alice/data/tomato_v1"
     assert personal.data.assets.assets_dir == "/alice/assets"
     assert baseline.data.lerobot_datasets[0].root != personal.data.lerobot_datasets[0].root

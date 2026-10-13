@@ -1,4 +1,4 @@
 # Fill in your own team handles when creating the new repository.
 # /src/openpi/training/ @your-training-team
 # /training_configs/recipes/ @your-training-team
-# /training_configs/experiments/alice/ @alice
+# /training_configs/experiments/*/template/alice/ @alice

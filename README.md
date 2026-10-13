@@ -30,22 +30,32 @@ bash scripts/setup_training_env.sh
 
 ```bash
 .venv/bin/python -m scripts.run_training \
-  training_configs.experiments.baselines.tomato_fr3_lora_v1 --dry-run
+  training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 --dry-run
 ```
 
 ## 2. 新建自己的实验
+
+先选择任务，每个任务下有训练说明、`baseline/` 和 `template/`。当前只放已有 baseline，`template/` 为空；以后新增实验从对应 baseline 复制到 `template/<负责人>/`。
+
+| 任务 | 训练说明 | 状态 |
+| --- | --- | --- |
+| 番茄-Wuji | [tomato_wuji](training_configs/experiments/tomato_wuji/README.md) | LoRA / 全参 v1 baseline |
+| 番茄-Sharpa | [tomato_sharpa](training_configs/experiments/tomato_sharpa/README.md) | LoRA / 全参 v1 baseline |
+| 铲柠檬 | [lemon_scooping](training_configs/experiments/lemon_scooping/README.md) | 待补充 baseline |
+| 抓取杯子 | [cup_grasping](training_configs/experiments/cup_grasping/README.md) | 待补充 baseline |
 
 每次实验使用独立配置文件和实验名。以下用 `alice` 作示例，替换成自己的负责人名称：
 
 ```bash
 git switch -c exp/alice-tomato-lora
-mkdir -p training_configs/experiments/alice
-touch training_configs/experiments/alice/__init__.py
-cp training_configs/experiments/template/tomato_lora_lr1e5.py \
-  training_configs/experiments/alice/tomato_lora_lr1e5.py
+mkdir -p training_configs/experiments/tomato_wuji/template/alice
+touch training_configs/experiments/tomato_wuji/template/__init__.py \
+  training_configs/experiments/tomato_wuji/template/alice/__init__.py
+cp training_configs/experiments/tomato_wuji/baseline/tomato_fr3_lora_v1.py \
+  training_configs/experiments/tomato_wuji/template/alice/tomato_lora_lr1e5.py
 ```
 
-编辑复制后的实验文件：
+编辑复制后的实验文件。需要覆盖参数时，将 `return build_recipe(...)` 改为 `config = build_recipe(...)`，然后用 `dataclasses.replace` 返回个人配置，完整示例见 [多人开发 README](docs/多人开发README.md)：
 
 | 修改位置 | 设置内容 |
 | --- | --- |
@@ -56,26 +66,24 @@ cp training_configs/experiments/template/tomato_lora_lr1e5.py \
 | `build_config()` | 配置名、唯一 `exp_name`、负责人及实验目的 |
 | `dataclasses.replace` 覆盖 | 学习率、batch、训练步数、seed 等本次实验参数 |
 
-在个人实验文件中将默认数据目录设为 `repository / "data/alice_tomato_v1"`，统计父目录设为 `repository / "assets"`，并填写对应数据身份。数据和参数随实验文件一起保存。
+在个人实验文件中将默认数据目录设为 `repository / "data/alice_tomato_v1"`，统计父目录设为 `repository / "assets"`，并填写对应数据身份。数据身份和参数随实验文件一起保存。若复制全参历史基准后改用新数据，删除历史统计摘要与 `allow_legacy_norm_stats=True`，填写真实 sources 并计算新统计。
 
 数据身份应与实际内容一致：更换来源、筛选规则或变换时更新数据版本、`repo_id`、`asset_id` 和统计；同一数据仅搬迁目录时修改路径即可。个人实验的具体数据设置都在同一个文件中。
 
 ## 3. 准备数据、统计与初始权重
 
-数据集和权重需要单独准备。数据转换、筛选与合并在独立的数据仓库完成，训练仓库接收已准备的数据。本体适配器决定输入格式；当前 FR3/Wuji 使用本地 LeRobot v2.1 数据，包含 `meta/`、`data/`、`videos/`，30 Hz、54 维 action、54 或 108 维原始 state，以及 cam0/cam1/cam2 图像。真实英文指令来自 `meta/tasks.jsonl`。本仓库保留数据校验及归一化统计工具。
+数据集和权重需要单独准备。数据转换、筛选与合并在独立数据仓库完成，本仓库只接收已准备的数据并负责校验、统计与训练。各任务的维度、相机、数据身份及默认目录见对应任务训练说明；Wuji 与 Sharpa 分别使用 54 / 58 维动作协议。真实英文指令来自 `meta/tasks.jsonl`。
 
 先完成实验文件的数据设置，再计算新数据的归一化统计：
 
 ```bash
 .venv/bin/python -m scripts.compute_experiment_norm \
-  training_configs.experiments.alice.tomato_lora_lr1e5 --stats-batch-size 512
+  training_configs.experiments.tomato_wuji.template.alice.tomato_lora_lr1e5 --stats-batch-size 512
 ```
 
 工具将 `norm_stats.json` 和 `norm_metadata.json` 成对发布到 `<assets_dir>/<asset_id>/`，同一目标的并发计算会报错，已有目标目录拒绝覆盖（包括空目录）；新统计使用新的 asset_id，不要预先创建其最终目录。计算或写入失败不会留下可被训练读取的半成品。训练前会核对统计文件、数据身份、元信息与 Parquet 文件摘要、动作维度、horizon 和输入变换；复制统计时保留这两个文件。相同数据搬迁目录或换学习率可复用，数据文件或输入变换变化后需重新计算。也可将统计文件 SHA-256 填入 Dataset 的 `expected_norm_sha256`，固定发布版本。
 
 某个关节全程不变时，工具正常保存零方差统计，并在元数据中记录相应维度；归一化使用现有 epsilon 保护。当前统计入口支持 FR3/Wuji 与 FR3/Sharpa，其他本体需补充适配。旧统计缺少数据绑定记录时默认拒绝；已固定摘要的全参历史基准保留明确的兼容设置，详见训练使用说明。
-
-FR3/Sharpa 使用独立 58 维 state/action 协议（7+22+7+22），cam2 左腕、cam1 右腕。LoRA 和全参 baseline 分别为 `training_configs.experiments.baselines.tomato_fr3_sharpa_lora_v1` 与 `training_configs.experiments.baselines.tomato_fr3_sharpa_fullft_v1`；个人模板为 `training_configs/experiments/template/tomato_sharpa_lora_v1.py` 与 `tomato_sharpa_fullft_v1.py`。训练参数复用现有公共方案，具体数据要求和命令见 [Sharpa 训练说明](docs/Sharpa训练说明.md)。
 
 公共方案默认加载 `gs://openpi-assets/checkpoints/pi05_base/params`，首次使用需要下载并缓存初始权重；离线训练前须准备好权重及 tokenizer。数据格式、统计校验和权重设置详见 [训练使用说明](docs/训练使用说明.md)。
 
@@ -84,18 +92,18 @@ FR3/Sharpa 使用独立 58 维 state/action 协议（7+22+7+22），cam2 左腕�
 ```bash
 # 展开最终配置，检查实验名、路径和训练参数。
 .venv/bin/python -m scripts.run_training \
-  training_configs.experiments.alice.tomato_lora_lr1e5 --dry-run
+  training_configs.experiments.tomato_wuji.template.alice.tomato_lora_lr1e5 --dry-run
 
 # 检查已准备的数据元信息和归一化统计。
 .venv/bin/python -m scripts.run_training \
-  training_configs.experiments.alice.tomato_lora_lr1e5 --check
+  training_configs.experiments.tomato_wuji.template.alice.tomato_lora_lr1e5 --check
 
 # 首次在线使用 W&B 时登录。
 .venv/bin/wandb login
 
 # 按服务器分配选择 GPU；batch 必须能被可见设备数整除。
 CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
-  training_configs.experiments.alice.tomato_lora_lr1e5 --wandb-mode online
+  training_configs.experiments.tomato_wuji.template.alice.tomato_lora_lr1e5 --wandb-mode online
 ```
 
 启动器只导入所选实验模块，调用它的 `build_config()`，然后执行输入检查和共享训练流程。可临时使用 `--batch-size 4`、`--num-train-steps 20000` 等 CLI 覆盖；正式实验将参数写入自己的配置并提交。
@@ -128,7 +136,7 @@ log_interval、save_interval 必须为正整数，keep_period 为 None 或正整
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
-  training_configs.experiments.alice.tomato_lora_lr1e5 --resume --wandb-mode online
+  training_configs.experiments.tomato_wuji.template.alice.tomato_lora_lr1e5 --resume --wandb-mode online
 ```
 
 离线恢复将模式改为 offline 即可；训练状态从 checkpoint 恢复，W&B 创建新的日志段。没有有效 checkpoint 时 --resume 报错；已完成原预算时直接退出。迁移续训须复制完整实验目录及旧日志段，保持相同源码和数据内容。
@@ -139,9 +147,9 @@ CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
 
 | 路径 | 用途 |
 | --- | --- |
-| `training_configs/experiments/baselines/` | Wuji 与 Sharpa 各自的 LoRA v1、全参 v1 公共参考配置 |
-| `training_configs/experiments/template/` | 可复制的个人实验模板 |
-| `training_configs/experiments/<负责人>/` | 个人数据设置与实验参数 |
+| `training_configs/experiments/<任务>/README.md` | 对应任务的协议、数据与训练说明 |
+| `training_configs/experiments/<任务>/baseline/` | 公共参考配置；番茄两种本体各有 LoRA 和全参 v1 |
+| `training_configs/experiments/<任务>/template/` | 当前留空，后续按负责人保存独立实验记录 |
 | `training_configs/recipes/` | 带版本的公共训练方案 |
 | `training_configs/embodiments/` | 本体规格与数据适配 |
 | `src/openpi/` | 模型、训练循环及共享数据变换 |

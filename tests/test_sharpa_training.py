@@ -21,12 +21,12 @@ from scripts import run_training
 from training_configs import common
 from training_configs.embodiments.fr3_sharpa import Fr3Sharpa
 
-BASE = "training_configs.experiments.baselines."
+BASE = "training_configs.experiments.tomato_sharpa.baseline."
 
 
 @pytest.mark.parametrize("scheme", ["lora", "fullft"])
 def test_sharpa_changes_only_adapter_and_experiment_identity(scheme):
-    wuji = run_training.load_experiment(BASE + f"tomato_fr3_{scheme}_v1")
+    wuji = run_training.load_experiment(f"training_configs.experiments.tomato_wuji.baseline.tomato_fr3_{scheme}_v1")
     sharpa = run_training.load_experiment(BASE + f"tomato_fr3_sharpa_{scheme}_v1")
     run_training.validate_config(sharpa)
     wuji_fields = json.loads(serialize_config(wuji))["fields"]
@@ -50,11 +50,13 @@ def test_sharpa_changes_only_adapter_and_experiment_identity(scheme):
 
 
 @pytest.mark.parametrize("scheme", ["lora", "fullft"])
-def test_personal_sharpa_templates_keep_recipe_and_independent_paths(tmp_path, monkeypatch, scheme):
+def test_copied_sharpa_baselines_keep_recipe_and_independent_paths(
+    tmp_path, monkeypatch, scheme, make_personal_experiment
+):
     baseline = run_training.load_experiment(BASE + f"tomato_fr3_sharpa_{scheme}_v1")
     monkeypatch.setenv("PI05_DATASET_ROOT", str(tmp_path / "personal_dataset"))
     monkeypatch.setenv("PI05_ASSETS_DIR", str(tmp_path / "personal_assets"))
-    template = run_training.load_experiment(f"training_configs.experiments.template.tomato_sharpa_{scheme}_v1")
+    template = run_training.load_experiment(make_personal_experiment(BASE + f"tomato_fr3_sharpa_{scheme}_v1"))
     run_training.validate_config(template)
     assert template.data.lerobot_datasets[0].root == str(tmp_path / "personal_dataset")
     assert template.data.assets.assets_dir == str(tmp_path / "personal_assets")
@@ -62,7 +64,7 @@ def test_personal_sharpa_templates_keep_recipe_and_independent_paths(tmp_path, m
     assert template.checkpoint_dir != baseline.checkpoint_dir
     assert template.lr_schedule == baseline.lr_schedule
     assert template.num_train_steps == baseline.num_train_steps
-    assert template.policy_metadata["owner"] == "template"
+    assert template.policy_metadata["owner"] == "alice"
     assert run_training.load_experiment(BASE + f"tomato_fr3_sharpa_{scheme}_v1").data == baseline.data
 
 

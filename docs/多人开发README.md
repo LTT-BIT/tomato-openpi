@@ -6,7 +6,7 @@
 
 | 改动 | 位置 | 规则 |
 | --- | --- | --- |
-| 个人学习率、batch、步数、seed | `training_configs/experiments/<负责人>/` | 独立文件，通过 dataclasses.replace 覆盖 |
+| 个人学习率、batch、步数、seed | `training_configs/experiments/<任务>/template/<负责人>/` | 独立文件，通过 dataclasses.replace 覆盖 |
 | 团队训练方案升级 | `training_configs/recipes/` | 建立新 recipe 版本，旧实验继续引用旧版 |
 | 数据、路径及统计变化 | 同一个个人实验文件的 `build_dataset()` | 新数据建立新版本、新 asset_id，记录来源与统计哈希 |
 | 本体维度、顺序或动作语义变化 | `training_configs/embodiments/` 及对应适配器 | 新规格版本，验证完整输入变换 |
@@ -22,36 +22,40 @@ experiments 是完整实验配置的集合，不是训练结果目录。子目�
 
 ```text
 training_configs/
-  common.py                      # 统一 Dataset 结构，无具体数据设置
+  common.py                      # Dataset 结构，无具体数据设置
   embodiments/                   # 公共本体规格与适配
   recipes/                       # 公共 LoRA v1、全参 v1 方案
   experiments/
-    baselines/                   # Wuji/Sharpa 的 LoRA、全参公共参考示例
-    template/                    # 可复制的独立个人实验模板
-    alice/                       # Alice 自己的实验，按需创建
-    bob/                         # Bob 自己的实验，按需创建
+    tomato_wuji/                 # 番茄-Wuji
+      README.md                  # 本任务训练说明
+      baseline/                  # LoRA、全参 v1
+      template/                  # 当前留空，后续放 <负责人>/<实验>.py
+    tomato_sharpa/               # 番茄-Sharpa，相同目录结构
+    lemon_scooping/              # 铲柠檬，baseline/template 目前为空
+    cup_grasping/                # 抓取杯子，baseline/template 目前为空
 ```
 
-Sharpa 的两份 baseline 及两份个人模板复用公共 recipe，具体模块、58 维关节协议和相机映射见 [Sharpa 训练说明](Sharpa训练说明.md)。修改个人模板的数据路径、身份和实验名后运行，无需中央注册。
+四个任务各自维护说明与配置。当前没有 template 实验记录，空目录用 `.gitkeep` 保留；新增实验时从本任务 baseline 复制到 `template/<负责人>/`。文件的模块路径需要唯一，任务和负责人目录用于组织文件，不代表训练先后阶段。
 
-baselines 用于核对公共基准；template 用于复制，已包含自己的数据设置，不依赖基准实验文件。alice/bob 是负责人目录的示例，当前不会自动创建。目录名不是程序要求，只有完整 Python 模块路径需要唯一。
+例如 `training_configs.experiments.tomato_wuji.template.alice.tomato_lora_lr1e5` 对应 `tomato_wuji/template/alice/tomato_lora_lr1e5.py`。启动器只导入该模块并调用 `build_config()`，构造 Dataset、本体与 recipe，应用个人参数和 CLI 覆盖，然后检查输入、记录配置并调用共享训练循环。其他实验不会一起运行；dry-run 只打印配置，check 只验证输入。
 
-例如指定 `training_configs.experiments.alice.tomato_lora_lr1e5`，启动器就导入 `experiments/alice/tomato_lora_lr1e5.py`，调用它的 build_config()。这个函数先构造本次 Dataset，再选择本体和 recipe，覆盖本次参数，返回完整 TrainConfig；启动器随后应用 CLI 覆盖、检查输入、记录配置并调用共享训练循环。一次命令只执行一个所选实验，其他文件不会一起训练。dry-run 只打印配置，check 只验证输入。
+任务协议与默认数据分别见 [番茄-Wuji](../training_configs/experiments/tomato_wuji/README.md) 和 [番茄-Sharpa](../training_configs/experiments/tomato_sharpa/README.md)。铲柠檬、抓取杯子尚未定义训练配置，不能照搬其他任务的数据或维度。
 
 ## 新建个人实验
 
-从模板建立自己的配置：
+从本任务 baseline 复制完整配置，保存到自己的目录：
 
 ```bash
 git switch main  # 新仓库初始化后的主线；源仓库分支名以 git branch 为准。
 git switch -c exp/alice-tomato-lr
-mkdir -p training_configs/experiments/alice
-touch training_configs/experiments/alice/__init__.py
-cp training_configs/experiments/template/tomato_lora_lr1e5.py \
-  training_configs/experiments/alice/tomato_lora_lr1e5.py
+mkdir -p training_configs/experiments/tomato_wuji/template/alice
+touch training_configs/experiments/tomato_wuji/template/__init__.py \
+  training_configs/experiments/tomato_wuji/template/alice/__init__.py
+cp training_configs/experiments/tomato_wuji/baseline/tomato_fr3_lora_v1.py \
+  training_configs/experiments/tomato_wuji/template/alice/tomato_lora_lr1e5.py
 ```
 
-在复制后的同一个文件里修改数据、路径、统计身份、prompt 示例、实验名、owner 和 purpose。模板已提供完整结构，核心组合方式如下：
+在复制后的同一个文件里修改数据、路径、统计身份、prompt 示例、实验名、owner 和 purpose。baseline 直接返回 recipe 结果；需要记录负责人或覆盖参数时，先保存为 config，再用 replace 返回个人配置，核心组合方式如下：
 
 ```python
 from dataclasses import replace
@@ -90,7 +94,7 @@ def build_config():
 
 ```bash
 .venv/bin/python -m scripts.run_training \
-  training_configs.experiments.alice.tomato_lora_lr1e5 --dry-run
+  training_configs.experiments.tomato_wuji.template.alice.tomato_lora_lr1e5 --dry-run
 ```
 
 个人实验只需引用公共 recipe、embodiment 和 Dataset 结构，不导入他人的实验文件。配置中的 prompt_example 用于记录，真实训练从数据 task 读取英文指令。
@@ -99,7 +103,7 @@ def build_config():
 
 数据格式转换、筛选和合并统一在独立数据仓库完成，训练仓库保留元信息/归一化绑定检查和原始采集对照校验。常规流程是准备数据与实验配置 → 新数据计算统计 → --check → 正式启动时再检查并记录数据/采样审计。--check 需要统计；原始采集对照工具是额外抽样核验，前提是有采集数据且 episode 顺序对应。详细步骤及校验范围见训练使用说明。
 
-新统计同时保存 norm_stats.json 和 norm_metadata.json，提交实验配置前执行 --check，确认统计与数据文件、输入变换及 horizon 对应。复制统计需保留两个文件；学习率、batch 等训练参数不影响统计复用。常量关节允许生成零方差统计，其维度记录在元数据中。个人新实验不要沿用历史基准的 allow_legacy_norm_stats=True；旧格式兼容必须人工确认来源并固定摘要，具体条件见训练使用说明。
+新统计同时保存 norm_stats.json 和 norm_metadata.json，提交实验配置前执行 --check，确认统计与数据文件、输入变换及 horizon 对应。复制统计需保留两个文件；学习率、batch 等训练参数不影响统计复用。常量关节允许生成零方差统计，其维度记录在元数据中。复制全参历史基准后若改用新数据，删除历史 NORM_AUDIT_SHA256 / expected_norm_audit_sha256、allow_legacy_norm_stats=True，并更新真实来源；旧格式兼容必须人工确认来源并固定摘要，具体条件见训练使用说明。
 
 统计计算按目标目录加锁，并在完整写好两个文件后一次发布，已有目录不覆盖；不要预先创建 asset_id 最终目录。多人的不同数据/变换使用各自统计身份，共享盘跨主机仍按团队调度安排计算。log_interval/save_interval/action_horizon 使用正整数，keep_period 使用 None 或正整数。
 
@@ -157,7 +161,7 @@ GitLab 和 GitHub 共用的 `scripts/check_training.sh` 仍保留，本地安装
 bash scripts/check_training.sh
 ```
 
-检查包括 uv 锁一致性、配置/启动器/统计工具的 Ruff 与格式、Shell 语法、Wuji/Sharpa 四份基准与三份模板 dry-run、数据与统计绑定/常量关节/采样/模型冻结/中断恢复等 CPU 回归，以及 wheel 打包。测试使用临时小数据、小模型及本地生成的 tokenizer，不读取真实数据、下载预训练权重或启动正式训练；依赖下载和 wheel 构建仍需要网络。外部真实数据测试标记 manual，自动验证使用 -m 'not manual' 排除；准备好对应数据后可单独手动执行。JUnit 报告与 wheel 在流水线保留一周。开发者仍需针对新增共享源码运行相应检查。
+检查包括 uv 锁一致性、配置/启动器/统计工具的 Ruff 与格式、Shell 语法、Wuji/Sharpa 四份基准 dry-run、从 baseline 复制临时个人实验的路径与参数隔离验证、数据与统计绑定/常量关节/采样/模型冻结/中断恢复等 CPU 回归，以及 wheel 打包。测试使用临时小数据、小模型及本地生成的 tokenizer，不读取真实数据、下载预训练权重或启动正式训练；依赖下载和 wheel 构建仍需要网络。外部真实数据测试标记 manual，自动验证使用 -m 'not manual' 排除；准备好对应数据后可单独手动执行。JUnit 报告与 wheel 在流水线保留一周。开发者仍需针对新增共享源码运行相应检查。
 
 项目需要启用一个能运行 `python:3.11-bookworm` 容器的 Linux Docker/Kubernetes Runner，允许无标签作业；本方案不要求 GPU、训练数据或 W&B 密钥。Runner 需要访问 PyPI、GitHub、PyTorch 包源及 Debian 包源。依赖仍按训练 uv.lock 安装，含 CUDA 包，即使测试只用 CPU，首次安装仍需较大空间；建议至少 16 GB 内存、30 GB 可用磁盘。若作业一直 pending，先检查 Settings → CI/CD → Runners 是否有可用 Runner；代码里的 CI 文件不会自动创建 Runner。
 

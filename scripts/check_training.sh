@@ -30,13 +30,10 @@ CHECK_PATHS=(
 bash -n scripts/setup_training_env.sh scripts/check_training.sh
 
 for experiment in \
-  training_configs.experiments.baselines.tomato_fr3_lora_v1 \
-  training_configs.experiments.baselines.tomato_fr3_fullft_v1 \
-  training_configs.experiments.template.tomato_lora_lr1e5 \
-  training_configs.experiments.baselines.tomato_fr3_sharpa_lora_v1 \
-  training_configs.experiments.baselines.tomato_fr3_sharpa_fullft_v1 \
-  training_configs.experiments.template.tomato_sharpa_lora_v1 \
-  training_configs.experiments.template.tomato_sharpa_fullft_v1; do
+  training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 \
+  training_configs.experiments.tomato_wuji.baseline.tomato_fr3_fullft_v1 \
+  training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1 \
+  training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_fullft_v1; do
   .venv/bin/python -m scripts.run_training "$experiment" --dry-run
 done
 

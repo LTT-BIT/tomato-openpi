@@ -1,1 +1,1 @@
-"""Each owner creates separate experiment modules; no central registry required."""
+"""Task-specific baselines and future personal experiments; no central registry."""
