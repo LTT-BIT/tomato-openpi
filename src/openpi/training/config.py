@@ -518,7 +518,7 @@ class RLDSDroidDataConfig(DataConfigFactory):
 class LeRobotDROIDDataConfig(DataConfigFactory):
     """
     Example data config for custom DROID dataset in LeRobot format.
-    To convert your custom DROID dataset (<10s of hours) to LeRobot format, see examples/droid/convert_droid_data_to_lerobot.py
+    Prepare custom DROID datasets in LeRobot format using the separate data preparation repository.
     """
 
     @override
@@ -799,7 +799,7 @@ _CONFIGS = [
             paligemma_variant="gemma_2b_lora",
             action_expert_variant="gemma_300m_lora",
         ),
-        # Produced by examples/fr3_wuji/convert_dataset.py: the 65 captures merged into one
+        # Prepared by the separate data repository: the 65 captures merged into one
         # standard LeRobot dataset. State stays 108-dim and actions keep their original
         # joint order, so the 54-dim slicing and reordering still happen in Fr3WujiInputs.
         data=LeRobotFr3WujiDataConfig(
@@ -960,7 +960,7 @@ _CONFIGS = [
     TrainConfig(
         # This config is for fine-tuning pi05-DROID on a custom (smaller) DROID dataset.
         # Here, we use LeRobot data format (like for all other fine-tuning examples)
-        # To convert your custom DROID dataset (<10s of hours) to LeRobot format, see examples/droid/convert_droid_data_to_lerobot.py
+        # Prepare custom DROID datasets in LeRobot format using the separate data repository.
         name="pi05_droid_finetune",
         model=pi0_config.Pi0Config(
             pi05=True,

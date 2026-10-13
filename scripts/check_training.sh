@@ -20,6 +20,7 @@ CHECK_PATHS=(
   scripts/run_training.py scripts/compute_experiment_norm.py scripts/train.py
   src/openpi/training/norm_provenance.py examples/fr3_wuji/compute_norm_stats.py
   src/openpi/transforms_test.py src/openpi/training/data_loader_test.py
+  examples/fr3_wuji/verify_dataset.py
 )
 .venv/bin/ruff check "${CHECK_PATHS[@]}"
 .venv/bin/ruff format --check "${CHECK_PATHS[@]}"

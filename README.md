@@ -52,7 +52,7 @@ cp training_configs/experiments/template/tomato_lora_lr1e5.py \
 
 ## 3. 准备数据、统计与初始权重
 
-数据集和权重需要单独准备。本体适配器决定输入格式；当前 FR3/Wuji 使用本地 LeRobot v2.1 数据，包含 `meta/`、`data/`、`videos/`，30 Hz、54 维 action、54 或 108 维原始 state，以及 cam0/cam1/cam2 图像。真实英文指令来自 `meta/tasks.jsonl`。转换、验证和合并工具位于 `examples/fr3_wuji/`。
+数据集和权重需要单独准备。数据转换、筛选与合并在独立的数据仓库完成，训练仓库接收已准备的数据。本体适配器决定输入格式；当前 FR3/Wuji 使用本地 LeRobot v2.1 数据，包含 `meta/`、`data/`、`videos/`，30 Hz、54 维 action、54 或 108 维原始 state，以及 cam0/cam1/cam2 图像。真实英文指令来自 `meta/tasks.jsonl`。本仓库保留数据校验及归一化统计工具。
 
 先完成实验文件的数据设置，再计算新数据的归一化统计：
 
@@ -128,7 +128,7 @@ CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
 | `training_configs/embodiments/` | 本体规格与数据适配 |
 | `src/openpi/` | 模型、训练循环及共享数据变换 |
 | `scripts/` | 环境、统计计算和统一训练入口 |
-| `examples/fr3_wuji/` | FR3/Wuji 训练数据工具 |
+| `examples/fr3_wuji/` | FR3/Wuji 数据校验与归一化统计 |
 
 个人实验通过短期分支和合并请求进入 `main`；公共 recipe 或训练功能变更单独评审。每位训练者使用独立 checkout、GPU 分配和仓库内输出目录，训练固定已提交的 commit。数据集、权重、日志及密钥不提交 Git。
 

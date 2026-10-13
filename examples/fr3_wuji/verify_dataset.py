@@ -8,29 +8,67 @@ dataset runs at 30fps, which makes some neighbouring source frames identical; th
 excluded from the comparison rather than counted as competitors.
 
 Example:
-    uv run python -m examples.fr3_wuji.verify_dataset --repo-id fr3_wuji/tomato
+    .venv/bin/python -m examples.fr3_wuji.verify_dataset \
+        --src-root data/raw_captures --root data/tomato_fulltask_v1 --repo-id fr3_wuji/tomato_fulltask_v1
 """
 
 import dataclasses
+import importlib.util
 import pathlib
+import sys
 
 from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
 import numpy as np
+import pyarrow.parquet as pq
 import tyro
 
-from examples.fr3_wuji.convert_dataset import CAMERA_KEYS
-from examples.fr3_wuji.convert_dataset import SOURCE_LOADER_FILENAME
-from examples.fr3_wuji.convert_dataset import VECTOR_KEYS
-from examples.fr3_wuji.convert_dataset import _find_captures
-from examples.fr3_wuji.convert_dataset import _load_source_loader
-from examples.fr3_wuji.convert_dataset import _make_capture_reader
+SOURCE_LOADER_FILENAME = "dataloader.py"
+VECTOR_KEYS = ("observation.state", "action")
+CAMERA_KEYS = ("observation.images.cam0", "observation.images.cam1", "observation.images.cam2")
+
+
+def _load_source_loader(module_path: pathlib.Path):
+    """Read source captures through their original timestamp-aware loader."""
+    spec = importlib.util.spec_from_file_location("fr3_wuji_source_dataloader", module_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load source dataloader: {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def _make_capture_reader(source_loader):
+    """Read only vectors and camera references, excluding unused depth payloads."""
+    columns = ["timestamp", *VECTOR_KEYS, *CAMERA_KEYS]
+
+    class CaptureReader(source_loader.LeRobotEpisodeDataset):
+        def _table(self, position: int):
+            table = self._tables.get(position)
+            if table is None:
+                table = pq.read_table(self.episodes[position].parquet_path, columns=columns)
+                self._tables[position] = table
+            return table
+
+    return CaptureReader
+
+
+def _find_captures(src_root: pathlib.Path, max_episodes: int) -> list[pathlib.Path]:
+    def episode_order(path):
+        digits = "".join(c for c in path.name if c.isdigit())
+        return (int(digits) if digits else 0, path.name)
+
+    captures = sorted((path for path in src_root.iterdir() if (path / "meta/info.json").is_file()), key=episode_order)
+    if not captures:
+        raise FileNotFoundError(f"No LeRobot captures found under {src_root}")
+    return captures[:max_episodes]
 
 
 @dataclasses.dataclass
 class Args:
+    src_root: pathlib.Path
+    root: pathlib.Path
     repo_id: str = "fr3_wuji/tomato"
-    src_root: pathlib.Path = pathlib.Path("/home/descfly/datasets")
-    root: pathlib.Path | None = None
     # Number of episodes to check, taken from the start of the dataset.
     episodes: int = 2
     # Number of frames sampled per episode.
@@ -39,8 +77,9 @@ class Args:
     neighbourhood: int = 3
     # Rows probed while searching for motion, per sample.
     probes_per_sample: int = 8
-    # A neighbour only counts as a competitor if it differs from the own source frame by
-    # this multiple of the codec reconstruction error.
+    # Minimum mean pixel difference (uint8 units) between distinct source frames.
+    # This threshold must not depend on target/source mismatch: a shifted target
+    # would otherwise exclude the very neighbour that reveals the shift.
     discriminability: float = 2.0
 
 
@@ -69,6 +108,10 @@ def _pick_moving_rows(source, key: str, episode_length: int, args: Args) -> list
 
 
 def main(args: Args) -> None:
+    if min(args.episodes, args.samples, args.neighbourhood, args.probes_per_sample) <= 0:
+        raise ValueError("Verification episode, sample and neighbourhood counts must be positive")
+    if not np.isfinite(args.discriminability) or args.discriminability <= 0:
+        raise ValueError("discriminability must be positive and finite")
     dataset = LeRobotDataset(args.repo_id, root=args.root)
     captures = _find_captures(args.src_root, max_episodes=args.episodes)
     capture_reader = _make_capture_reader(_load_source_loader(captures[0] / SOURCE_LOADER_FILENAME))
@@ -111,9 +154,8 @@ def main(args: Args) -> None:
                         if shift == 0:
                             continue
                         candidate = _to_hwc_uint8(source[row + shift][key].numpy())
-                        # A neighbour that barely differs from the own frame (cam0 repeats
-                        # frames at 20fps, and static scenes look alike) cannot decide anything.
-                        if _distance(candidate, own) > args.discriminability * max(own_distance, 1e-6):
+                        # Repeated/near-static source frames cannot decide alignment.
+                        if _distance(candidate, own) > args.discriminability:
                             competitors[shift] = _distance(converted, candidate)
                     if not competitors:
                         continue
@@ -126,6 +168,8 @@ def main(args: Args) -> None:
                         failures.append((key, row, own_distance, closest, competitors[closest]))
 
             status = "OK" if not failures and worst_vector == 0.0 else "FAIL"
+            if status == "OK" and comparisons == 0:
+                status = "VECTOR_OK_ALIGNMENT_UNVERIFIED"
             margin_text = "n/a" if worst_margin is None else f"{worst_margin:.2f}"
             print(
                 f"[{status}] {capture.name}: {episode_length} frames, "
@@ -144,7 +188,7 @@ def main(args: Args) -> None:
         finally:
             source.close()
 
-    print("All checks passed.")
+    print("Sampled vector checks passed. Review alignment counts; zero comparisons cannot verify alignment.")
 
 
 if __name__ == "__main__":
