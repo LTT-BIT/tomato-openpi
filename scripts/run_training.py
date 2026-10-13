@@ -25,6 +25,7 @@ import tyro
 
 from openpi.shared import normalize
 from openpi.training import config as cfg
+from openpi.training import norm_provenance
 from openpi.training import reproducibility
 from training_configs import common
 
@@ -133,11 +134,7 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
                     raise ValueError(f"Invalid normalization {key}.{field} shape or values")
             if np.any(value.std < 0) or np.any(value.q99 < value.q01):
                 raise ValueError(f"Invalid normalization range for {key}")
-        norm_metadata = norm_dir / "norm_metadata.json"
-        if norm_metadata.exists():
-            recorded = json.loads(norm_metadata.read_text())
-            if recorded["action_horizon"] != config.model.action_horizon:
-                raise ValueError("Normalization action window differs from the experiment")
+        result["norm_provenance"] = norm_provenance.validate_metadata(config, norm_dir, stats_sha256=digest)
         result["norm_stats_sha256"] = digest
         result["norm_audit_sha256"] = audit_digest
     return result

@@ -1,0 +1,83 @@
+"""Exercise statistics, saved provenance and preflight with tiny vector episodes."""
+
+from dataclasses import replace
+import json
+from pathlib import Path
+
+import numpy as np
+import pyarrow as pa
+import pyarrow.parquet as pq
+import pytest
+
+from examples.fr3_wuji import compute_norm_stats
+from openpi import transforms
+from openpi.shared import normalize
+from openpi.training import config as cfg
+from scripts import run_training
+from training_configs import common
+
+
+@pytest.mark.parametrize("all_constant", [False, True])
+def test_statistics_save_constant_joints_and_bind_to_vectors(tmp_path, monkeypatch, caplog, all_constant):
+    monkeypatch.setattr(common, "repository_root", lambda: tmp_path)
+    config = run_training.load_experiment("training_configs.experiments.baselines.tomato_fr3_lora_v1")
+    config = replace(config, model=replace(config.model, action_horizon=3))
+    root = Path(config.data.lerobot_datasets[0].root)
+    for folder in ("meta", "data", "videos"):
+        (root / folder).mkdir(parents=True, exist_ok=True)
+    info = {
+        "codebase_version": "v2.1",
+        "fps": 30,
+        "total_frames": 4,
+        "total_episodes": 1,
+        "chunks_size": 1000,
+        "data_path": "data/episode_{episode_index:06d}.parquet",
+        "features": {
+            "action": {"shape": [54]},
+            "observation.state": {"shape": [108]},
+            **{key: {"shape": [1, 1, 3]} for key in config.policy_metadata["camera_keys"]},
+        },
+    }
+    (root / "meta/info.json").write_text(json.dumps(info))
+    (root / "meta/episodes.jsonl").write_text('{"episode_index": 0, "length": 4}\n')
+    (root / "meta/tasks.jsonl").write_text('{"task_index": 0, "task": "Pick the tomato."}\n')
+    state, actions = np.zeros((4, 108), dtype=np.float32), np.zeros((4, 54), dtype=np.float32)
+    if not all_constant:
+        state[:, 0] = np.arange(4)
+        actions[:, 0] = np.arange(4) * 2
+    parquet = root / "data/episode_000000.parquet"
+    pq.write_table(pa.table({"observation.state": state.tolist(), "action": actions.tolist()}), parquet)
+
+    class Reference:
+        def __len__(self):
+            return 4
+
+        def __getitem__(self, row):
+            return {
+                "observation.state": state[row],
+                "action": actions[np.minimum(np.arange(3) + row, 3)],
+                "prompt": "Pick the tomato.",
+                "episode_index": 0,
+                **{key: np.zeros((1, 1, 3), dtype=np.uint8) for key in config.policy_metadata["camera_keys"]},
+            }
+
+    monkeypatch.setattr(cfg.ModelTransformFactory, "__call__", lambda *args: transforms.Group())
+    monkeypatch.setattr(compute_norm_stats.data_loader, "create_torch_dataset", lambda *args: Reference())
+    compute_norm_stats.compute(config, batch_size=3)  # Include a final partial batch and changing histogram ranges.
+    directory = Path(config.data.assets.assets_dir) / config.data.assets.asset_id
+    stats = normalize.load(directory)
+    recorded = json.loads((directory / "norm_metadata.json").read_text())
+    assert recorded["vector_counts"] == {"state": 4, "actions": 12}
+    assert recorded["constant_dimensions"]["state"] == list(range(0 if all_constant else 1, 54))
+    assert recorded["constant_dimensions"]["actions"] == list(range(0 if all_constant else 1, 54))
+    assert "Zero-variance" in caplog.text
+    assert np.all(stats["state"].std[1:] == 0)
+    assert np.all(stats["state"].q99[1:] == stats["state"].q01[1:])
+    sample = {"state": np.zeros(54), "actions": np.zeros((3, 54))}
+    normalized = transforms.Normalize(stats, use_quantiles=True)(sample)
+    assert all(np.isfinite(value).all() for value in normalized.values())
+    assert run_training.preflight(config)["norm_provenance"] == "verified"
+    actions[0, 0] += 1
+    pq.write_table(pa.table({"observation.state": state.tolist(), "action": actions.tolist()}), parquet)
+    with pytest.raises(ValueError, match="data or vector transforms differ"):
+        run_training.preflight(config)

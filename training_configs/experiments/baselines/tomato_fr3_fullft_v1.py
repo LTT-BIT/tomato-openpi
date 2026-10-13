@@ -27,6 +27,7 @@ def build_dataset() -> Dataset:
         sources=tuple(str((source_root / item).resolve()) for item in ("0925/A", "0925/B", "1002_AB_190/full")),
         prompt_example=PROMPT,
         expected_norm_audit_sha256=NORM_AUDIT_SHA256,
+        allow_legacy_norm_stats=True,
     )
 
 

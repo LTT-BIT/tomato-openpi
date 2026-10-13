@@ -402,6 +402,22 @@ class LeRobotFr3WujiDataConfig(DataConfigFactory):
 
     @override
     def create(self, assets_dirs: pathlib.Path, model_config: _model.BaseModelConfig) -> DataConfig:
+        repack_transform, data_transforms = self.create_vector_transforms(model_config)
+        return dataclasses.replace(
+            self.create_base_config(assets_dirs, model_config),
+            repack_transforms=repack_transform,
+            data_transforms=data_transforms,
+            model_transforms=ModelTransformFactory()(model_config),
+            action_sequence_keys=self.action_sequence_keys,
+            lerobot_datasets=self.lerobot_datasets,
+            action_hz=self.action_hz,
+            video_backend=self.video_backend,
+        )
+
+    def create_vector_transforms(
+        self, model_config: _model.BaseModelConfig
+    ) -> tuple[_transforms.Group, _transforms.Group]:
+        """Build the pre-normalization pipeline without loading stats or tokenizers."""
         repack_transform = _transforms.Group(
             inputs=[
                 _transforms.RepackTransform(
@@ -427,16 +443,7 @@ class LeRobotFr3WujiDataConfig(DataConfigFactory):
                 outputs=[_transforms.AbsoluteActions(delta_action_mask)],
             )
 
-        return dataclasses.replace(
-            self.create_base_config(assets_dirs, model_config),
-            repack_transforms=repack_transform,
-            data_transforms=data_transforms,
-            model_transforms=ModelTransformFactory()(model_config),
-            action_sequence_keys=self.action_sequence_keys,
-            lerobot_datasets=self.lerobot_datasets,
-            action_hz=self.action_hz,
-            video_backend=self.video_backend,
-        )
+        return repack_transform, data_transforms
 
 
 @dataclasses.dataclass(frozen=True)

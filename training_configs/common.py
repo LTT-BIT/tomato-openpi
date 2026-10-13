@@ -16,6 +16,7 @@ class Dataset:
     prompt_example: str
     expected_norm_sha256: str | None = None
     expected_norm_audit_sha256: str | None = None
+    allow_legacy_norm_stats: bool = False
 
     def __post_init__(self):
         if not self.sources or any(not isinstance(source, str) or not source.strip() for source in self.sources):

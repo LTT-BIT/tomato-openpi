@@ -9,7 +9,9 @@ Example:
     uv run examples/fr3_wuji/compute_norm_stats.py --config-name pi05_fr3_wuji_125ep
 """
 
+from dataclasses import replace
 import json
+import logging
 from pathlib import Path
 
 from lerobot.common.constants import HF_LEROBOT_HOME
@@ -23,6 +25,8 @@ from openpi.policies import fr3_wuji_policy
 from openpi.shared import normalize
 from openpi.training import config as training_config
 from openpi.training import data_loader
+from openpi.training import norm_provenance
+from openpi.training import reproducibility
 
 
 def transform_vectors(state, actions, rows, horizon, transform):
@@ -72,6 +76,8 @@ def compute(config: training_config.TrainConfig, *, batch_size: int = 512):
             raise ValueError("Vector-only statistics currently require action_hz to match source FPS")
         episodes = [json.loads(line) for line in (root / "meta/episodes.jsonl").read_text().splitlines() if line]
         sources.append((spec, root, info, episodes))
+    specs_with_roots = tuple(replace(spec, root=str(root)) for spec, root, _, _ in sources)
+    contract = norm_provenance.build_contract(config, dataset_specs=specs_with_roots)
     transform = transforms.compose([*data_config.repack_transforms.inputs, *data_config.data_transforms.inputs])
     reference = data_loader.create_torch_dataset(data_config, config.model.action_horizon, config.model)
     stats = {key: normalize.RunningStats() for key in ("state", "actions")}
@@ -121,12 +127,22 @@ def compute(config: training_config.TrainConfig, *, batch_size: int = 512):
         np.testing.assert_allclose(value.mean, mean, atol=1e-10, rtol=1e-10)
         np.testing.assert_allclose(value.std, std, atol=1e-9, rtol=1e-9)
         assert all(np.isfinite(getattr(value, field)).all() for field in ("mean", "std", "q01", "q99"))
-        assert np.all(value.std > 0)
-        assert np.all(value.q99 > value.q01)
+        if np.any(value.std < 0) or np.any(value.q99 < value.q01):
+            raise ValueError(f"Invalid normalization range for {key}")
+    constant_dimensions = {key: np.flatnonzero(value.std == 0).tolist() for key, value in result.items()}
+    for key, dimensions in constant_dimensions.items():
+        if dimensions:
+            logging.warning("Zero-variance %s dimensions %s are retained; normalization uses epsilon", key, dimensions)
+    if norm_provenance.build_contract(config, dataset_specs=specs_with_roots) != contract:
+        raise ValueError("Normalization source data changed during computation; statistics were not saved")
     normalize.save(output, result)
     (output / "norm_metadata.json").write_text(
         json.dumps(
             {
+                "schema_version": norm_provenance.SCHEMA_VERSION,
+                "contract": contract,
+                "norm_stats_sha256": reproducibility.file_sha256(output / "norm_stats.json"),
+                "constant_dimensions": constant_dimensions,
                 "config_name": config.name,
                 "repo_id": data_config.repo_id,
                 "datasets": [

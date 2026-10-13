@@ -61,7 +61,9 @@ cp training_configs/experiments/template/tomato_lora_lr1e5.py \
   training_configs.experiments.alice.tomato_lora_lr1e5 --stats-batch-size 512
 ```
 
-统计保存在 `<assets_dir>/<asset_id>/norm_stats.json`，已有统计拒绝覆盖。将文件 SHA-256 填入实验 Dataset 的 `expected_norm_sha256`；复用统计时确认对应的数据、动作表示和 horizon 一致。当前统计入口支持 FR3/Wuji，其他本体需补充适配。
+工具在 `<assets_dir>/<asset_id>/` 保存 `norm_stats.json` 和 `norm_metadata.json`，已有统计拒绝覆盖。训练前会核对统计文件、数据身份、元信息与 Parquet 文件摘要、动作维度、horizon 和输入变换；复制统计时保留这两个文件。相同数据搬迁目录或换学习率可复用，数据文件或输入变换变化后需重新计算。也可将统计文件 SHA-256 填入 Dataset 的 `expected_norm_sha256`，固定发布版本。
+
+某个关节全程不变时，工具正常保存零方差统计，并在元数据中记录相应维度；归一化使用现有 epsilon 保护。当前统计入口支持 FR3/Wuji，其他本体需补充适配。旧统计缺少数据绑定记录时默认拒绝；已固定摘要的全参历史基准保留明确的兼容设置，详见训练使用说明。
 
 公共方案默认加载 `gs://openpi-assets/checkpoints/pi05_base/params`，首次使用需要下载并缓存初始权重；离线训练前须准备好权重及 tokenizer。数据格式、统计校验和权重设置详见 [训练使用说明](docs/训练使用说明.md)。
 

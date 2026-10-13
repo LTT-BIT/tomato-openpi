@@ -108,5 +108,6 @@ class Recipe:
                 "prompt_example": dataset.prompt_example,
                 "expected_norm_sha256": dataset.expected_norm_sha256,
                 "expected_norm_audit_sha256": dataset.expected_norm_audit_sha256,
+                "allow_legacy_norm_stats": dataset.allow_legacy_norm_stats,
             },
         )
