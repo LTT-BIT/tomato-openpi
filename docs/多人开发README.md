@@ -87,7 +87,7 @@ def build_config():
 通过模块路径加载，不需要中央注册：
 
 ```bash
-"$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.run_training \
+.venv/bin/python -m scripts.run_training \
   training_configs.experiments.alice.tomato_lora_lr1e5 --dry-run
 ```
 
@@ -115,7 +115,6 @@ PR 说明目的、基准、覆盖参数、数据身份、统计引用、英文 p
 git worktree add /你的工作目录/pi05-alice "<已提交分支或commit>"
 cd /你的工作目录/pi05-alice
 bash scripts/setup_training_env.sh
-source scripts/training_env.sh
 ```
 
 数据、权重、日志、W&B 和密钥不提交 Git。个人实验文件保存数据身份与默认路径，默认路径按仓库位置自动确定，数据放在 data/、统计放在 assets/，换电脑克隆后使用对应目录即可。同一内容只更换路径不需要新数据版本。
@@ -126,7 +125,7 @@ source scripts/training_env.sh
 
 ```bash
 PYTHONNOUSERSITE=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 JAX_PLATFORMS=cpu \
-  "$UV_PROJECT_ENVIRONMENT/bin/python" -m pytest \
+  .venv/bin/python -m pytest \
   tests \
   src/openpi/training/sampling_test.py src/openpi/training/reproducibility_test.py \
   src/openpi/training/weight_loaders_test.py src/openpi/training/data_loader_test.py \

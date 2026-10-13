@@ -32,11 +32,11 @@ def test_defaults_use_checkout_even_with_old_runtime_setting(tmp_path, monkeypat
 @pytest.mark.parametrize("old_settings", [False, True])
 def test_environment_uses_its_checkout_and_replaces_old_mount_paths(tmp_path, old_settings):
     repository = tmp_path / "checkout with spaces"
-    script = repository / "scripts/training_env.sh"
-    script.parent.mkdir(parents=True)
-    script.write_text((common.repository_root() / "scripts/training_env.sh").read_text())
+    for name in ("scripts/__init__.py", "training_configs/__init__.py", "training_configs/common.py"):
+        destination = repository / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text((common.repository_root() / name).read_text())
     paths = {
-        "PI05_REPOSITORY_DIR": repository,
         "UV_PROJECT_ENVIRONMENT": repository / ".venv",
         "UV_CACHE_DIR": repository / ".cache/uv",
         "XDG_CACHE_HOME": repository / ".cache",
@@ -56,10 +56,11 @@ def test_environment_uses_its_checkout_and_replaces_old_mount_paths(tmp_path, ol
             environment[key] = str(tmp_path / "old-mount" / key)
         else:
             environment.pop(key, None)
+    environment["PYTHONPATH"] = str(repository)
     keys = [*paths, "PI05_RUNTIME_DIR"]
-    probe = f"import os,json; print(json.dumps({{key: os.environ.get(key) for key in {keys!r}}}))"
+    probe = f"import scripts; import os,json; print(json.dumps({{key: os.environ.get(key) for key in {keys!r}}}))"
     result = subprocess.run(
-        ["bash", "-c", 'source "$1"; "$2" -c "$3"', "probe", str(script), sys.executable, probe],
+        [sys.executable, "-c", probe],
         cwd=tmp_path,
         env=environment,
         capture_output=True,

@@ -12,15 +12,14 @@ git clone --branch main \
 cd tomato-openpi
 
 bash scripts/setup_training_env.sh
-source scripts/training_env.sh
 ```
 
-安装脚本按 `uv.lock` 安装依赖，并打印 JAX、PyTorch 和设备信息。环境使用仓库内 `.venv/`，缓存放在 `.cache/`；数据、统计、日志、checkpoint 和 W&B 分别放在仓库根目录的 `data/`、`assets/`、`logs/`、`checkpoints/`、`wandb/`。新终端进入仓库后执行 `source scripts/training_env.sh`。
+安装脚本按 `uv.lock` 安装依赖，并打印 JAX、PyTorch 和设备信息。环境使用仓库内 `.venv/`，缓存放在 `.cache/`；数据、统计、日志、checkpoint 和 W&B 分别放在仓库根目录的 `data/`、`assets/`、`logs/`、`checkpoints/`、`wandb/`。安装完成后直接运行下面的命令；启动入口自动设置仓库内的缓存和输出路径。
 
 可以先展开参考配置，确认环境和入口可用，无需准备数据或权重：
 
 ```bash
-"$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.run_training \
+.venv/bin/python -m scripts.run_training \
   training_configs.experiments.baselines.tomato_fr3_lora_v1 --dry-run
 ```
 
@@ -47,13 +46,7 @@ cp training_configs/experiments/template/tomato_lora_lr1e5.py \
 | `build_config()` | 配置名、唯一 `exp_name`、负责人及实验目的 |
 | `dataclasses.replace` 覆盖 | 学习率、batch、训练步数、seed 等本次实验参数 |
 
-模板支持用环境变量覆盖本机数据和统计位置：
-
-```bash
-export PI05_DATASET_ROOT="$PWD/data/alice_tomato_v1"
-export PI05_ASSETS_DIR="$PWD/assets"
-export EXPERIMENT=training_configs.experiments.alice.tomato_lora_lr1e5
-```
+在个人实验文件中将默认数据目录设为 `repository / "data/alice_tomato_v1"`，统计父目录设为 `repository / "assets"`，并填写对应数据身份。数据和参数随实验文件一起保存。
 
 数据身份应与实际内容一致：更换来源、筛选规则或变换时更新数据版本、`repo_id`、`asset_id` 和统计；同一数据仅搬迁目录时修改路径即可。个人实验的具体数据设置都在同一个文件中。
 
@@ -64,8 +57,8 @@ export EXPERIMENT=training_configs.experiments.alice.tomato_lora_lr1e5
 先完成实验文件的数据设置，再计算新数据的归一化统计：
 
 ```bash
-"$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.compute_experiment_norm \
-  "$EXPERIMENT" --stats-batch-size 512
+.venv/bin/python -m scripts.compute_experiment_norm \
+  training_configs.experiments.alice.tomato_lora_lr1e5 --stats-batch-size 512
 ```
 
 统计保存在 `<assets_dir>/<asset_id>/norm_stats.json`，已有统计拒绝覆盖。将文件 SHA-256 填入实验 Dataset 的 `expected_norm_sha256`；复用统计时确认对应的数据、动作表示和 horizon 一致。当前统计入口支持 FR3/Wuji，其他本体需补充适配。
@@ -76,19 +69,19 @@ export EXPERIMENT=training_configs.experiments.alice.tomato_lora_lr1e5
 
 ```bash
 # 展开最终配置，检查实验名、路径和训练参数。
-"$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.run_training \
-  "$EXPERIMENT" --dry-run
+.venv/bin/python -m scripts.run_training \
+  training_configs.experiments.alice.tomato_lora_lr1e5 --dry-run
 
 # 检查已准备的数据元信息和归一化统计。
-"$UV_PROJECT_ENVIRONMENT/bin/python" -m scripts.run_training \
-  "$EXPERIMENT" --check
+.venv/bin/python -m scripts.run_training \
+  training_configs.experiments.alice.tomato_lora_lr1e5 --check
 
 # 首次在线使用 W&B 时登录。
-"$UV_PROJECT_ENVIRONMENT/bin/wandb" login
+.venv/bin/wandb login
 
 # 按服务器分配选择 GPU；batch 必须能被可见设备数整除。
-CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_training \
-  "$EXPERIMENT" --wandb-mode online
+CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
+  training_configs.experiments.alice.tomato_lora_lr1e5 --wandb-mode online
 ```
 
 启动器只导入所选实验模块，调用它的 `build_config()`，然后执行输入检查和共享训练流程。可临时使用 `--batch-size 4`、`--num-train-steps 20000` 等 CLI 覆盖；正式实验将参数写入自己的配置并提交。
@@ -96,8 +89,8 @@ CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_tr
 没有网络时显式改用 `--wandb-mode offline`，恢复联网后同步：
 
 ```bash
-"$UV_PROJECT_ENVIRONMENT/bin/wandb" sync \
-  "$PI05_REPOSITORY_DIR/wandb/offline-run-实际编号"
+.venv/bin/wandb sync \
+  wandb/offline-run-实际编号
 ```
 
 ## 5. 查看结果与恢复训练
@@ -115,8 +108,8 @@ CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_tr
 恢复未完成的同一实验时，使用原 commit、配置、数据、统计和完整 checkpoint：
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_training \
-  "$EXPERIMENT" --resume --wandb-mode online
+CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
+  training_configs.experiments.alice.tomato_lora_lr1e5 --resume --wandb-mode online
 ```
 
 训练期间保持 checkout 不变；修改预算、数据或源码后建立新实验。恢复条件及离线日志同步见 [训练使用说明](docs/训练使用说明.md)。
