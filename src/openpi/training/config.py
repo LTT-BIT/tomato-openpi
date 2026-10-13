@@ -20,6 +20,7 @@ import openpi.models.pi0_fast as pi0_fast
 import openpi.models.tokenizer as _tokenizer
 import openpi.policies.aloha_policy as aloha_policy
 import openpi.policies.droid_policy as droid_policy
+import openpi.policies.fr3_sharpa_policy as fr3_sharpa_policy
 import openpi.policies.fr3_wuji_policy as fr3_wuji_policy
 import openpi.policies.libero_policy as libero_policy
 import openpi.shared.download as _download
@@ -444,6 +445,62 @@ class LeRobotFr3WujiDataConfig(DataConfigFactory):
             )
 
         return repack_transform, data_transforms
+
+
+@dataclasses.dataclass(frozen=True)
+class LeRobotFr3SharpaDataConfig(DataConfigFactory):
+    """58D measured state/commanded actions with Sharpa's physical wrist camera mapping."""
+
+    extra_delta_transform: bool = False
+    action_sequence_keys: Sequence[str] = ("action",)
+    lerobot_datasets: Sequence[LeRobotDatasetSpec] = ()
+    action_hz: float | None = None
+    video_backend: str | None = "pyav"
+
+    @override
+    def create(self, assets_dirs: pathlib.Path, model_config: _model.BaseModelConfig) -> DataConfig:
+        repack, vectors = self.create_vector_transforms(model_config)
+        return dataclasses.replace(
+            self.create_base_config(assets_dirs, model_config),
+            repack_transforms=repack,
+            data_transforms=vectors,
+            model_transforms=ModelTransformFactory()(model_config),
+            action_sequence_keys=self.action_sequence_keys,
+            lerobot_datasets=self.lerobot_datasets,
+            action_hz=self.action_hz,
+            video_backend=self.video_backend,
+        )
+
+    def create_vector_transforms(
+        self, model_config: _model.BaseModelConfig
+    ) -> tuple[_transforms.Group, _transforms.Group]:
+        if model_config.action_dim != 58:
+            raise ValueError("FR3/Sharpa v1 model action_dim must be 58")
+        repack = _transforms.Group(
+            inputs=[
+                _transforms.RepackTransform(
+                    {
+                        "observation/image": "observation.images.cam0",
+                        "observation/left_wrist_image": "observation.images.cam2",
+                        "observation/right_wrist_image": "observation.images.cam1",
+                        "observation/state": "observation.state",
+                        "actions": "action",
+                        "prompt": "prompt",
+                    }
+                )
+            ]
+        )
+        vectors = _transforms.Group(
+            inputs=[fr3_sharpa_policy.Fr3SharpaInputs(model_type=model_config.model_type)],
+            outputs=[fr3_sharpa_policy.Fr3SharpaOutputs()],
+        )
+        if self.extra_delta_transform:
+            mask = _transforms.make_bool_mask(7, -22, 7, -22)
+            vectors = vectors.push(
+                inputs=[_transforms.DeltaActions(mask)],
+                outputs=[_transforms.AbsoluteActions(mask)],
+            )
+        return repack, vectors
 
 
 @dataclasses.dataclass(frozen=True)

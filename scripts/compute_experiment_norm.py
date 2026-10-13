@@ -1,4 +1,4 @@
-"""Compute FR3/Wuji statistics using the same composed experiment as training."""
+"""Compute FR3/Wuji or FR3/Sharpa statistics from the same experiment as training."""
 
 import argparse
 

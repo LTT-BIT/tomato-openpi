@@ -1,9 +1,9 @@
-"""Compute FR3/Wuji vector statistics without decoding every video frame.
+"""Compute FR3/Wuji or FR3/Sharpa vector statistics without decoding every video frame.
 
 Uses the configured repack/state/action/delta transforms and LeRobot's forward
 action windows, clamped at each episode boundary. All frames, including the final
 partial batch, are included. Boundary/middle samples are checked against LeRobot.
-Only the known image-independent FR3/Wuji transforms are supported.
+Only the known image-independent FR3/Wuji and FR3/Sharpa transforms are supported.
 
 Example:
     uv run examples/fr3_wuji/compute_norm_stats.py --config-name pi05_fr3_wuji_125ep
@@ -21,6 +21,7 @@ import tqdm
 import tyro
 
 from openpi import transforms
+from openpi.policies import fr3_sharpa_policy
 from openpi.policies import fr3_wuji_policy
 from openpi.shared import normalize
 from openpi.shared.local_storage import new_artifact_directory
@@ -51,8 +52,10 @@ def compute(config: training_config.TrainConfig, *, batch_size: int = 512):
     """Compute statistics for registered or standalone training configurations."""
     if batch_size <= 0:
         raise ValueError("batch_size must be positive")
-    if not isinstance(config.data, training_config.LeRobotFr3WujiDataConfig):
-        raise ValueError("Only LeRobotFr3WujiDataConfig is supported")
+    if not isinstance(
+        config.data, training_config.LeRobotFr3WujiDataConfig | training_config.LeRobotFr3SharpaDataConfig
+    ):
+        raise ValueError("Only FR3/Wuji and FR3/Sharpa LeRobot data adapters are supported")
     asset_id = config.data.assets.asset_id or config.data.repo_id
     if asset_id is None:
         raise ValueError("A normalization asset_id is required")
@@ -69,7 +72,7 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
     if any(type(t) is not transforms.RepackTransform for t in data_config.repack_transforms.inputs):
         raise ValueError("Unsupported repack transforms")
     if any(
-        type(t) not in (fr3_wuji_policy.Fr3WujiInputs, transforms.DeltaActions)
+        type(t) not in (fr3_wuji_policy.Fr3WujiInputs, fr3_sharpa_policy.Fr3SharpaInputs, transforms.DeltaActions)
         for t in data_config.data_transforms.inputs
     ):
         raise ValueError("Unsupported transforms: image-dependent transforms cannot use vector-only statistics")

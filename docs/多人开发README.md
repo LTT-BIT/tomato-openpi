@@ -26,11 +26,13 @@ training_configs/
   embodiments/                   # 公共本体规格与适配
   recipes/                       # 公共 LoRA v1、全参 v1 方案
   experiments/
-    baselines/                   # 两套可运行的公共参考示例
+    baselines/                   # Wuji/Sharpa 的 LoRA、全参公共参考示例
     template/                    # 可复制的独立个人实验模板
     alice/                       # Alice 自己的实验，按需创建
     bob/                         # Bob 自己的实验，按需创建
 ```
+
+Sharpa 的两份 baseline 及两份个人模板复用公共 recipe，具体模块、58 维关节协议和相机映射见 [Sharpa 训练说明](Sharpa训练说明.md)。修改个人模板的数据路径、身份和实验名后运行，无需中央注册。
 
 baselines 用于核对公共基准；template 用于复制，已包含自己的数据设置，不依赖基准实验文件。alice/bob 是负责人目录的示例，当前不会自动创建。目录名不是程序要求，只有完整 Python 模块路径需要唯一。
 
@@ -101,7 +103,7 @@ def build_config():
 
 统计计算按目标目录加锁，并在完整写好两个文件后一次发布，已有目录不覆盖；不要预先创建 asset_id 最终目录。多人的不同数据/变换使用各自统计身份，共享盘跨主机仍按团队调度安排计算。log_interval/save_interval/action_horizon 使用正整数，keep_period 使用 None 或正整数。
 
-新本体实现 `recipes/common.py` 的 Embodiment 接口，提供 action_dim、raw_state_dims、action_hz、camera_keys 与 data_config()。当前启动流程要求单个显式本地 LeRobot 数据集，data_config() 需提供对应数据字段；适配器负责关节顺序、单位和动作表示。为归一化绑定检查，数据工厂需提供 create_vector_transforms(model_config)，返回归一化前的 repack/data 两组变换，不能在此加载模型、统计或 tokenizer；实际训练 create() 复用同一变换构造方法，统计计算入口也需对应适配。修改模型内部维度或增加 padding，需配套修改适配、统计检查和权重加载，不能直接修改 FR3 的维度数字。
+新本体实现 `recipes/common.py` 的 Embodiment 接口，提供 action_dim、raw_state_dims、action_hz、camera_keys 与 data_config()。当前启动流程要求单个显式本地 LeRobot 数据集，data_config() 需提供对应数据字段；适配器负责关节顺序、单位和动作表示。为归一化绑定检查，数据工厂需提供 create_vector_transforms(model_config)，返回归一化前的 repack/data 两组变换，不能在此加载模型、统计或 tokenizer；实际训练 create() 复用同一变换构造方法，统计计算入口也需对应适配。现有统计入口已经支持 Wuji 与 Sharpa；Sharpa 协议元数据随实验保存，并在预检查中核对 state/action 的关节名称和顺序。修改模型内部维度或增加 padding，需配套修改适配、统计检查和权重加载，不能直接修改 FR3 的维度数字。
 
 ## 分支与评审
 
@@ -155,7 +157,7 @@ GitLab 和 GitHub 共用的 `scripts/check_training.sh` 仍保留，本地安装
 bash scripts/check_training.sh
 ```
 
-检查包括 uv 锁一致性、配置/启动器/统计工具的 Ruff 与格式、Shell 语法、两个基准与模板 dry-run、数据与统计绑定/常量关节/采样/模型冻结/中断恢复等 CPU 回归，以及 wheel 打包。测试使用临时小数据、小模型及本地生成的 tokenizer，不读取真实数据、下载预训练权重或启动正式训练；依赖下载和 wheel 构建仍需要网络。外部真实数据测试标记 manual，自动验证使用 -m 'not manual' 排除；准备好对应数据后可单独手动执行。JUnit 报告与 wheel 在流水线保留一周。开发者仍需针对新增共享源码运行相应检查。
+检查包括 uv 锁一致性、配置/启动器/统计工具的 Ruff 与格式、Shell 语法、Wuji/Sharpa 四份基准与三份模板 dry-run、数据与统计绑定/常量关节/采样/模型冻结/中断恢复等 CPU 回归，以及 wheel 打包。测试使用临时小数据、小模型及本地生成的 tokenizer，不读取真实数据、下载预训练权重或启动正式训练；依赖下载和 wheel 构建仍需要网络。外部真实数据测试标记 manual，自动验证使用 -m 'not manual' 排除；准备好对应数据后可单独手动执行。JUnit 报告与 wheel 在流水线保留一周。开发者仍需针对新增共享源码运行相应检查。
 
 项目需要启用一个能运行 `python:3.11-bookworm` 容器的 Linux Docker/Kubernetes Runner，允许无标签作业；本方案不要求 GPU、训练数据或 W&B 密钥。Runner 需要访问 PyPI、GitHub、PyTorch 包源及 Debian 包源。依赖仍按训练 uv.lock 安装，含 CUDA 包，即使测试只用 CPU，首次安装仍需较大空间；建议至少 16 GB 内存、30 GB 可用磁盘。若作业一直 pending，先检查 Settings → CI/CD → Runners 是否有可用 Runner；代码里的 CI 文件不会自动创建 Runner。
 

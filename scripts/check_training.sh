@@ -20,6 +20,7 @@ CHECK_PATHS=(
   scripts/run_training.py scripts/compute_experiment_norm.py scripts/train.py
   src/openpi/training/norm_provenance.py examples/fr3_wuji/compute_norm_stats.py
   src/openpi/shared/local_storage.py src/openpi/training/tracking.py
+  src/openpi/policies/fr3_sharpa_policy.py src/openpi/policies/fr3_sharpa_protocol.py
   src/openpi/training/config.py src/openpi/training/checkpoints.py
   src/openpi/transforms_test.py src/openpi/training/data_loader_test.py
   examples/fr3_wuji/verify_dataset.py
@@ -31,7 +32,11 @@ bash -n scripts/setup_training_env.sh scripts/check_training.sh
 for experiment in \
   training_configs.experiments.baselines.tomato_fr3_lora_v1 \
   training_configs.experiments.baselines.tomato_fr3_fullft_v1 \
-  training_configs.experiments.template.tomato_lora_lr1e5; do
+  training_configs.experiments.template.tomato_lora_lr1e5 \
+  training_configs.experiments.baselines.tomato_fr3_sharpa_lora_v1 \
+  training_configs.experiments.baselines.tomato_fr3_sharpa_fullft_v1 \
+  training_configs.experiments.template.tomato_sharpa_lora_v1 \
+  training_configs.experiments.template.tomato_sharpa_fullft_v1; do
   .venv/bin/python -m scripts.run_training "$experiment" --dry-run
 done
 

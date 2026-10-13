@@ -48,7 +48,15 @@ def test_composition_preserves_baseline_training_semantics(module):
     validate_config(current)
 
 
-@pytest.mark.parametrize(("module", "is_lora"), [("tomato_fr3_lora_v1", True), ("tomato_fr3_fullft_v1", False)])
+@pytest.mark.parametrize(
+    ("module", "is_lora"),
+    [
+        ("tomato_fr3_lora_v1", True),
+        ("tomato_fr3_fullft_v1", False),
+        ("tomato_fr3_sharpa_lora_v1", True),
+        ("tomato_fr3_sharpa_fullft_v1", False),
+    ],
+)
 def test_actual_model_trainable_scope(module, is_lora):
     config = load_experiment(BASE + module)
 
@@ -56,6 +64,8 @@ def test_actual_model_trainable_scope(module, is_lora):
         return nnx.state(config.model.create(jax.random.key(config.model_seed)), nnx.Param)
 
     params = jax.eval_shape(shapes)
+    assert params["action_in_proj"]["kernel"].value.shape[0] == config.model.action_dim
+    assert params["action_out_proj"]["kernel"].value.shape[-1] == config.model.action_dim
     trainable = params.filter(config.trainable_filter).flat_state()
     frozen = params.filter(config.freeze_filter).flat_state()
     names = [str(path) for path in trainable]

@@ -52,7 +52,7 @@ cp training_configs/experiments/template/tomato_lora_lr1e5.py \
 | `build_dataset()` | 数据版本、`repo_id`、实际数据路径、原始来源、统计目录和 `asset_id` |
 | `PROMPT` | 本次任务的英文指令示例；训练实际读取数据中的 task |
 | recipe 导入 | `pi05_lora_v1` 或 `pi05_fullft_v1` |
-| `embodiment` | 本体规格和数据适配器；当前提供 FR3/Wuji |
+| `embodiment` | 本体规格和数据适配器；当前提供 FR3/Wuji 与 FR3/Sharpa |
 | `build_config()` | 配置名、唯一 `exp_name`、负责人及实验目的 |
 | `dataclasses.replace` 覆盖 | 学习率、batch、训练步数、seed 等本次实验参数 |
 
@@ -73,7 +73,9 @@ cp training_configs/experiments/template/tomato_lora_lr1e5.py \
 
 工具将 `norm_stats.json` 和 `norm_metadata.json` 成对发布到 `<assets_dir>/<asset_id>/`，同一目标的并发计算会报错，已有目标目录拒绝覆盖（包括空目录）；新统计使用新的 asset_id，不要预先创建其最终目录。计算或写入失败不会留下可被训练读取的半成品。训练前会核对统计文件、数据身份、元信息与 Parquet 文件摘要、动作维度、horizon 和输入变换；复制统计时保留这两个文件。相同数据搬迁目录或换学习率可复用，数据文件或输入变换变化后需重新计算。也可将统计文件 SHA-256 填入 Dataset 的 `expected_norm_sha256`，固定发布版本。
 
-某个关节全程不变时，工具正常保存零方差统计，并在元数据中记录相应维度；归一化使用现有 epsilon 保护。当前统计入口支持 FR3/Wuji，其他本体需补充适配。旧统计缺少数据绑定记录时默认拒绝；已固定摘要的全参历史基准保留明确的兼容设置，详见训练使用说明。
+某个关节全程不变时，工具正常保存零方差统计，并在元数据中记录相应维度；归一化使用现有 epsilon 保护。当前统计入口支持 FR3/Wuji 与 FR3/Sharpa，其他本体需补充适配。旧统计缺少数据绑定记录时默认拒绝；已固定摘要的全参历史基准保留明确的兼容设置，详见训练使用说明。
+
+FR3/Sharpa 使用独立 58 维 state/action 协议（7+22+7+22），cam2 左腕、cam1 右腕。LoRA 和全参 baseline 分别为 `training_configs.experiments.baselines.tomato_fr3_sharpa_lora_v1` 与 `training_configs.experiments.baselines.tomato_fr3_sharpa_fullft_v1`；个人模板为 `training_configs/experiments/template/tomato_sharpa_lora_v1.py` 与 `tomato_sharpa_fullft_v1.py`。训练参数复用现有公共方案，具体数据要求和命令见 [Sharpa 训练说明](docs/Sharpa训练说明.md)。
 
 公共方案默认加载 `gs://openpi-assets/checkpoints/pi05_base/params`，首次使用需要下载并缓存初始权重；离线训练前须准备好权重及 tokenizer。数据格式、统计校验和权重设置详见 [训练使用说明](docs/训练使用说明.md)。
 
@@ -137,7 +139,7 @@ CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
 
 | 路径 | 用途 |
 | --- | --- |
-| `training_configs/experiments/baselines/` | LoRA v1、全参 v1 公共参考配置 |
+| `training_configs/experiments/baselines/` | Wuji 与 Sharpa 各自的 LoRA v1、全参 v1 公共参考配置 |
 | `training_configs/experiments/template/` | 可复制的个人实验模板 |
 | `training_configs/experiments/<负责人>/` | 个人数据设置与实验参数 |
 | `training_configs/recipes/` | 带版本的公共训练方案 |

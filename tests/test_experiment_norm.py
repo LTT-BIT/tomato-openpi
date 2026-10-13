@@ -18,11 +18,15 @@ from training_configs import common
 
 
 @pytest.mark.parametrize("all_constant", [False, True])
-def test_statistics_save_constant_joints_and_bind_to_vectors(tmp_path, monkeypatch, caplog, all_constant):
+@pytest.mark.parametrize("module", ["tomato_fr3_lora_v1", "tomato_fr3_sharpa_lora_v1"])
+def test_statistics_save_constant_joints_and_bind_to_vectors(tmp_path, monkeypatch, caplog, all_constant, module):
     monkeypatch.setattr(common, "repository_root", lambda: tmp_path)
-    config = run_training.load_experiment("training_configs.experiments.baselines.tomato_fr3_lora_v1")
+    config = run_training.load_experiment("training_configs.experiments.baselines." + module)
     config = replace(config, model=replace(config.model, action_horizon=3))
     root = Path(config.data.lerobot_datasets[0].root)
+    dim = config.model.action_dim
+    raw_dim = config.policy_metadata["raw_state_dims"][-1]
+    names = {"names": config.policy_metadata["joint_names"]} if dim == 58 else {}
     for folder in ("meta", "data", "videos"):
         (root / folder).mkdir(parents=True, exist_ok=True)
     info = {
@@ -33,15 +37,15 @@ def test_statistics_save_constant_joints_and_bind_to_vectors(tmp_path, monkeypat
         "chunks_size": 1000,
         "data_path": "data/episode_{episode_index:06d}.parquet",
         "features": {
-            "action": {"shape": [54]},
-            "observation.state": {"shape": [108]},
+            "action": {"shape": [dim], **names},
+            "observation.state": {"shape": [raw_dim], **names},
             **{key: {"shape": [1, 1, 3]} for key in config.policy_metadata["camera_keys"]},
         },
     }
     (root / "meta/info.json").write_text(json.dumps(info))
     (root / "meta/episodes.jsonl").write_text('{"episode_index": 0, "length": 4}\n')
     (root / "meta/tasks.jsonl").write_text('{"task_index": 0, "task": "Pick the tomato."}\n')
-    state, actions = np.zeros((4, 108), dtype=np.float32), np.zeros((4, 54), dtype=np.float32)
+    state, actions = np.zeros((4, raw_dim), dtype=np.float32), np.zeros((4, dim), dtype=np.float32)
     if not all_constant:
         state[:, 0] = np.arange(4)
         actions[:, 0] = np.arange(4) * 2
@@ -71,12 +75,12 @@ def test_statistics_save_constant_joints_and_bind_to_vectors(tmp_path, monkeypat
     with pytest.raises(FileExistsError, match="target already exists"):
         compute_norm_stats.compute(config, batch_size=3)
     assert recorded["vector_counts"] == {"state": 4, "actions": 12}
-    assert recorded["constant_dimensions"]["state"] == list(range(0 if all_constant else 1, 54))
-    assert recorded["constant_dimensions"]["actions"] == list(range(0 if all_constant else 1, 54))
+    assert recorded["constant_dimensions"]["state"] == list(range(0 if all_constant else 1, dim))
+    assert recorded["constant_dimensions"]["actions"] == list(range(0 if all_constant else 1, dim))
     assert "Zero-variance" in caplog.text
     assert np.all(stats["state"].std[1:] == 0)
     assert np.all(stats["state"].q99[1:] == stats["state"].q01[1:])
-    sample = {"state": np.zeros(54), "actions": np.zeros((3, 54))}
+    sample = {"state": np.zeros(dim), "actions": np.zeros((3, dim))}
     normalized = transforms.Normalize(stats, use_quantiles=True)(sample)
     assert all(np.isfinite(value).all() for value in normalized.values())
     assert run_training.preflight(config)["norm_provenance"] == "verified"
