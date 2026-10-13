@@ -54,7 +54,7 @@ bash scripts/setup_training_env.sh
 | 铲柠檬 LoRA | [lemon_ur_o30_lora_v1.py](training_configs/experiments/lemon_scooping/baseline/lemon_ur_o30_lora_v1.py) | 12（模型 32，状态 52） | 30,000 | `data/lemon_wrist_reset_v1` |
 | 铲柠檬 全参 | [lemon_ur_o30_fullft_v1.py](training_configs/experiments/lemon_scooping/baseline/lemon_ur_o30_fullft_v1.py) | 12（模型 32，状态 52） | 30,000 | `data/lemon_wrist_reset_v1` |
 
-番茄与杯子六份配置共用以下训练参数；柠檬 LoRA 复用公共训练配方，柠檬全参按来源任务记录覆盖 batch、学习率和保存间隔，详见[柠檬说明](training_configs/experiments/lemon_scooping/README.md)。以下公共参数中的频率与动作语义以各任务协议为准。
+番茄与杯子六份配置共用以下训练参数；柠檬 LoRA 复用公共训练配方，柠檬全参按来源任务记录覆盖学习率和保存间隔，详见[柠檬说明](training_configs/experiments/lemon_scooping/README.md)。以下公共参数中的频率与动作语义以各任务协议为准。
 
 本体协议、数据身份、统计及英文 prompt 见对应任务说明。
 
@@ -66,7 +66,7 @@ bash scripts/setup_training_env.sh
 | LoRA | VLM `gemma_2b_lora` rank/alpha=16/16；Expert `gemma_300m_lora` rank/alpha=32/32；视觉及投影可训练 |
 | 全参 | `gemma_2b` + `gemma_300m`，所有参数可训练 |
 | 频率 / horizon | 30 Hz / 50；番茄双臂 delta、手部 absolute；杯子沿用原始动作，不额外转 delta |
-| batch / workers / FSDP | 全局 batch 8 / workers 8 / fsdp_devices=1 |
+| batch / workers / FSDP | 全局 batch：LoRA 8、全参 64 / workers 8 / fsdp_devices=1 |
 | 采样 / seed | epoch_shuffle；seed=42、model_seed=42、data_seed=42001、augmentation_seed=42002 |
 | 学习率 | cosine；warmup=1,000，peak=2.5e-5，decay_steps=30,000，end=2.5e-6 |
 | 优化器 | AdamW；β1=0.9、β2=0.95、eps=1e-8、weight_decay=1e-10、clip=1.0 |

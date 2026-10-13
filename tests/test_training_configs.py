@@ -37,8 +37,12 @@ def test_composition_preserves_baseline_training_semantics(module):
     current_values = json.loads(serialize_config(portable))["fields"]
     for key in snapshot["excluded_fields"]:
         current_values.pop(key)
-    # The current recipes intentionally standardize only the training budget to 30k.
-    assert current_values == {**snapshot["config_fields"], "num_train_steps": 30_000}
+    # Keep historical snapshots intact; current recipes use 30k and full tuning uses global batch 64.
+    assert current_values == {
+        **snapshot["config_fields"],
+        "num_train_steps": 30_000,
+        "batch_size": 8 if "lora" in module else 64,
+    }
     expected_recipe = "pi05_lora_v1" if "lora" in module else "pi05_fullft_v1"
     assert current.policy_metadata["recipe_version"] == expected_recipe
     assert current.policy_metadata["baseline_version"] == expected_recipe

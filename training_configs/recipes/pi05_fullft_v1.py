@@ -1,5 +1,7 @@
 """Published full-parameter v1 recipe (derived from historical C0 v3): all model parameters trainable, 30,000 optimization steps."""
 
+from dataclasses import replace
+
 from openpi.models import gemma
 from training_configs.recipes.common import Recipe
 
@@ -16,4 +18,4 @@ def build_config(**kwargs):
     for variant in ("gemma_2b", "gemma_300m"):
         if gemma.get_config(variant).lora_configs:
             raise ValueError(f"{variant}: full-parameter recipe cannot contain LoRA")
-    return RECIPE.build(**kwargs)
+    return replace(RECIPE.build(**kwargs), batch_size=64)

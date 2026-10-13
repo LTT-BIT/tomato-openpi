@@ -15,7 +15,7 @@
 | LoRA | [tomato_fr3_lora_v1.py](baseline/tomato_fr3_lora_v1.py) | 30,000 步 |
 | 全参 | [tomato_fr3_fullft_v1.py](baseline/tomato_fr3_fullft_v1.py) | 30,000 步 |
 
-模块前缀为 `training_configs.experiments.tomato_wuji.baseline.`。两份文件分别组合公共 `pi05_lora_v1` / `pi05_fullft_v1`；batch 8、workers 8、bfloat16、warmup 1000、peak lr 2.5e-5、end lr 2.5e-6、decay 30000、无 EMA、epoch_shuffle、seed 42/42/42001/42002、每 2000 步保存、keep_period 10000、W&B 启用。
+模块前缀为 `training_configs.experiments.tomato_wuji.baseline.`。两份文件分别组合公共 `pi05_lora_v1` / `pi05_fullft_v1`；全局 batch：LoRA 8、全参 64；workers 8、bfloat16、warmup 1000、peak lr 2.5e-5、end lr 2.5e-6、decay 30000、无 EMA、epoch_shuffle、seed 42/42/42001/42002、每 2000 步保存、keep_period 10000、W&B 启用。
 
 | 设置 | LoRA | 全参 |
 | --- | --- | --- |

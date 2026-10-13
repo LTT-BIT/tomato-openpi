@@ -6,7 +6,7 @@
 
 单臂 Franka，原始 state/action 均为 7 维关节向量。先按 7 维计算归一化统计，再补零到模型的 32 维；沿用数据中的动作，不额外转 delta。主相机为 `observation.images.cam_head`，左腕相机为 `observation.images.wrist_left`，右腕图像为空并屏蔽。
 
-定义来自提供的杯子任务 `config.py`，SHA-256 为 `3c7096905a694437c5ce020c76817a1c3fac5924e9c8a0bf179af05d3b0834a1`。源配置未提供完整关节顺序与单位，准备生产数据时须核对；其他训练参数复用公共 recipe：30 Hz、horizon 50、batch 8、全参与 LoRA 均为 30,000 步。
+定义来自提供的杯子任务 `config.py`，SHA-256 为 `3c7096905a694437c5ce020c76817a1c3fac5924e9c8a0bf179af05d3b0834a1`。源配置未提供完整关节顺序与单位，准备生产数据时须核对；其他训练参数复用公共 recipe：30 Hz、horizon 50、全局 batch：LoRA 8、全参 64；全参与 LoRA 均为 30,000 步。
 
 本仓库仅接受 **LeRobot v2.1**，不兼容 v3.0，也不提供数据转换。现有杯子数据预计为 v3.0，须在独立数据仓库准备并核验 v2.1 数据，不能仅修改版本字段。检查帧数、episode 边界、关节顺序、任务文本和视频时间对齐。
 

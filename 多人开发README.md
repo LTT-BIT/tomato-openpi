@@ -145,3 +145,5 @@ def build_config():
 柠檬的五时间戳入口见[任务说明](training_configs/experiments/lemon_scooping/README.md)：`phase_annotations_path` 指向实际标注，`phase_prompts` 定义五个阶段的英文指令，`phase_arm_hold` 可启用双 UR 特定的手臂保持。它根据已知边界生成训练样本，不训练阶段分类器。阶段模式与 task_indices/prompt_overrides 模式分开使用。
 
 当前所有 baseline 都没有验证集。柠檬清单把原 188 train + 21 val 合并成 209 个训练 episode；`split_path` 在这里仅用于选取有效数据。将来换数据时同步修改目录、repo_id、清单、来源和统计身份；不能只换路径却保留旧 episode 编号。筛选、阶段边界、prompt 映射的配置或内容变化会使旧统计失效，续训校验也会检查样本视图身份，需作为新实验重新计算统计。
+
+所有任务的全参数 baseline 默认全局 `batch_size=64`，LoRA 默认 `batch_size=8`；全局 batch 是所有参与训练 GPU 的合计，不是每张 GPU 的 batch。个人实验可显式覆盖，并使用新的实验名称；已经开始的实验续训时保持原 batch。
