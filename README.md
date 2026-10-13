@@ -45,10 +45,10 @@ bash scripts/setup_training_env.sh
 
 | 任务 / 方案 | baseline 文件 | 动作维度 | 总步数 | 默认数据目录 |
 | --- | --- | ---: | ---: | --- |
-| 番茄-Wuji LoRA | [tomato_fr3_lora_v1.py](training_configs/experiments/tomato_wuji/baseline/tomato_fr3_lora_v1.py) | 54 | 20,000 | `data/tomato_fulltask_v1` |
-| 番茄-Wuji 全参 | [tomato_fr3_fullft_v1.py](training_configs/experiments/tomato_wuji/baseline/tomato_fr3_fullft_v1.py) | 54 | 60,153 | `data/tomato_all_full_v1` |
-| 番茄-Sharpa LoRA | [tomato_fr3_sharpa_lora_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_lora_v1.py) | 58 | 20,000 | `data/tomato_sharpa_fulltask_v1` |
-| 番茄-Sharpa 全参 | [tomato_fr3_sharpa_fullft_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_fullft_v1.py) | 58 | 60,153 | `data/tomato_sharpa_fulltask_v1` |
+| 番茄-Wuji LoRA | [tomato_fr3_lora_v1.py](training_configs/experiments/tomato_wuji/baseline/tomato_fr3_lora_v1.py) | 54 | 30,000 | `data/tomato_fulltask_v1` |
+| 番茄-Wuji 全参 | [tomato_fr3_fullft_v1.py](training_configs/experiments/tomato_wuji/baseline/tomato_fr3_fullft_v1.py) | 54 | 30,000 | `data/tomato_all_full_v1` |
+| 番茄-Sharpa LoRA | [tomato_fr3_sharpa_lora_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_lora_v1.py) | 58 | 30,000 | `data/tomato_sharpa_fulltask_v1` |
+| 番茄-Sharpa 全参 | [tomato_fr3_sharpa_fullft_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_fullft_v1.py) | 58 | 30,000 | `data/tomato_sharpa_fulltask_v1` |
 
 四份配置共用以下训练参数；本体协议、数据身份、统计及英文 prompt 见对应任务说明。
 
@@ -66,7 +66,7 @@ bash scripts/setup_training_env.sh
 | 日志 / checkpoint | log_interval=10、save_interval=2,000、keep_period=10,000 |
 | W&B | 启用，project=openpi；联网 online，离线显式 offline |
 
-全参 60,153 步来自历史 Wuji 数据预算，并不会随数据量自动调整；LoRA 的 20,000 步预算也早于学习率计划的 30,000 步终点。baseline 是参考参数，复制后应按本次数据和训练计划调整。
+LoRA 和全参默认均训练 30,000 步，学习率计划的 decay_steps 同为 30,000；步数不随数据量自动调整。个人实验可按实际训练计划覆盖。
 
 以下以 Wuji LoRA 为例，选择模块并展开配置，无需数据、权重或 GPU：
 

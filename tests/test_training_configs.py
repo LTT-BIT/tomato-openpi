@@ -37,7 +37,8 @@ def test_composition_preserves_baseline_training_semantics(module):
     current_values = json.loads(serialize_config(portable))["fields"]
     for key in snapshot["excluded_fields"]:
         current_values.pop(key)
-    assert current_values == snapshot["config_fields"]
+    # The current recipes intentionally standardize only the training budget to 30k.
+    assert current_values == {**snapshot["config_fields"], "num_train_steps": 30_000}
     expected_recipe = "pi05_lora_v1" if "lora" in module else "pi05_fullft_v1"
     assert current.policy_metadata["recipe_version"] == expected_recipe
     assert current.policy_metadata["baseline_version"] == expected_recipe
@@ -93,7 +94,7 @@ def test_fullft_selected_data_and_reproducibility_contract(monkeypatch):
         "/test-data/harvest-tomato/0925/B",
         "/test-data/harvest-tomato/1002_AB_190/full",
     ]
-    assert config.num_train_steps == (481_223 + config.batch_size - 1) // config.batch_size
+    assert config.num_train_steps == 30_000
     assert (config.seed, config.model_seed, config.data_seed, config.augmentation_seed) == (42, 42, 42001, 42002)
     assert config.sampling_mode == "epoch_shuffle"
     assert config.data.base_config.prompt_from_task

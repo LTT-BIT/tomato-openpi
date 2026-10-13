@@ -29,6 +29,7 @@ def test_sharpa_changes_only_adapter_and_experiment_identity(scheme):
     wuji = run_training.load_experiment(f"training_configs.experiments.tomato_wuji.baseline.tomato_fr3_{scheme}_v1")
     sharpa = run_training.load_experiment(BASE + f"tomato_fr3_sharpa_{scheme}_v1")
     run_training.validate_config(sharpa)
+    assert sharpa.num_train_steps == wuji.num_train_steps == 30_000
     wuji_fields = json.loads(serialize_config(wuji))["fields"]
     sharpa_fields = json.loads(serialize_config(sharpa))["fields"]
     for key in ("name", "exp_name", "data", "policy_metadata"):

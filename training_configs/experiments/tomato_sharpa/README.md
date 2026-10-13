@@ -23,8 +23,8 @@ meta/info.json 的 observation.state 和 action 的 shape 均为 [58]，names �
 
 | 方案 | baseline 文件 | 默认预算 |
 | --- | --- | --- |
-| LoRA | [tomato_fr3_sharpa_lora_v1.py](baseline/tomato_fr3_sharpa_lora_v1.py) | 20,000 步 |
-| 全参 | [tomato_fr3_sharpa_fullft_v1.py](baseline/tomato_fr3_sharpa_fullft_v1.py) | 60,153 步 |
+| LoRA | [tomato_fr3_sharpa_lora_v1.py](baseline/tomato_fr3_sharpa_lora_v1.py) | 30,000 步 |
+| 全参 | [tomato_fr3_sharpa_fullft_v1.py](baseline/tomato_fr3_sharpa_fullft_v1.py) | 30,000 步 |
 
 模块前缀为 `training_configs.experiments.tomato_sharpa.baseline.`。当前 `template/` 留空，只保留 `.gitkeep`；后续实验从 baseline 复制到 `template/<负责人>/`。两种方案分别引用既有 `pi05_lora_v1` 和 `pi05_fullft_v1`。LoRA 为 VLM rank 16、Expert rank 32，视觉及投影可训练；全参无 LoRA、全部参数可训练。
 

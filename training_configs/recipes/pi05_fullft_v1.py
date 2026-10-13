@@ -1,4 +1,4 @@
-"""Published full-parameter v1 recipe (derived from historical C0 v3): all model parameters trainable, 60,153 optimization steps."""
+"""Published full-parameter v1 recipe (derived from historical C0 v3): all model parameters trainable, 30,000 optimization steps."""
 
 from openpi.models import gemma
 from training_configs.recipes.common import Recipe
@@ -8,7 +8,7 @@ RECIPE = Recipe(
     source_baseline="fulltask_c0_v3_fullft",
     paligemma_variant="gemma_2b",
     action_expert_variant="gemma_300m",
-    num_train_steps=60_153,
+    num_train_steps=30_000,
 )
 
 

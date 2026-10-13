@@ -8,7 +8,7 @@ RECIPE = Recipe(
     source_baseline="fulltask_c0_v2",
     paligemma_variant="gemma_2b_lora",
     action_expert_variant="gemma_300m_lora",
-    num_train_steps=20_000,
+    num_train_steps=30_000,
 )
 
 
