@@ -37,7 +37,7 @@ class Recipe:
         model = pi0_config.Pi0Config(
             pi05=True,
             dtype="bfloat16",
-            action_dim=embodiment.action_dim,
+            action_dim=getattr(embodiment, "model_action_dim", embodiment.action_dim),
             action_horizon=50,
             max_token_len=256,
             discrete_state_input=True,

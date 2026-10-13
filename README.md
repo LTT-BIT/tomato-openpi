@@ -1,6 +1,6 @@
 # Tomato OpenPI 训练仓库
 
-基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
+基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
 本页说明下载安装和运行；创建个人配置、修改公共代码及分支管理见 [多人开发 README](多人开发README.md)。
 
@@ -37,11 +37,11 @@ bash scripts/setup_training_env.sh
 | 番茄-Wuji | [tomato_wuji](training_configs/experiments/tomato_wuji/README.md) | LoRA / 全参 v1 baseline |
 | 番茄-Sharpa | [tomato_sharpa](training_configs/experiments/tomato_sharpa/README.md) | LoRA / 全参 v1 baseline；生产数据待准备 |
 | 铲柠檬 | [lemon_scooping](training_configs/experiments/lemon_scooping/README.md) | 本体、数据及 baseline 待定义 |
-| 抓取杯子 | [cup_grasping](training_configs/experiments/cup_grasping/README.md) | 本体、数据及 baseline 待定义 |
+| 抓取杯子 | [cup_grasping](training_configs/experiments/cup_grasping/README.md) | 单臂 Franka LoRA / 全参 v1 baseline；v2.1 数据待准备 |
 
 每个任务下的 `baseline/` 存放参考配置，`template/` 当前为空，后续按负责人保存实验。数据、统计和真实训练结果不随 Git 仓库分发。
 
-当前四份 baseline：
+当前六份 baseline：
 
 | 任务 / 方案 | baseline 文件 | 动作维度 | 总步数 | 默认数据目录 |
 | --- | --- | ---: | ---: | --- |
@@ -49,15 +49,17 @@ bash scripts/setup_training_env.sh
 | 番茄-Wuji 全参 | [tomato_fr3_fullft_v1.py](training_configs/experiments/tomato_wuji/baseline/tomato_fr3_fullft_v1.py) | 54 | 30,000 | `data/tomato_all_full_v1` |
 | 番茄-Sharpa LoRA | [tomato_fr3_sharpa_lora_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_lora_v1.py) | 58 | 30,000 | `data/tomato_sharpa_fulltask_v1` |
 | 番茄-Sharpa 全参 | [tomato_fr3_sharpa_fullft_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_fullft_v1.py) | 58 | 30,000 | `data/tomato_sharpa_fulltask_v1` |
+| 抓取杯子 LoRA | [cup_single_franka_lora_v1.py](training_configs/experiments/cup_grasping/baseline/cup_single_franka_lora_v1.py) | 7（模型补零至 32） | 30,000 | `data/cup_grasping_v1` |
+| 抓取杯子 全参 | [cup_single_franka_fullft_v1.py](training_configs/experiments/cup_grasping/baseline/cup_single_franka_fullft_v1.py) | 7（模型补零至 32） | 30,000 | `data/cup_grasping_v1` |
 
-四份配置共用以下训练参数；本体协议、数据身份、统计及英文 prompt 见对应任务说明。
+六份配置共用以下训练参数；本体协议、数据身份、统计及英文 prompt 见对应任务说明。
 
 | 参数 | 默认值 |
 | --- | --- |
 | 模型 / 精度 | π0.5，bfloat16；max_token_len=256，discrete_state_input=True |
 | LoRA | VLM `gemma_2b_lora` rank/alpha=16/16；Expert `gemma_300m_lora` rank/alpha=32/32；视觉及投影可训练 |
 | 全参 | `gemma_2b` + `gemma_300m`，所有参数可训练 |
-| 频率 / horizon | 30 Hz / 50；双臂 delta，手部 absolute |
+| 频率 / horizon | 30 Hz / 50；番茄双臂 delta、手部 absolute；杯子沿用原始动作，不额外转 delta |
 | batch / workers / FSDP | 全局 batch 8 / workers 8 / fsdp_devices=1 |
 | 采样 / seed | epoch_shuffle；seed=42、model_seed=42、data_seed=42001、augmentation_seed=42002 |
 | 学习率 | cosine；warmup=1,000，peak=2.5e-5，decay_steps=30,000，end=2.5e-6 |

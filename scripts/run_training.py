@@ -64,7 +64,11 @@ def validate_config(config: cfg.TrainConfig) -> None:
     if any(seed is None for seed in (config.model_seed, config.data_seed, config.augmentation_seed)):
         raise ValueError("Record all independent model/data/augmentation seeds")
     metadata = config.policy_metadata or {}
-    if config.model.action_dim != metadata.get("physical_action_dim"):
+    physical_dim = metadata.get("physical_action_dim")
+    model_dim = metadata.get("model_action_dim", physical_dim)
+    if not isinstance(physical_dim, int) or not 0 < physical_dim <= config.model.action_dim:
+        raise ValueError("Physical action dimension must fit the model action dimension")
+    if config.model.action_dim != model_dim:
         raise ValueError("Model action_dim differs from the embodiment adapter; define a new embodiment")
     if not config.data.base_config or not config.data.base_config.prompt_from_task:
         raise ValueError("Read English prompts from dataset task labels")
@@ -88,7 +92,7 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     if info.get("fps") != config.data.action_hz:
         raise ValueError("Dataset fps differs from the configured action sampling frequency")
     features = info["features"]
-    if features["action"]["shape"] != [config.model.action_dim]:
+    if features["action"]["shape"] != [metadata["physical_action_dim"]]:
         raise ValueError("Dataset action shape differs from the embodiment")
     if features["observation.state"]["shape"] not in [[dim] for dim in metadata["raw_state_dims"]]:
         raise ValueError("Dataset raw state shape is not supported by the embodiment")
@@ -135,7 +139,11 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
             value = stats[key]
             for field in ("mean", "std", "q01", "q99"):
                 array = getattr(value, field)
-                if array is None or array.shape != (config.model.action_dim,) or not np.isfinite(array).all():
+                if (
+                    array is None
+                    or array.shape != (metadata.get("normalization_dim", config.model.action_dim),)
+                    or not np.isfinite(array).all()
+                ):
                     raise ValueError(f"Invalid normalization {key}.{field} shape or values")
             if np.any(value.std < 0) or np.any(value.q99 < value.q01):
                 raise ValueError(f"Invalid normalization range for {key}")

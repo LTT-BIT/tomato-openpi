@@ -14,7 +14,7 @@
 | 模型、数据加载与训练循环 | `src/openpi/` |
 | 历史有效实验记录 | `docs/records/` |
 
-当前任务为 tomato_wuji、tomato_sharpa、lemon_scooping、cup_grasping，后两项尚无 baseline。template 目录当前仅保留空占位，有真实实验时再添加文件。启动器只导入指定模块并调用 `build_config()`，无需中央注册，不会运行其他配置。
+当前任务为 tomato_wuji、tomato_sharpa、lemon_scooping、cup_grasping，其中 lemon_scooping 尚无 baseline；杯子 baseline 要求 LeRobot v2.1 数据。template 目录当前仅保留空占位，有真实实验时再添加文件。启动器只导入指定模块并调用 `build_config()`，无需中央注册，不会运行其他配置。
 
 ## 创建个人实验
 
@@ -81,7 +81,7 @@ def build_config():
 bash scripts/check_training.sh
 ```
 
-脚本验证锁文件、Ruff、Shell 语法、四份 baseline 展开、CPU 回归和 wheel 打包。测试使用临时数据，不启动正式训练；标记 manual 的外部数据测试需另外执行。GitLab 自动 CI 当前暂停；重新启用时删除 `.gitlab-ci.yml` 中首条无条件 `when: never`，并配置可运行作业的 Linux Docker/Kubernetes Runner，下方条件规则保留。
+脚本验证锁文件、Ruff、Shell 语法、六份 baseline 展开、CPU 回归和 wheel 打包。测试使用临时数据，不启动正式训练；标记 manual 的外部数据测试需另外执行。GitLab 自动 CI 当前暂停；重新启用时删除 `.gitlab-ci.yml` 中首条无条件 `when: never`，并配置可运行作业的 Linux Docker/Kubernetes Runner，下方条件规则保留。
 
 提交前确认只包含本任务文件，使用中文提交说明。合并请求写明改动目的、影响和验证结果；不新增开发流水账。数据、权重、日志、环境、缓存及密钥不提交 Git。
 

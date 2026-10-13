@@ -56,10 +56,12 @@ def test_composition_preserves_baseline_training_semantics(module):
         ("tomato_fr3_fullft_v1", False),
         ("tomato_fr3_sharpa_lora_v1", True),
         ("tomato_fr3_sharpa_fullft_v1", False),
+        ("cup_single_franka_lora_v1", True),
+        ("cup_single_franka_fullft_v1", False),
     ],
 )
 def test_actual_model_trainable_scope(module, is_lora):
-    task = "tomato_sharpa" if "_sharpa_" in module else "tomato_wuji"
+    task = "cup_grasping" if module.startswith("cup_") else "tomato_sharpa" if "_sharpa_" in module else "tomato_wuji"
     config = load_experiment(f"training_configs.experiments.{task}.baseline.{module}")
 
     def shapes():

@@ -21,6 +21,7 @@ CHECK_PATHS=(
   src/openpi/training/norm_provenance.py examples/fr3_wuji/compute_norm_stats.py
   src/openpi/shared/local_storage.py src/openpi/training/tracking.py
   src/openpi/policies/fr3_sharpa_policy.py src/openpi/policies/fr3_sharpa_protocol.py
+  src/openpi/policies/single_franka_policy.py
   src/openpi/training/config.py src/openpi/training/checkpoints.py
   src/openpi/transforms_test.py src/openpi/training/data_loader_test.py
   examples/fr3_wuji/verify_dataset.py
@@ -33,7 +34,9 @@ for experiment in \
   training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 \
   training_configs.experiments.tomato_wuji.baseline.tomato_fr3_fullft_v1 \
   training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1 \
-  training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_fullft_v1; do
+  training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_fullft_v1 \
+  training_configs.experiments.cup_grasping.baseline.cup_single_franka_lora_v1 \
+  training_configs.experiments.cup_grasping.baseline.cup_single_franka_fullft_v1; do
   .venv/bin/python -m scripts.run_training "$experiment" --dry-run
 done
 

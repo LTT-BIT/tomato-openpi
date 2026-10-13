@@ -1,9 +1,9 @@
-"""Compute FR3/Wuji or FR3/Sharpa vector statistics without decoding every video frame.
+"""Compute supported robot vector statistics without decoding every video frame.
 
 Uses the configured repack/state/action/delta transforms and LeRobot's forward
 action windows, clamped at each episode boundary. All frames, including the final
 partial batch, are included. Boundary/middle samples are checked against LeRobot.
-Only the known image-independent FR3/Wuji and FR3/Sharpa transforms are supported.
+Only the explicitly allowed image-independent robot transforms are supported.
 
 Example:
     uv run examples/fr3_wuji/compute_norm_stats.py --config-name pi05_fr3_wuji_125ep
@@ -23,6 +23,7 @@ import tyro
 from openpi import transforms
 from openpi.policies import fr3_sharpa_policy
 from openpi.policies import fr3_wuji_policy
+from openpi.policies import single_franka_policy
 from openpi.shared import normalize
 from openpi.shared.local_storage import new_artifact_directory
 from openpi.training import config as training_config
@@ -31,7 +32,15 @@ from openpi.training import norm_provenance
 from openpi.training import reproducibility
 
 
-def transform_vectors(state, actions, rows, horizon, transform):
+def transform_vectors(
+    state,
+    actions,
+    rows,
+    horizon,
+    transform,
+    *,
+    camera_keys=("observation.images.cam0", "observation.images.cam1", "observation.images.cam2"),
+):
     indices = np.minimum(rows[:, None] + np.arange(horizon), len(state) - 1)
     # Images cannot affect state/actions for the explicitly allowed transforms below.
     image = np.zeros((1, 1, 3), dtype=np.uint8)
@@ -39,7 +48,7 @@ def transform_vectors(state, actions, rows, horizon, transform):
         "observation.state": state[rows],
         "action": actions[indices],
         "prompt": "",
-        **{f"observation.images.cam{i}": image for i in range(3)},
+        **dict.fromkeys(camera_keys, image),
     }
     return transform(raw)
 
@@ -53,9 +62,12 @@ def compute(config: training_config.TrainConfig, *, batch_size: int = 512):
     if batch_size <= 0:
         raise ValueError("batch_size must be positive")
     if not isinstance(
-        config.data, training_config.LeRobotFr3WujiDataConfig | training_config.LeRobotFr3SharpaDataConfig
+        config.data,
+        training_config.LeRobotFr3WujiDataConfig
+        | training_config.LeRobotFr3SharpaDataConfig
+        | training_config.LeRobotSingleFrankaDataConfig,
     ):
-        raise ValueError("Only FR3/Wuji and FR3/Sharpa LeRobot data adapters are supported")
+        raise ValueError("Only FR3/Wuji, FR3/Sharpa and single Franka LeRobot data adapters are supported")
     asset_id = config.data.assets.asset_id or config.data.repo_id
     if asset_id is None:
         raise ValueError("A normalization asset_id is required")
@@ -72,7 +84,13 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
     if any(type(t) is not transforms.RepackTransform for t in data_config.repack_transforms.inputs):
         raise ValueError("Unsupported repack transforms")
     if any(
-        type(t) not in (fr3_wuji_policy.Fr3WujiInputs, fr3_sharpa_policy.Fr3SharpaInputs, transforms.DeltaActions)
+        type(t)
+        not in (
+            fr3_wuji_policy.Fr3WujiInputs,
+            fr3_sharpa_policy.Fr3SharpaInputs,
+            single_franka_policy.SingleFrankaInputs,
+            transforms.DeltaActions,
+        )
         for t in data_config.data_transforms.inputs
     ):
         raise ValueError("Unsupported transforms: image-dependent transforms cannot use vector-only statistics")
@@ -92,13 +110,15 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
     transform = transforms.compose([*data_config.repack_transforms.inputs, *data_config.data_transforms.inputs])
     reference = data_loader.create_torch_dataset(data_config, config.model.action_horizon, config.model)
     stats = {key: normalize.RunningStats() for key in ("state", "actions")}
-    totals = {key: np.zeros(config.model.action_dim, dtype=np.float64) for key in stats}
-    squares = {key: np.zeros(config.model.action_dim, dtype=np.float64) for key in stats}
+    norm_dim = (config.policy_metadata or {}).get("normalization_dim", config.model.action_dim)
+    totals = {key: np.zeros(norm_dim, dtype=np.float64) for key in stats}
+    squares = {key: np.zeros(norm_dim, dtype=np.float64) for key in stats}
     counts = dict.fromkeys(stats, 0)
     offset = 0
     checked = 0
     for spec, root, info, episodes in sources:
         source_offset = 0
+        camera_keys = tuple(key for key in info["features"] if key.startswith("observation.images."))
         for episode in tqdm.tqdm(episodes, desc=f"Vector norm ({spec.repo_id})"):
             index, length = episode["episode_index"], episode["length"]
             path = root / info["data_path"].format(episode_chunk=index // info["chunks_size"], episode_index=index)
@@ -107,7 +127,9 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
             actions = np.asarray(table["action"].to_pylist(), dtype=np.float32)
             assert len(table) == length
             rows = np.array([0, length // 2, length - 1])
-            actual = transform_vectors(state, actions, rows, config.model.action_horizon, transform)
+            actual = transform_vectors(
+                state, actions, rows, config.model.action_horizon, transform, camera_keys=camera_keys
+            )
             for i, row in enumerate(rows):
                 raw = reference[offset + source_offset + int(row)]
                 assert int(raw["episode_index"]) == index
@@ -117,9 +139,11 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
                 checked += 1
             for start in range(0, length, batch_size):
                 rows = np.arange(start, min(start + batch_size, length))
-                batch = transform_vectors(state, actions, rows, config.model.action_horizon, transform)
+                batch = transform_vectors(
+                    state, actions, rows, config.model.action_horizon, transform, camera_keys=camera_keys
+                )
                 for key, running_stats in stats.items():
-                    values = np.asarray(batch[key], dtype=np.float64).reshape(-1, config.model.action_dim)
+                    values = np.asarray(batch[key], dtype=np.float64).reshape(-1, norm_dim)
                     if not np.isfinite(values).all():
                         raise ValueError(f"Non-finite values in {spec.repo_id} episode {index}, {key}")
                     running_stats.update(values)

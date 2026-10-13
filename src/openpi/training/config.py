@@ -23,6 +23,7 @@ import openpi.policies.droid_policy as droid_policy
 import openpi.policies.fr3_sharpa_policy as fr3_sharpa_policy
 import openpi.policies.fr3_wuji_policy as fr3_wuji_policy
 import openpi.policies.libero_policy as libero_policy
+import openpi.policies.single_franka_policy as single_franka_policy
 import openpi.shared.download as _download
 import openpi.shared.nnx_utils as nnx_utils
 import openpi.shared.normalize as _normalize
@@ -500,6 +501,54 @@ class LeRobotFr3SharpaDataConfig(DataConfigFactory):
                 inputs=[_transforms.DeltaActions(mask)],
                 outputs=[_transforms.AbsoluteActions(mask)],
             )
+        return repack, vectors
+
+
+@dataclasses.dataclass(frozen=True)
+class LeRobotSingleFrankaDataConfig(DataConfigFactory):
+    """Seven physical joints and two cameras, normalized before padding to model width."""
+
+    action_sequence_keys: Sequence[str] = ("action",)
+    lerobot_datasets: Sequence[LeRobotDatasetSpec] = ()
+    action_hz: float | None = None
+    video_backend: str | None = "pyav"
+
+    @override
+    def create(self, assets_dirs: pathlib.Path, model_config: _model.BaseModelConfig) -> DataConfig:
+        repack, vectors = self.create_vector_transforms(model_config)
+        return dataclasses.replace(
+            self.create_base_config(assets_dirs, model_config),
+            repack_transforms=repack,
+            data_transforms=vectors,
+            model_transforms=ModelTransformFactory()(model_config),
+            action_sequence_keys=self.action_sequence_keys,
+            lerobot_datasets=self.lerobot_datasets,
+            action_hz=self.action_hz,
+            video_backend=self.video_backend,
+        )
+
+    def create_vector_transforms(
+        self, model_config: _model.BaseModelConfig
+    ) -> tuple[_transforms.Group, _transforms.Group]:
+        if model_config.action_dim != single_franka_policy.MODEL_DIM:
+            raise ValueError("Single Franka v1 model action_dim must be 32")
+        repack = _transforms.Group(
+            inputs=[
+                _transforms.RepackTransform(
+                    {
+                        "observation/image": "observation.images.cam_head",
+                        "observation/wrist_image": "observation.images.wrist_left",
+                        "observation/state": "observation.state",
+                        "actions": "action",
+                        "prompt": "prompt",
+                    }
+                )
+            ]
+        )
+        vectors = _transforms.Group(
+            inputs=[single_franka_policy.SingleFrankaInputs()],
+            outputs=[single_franka_policy.SingleFrankaOutputs()],
+        )
         return repack, vectors
 
 
