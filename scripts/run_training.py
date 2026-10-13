@@ -26,7 +26,7 @@ import tyro
 from openpi.shared import normalize
 from openpi.training import config as cfg
 from openpi.training import reproducibility
-from training_configs.common import runtime_root
+from training_configs import common
 
 
 def load_experiment(module_name: str) -> cfg.TrainConfig:
@@ -181,12 +181,12 @@ class Tee:
 
 def launch(config: cfg.TrainConfig, *, wandb_mode: str, inputs: dict) -> None:
     stamp = datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y%m%d_%H%M%S")
-    directory = runtime_root() / "logs" / config.name / config.exp_name
+    directory = common.repository_root() / "logs" / config.name / config.exp_name
     directory.mkdir(parents=True, exist_ok=True)
     prefix = directory / f"{stamp}_{os.getpid()}"
     manifest_path = prefix.with_suffix(".json")
     os.environ["WANDB_MODE"] = wandb_mode
-    os.environ.setdefault("WANDB_DIR", str(runtime_root()))
+    os.environ["WANDB_DIR"] = str(common.repository_root())
     revision = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False).stdout.strip()
     manifest = {
         "status": "starting",

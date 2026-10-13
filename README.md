@@ -11,13 +11,11 @@ git clone --branch main \
   ssh://git@gitlab.litchibot.top:2222/fruit-train/harvesting/tomato-openpi.git
 cd tomato-openpi
 
-# 每位训练者使用自己的运行目录，按本机磁盘位置修改。
-export PI05_RUNTIME_DIR=/你的本地磁盘/tomato-openpi-runtime
 bash scripts/setup_training_env.sh
 source scripts/training_env.sh
 ```
 
-安装脚本按 `uv.lock` 安装依赖，并打印 JAX、PyTorch 和设备信息。虚拟环境、缓存、日志及 checkpoint 默认放在运行目录；不设置 `PI05_RUNTIME_DIR` 时使用仓库内 `.runtime/`。新终端需要重新设置运行目录并执行 `source scripts/training_env.sh`。
+安装脚本按 `uv.lock` 安装依赖，并打印 JAX、PyTorch 和设备信息。环境使用仓库内 `.venv/`，缓存放在 `.cache/`；数据、统计、日志、checkpoint 和 W&B 分别放在仓库根目录的 `data/`、`assets/`、`logs/`、`checkpoints/`、`wandb/`。新终端进入仓库后执行 `source scripts/training_env.sh`。
 
 可以先展开参考配置，确认环境和入口可用，无需准备数据或权重：
 
@@ -52,8 +50,8 @@ cp training_configs/experiments/template/tomato_lora_lr1e5.py \
 模板支持用环境变量覆盖本机数据和统计位置：
 
 ```bash
-export PI05_DATASET_ROOT=/实际路径/你的数据集
-export PI05_ASSETS_DIR=/实际路径/你的统计父目录
+export PI05_DATASET_ROOT="$PWD/data/alice_tomato_v1"
+export PI05_ASSETS_DIR="$PWD/assets"
 export EXPERIMENT=training_configs.experiments.alice.tomato_lora_lr1e5
 ```
 
@@ -99,16 +97,18 @@ CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_tr
 
 ```bash
 "$UV_PROJECT_ENVIRONMENT/bin/wandb" sync \
-  "$PI05_RUNTIME_DIR/wandb/offline-run-实际编号"
+  "$PI05_REPOSITORY_DIR/wandb/offline-run-实际编号"
 ```
 
 ## 5. 查看结果与恢复训练
 
 | 输出 | 默认位置 |
 | --- | --- |
-| 本地终端日志及运行清单 | `$PI05_RUNTIME_DIR/logs/<配置名>/<实验名>/` |
-| checkpoint 与恢复审计 | `$PI05_RUNTIME_DIR/checkpoints/<配置名>/<实验名>/` |
-| W&B 运行记录 | `$PI05_RUNTIME_DIR/wandb/` |
+| 本地终端日志及运行清单 | `logs/<配置名>/<实验名>/` |
+| checkpoint 与恢复审计 | `checkpoints/<配置名>/<实验名>/` |
+| W&B 运行记录 | `wandb/` |
+
+表中路径均相对于仓库根目录。权重保存在每个 checkpoint 的 `<step>/params/`，完整恢复状态在 `<step>/train_state/`，对应统计在 `<step>/assets/`。
 
 运行清单记录 Git commit、最终配置、数据来源、实际英文 prompt、统计摘要和运行结果。已有实验拒绝覆盖，重复训练使用新的 `exp_name`。
 
@@ -134,7 +134,7 @@ CUDA_VISIBLE_DEVICES=0 "$UV_PROJECT_ENVIRONMENT/bin/python" -u -m scripts.run_tr
 | `scripts/` | 环境、统计计算和统一训练入口 |
 | `examples/fr3_wuji/` | FR3/Wuji 训练数据工具 |
 
-个人实验通过短期分支和合并请求进入 `main`；公共 recipe 或训练功能变更单独评审。每位训练者使用独立 checkout、GPU 分配和输出目录，训练固定已提交的 commit。数据集、权重、日志及密钥不提交 Git。
+个人实验通过短期分支和合并请求进入 `main`；公共 recipe 或训练功能变更单独评审。每位训练者使用独立 checkout、GPU 分配和仓库内输出目录，训练固定已提交的 commit。数据集、权重、日志及密钥不提交 Git。
 
 完整配置示例、版本规则和协作流程见 [多人开发 README](docs/多人开发README.md)。
 

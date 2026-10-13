@@ -10,11 +10,12 @@ import pytest
 
 from openpi.shared import normalize
 from scripts import run_training
+from training_configs import common
 
 
 @pytest.fixture
 def prepared(tmp_path, monkeypatch):
-    monkeypatch.setenv("PI05_RUNTIME_DIR", str(tmp_path / "runtime"))
+    monkeypatch.setattr(common, "repository_root", lambda: tmp_path)
     config = run_training.load_experiment("training_configs.experiments.baselines.tomato_fr3_lora_v1")
     root = Path(config.data.lerobot_datasets[0].root)
     (root / "meta").mkdir(parents=True)
@@ -98,6 +99,7 @@ def test_launch_writes_local_log_snapshot_and_explicit_offline_mode(prepared, mo
         run_training.launch(config, wandb_mode="offline", inputs=run_training.preflight(config))
     finally:
         run_training.logging.getLogger().handlers = handlers
+    assert run_training.os.environ["WANDB_DIR"] == str(Path(config.checkpoint_base_dir).parent)
     directory = Path(config.checkpoint_base_dir).parent / "logs" / config.name / config.exp_name
     manifest = json.loads(next(directory.glob("*.json")).read_text())
     assert manifest["status"] == "training_completed"

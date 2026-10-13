@@ -8,8 +8,8 @@ from openpi.models import pi0_config
 from openpi.training import config as cfg
 from openpi.training import optimizer
 from openpi.training import weight_loaders
+from training_configs import common
 from training_configs.common import Dataset
-from training_configs.common import runtime_root
 
 
 class Embodiment(Protocol):
@@ -82,8 +82,8 @@ class Recipe:
             log_interval=10,
             save_interval=2_000,
             keep_period=10_000,
-            assets_base_dir=str(runtime_root() / "assets"),
-            checkpoint_base_dir=str(runtime_root() / "checkpoints"),
+            assets_base_dir=str(common.repository_root() / "assets"),
+            checkpoint_base_dir=str(common.repository_root() / "checkpoints"),
             resume=False,
             overwrite=False,
             wandb_enabled=True,

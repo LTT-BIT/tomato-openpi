@@ -5,7 +5,9 @@ data/
 wandb/
 replay_checks/
 logs/
+# Legacy runtime files remain local.
 .runtime/
+.cache/
 exports/
 *.safetensors
 *.ckpt

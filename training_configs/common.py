@@ -1,7 +1,6 @@
 """Data identity shared by experiment composition and launch preflight."""
 
 from dataclasses import dataclass
-import os
 from pathlib import Path
 
 
@@ -22,5 +21,6 @@ class Dataset:
             raise ValueError("Record at least one nonempty data source")
 
 
-def runtime_root() -> Path:
-    return Path(os.environ.get("PI05_RUNTIME_DIR", ".runtime")).expanduser().resolve()
+def repository_root() -> Path:
+    """Locate this checkout regardless of the working directory or old runtime settings."""
+    return Path(__file__).resolve().parents[1]

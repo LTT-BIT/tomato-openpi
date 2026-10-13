@@ -54,18 +54,18 @@ cp training_configs/experiments/template/tomato_lora_lr1e5.py \
 ```python
 from dataclasses import replace
 import os
-from training_configs.common import Dataset, runtime_root
+from training_configs.common import Dataset, repository_root
 from training_configs.embodiments.fr3_wuji import FR3_WUJI
 from training_configs.recipes.pi05_lora_v1 import build_config as build_recipe
 
 def build_config():
-    runtime = runtime_root()
-    root = os.environ.get("PI05_DATASET_ROOT", str(runtime / "data/alice_tomato_v1"))
+    repository = repository_root()
+    root = os.environ.get("PI05_DATASET_ROOT", str(repository / "data/alice_tomato_v1"))
     dataset = Dataset(
         version="alice_tomato_v1_30hz",
         repo_id="fr3_wuji/alice_tomato_v1",
         root=root,
-        assets_dir=os.environ.get("PI05_ASSETS_DIR", str(runtime / "assets")),
+        assets_dir=os.environ.get("PI05_ASSETS_DIR", str(repository / "assets")),
         asset_id="alice_tomato_v1_30hz",
         sources=(root,),
         prompt_example="Pick a tomato and place it in the basket.",
@@ -109,16 +109,16 @@ PR 说明目的、基准、覆盖参数、数据身份、统计引用、英文 p
 
 运行名建议为 `<负责人>_<任务>_<方案>_s<seed>_run<编号>`，重复运行另用编号。checkpoint 路径为 `<checkpoint_base_dir>/<config.name>/<exp_name>/`，W&B 名称与实验名一致。
 
-使用独立 checkout 或 worktree，运行期间不切分支、不拉新代码。显式分配 CUDA_VISIBLE_DEVICES；每人使用自己的运行目录、缓存和环境，数据可只读共享，发布后不能原地修改。目录锁只提供本机相同输出路径的并发保护，跨主机或共享文件系统还需团队调度和输出目录分配。
+使用独立 checkout 或 worktree，运行期间不切分支、不拉新代码。显式分配 CUDA_VISIBLE_DEVICES；每个 checkout 使用自己的 .venv/、.cache/、logs/、checkpoints/ 和 wandb/，数据与统计放在各自仓库的 data/ 和 assets/，发布后不能原地修改。目录锁只提供本机相同输出路径的并发保护，跨主机或共享文件系统还需团队调度和输出目录分配。
 
 ```bash
-git worktree add /你的工作目录/pi05-alice <已提交分支或commit>
+git worktree add /你的工作目录/pi05-alice "<已提交分支或commit>"
 cd /你的工作目录/pi05-alice
-export PI05_RUNTIME_DIR=/你的本地磁盘/pi05-alice-runtime
+bash scripts/setup_training_env.sh
 source scripts/training_env.sh
 ```
 
-数据、权重、日志、W&B 和密钥不提交 Git。个人实验文件保存数据身份与默认路径，本机绝对路径建议通过个人环境变量覆盖，换电脑不用修改公共方案。同一内容只更换路径不需要新数据版本。
+数据、权重、日志、W&B 和密钥不提交 Git。个人实验文件保存数据身份与默认路径，默认路径按仓库位置自动确定，数据放在 data/、统计放在 assets/，换电脑克隆后使用对应目录即可。同一内容只更换路径不需要新数据版本。
 
 ## 验证与提交
 

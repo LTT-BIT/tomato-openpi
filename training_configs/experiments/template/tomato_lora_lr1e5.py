@@ -3,8 +3,8 @@
 from dataclasses import replace
 import os
 
+from training_configs import common
 from training_configs.common import Dataset
-from training_configs.common import runtime_root
 from training_configs.embodiments.fr3_wuji import FR3_WUJI
 from training_configs.recipes.pi05_lora_v1 import build_config as build_recipe
 
@@ -16,13 +16,13 @@ PROMPT = (
 
 
 def build_dataset() -> Dataset:
-    runtime = runtime_root()
-    root = os.environ.get("PI05_DATASET_ROOT", str(runtime / "data/tomato_fulltask_v1"))
+    repository = common.repository_root()
+    root = os.environ.get("PI05_DATASET_ROOT", str(repository / "data/tomato_fulltask_v1"))
     return Dataset(
         version="tomato_fulltask_v1_30hz",
         repo_id="fr3_wuji/tomato_fulltask_v1",
         root=root,
-        assets_dir=os.environ.get("PI05_ASSETS_DIR", str(runtime / "assets/fulltask_c0")),
+        assets_dir=os.environ.get("PI05_ASSETS_DIR", str(repository / "assets/fulltask_c0")),
         asset_id="tomato_fulltask_v1_30hz",
         sources=(root,),
         prompt_example=PROMPT,

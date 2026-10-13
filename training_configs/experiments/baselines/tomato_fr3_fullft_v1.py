@@ -3,8 +3,8 @@
 import os
 from pathlib import Path
 
+from training_configs import common
 from training_configs.common import Dataset
-from training_configs.common import runtime_root
 from training_configs.embodiments.fr3_wuji import FR3_WUJI
 from training_configs.recipes.pi05_fullft_v1 import build_config as build_recipe
 
@@ -16,13 +16,13 @@ NORM_AUDIT_SHA256 = "f933853e8e1bfbf8a7f37e377bd9a5a87c57d37a437685a95e464bcc65c
 
 
 def build_dataset() -> Dataset:
-    runtime = runtime_root()
-    source_root = Path(os.environ.get("PI05_SOURCE_DATA_DIR", "data/harvest-tomato"))
+    repository = common.repository_root()
+    source_root = Path(os.environ.get("PI05_SOURCE_DATA_DIR", str(repository / "data/harvest-tomato")))
     return Dataset(
         version="tomato_all_full_v1_30hz",
         repo_id="fr3_wuji/tomato_all_full_v1",
-        root=os.environ.get("PI05_ALL_FULL_DATASET_ROOT", str(runtime / "data/tomato_all_full_v1")),
-        assets_dir=os.environ.get("PI05_ALL_FULL_ASSETS_DIR", str(runtime / "assets")),
+        root=os.environ.get("PI05_ALL_FULL_DATASET_ROOT", str(repository / "data/tomato_all_full_v1")),
+        assets_dir=os.environ.get("PI05_ALL_FULL_ASSETS_DIR", str(repository / "assets")),
         asset_id="tomato_all_full_v1_30hz",
         sources=tuple(str((source_root / item).resolve()) for item in ("0925/A", "0925/B", "1002_AB_190/full")),
         prompt_example=PROMPT,
