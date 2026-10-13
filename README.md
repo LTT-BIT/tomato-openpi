@@ -21,7 +21,7 @@ curl -LsSf https://astral.sh/uv/0.12.10/install.sh | sh
 ```bash
 ssh -T -p 2222 git@gitlab.litchibot.top
 git clone --branch main \
-  ssh://git@gitlab.litchibot.top:2222/fruit-train/harvesting/tomato-openpi.git
+  ssh://git@gitlab.litchibot.top:2222/fruit-train/tomato-openpi.git
 cd tomato-openpi
 bash scripts/setup_training_env.sh
 ```
