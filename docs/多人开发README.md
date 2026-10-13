@@ -145,7 +145,11 @@ PYTHONNOUSERSITE=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 JAX_PLATFORMS=cpu \
 
 ### GitLab 自动验证
 
-`.gitlab-ci.yml` 在分支推送、合并请求创建/更新时执行；有打开的合并请求时只运行合并请求流水线，避免重复运行。分支也可在 GitLab 手动运行流水线。GitLab 和 GitHub 共用 `scripts/check_training.sh`，本地安装环境后也可执行：
+GitLab 自动验证目前暂停，`.gitlab-ci.yml` 的 `workflow.rules` 第一条为无条件 `when: never`，不会创建新流水线，包括页面手动运行。已创建的等待中或运行中任务不会因修改该文件自动取消，需要在 GitLab 的 CI/CD → Pipelines 中取消。
+
+以后需要恢复时，删除 `workflow.rules` 第一条无条件 `when: never`（下方原有条件规则中的 `when: never` 保留），提交并推送，同时确认项目已有可用 Runner。恢复后，在分支推送、合并请求创建/更新时执行；有打开的合并请求时只运行合并请求流水线，避免重复运行。分支也可在 GitLab 手动运行流水线。
+
+GitLab 和 GitHub 共用的 `scripts/check_training.sh` 仍保留，本地安装环境后按需执行：
 
 ```bash
 bash scripts/check_training.sh

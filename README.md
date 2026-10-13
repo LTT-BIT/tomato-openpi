@@ -150,6 +150,6 @@ CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
 
 完整配置示例、版本规则和协作流程见 [多人开发 README](docs/多人开发README.md)。
 
-推送分支或创建、更新 GitLab 合并请求会自动运行 `.gitlab-ci.yml` 中的验证：格式、锁文件、基准与模板配置展开、CPU 回归和 wheel 打包。安装环境后本地执行同一套检查：`bash scripts/check_training.sh`。结果在 GitLab 的 CI/CD → Pipelines 查看，具体 Runner 要求见多人开发 README。
+GitLab 自动验证目前暂停，推送分支或创建、更新合并请求不会创建新的流水线。检查脚本保留，需要时可在安装环境后手动执行 `bash scripts/check_training.sh`。恢复自动验证的方法与 Runner 要求见 [多人开发 README](docs/多人开发README.md)。
 
 本项目基于 Physical Intelligence OpenPI，遵循 [LICENSE](LICENSE) 与 [Gemma 许可](LICENSE_GEMMA.txt)。

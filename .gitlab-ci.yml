@@ -1,5 +1,7 @@
 workflow:
   rules:
+    # 暂停创建流水线；恢复时删除这一条 when: never，保留下方原触发规则。
+    - when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"'
       when: never
