@@ -14,7 +14,7 @@
 | 模型、数据加载与训练循环 | `src/openpi/` |
 | 历史有效实验记录 | `docs/records/` |
 
-当前任务为 tomato_wuji、tomato_sharpa、lemon_scooping、cup_grasping，其中 lemon_scooping 尚无 baseline；杯子 baseline 要求 LeRobot v2.1 数据。template 目录当前仅保留空占位，有真实实验时再添加文件。启动器只导入指定模块并调用 `build_config()`，无需中央注册，不会运行其他配置。
+当前任务为 tomato_wuji、tomato_sharpa、lemon_scooping、cup_grasping，四项均已有 LoRA / 全参 baseline；数据统一要求 LeRobot v2.1。template 目录当前仅保留空占位，有真实实验时再添加文件。启动器只导入指定模块并调用 `build_config()`，无需中央注册，不会运行其他配置。
 
 ## 创建个人实验
 
@@ -81,7 +81,7 @@ def build_config():
 bash scripts/check_training.sh
 ```
 
-脚本验证锁文件、Ruff、Shell 语法、六份 baseline 展开、CPU 回归和 wheel 打包。测试使用临时数据，不启动正式训练；标记 manual 的外部数据测试需另外执行。GitLab 自动 CI 当前暂停；重新启用时删除 `.gitlab-ci.yml` 中首条无条件 `when: never`，并配置可运行作业的 Linux Docker/Kubernetes Runner，下方条件规则保留。
+脚本验证锁文件、Ruff、Shell 语法、八份 baseline 展开、CPU 回归和 wheel 打包。测试使用临时数据，不启动正式训练；标记 manual 的外部数据测试需另外执行。GitLab 自动 CI 当前暂停；重新启用时删除 `.gitlab-ci.yml` 中首条无条件 `when: never`，并配置可运行作业的 Linux Docker/Kubernetes Runner，下方条件规则保留。
 
 提交前确认只包含本任务文件，使用中文提交说明。合并请求写明改动目的、影响和验证结果；不新增开发流水账。数据、权重、日志、环境、缓存及密钥不提交 Git。
 
@@ -98,3 +98,50 @@ bash scripts/setup_training_env.sh
 实验配置及其旁边的结果记录只保留可核对的信息：数据生产来源和版本、源码 commit、配置名、实验名、统计身份/摘要、实际英文 prompt、关键参数、checkpoint、W&B run，以及指标与评估条件。缺失项明确写未记录。区分数据准备完成、训练完成、实机验证；配置检查通过不能写成训练完成，训练 loss 不能代替任务成功率。
 
 训练同时保存本地日志并启用 W&B；无法联网明确用 offline，联网后逐段 sync。精确续训保持原 commit、配置、数据和完整 checkpoint；模块移动或新增配置也可能改变源码审计，因此运行期间固定整个 checkout。详细输出和续训步骤见仓库 README。
+
+## subtask 与不同 prompt
+
+配置文件里的 `Dataset.prompt_example` 是记录用示例，改它不会改变实际训练 prompt。普通入口按每帧 `task_index` 从数据集 `meta/tasks.jsonl` 读取文本；数据里已有不同任务标签时，不需要另一套训练脚本。
+
+要只训练某些 subtask，或在个人参数文件中覆盖任务文本，可以使用 `TaskView`。例如复制一份个人实验，将 `build_config()` 写为：
+
+```python
+from dataclasses import replace
+from openpi.training.config import TaskDataConfig
+from openpi.training.task_view import TaskView
+from training_configs.experiments.lemon_scooping.baseline.lemon_ur_o30_lora_v1 import build_config as baseline
+
+
+def build_config():
+    config = baseline()
+    view = TaskView(
+        split_path=config.data.base_config.task_view.split_path,  # 保留有效 episode 清单
+        task_indices=(0,),                                    # 使用数据中实际存在的任务 ID
+        prompt_overrides=((0, "Scoop the lemon slice into the cup."),),
+        task_boundary_hold=True,                              # 动作窗口不跨任务标签边界
+    )
+    return replace(
+        config,
+        name="pi05_lemon_subtask_v1",
+        exp_name="lemon_subtask_owner_run01",
+        data=replace(
+            config.data,
+            assets=replace(config.data.assets, asset_id="lemon_subtask_v1"),
+            base_config=TaskDataConfig(prompt_from_task=True, task_view=view),
+        ),
+        policy_metadata={
+            **config.policy_metadata,
+            "dataset_version": "lemon_subtask_v1",
+            "prompt_source": "TaskView.prompt_overrides",
+            "prompt_example": "Scoop the lemon slice into the cup.",
+        },
+    )
+```
+
+然后照常使用个人模块执行 `--dry-run`、计算新统计、`--check` 和训练。其他本体的数据工厂同样可以接收 `TaskDataConfig`；不需要 episode 清单时省略 `split_path`。`task_indices=()` 表示不按任务 ID 筛选；`prompt_overrides=()` 表示沿用数据任务文本。
+
+**字段不能代替数据标注**：如果整条 episode 只有一个任务 ID，仅增加三句 prompt 并不能让模型知道哪些帧属于哪个 subtask。应在数据仓库提供逐帧任务标签，或使用明确阶段边界的视图。已有逐帧标签时，`task_boundary_hold=True` 将窗口限制在当前连续任务片段的最后一帧；不设置时仍允许跨任务标签取后续动作。
+
+柠檬的五时间戳入口见[任务说明](training_configs/experiments/lemon_scooping/README.md)：`phase_annotations_path` 指向实际标注，`phase_prompts` 定义五个阶段的英文指令，`phase_arm_hold` 可启用双 UR 特定的手臂保持。它根据已知边界生成训练样本，不训练阶段分类器。阶段模式与 task_indices/prompt_overrides 模式分开使用。
+
+当前所有 baseline 都没有验证集。柠檬清单把原 188 train + 21 val 合并成 209 个训练 episode；`split_path` 在这里仅用于选取有效数据。将来换数据时同步修改目录、repo_id、清单、来源和统计身份；不能只换路径却保留旧 episode 编号。筛选、阶段边界、prompt 映射的配置或内容变化会使旧统计失效，续训校验也会检查样本视图身份，需作为新实验重新计算统计。

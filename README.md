@@ -1,6 +1,6 @@
 # Tomato OpenPI 训练仓库
 
-基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
+基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
 本页说明下载安装和运行；创建个人配置、修改公共代码及分支管理见 [多人开发 README](多人开发README.md)。
 
@@ -36,12 +36,12 @@ bash scripts/setup_training_env.sh
 | --- | --- | --- |
 | 番茄-Wuji | [tomato_wuji](training_configs/experiments/tomato_wuji/README.md) | LoRA / 全参 v1 baseline |
 | 番茄-Sharpa | [tomato_sharpa](training_configs/experiments/tomato_sharpa/README.md) | LoRA / 全参 v1 baseline；生产数据待准备 |
-| 铲柠檬 | [lemon_scooping](training_configs/experiments/lemon_scooping/README.md) | 本体、数据及 baseline 待定义 |
+| 铲柠檬 | [lemon_scooping](training_configs/experiments/lemon_scooping/README.md) | 双 UR/O30 LoRA / 全参 v1 baseline；209 条有效数据全部训练 |
 | 抓取杯子 | [cup_grasping](training_configs/experiments/cup_grasping/README.md) | 单臂 Franka LoRA / 全参 v1 baseline；v2.1 数据待准备 |
 
 每个任务下的 `baseline/` 存放参考配置，`template/` 当前为空，后续按负责人保存实验。数据、统计和真实训练结果不随 Git 仓库分发。
 
-当前六份 baseline：
+当前八份 baseline：
 
 | 任务 / 方案 | baseline 文件 | 动作维度 | 总步数 | 默认数据目录 |
 | --- | --- | ---: | ---: | --- |
@@ -51,8 +51,14 @@ bash scripts/setup_training_env.sh
 | 番茄-Sharpa 全参 | [tomato_fr3_sharpa_fullft_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_fullft_v1.py) | 58 | 30,000 | `data/tomato_sharpa_fulltask_v1` |
 | 抓取杯子 LoRA | [cup_single_franka_lora_v1.py](training_configs/experiments/cup_grasping/baseline/cup_single_franka_lora_v1.py) | 7（模型补零至 32） | 30,000 | `data/cup_grasping_v1` |
 | 抓取杯子 全参 | [cup_single_franka_fullft_v1.py](training_configs/experiments/cup_grasping/baseline/cup_single_franka_fullft_v1.py) | 7（模型补零至 32） | 30,000 | `data/cup_grasping_v1` |
+| 铲柠檬 LoRA | [lemon_ur_o30_lora_v1.py](training_configs/experiments/lemon_scooping/baseline/lemon_ur_o30_lora_v1.py) | 12（模型 32，状态 52） | 30,000 | `data/lemon_wrist_reset_v1` |
+| 铲柠檬 全参 | [lemon_ur_o30_fullft_v1.py](training_configs/experiments/lemon_scooping/baseline/lemon_ur_o30_fullft_v1.py) | 12（模型 32，状态 52） | 30,000 | `data/lemon_wrist_reset_v1` |
 
-六份配置共用以下训练参数；本体协议、数据身份、统计及英文 prompt 见对应任务说明。
+番茄与杯子六份配置共用以下训练参数；柠檬 LoRA 复用公共训练配方，柠檬全参按来源任务记录覆盖 batch、学习率和保存间隔，详见[柠檬说明](training_configs/experiments/lemon_scooping/README.md)。以下公共参数中的频率与动作语义以各任务协议为准。
+
+本体协议、数据身份、统计及英文 prompt 见对应任务说明。
+
+公共训练参数：
 
 | 参数 | 默认值 |
 | --- | --- |

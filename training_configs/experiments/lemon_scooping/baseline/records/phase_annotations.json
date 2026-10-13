@@ -1,0 +1,3565 @@
+{
+  "schema_version": 3,
+  "boundary_fields": [
+    "left_support_ready_s",
+    "scoop_ready_s",
+    "lemon_supported_s",
+    "pour_ready_s",
+    "task_complete_s"
+  ],
+  "episodes": [
+    {
+      "episode_index": 0,
+      "status": "complete",
+      "frame_count": 279,
+      "frame_indices": {
+        "left_support_ready_s": 75,
+        "scoop_ready_s": 135,
+        "lemon_supported_s": 185,
+        "pour_ready_s": 215,
+        "task_complete_s": 265
+      },
+      "left_support_ready_s": 7.5,
+      "scoop_ready_s": 13.5,
+      "lemon_supported_s": 18.5,
+      "pour_ready_s": 21.5,
+      "task_complete_s": 26.5
+    },
+    {
+      "episode_index": 1,
+      "status": "complete",
+      "frame_count": 697,
+      "frame_indices": {
+        "left_support_ready_s": 382,
+        "scoop_ready_s": 383,
+        "lemon_supported_s": 463,
+        "pour_ready_s": 523,
+        "task_complete_s": 643
+      },
+      "left_support_ready_s": 38.2,
+      "scoop_ready_s": 38.3,
+      "lemon_supported_s": 46.3,
+      "pour_ready_s": 52.3,
+      "task_complete_s": 64.3
+    },
+    {
+      "episode_index": 2,
+      "status": "complete",
+      "frame_count": 521,
+      "frame_indices": {
+        "left_support_ready_s": 124,
+        "scoop_ready_s": 254,
+        "lemon_supported_s": 344,
+        "pour_ready_s": 404,
+        "task_complete_s": 474
+      },
+      "left_support_ready_s": 12.4,
+      "scoop_ready_s": 25.4,
+      "lemon_supported_s": 34.4,
+      "pour_ready_s": 40.4,
+      "task_complete_s": 47.4
+    },
+    {
+      "episode_index": 3,
+      "status": "complete",
+      "frame_count": 547,
+      "frame_indices": {
+        "left_support_ready_s": 117,
+        "scoop_ready_s": 257,
+        "lemon_supported_s": 357,
+        "pour_ready_s": 427,
+        "task_complete_s": 487
+      },
+      "left_support_ready_s": 11.7,
+      "scoop_ready_s": 25.7,
+      "lemon_supported_s": 35.7,
+      "pour_ready_s": 42.7,
+      "task_complete_s": 48.7
+    },
+    {
+      "episode_index": 4,
+      "status": "complete",
+      "frame_count": 499,
+      "frame_indices": {
+        "left_support_ready_s": 97,
+        "scoop_ready_s": 227,
+        "lemon_supported_s": 337,
+        "pour_ready_s": 387,
+        "task_complete_s": 437
+      },
+      "left_support_ready_s": 9.7,
+      "scoop_ready_s": 22.7,
+      "lemon_supported_s": 33.7,
+      "pour_ready_s": 38.7,
+      "task_complete_s": 43.7
+    },
+    {
+      "episode_index": 5,
+      "status": "complete",
+      "frame_count": 507,
+      "frame_indices": {
+        "left_support_ready_s": 65,
+        "scoop_ready_s": 238,
+        "lemon_supported_s": 328,
+        "pour_ready_s": 368,
+        "task_complete_s": 438
+      },
+      "left_support_ready_s": 6.5,
+      "scoop_ready_s": 23.8,
+      "lemon_supported_s": 32.8,
+      "pour_ready_s": 36.8,
+      "task_complete_s": 43.8
+    },
+    {
+      "episode_index": 6,
+      "status": "complete",
+      "frame_count": 538,
+      "frame_indices": {
+        "left_support_ready_s": 76,
+        "scoop_ready_s": 248,
+        "lemon_supported_s": 348,
+        "pour_ready_s": 396,
+        "task_complete_s": 459
+      },
+      "left_support_ready_s": 7.6,
+      "scoop_ready_s": 24.8,
+      "lemon_supported_s": 34.8,
+      "pour_ready_s": 39.6,
+      "task_complete_s": 45.9
+    },
+    {
+      "episode_index": 7,
+      "status": "complete",
+      "frame_count": 698,
+      "frame_indices": {
+        "left_support_ready_s": 62,
+        "scoop_ready_s": 334,
+        "lemon_supported_s": 474,
+        "pour_ready_s": 574,
+        "task_complete_s": 644
+      },
+      "left_support_ready_s": 6.2,
+      "scoop_ready_s": 33.4,
+      "lemon_supported_s": 47.4,
+      "pour_ready_s": 57.4,
+      "task_complete_s": 64.4
+    },
+    {
+      "episode_index": 8,
+      "status": "complete",
+      "frame_count": 513,
+      "frame_indices": {
+        "left_support_ready_s": 53,
+        "scoop_ready_s": 235,
+        "lemon_supported_s": 345,
+        "pour_ready_s": 395,
+        "task_complete_s": 449
+      },
+      "left_support_ready_s": 5.3,
+      "scoop_ready_s": 23.5,
+      "lemon_supported_s": 34.5,
+      "pour_ready_s": 39.5,
+      "task_complete_s": 44.9
+    },
+    {
+      "episode_index": 9,
+      "status": "complete",
+      "frame_count": 416,
+      "frame_indices": {
+        "left_support_ready_s": 32,
+        "scoop_ready_s": 170,
+        "lemon_supported_s": 253,
+        "pour_ready_s": 305,
+        "task_complete_s": 355
+      },
+      "left_support_ready_s": 3.2,
+      "scoop_ready_s": 17.0,
+      "lemon_supported_s": 25.3,
+      "pour_ready_s": 30.5,
+      "task_complete_s": 35.5
+    },
+    {
+      "episode_index": 10,
+      "status": "complete",
+      "frame_count": 371,
+      "frame_indices": {
+        "left_support_ready_s": 41,
+        "scoop_ready_s": 169,
+        "lemon_supported_s": 233,
+        "pour_ready_s": 279,
+        "task_complete_s": 304
+      },
+      "left_support_ready_s": 4.1,
+      "scoop_ready_s": 16.9,
+      "lemon_supported_s": 23.3,
+      "pour_ready_s": 27.9,
+      "task_complete_s": 30.4
+    },
+    {
+      "episode_index": 11,
+      "status": "complete",
+      "frame_count": 576,
+      "frame_indices": {
+        "left_support_ready_s": 45,
+        "scoop_ready_s": 327,
+        "lemon_supported_s": 435,
+        "pour_ready_s": 466,
+        "task_complete_s": 508
+      },
+      "left_support_ready_s": 4.5,
+      "scoop_ready_s": 32.7,
+      "lemon_supported_s": 43.5,
+      "pour_ready_s": 46.6,
+      "task_complete_s": 50.8
+    },
+    {
+      "episode_index": 12,
+      "status": "complete",
+      "frame_count": 494,
+      "frame_indices": {
+        "left_support_ready_s": 53,
+        "scoop_ready_s": 208,
+        "lemon_supported_s": 278,
+        "pour_ready_s": 328,
+        "task_complete_s": 411
+      },
+      "left_support_ready_s": 5.3,
+      "scoop_ready_s": 20.8,
+      "lemon_supported_s": 27.8,
+      "pour_ready_s": 32.8,
+      "task_complete_s": 41.1
+    },
+    {
+      "episode_index": 13,
+      "status": "complete",
+      "frame_count": 492,
+      "frame_indices": {
+        "left_support_ready_s": 69,
+        "scoop_ready_s": 201,
+        "lemon_supported_s": 281,
+        "pour_ready_s": 343,
+        "task_complete_s": 362
+      },
+      "left_support_ready_s": 6.9,
+      "scoop_ready_s": 20.1,
+      "lemon_supported_s": 28.1,
+      "pour_ready_s": 34.3,
+      "task_complete_s": 36.2
+    },
+    {
+      "episode_index": 14,
+      "status": "complete",
+      "frame_count": 525,
+      "frame_indices": {
+        "left_support_ready_s": 50,
+        "scoop_ready_s": 183,
+        "lemon_supported_s": 273,
+        "pour_ready_s": 315,
+        "task_complete_s": 395
+      },
+      "left_support_ready_s": 5.0,
+      "scoop_ready_s": 18.3,
+      "lemon_supported_s": 27.3,
+      "pour_ready_s": 31.5,
+      "task_complete_s": 39.5
+    },
+    {
+      "episode_index": 15,
+      "status": "complete",
+      "frame_count": 334,
+      "frame_indices": {
+        "left_support_ready_s": 52,
+        "scoop_ready_s": 135,
+        "lemon_supported_s": 205,
+        "pour_ready_s": 240,
+        "task_complete_s": 296
+      },
+      "left_support_ready_s": 5.2,
+      "scoop_ready_s": 13.5,
+      "lemon_supported_s": 20.5,
+      "pour_ready_s": 24.0,
+      "task_complete_s": 29.6
+    },
+    {
+      "episode_index": 17,
+      "status": "complete",
+      "frame_count": 352,
+      "frame_indices": {
+        "left_support_ready_s": 62,
+        "scoop_ready_s": 134,
+        "lemon_supported_s": 181,
+        "pour_ready_s": 202,
+        "task_complete_s": 314
+      },
+      "left_support_ready_s": 6.2,
+      "scoop_ready_s": 13.4,
+      "lemon_supported_s": 18.1,
+      "pour_ready_s": 20.2,
+      "task_complete_s": 31.4
+    },
+    {
+      "episode_index": 18,
+      "status": "complete",
+      "frame_count": 289,
+      "frame_indices": {
+        "left_support_ready_s": 48,
+        "scoop_ready_s": 124,
+        "lemon_supported_s": 170,
+        "pour_ready_s": 212,
+        "task_complete_s": 249
+      },
+      "left_support_ready_s": 4.8,
+      "scoop_ready_s": 12.4,
+      "lemon_supported_s": 17.0,
+      "pour_ready_s": 21.2,
+      "task_complete_s": 24.9
+    },
+    {
+      "episode_index": 19,
+      "status": "complete",
+      "frame_count": 335,
+      "frame_indices": {
+        "left_support_ready_s": 72,
+        "scoop_ready_s": 154,
+        "lemon_supported_s": 201,
+        "pour_ready_s": 243,
+        "task_complete_s": 301
+      },
+      "left_support_ready_s": 7.2,
+      "scoop_ready_s": 15.4,
+      "lemon_supported_s": 20.1,
+      "pour_ready_s": 24.3,
+      "task_complete_s": 30.1
+    },
+    {
+      "episode_index": 20,
+      "status": "complete",
+      "frame_count": 338,
+      "frame_indices": {
+        "left_support_ready_s": 64,
+        "scoop_ready_s": 136,
+        "lemon_supported_s": 201,
+        "pour_ready_s": 230,
+        "task_complete_s": 299
+      },
+      "left_support_ready_s": 6.4,
+      "scoop_ready_s": 13.6,
+      "lemon_supported_s": 20.1,
+      "pour_ready_s": 23.0,
+      "task_complete_s": 29.9
+    },
+    {
+      "episode_index": 21,
+      "status": "complete",
+      "frame_count": 317,
+      "frame_indices": {
+        "left_support_ready_s": 63,
+        "scoop_ready_s": 155,
+        "lemon_supported_s": 192,
+        "pour_ready_s": 224,
+        "task_complete_s": 276
+      },
+      "left_support_ready_s": 6.3,
+      "scoop_ready_s": 15.5,
+      "lemon_supported_s": 19.2,
+      "pour_ready_s": 22.4,
+      "task_complete_s": 27.6
+    },
+    {
+      "episode_index": 23,
+      "status": "complete",
+      "frame_count": 345,
+      "frame_indices": {
+        "left_support_ready_s": 65,
+        "scoop_ready_s": 143,
+        "lemon_supported_s": 198,
+        "pour_ready_s": 230,
+        "task_complete_s": 310
+      },
+      "left_support_ready_s": 6.5,
+      "scoop_ready_s": 14.3,
+      "lemon_supported_s": 19.8,
+      "pour_ready_s": 23.0,
+      "task_complete_s": 31.0
+    },
+    {
+      "episode_index": 24,
+      "status": "complete",
+      "frame_count": 335,
+      "frame_indices": {
+        "left_support_ready_s": 87,
+        "scoop_ready_s": 160,
+        "lemon_supported_s": 210,
+        "pour_ready_s": 243,
+        "task_complete_s": 301
+      },
+      "left_support_ready_s": 8.7,
+      "scoop_ready_s": 16.0,
+      "lemon_supported_s": 21.0,
+      "pour_ready_s": 24.3,
+      "task_complete_s": 30.1
+    },
+    {
+      "episode_index": 25,
+      "status": "complete",
+      "frame_count": 303,
+      "frame_indices": {
+        "left_support_ready_s": 62,
+        "scoop_ready_s": 129,
+        "lemon_supported_s": 172,
+        "pour_ready_s": 206,
+        "task_complete_s": 258
+      },
+      "left_support_ready_s": 6.2,
+      "scoop_ready_s": 12.9,
+      "lemon_supported_s": 17.2,
+      "pour_ready_s": 20.6,
+      "task_complete_s": 25.8
+    },
+    {
+      "episode_index": 26,
+      "status": "complete",
+      "frame_count": 388,
+      "frame_indices": {
+        "left_support_ready_s": 79,
+        "scoop_ready_s": 188,
+        "lemon_supported_s": 220,
+        "pour_ready_s": 265,
+        "task_complete_s": 342
+      },
+      "left_support_ready_s": 7.9,
+      "scoop_ready_s": 18.8,
+      "lemon_supported_s": 22.0,
+      "pour_ready_s": 26.5,
+      "task_complete_s": 34.2
+    },
+    {
+      "episode_index": 27,
+      "status": "complete",
+      "frame_count": 339,
+      "frame_indices": {
+        "left_support_ready_s": 106,
+        "scoop_ready_s": 185,
+        "lemon_supported_s": 220,
+        "pour_ready_s": 256,
+        "task_complete_s": 302
+      },
+      "left_support_ready_s": 10.6,
+      "scoop_ready_s": 18.5,
+      "lemon_supported_s": 22.0,
+      "pour_ready_s": 25.6,
+      "task_complete_s": 30.2
+    },
+    {
+      "episode_index": 28,
+      "status": "complete",
+      "frame_count": 279,
+      "frame_indices": {
+        "left_support_ready_s": 72,
+        "scoop_ready_s": 144,
+        "lemon_supported_s": 190,
+        "pour_ready_s": 223,
+        "task_complete_s": 250
+      },
+      "left_support_ready_s": 7.2,
+      "scoop_ready_s": 14.4,
+      "lemon_supported_s": 19.0,
+      "pour_ready_s": 22.3,
+      "task_complete_s": 25.0
+    },
+    {
+      "episode_index": 29,
+      "status": "complete",
+      "frame_count": 325,
+      "frame_indices": {
+        "left_support_ready_s": 89,
+        "scoop_ready_s": 171,
+        "lemon_supported_s": 220,
+        "pour_ready_s": 263,
+        "task_complete_s": 291
+      },
+      "left_support_ready_s": 8.9,
+      "scoop_ready_s": 17.1,
+      "lemon_supported_s": 22.0,
+      "pour_ready_s": 26.3,
+      "task_complete_s": 29.1
+    },
+    {
+      "episode_index": 30,
+      "status": "complete",
+      "frame_count": 294,
+      "frame_indices": {
+        "left_support_ready_s": 83,
+        "scoop_ready_s": 157,
+        "lemon_supported_s": 192,
+        "pour_ready_s": 215,
+        "task_complete_s": 247
+      },
+      "left_support_ready_s": 8.3,
+      "scoop_ready_s": 15.7,
+      "lemon_supported_s": 19.2,
+      "pour_ready_s": 21.5,
+      "task_complete_s": 24.7
+    },
+    {
+      "episode_index": 31,
+      "status": "complete",
+      "frame_count": 313,
+      "frame_indices": {
+        "left_support_ready_s": 88,
+        "scoop_ready_s": 158,
+        "lemon_supported_s": 195,
+        "pour_ready_s": 238,
+        "task_complete_s": 272
+      },
+      "left_support_ready_s": 8.8,
+      "scoop_ready_s": 15.8,
+      "lemon_supported_s": 19.5,
+      "pour_ready_s": 23.8,
+      "task_complete_s": 27.2
+    },
+    {
+      "episode_index": 33,
+      "status": "complete",
+      "frame_count": 334,
+      "frame_indices": {
+        "left_support_ready_s": 68,
+        "scoop_ready_s": 171,
+        "lemon_supported_s": 209,
+        "pour_ready_s": 242,
+        "task_complete_s": 294
+      },
+      "left_support_ready_s": 6.8,
+      "scoop_ready_s": 17.1,
+      "lemon_supported_s": 20.9,
+      "pour_ready_s": 24.2,
+      "task_complete_s": 29.4
+    },
+    {
+      "episode_index": 34,
+      "status": "complete",
+      "frame_count": 379,
+      "frame_indices": {
+        "left_support_ready_s": 105,
+        "scoop_ready_s": 173,
+        "lemon_supported_s": 212,
+        "pour_ready_s": 237,
+        "task_complete_s": 337
+      },
+      "left_support_ready_s": 10.5,
+      "scoop_ready_s": 17.3,
+      "lemon_supported_s": 21.2,
+      "pour_ready_s": 23.7,
+      "task_complete_s": 33.7
+    },
+    {
+      "episode_index": 35,
+      "status": "complete",
+      "frame_count": 361,
+      "frame_indices": {
+        "left_support_ready_s": 73,
+        "scoop_ready_s": 155,
+        "lemon_supported_s": 186,
+        "pour_ready_s": 220,
+        "task_complete_s": 318
+      },
+      "left_support_ready_s": 7.3,
+      "scoop_ready_s": 15.5,
+      "lemon_supported_s": 18.6,
+      "pour_ready_s": 22.0,
+      "task_complete_s": 31.8
+    },
+    {
+      "episode_index": 36,
+      "status": "complete",
+      "frame_count": 274,
+      "frame_indices": {
+        "left_support_ready_s": 44,
+        "scoop_ready_s": 117,
+        "lemon_supported_s": 169,
+        "pour_ready_s": 194,
+        "task_complete_s": 236
+      },
+      "left_support_ready_s": 4.4,
+      "scoop_ready_s": 11.7,
+      "lemon_supported_s": 16.9,
+      "pour_ready_s": 19.4,
+      "task_complete_s": 23.6
+    },
+    {
+      "episode_index": 37,
+      "status": "complete",
+      "frame_count": 285,
+      "frame_indices": {
+        "left_support_ready_s": 42,
+        "scoop_ready_s": 133,
+        "lemon_supported_s": 170,
+        "pour_ready_s": 206,
+        "task_complete_s": 247
+      },
+      "left_support_ready_s": 4.2,
+      "scoop_ready_s": 13.3,
+      "lemon_supported_s": 17.0,
+      "pour_ready_s": 20.6,
+      "task_complete_s": 24.7
+    },
+    {
+      "episode_index": 40,
+      "status": "complete",
+      "frame_count": 308,
+      "frame_indices": {
+        "left_support_ready_s": 62,
+        "scoop_ready_s": 153,
+        "lemon_supported_s": 183,
+        "pour_ready_s": 221,
+        "task_complete_s": 273
+      },
+      "left_support_ready_s": 6.2,
+      "scoop_ready_s": 15.3,
+      "lemon_supported_s": 18.3,
+      "pour_ready_s": 22.1,
+      "task_complete_s": 27.3
+    },
+    {
+      "episode_index": 41,
+      "status": "complete",
+      "frame_count": 301,
+      "frame_indices": {
+        "left_support_ready_s": 61,
+        "scoop_ready_s": 145,
+        "lemon_supported_s": 177,
+        "pour_ready_s": 203,
+        "task_complete_s": 263
+      },
+      "left_support_ready_s": 6.1,
+      "scoop_ready_s": 14.5,
+      "lemon_supported_s": 17.7,
+      "pour_ready_s": 20.3,
+      "task_complete_s": 26.3
+    },
+    {
+      "episode_index": 42,
+      "status": "complete",
+      "frame_count": 303,
+      "frame_indices": {
+        "left_support_ready_s": 56,
+        "scoop_ready_s": 130,
+        "lemon_supported_s": 167,
+        "pour_ready_s": 203,
+        "task_complete_s": 264
+      },
+      "left_support_ready_s": 5.6,
+      "scoop_ready_s": 13.0,
+      "lemon_supported_s": 16.7,
+      "pour_ready_s": 20.3,
+      "task_complete_s": 26.4
+    },
+    {
+      "episode_index": 43,
+      "status": "complete",
+      "frame_count": 297,
+      "frame_indices": {
+        "left_support_ready_s": 58,
+        "scoop_ready_s": 130,
+        "lemon_supported_s": 159,
+        "pour_ready_s": 197,
+        "task_complete_s": 255
+      },
+      "left_support_ready_s": 5.8,
+      "scoop_ready_s": 13.0,
+      "lemon_supported_s": 15.9,
+      "pour_ready_s": 19.7,
+      "task_complete_s": 25.5
+    },
+    {
+      "episode_index": 44,
+      "status": "complete",
+      "frame_count": 433,
+      "frame_indices": {
+        "left_support_ready_s": 55,
+        "scoop_ready_s": 144,
+        "lemon_supported_s": 181,
+        "pour_ready_s": 222,
+        "task_complete_s": 375
+      },
+      "left_support_ready_s": 5.5,
+      "scoop_ready_s": 14.4,
+      "lemon_supported_s": 18.1,
+      "pour_ready_s": 22.2,
+      "task_complete_s": 37.5
+    },
+    {
+      "episode_index": 45,
+      "status": "complete",
+      "frame_count": 386,
+      "frame_indices": {
+        "left_support_ready_s": 101,
+        "scoop_ready_s": 212,
+        "lemon_supported_s": 260,
+        "pour_ready_s": 301,
+        "task_complete_s": 349
+      },
+      "left_support_ready_s": 10.1,
+      "scoop_ready_s": 21.2,
+      "lemon_supported_s": 26.0,
+      "pour_ready_s": 30.1,
+      "task_complete_s": 34.9
+    },
+    {
+      "episode_index": 46,
+      "status": "complete",
+      "frame_count": 338,
+      "frame_indices": {
+        "left_support_ready_s": 92,
+        "scoop_ready_s": 163,
+        "lemon_supported_s": 201,
+        "pour_ready_s": 226,
+        "task_complete_s": 302
+      },
+      "left_support_ready_s": 9.2,
+      "scoop_ready_s": 16.3,
+      "lemon_supported_s": 20.1,
+      "pour_ready_s": 22.6,
+      "task_complete_s": 30.2
+    },
+    {
+      "episode_index": 47,
+      "status": "complete",
+      "frame_count": 514,
+      "frame_indices": {
+        "left_support_ready_s": 112,
+        "scoop_ready_s": 245,
+        "lemon_supported_s": 303,
+        "pour_ready_s": 373,
+        "task_complete_s": 396
+      },
+      "left_support_ready_s": 11.2,
+      "scoop_ready_s": 24.5,
+      "lemon_supported_s": 30.3,
+      "pour_ready_s": 37.3,
+      "task_complete_s": 39.6
+    },
+    {
+      "episode_index": 48,
+      "status": "complete",
+      "frame_count": 492,
+      "frame_indices": {
+        "left_support_ready_s": 67,
+        "scoop_ready_s": 284,
+        "lemon_supported_s": 357,
+        "pour_ready_s": 407,
+        "task_complete_s": 446
+      },
+      "left_support_ready_s": 6.7,
+      "scoop_ready_s": 28.4,
+      "lemon_supported_s": 35.7,
+      "pour_ready_s": 40.7,
+      "task_complete_s": 44.6
+    },
+    {
+      "episode_index": 49,
+      "status": "complete",
+      "frame_count": 472,
+      "frame_indices": {
+        "left_support_ready_s": 64,
+        "scoop_ready_s": 192,
+        "lemon_supported_s": 275,
+        "pour_ready_s": 344,
+        "task_complete_s": 407
+      },
+      "left_support_ready_s": 6.4,
+      "scoop_ready_s": 19.2,
+      "lemon_supported_s": 27.5,
+      "pour_ready_s": 34.4,
+      "task_complete_s": 40.7
+    },
+    {
+      "episode_index": 50,
+      "status": "complete",
+      "frame_count": 392,
+      "frame_indices": {
+        "left_support_ready_s": 31,
+        "scoop_ready_s": 162,
+        "lemon_supported_s": 229,
+        "pour_ready_s": 262,
+        "task_complete_s": 338
+      },
+      "left_support_ready_s": 3.1,
+      "scoop_ready_s": 16.2,
+      "lemon_supported_s": 22.9,
+      "pour_ready_s": 26.2,
+      "task_complete_s": 33.8
+    },
+    {
+      "episode_index": 52,
+      "status": "complete",
+      "frame_count": 662,
+      "frame_indices": {
+        "left_support_ready_s": 119,
+        "scoop_ready_s": 299,
+        "lemon_supported_s": 384,
+        "pour_ready_s": 455,
+        "task_complete_s": 590
+      },
+      "left_support_ready_s": 11.9,
+      "scoop_ready_s": 29.9,
+      "lemon_supported_s": 38.4,
+      "pour_ready_s": 45.5,
+      "task_complete_s": 59.0
+    },
+    {
+      "episode_index": 53,
+      "status": "complete",
+      "frame_count": 433,
+      "frame_indices": {
+        "left_support_ready_s": 87,
+        "scoop_ready_s": 201,
+        "lemon_supported_s": 264,
+        "pour_ready_s": 326,
+        "task_complete_s": 370
+      },
+      "left_support_ready_s": 8.7,
+      "scoop_ready_s": 20.1,
+      "lemon_supported_s": 26.4,
+      "pour_ready_s": 32.6,
+      "task_complete_s": 37.0
+    },
+    {
+      "episode_index": 54,
+      "status": "complete",
+      "frame_count": 502,
+      "frame_indices": {
+        "left_support_ready_s": 71,
+        "scoop_ready_s": 228,
+        "lemon_supported_s": 298,
+        "pour_ready_s": 344,
+        "task_complete_s": 428
+      },
+      "left_support_ready_s": 7.1,
+      "scoop_ready_s": 22.8,
+      "lemon_supported_s": 29.8,
+      "pour_ready_s": 34.4,
+      "task_complete_s": 42.8
+    },
+    {
+      "episode_index": 55,
+      "status": "complete",
+      "frame_count": 569,
+      "frame_indices": {
+        "left_support_ready_s": 83,
+        "scoop_ready_s": 227,
+        "lemon_supported_s": 262,
+        "pour_ready_s": 352,
+        "task_complete_s": 453
+      },
+      "left_support_ready_s": 8.3,
+      "scoop_ready_s": 22.7,
+      "lemon_supported_s": 26.2,
+      "pour_ready_s": 35.2,
+      "task_complete_s": 45.3
+    },
+    {
+      "episode_index": 56,
+      "status": "complete",
+      "frame_count": 404,
+      "frame_indices": {
+        "left_support_ready_s": 63,
+        "scoop_ready_s": 201,
+        "lemon_supported_s": 255,
+        "pour_ready_s": 292,
+        "task_complete_s": 322
+      },
+      "left_support_ready_s": 6.3,
+      "scoop_ready_s": 20.1,
+      "lemon_supported_s": 25.5,
+      "pour_ready_s": 29.2,
+      "task_complete_s": 32.2
+    },
+    {
+      "episode_index": 57,
+      "status": "complete",
+      "frame_count": 492,
+      "frame_indices": {
+        "left_support_ready_s": 131,
+        "scoop_ready_s": 247,
+        "lemon_supported_s": 296,
+        "pour_ready_s": 363,
+        "task_complete_s": 414
+      },
+      "left_support_ready_s": 13.1,
+      "scoop_ready_s": 24.7,
+      "lemon_supported_s": 29.6,
+      "pour_ready_s": 36.3,
+      "task_complete_s": 41.4
+    },
+    {
+      "episode_index": 58,
+      "status": "complete",
+      "frame_count": 506,
+      "frame_indices": {
+        "left_support_ready_s": 69,
+        "scoop_ready_s": 229,
+        "lemon_supported_s": 282,
+        "pour_ready_s": 349,
+        "task_complete_s": 376
+      },
+      "left_support_ready_s": 6.9,
+      "scoop_ready_s": 22.9,
+      "lemon_supported_s": 28.2,
+      "pour_ready_s": 34.9,
+      "task_complete_s": 37.6
+    },
+    {
+      "episode_index": 59,
+      "status": "complete",
+      "frame_count": 493,
+      "frame_indices": {
+        "left_support_ready_s": 48,
+        "scoop_ready_s": 276,
+        "lemon_supported_s": 336,
+        "pour_ready_s": 393,
+        "task_complete_s": 417
+      },
+      "left_support_ready_s": 4.8,
+      "scoop_ready_s": 27.6,
+      "lemon_supported_s": 33.6,
+      "pour_ready_s": 39.3,
+      "task_complete_s": 41.7
+    },
+    {
+      "episode_index": 62,
+      "status": "complete",
+      "frame_count": 642,
+      "frame_indices": {
+        "left_support_ready_s": 129,
+        "scoop_ready_s": 314,
+        "lemon_supported_s": 347,
+        "pour_ready_s": 448,
+        "task_complete_s": 560
+      },
+      "left_support_ready_s": 12.9,
+      "scoop_ready_s": 31.4,
+      "lemon_supported_s": 34.7,
+      "pour_ready_s": 44.8,
+      "task_complete_s": 56.0
+    },
+    {
+      "episode_index": 63,
+      "status": "complete",
+      "frame_count": 382,
+      "frame_indices": {
+        "left_support_ready_s": 57,
+        "scoop_ready_s": 160,
+        "lemon_supported_s": 191,
+        "pour_ready_s": 249,
+        "task_complete_s": 336
+      },
+      "left_support_ready_s": 5.7,
+      "scoop_ready_s": 16.0,
+      "lemon_supported_s": 19.1,
+      "pour_ready_s": 24.9,
+      "task_complete_s": 33.6
+    },
+    {
+      "episode_index": 65,
+      "status": "complete",
+      "frame_count": 271,
+      "frame_indices": {
+        "left_support_ready_s": 29,
+        "scoop_ready_s": 112,
+        "lemon_supported_s": 141,
+        "pour_ready_s": 195,
+        "task_complete_s": 222
+      },
+      "left_support_ready_s": 2.9,
+      "scoop_ready_s": 11.2,
+      "lemon_supported_s": 14.1,
+      "pour_ready_s": 19.5,
+      "task_complete_s": 22.2
+    },
+    {
+      "episode_index": 66,
+      "status": "complete",
+      "frame_count": 262,
+      "frame_indices": {
+        "left_support_ready_s": 75,
+        "scoop_ready_s": 155,
+        "lemon_supported_s": 171,
+        "pour_ready_s": 213,
+        "task_complete_s": 232
+      },
+      "left_support_ready_s": 7.5,
+      "scoop_ready_s": 15.5,
+      "lemon_supported_s": 17.1,
+      "pour_ready_s": 21.3,
+      "task_complete_s": 23.2
+    },
+    {
+      "episode_index": 67,
+      "status": "complete",
+      "frame_count": 281,
+      "frame_indices": {
+        "left_support_ready_s": 47,
+        "scoop_ready_s": 149,
+        "lemon_supported_s": 174,
+        "pour_ready_s": 226,
+        "task_complete_s": 254
+      },
+      "left_support_ready_s": 4.7,
+      "scoop_ready_s": 14.9,
+      "lemon_supported_s": 17.4,
+      "pour_ready_s": 22.6,
+      "task_complete_s": 25.4
+    },
+    {
+      "episode_index": 68,
+      "status": "complete",
+      "frame_count": 285,
+      "frame_indices": {
+        "left_support_ready_s": 46,
+        "scoop_ready_s": 140,
+        "lemon_supported_s": 156,
+        "pour_ready_s": 192,
+        "task_complete_s": 254
+      },
+      "left_support_ready_s": 4.6,
+      "scoop_ready_s": 14.0,
+      "lemon_supported_s": 15.6,
+      "pour_ready_s": 19.2,
+      "task_complete_s": 25.4
+    },
+    {
+      "episode_index": 69,
+      "status": "complete",
+      "frame_count": 342,
+      "frame_indices": {
+        "left_support_ready_s": 124,
+        "scoop_ready_s": 214,
+        "lemon_supported_s": 241,
+        "pour_ready_s": 275,
+        "task_complete_s": 312
+      },
+      "left_support_ready_s": 12.4,
+      "scoop_ready_s": 21.4,
+      "lemon_supported_s": 24.1,
+      "pour_ready_s": 27.5,
+      "task_complete_s": 31.2
+    },
+    {
+      "episode_index": 70,
+      "status": "complete",
+      "frame_count": 299,
+      "frame_indices": {
+        "left_support_ready_s": 60,
+        "scoop_ready_s": 149,
+        "lemon_supported_s": 167,
+        "pour_ready_s": 201,
+        "task_complete_s": 262
+      },
+      "left_support_ready_s": 6.0,
+      "scoop_ready_s": 14.9,
+      "lemon_supported_s": 16.7,
+      "pour_ready_s": 20.1,
+      "task_complete_s": 26.2
+    },
+    {
+      "episode_index": 71,
+      "status": "complete",
+      "frame_count": 320,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 196,
+        "lemon_supported_s": 226,
+        "pour_ready_s": 254,
+        "task_complete_s": 290
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 19.6,
+      "lemon_supported_s": 22.6,
+      "pour_ready_s": 25.4,
+      "task_complete_s": 29.0
+    },
+    {
+      "episode_index": 72,
+      "status": "complete",
+      "frame_count": 361,
+      "frame_indices": {
+        "left_support_ready_s": 106,
+        "scoop_ready_s": 186,
+        "lemon_supported_s": 256,
+        "pour_ready_s": 306,
+        "task_complete_s": 336
+      },
+      "left_support_ready_s": 10.6,
+      "scoop_ready_s": 18.6,
+      "lemon_supported_s": 25.6,
+      "pour_ready_s": 30.6,
+      "task_complete_s": 33.6
+    },
+    {
+      "episode_index": 73,
+      "status": "complete",
+      "frame_count": 355,
+      "frame_indices": {
+        "left_support_ready_s": 107,
+        "scoop_ready_s": 186,
+        "lemon_supported_s": 249,
+        "pour_ready_s": 280,
+        "task_complete_s": 325
+      },
+      "left_support_ready_s": 10.7,
+      "scoop_ready_s": 18.6,
+      "lemon_supported_s": 24.9,
+      "pour_ready_s": 28.0,
+      "task_complete_s": 32.5
+    },
+    {
+      "episode_index": 74,
+      "status": "complete",
+      "frame_count": 373,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 173,
+        "lemon_supported_s": 240,
+        "pour_ready_s": 272,
+        "task_complete_s": 344
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 17.3,
+      "lemon_supported_s": 24.0,
+      "pour_ready_s": 27.2,
+      "task_complete_s": 34.4
+    },
+    {
+      "episode_index": 75,
+      "status": "complete",
+      "frame_count": 310,
+      "frame_indices": {
+        "left_support_ready_s": 112,
+        "scoop_ready_s": 172,
+        "lemon_supported_s": 228,
+        "pour_ready_s": 260,
+        "task_complete_s": 284
+      },
+      "left_support_ready_s": 11.2,
+      "scoop_ready_s": 17.2,
+      "lemon_supported_s": 22.8,
+      "pour_ready_s": 26.0,
+      "task_complete_s": 28.4
+    },
+    {
+      "episode_index": 76,
+      "status": "complete",
+      "frame_count": 337,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 191,
+        "lemon_supported_s": 248,
+        "pour_ready_s": 280,
+        "task_complete_s": 306
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 19.1,
+      "lemon_supported_s": 24.8,
+      "pour_ready_s": 28.0,
+      "task_complete_s": 30.6
+    },
+    {
+      "episode_index": 77,
+      "status": "complete",
+      "frame_count": 333,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 184,
+        "lemon_supported_s": 244,
+        "pour_ready_s": 274,
+        "task_complete_s": 304
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 18.4,
+      "lemon_supported_s": 24.4,
+      "pour_ready_s": 27.4,
+      "task_complete_s": 30.4
+    },
+    {
+      "episode_index": 78,
+      "status": "complete",
+      "frame_count": 289,
+      "frame_indices": {
+        "left_support_ready_s": 86,
+        "scoop_ready_s": 156,
+        "lemon_supported_s": 206,
+        "pour_ready_s": 236,
+        "task_complete_s": 261
+      },
+      "left_support_ready_s": 8.6,
+      "scoop_ready_s": 15.6,
+      "lemon_supported_s": 20.6,
+      "pour_ready_s": 23.6,
+      "task_complete_s": 26.1
+    },
+    {
+      "episode_index": 79,
+      "status": "complete",
+      "frame_count": 320,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 163,
+        "lemon_supported_s": 213,
+        "pour_ready_s": 243,
+        "task_complete_s": 294
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 16.3,
+      "lemon_supported_s": 21.3,
+      "pour_ready_s": 24.3,
+      "task_complete_s": 29.4
+    },
+    {
+      "episode_index": 80,
+      "status": "complete",
+      "frame_count": 338,
+      "frame_indices": {
+        "left_support_ready_s": 124,
+        "scoop_ready_s": 184,
+        "lemon_supported_s": 244,
+        "pour_ready_s": 274,
+        "task_complete_s": 304
+      },
+      "left_support_ready_s": 12.4,
+      "scoop_ready_s": 18.4,
+      "lemon_supported_s": 24.4,
+      "pour_ready_s": 27.4,
+      "task_complete_s": 30.4
+    },
+    {
+      "episode_index": 81,
+      "status": "complete",
+      "frame_count": 340,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 154,
+        "lemon_supported_s": 224,
+        "pour_ready_s": 254,
+        "task_complete_s": 314
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 15.4,
+      "lemon_supported_s": 22.4,
+      "pour_ready_s": 25.4,
+      "task_complete_s": 31.4
+    },
+    {
+      "episode_index": 82,
+      "status": "complete",
+      "frame_count": 313,
+      "frame_indices": {
+        "left_support_ready_s": 105,
+        "scoop_ready_s": 165,
+        "lemon_supported_s": 215,
+        "pour_ready_s": 232,
+        "task_complete_s": 286
+      },
+      "left_support_ready_s": 10.5,
+      "scoop_ready_s": 16.5,
+      "lemon_supported_s": 21.5,
+      "pour_ready_s": 23.2,
+      "task_complete_s": 28.6
+    },
+    {
+      "episode_index": 83,
+      "status": "complete",
+      "frame_count": 343,
+      "frame_indices": {
+        "left_support_ready_s": 133,
+        "scoop_ready_s": 203,
+        "lemon_supported_s": 268,
+        "pour_ready_s": 291,
+        "task_complete_s": 313
+      },
+      "left_support_ready_s": 13.3,
+      "scoop_ready_s": 20.3,
+      "lemon_supported_s": 26.8,
+      "pour_ready_s": 29.1,
+      "task_complete_s": 31.3
+    },
+    {
+      "episode_index": 84,
+      "status": "complete",
+      "frame_count": 300,
+      "frame_indices": {
+        "left_support_ready_s": 84,
+        "scoop_ready_s": 154,
+        "lemon_supported_s": 214,
+        "pour_ready_s": 244,
+        "task_complete_s": 274
+      },
+      "left_support_ready_s": 8.4,
+      "scoop_ready_s": 15.4,
+      "lemon_supported_s": 21.4,
+      "pour_ready_s": 24.4,
+      "task_complete_s": 27.4
+    },
+    {
+      "episode_index": 85,
+      "status": "complete",
+      "frame_count": 382,
+      "frame_indices": {
+        "left_support_ready_s": 106,
+        "scoop_ready_s": 196,
+        "lemon_supported_s": 266,
+        "pour_ready_s": 296,
+        "task_complete_s": 356
+      },
+      "left_support_ready_s": 10.6,
+      "scoop_ready_s": 19.6,
+      "lemon_supported_s": 26.6,
+      "pour_ready_s": 29.6,
+      "task_complete_s": 35.6
+    },
+    {
+      "episode_index": 86,
+      "status": "complete",
+      "frame_count": 322,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 153,
+        "lemon_supported_s": 197,
+        "pour_ready_s": 229,
+        "task_complete_s": 289
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 15.3,
+      "lemon_supported_s": 19.7,
+      "pour_ready_s": 22.9,
+      "task_complete_s": 28.9
+    },
+    {
+      "episode_index": 87,
+      "status": "complete",
+      "frame_count": 360,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 193,
+        "lemon_supported_s": 263,
+        "pour_ready_s": 293,
+        "task_complete_s": 333
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 19.3,
+      "lemon_supported_s": 26.3,
+      "pour_ready_s": 29.3,
+      "task_complete_s": 33.3
+    },
+    {
+      "episode_index": 88,
+      "status": "complete",
+      "frame_count": 328,
+      "frame_indices": {
+        "left_support_ready_s": 111,
+        "scoop_ready_s": 181,
+        "lemon_supported_s": 251,
+        "pour_ready_s": 271,
+        "task_complete_s": 301
+      },
+      "left_support_ready_s": 11.1,
+      "scoop_ready_s": 18.1,
+      "lemon_supported_s": 25.1,
+      "pour_ready_s": 27.1,
+      "task_complete_s": 30.1
+    },
+    {
+      "episode_index": 90,
+      "status": "complete",
+      "frame_count": 355,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 203,
+        "lemon_supported_s": 243,
+        "pour_ready_s": 273,
+        "task_complete_s": 333
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 20.3,
+      "lemon_supported_s": 24.3,
+      "pour_ready_s": 27.3,
+      "task_complete_s": 33.3
+    },
+    {
+      "episode_index": 91,
+      "status": "complete",
+      "frame_count": 389,
+      "frame_indices": {
+        "left_support_ready_s": 129,
+        "scoop_ready_s": 229,
+        "lemon_supported_s": 279,
+        "pour_ready_s": 309,
+        "task_complete_s": 359
+      },
+      "left_support_ready_s": 12.9,
+      "scoop_ready_s": 22.9,
+      "lemon_supported_s": 27.9,
+      "pour_ready_s": 30.9,
+      "task_complete_s": 35.9
+    },
+    {
+      "episode_index": 93,
+      "status": "complete",
+      "frame_count": 330,
+      "frame_indices": {
+        "left_support_ready_s": 108,
+        "scoop_ready_s": 169,
+        "lemon_supported_s": 239,
+        "pour_ready_s": 269,
+        "task_complete_s": 299
+      },
+      "left_support_ready_s": 10.8,
+      "scoop_ready_s": 16.9,
+      "lemon_supported_s": 23.9,
+      "pour_ready_s": 26.9,
+      "task_complete_s": 29.9
+    },
+    {
+      "episode_index": 94,
+      "status": "complete",
+      "frame_count": 342,
+      "frame_indices": {
+        "left_support_ready_s": 134,
+        "scoop_ready_s": 194,
+        "lemon_supported_s": 244,
+        "pour_ready_s": 279,
+        "task_complete_s": 315
+      },
+      "left_support_ready_s": 13.4,
+      "scoop_ready_s": 19.4,
+      "lemon_supported_s": 24.4,
+      "pour_ready_s": 27.9,
+      "task_complete_s": 31.5
+    },
+    {
+      "episode_index": 95,
+      "status": "complete",
+      "frame_count": 331,
+      "frame_indices": {
+        "left_support_ready_s": 106,
+        "scoop_ready_s": 186,
+        "lemon_supported_s": 226,
+        "pour_ready_s": 256,
+        "task_complete_s": 306
+      },
+      "left_support_ready_s": 10.6,
+      "scoop_ready_s": 18.6,
+      "lemon_supported_s": 22.6,
+      "pour_ready_s": 25.6,
+      "task_complete_s": 30.6
+    },
+    {
+      "episode_index": 96,
+      "status": "complete",
+      "frame_count": 306,
+      "frame_indices": {
+        "left_support_ready_s": 110,
+        "scoop_ready_s": 170,
+        "lemon_supported_s": 204,
+        "pour_ready_s": 247,
+        "task_complete_s": 279
+      },
+      "left_support_ready_s": 11.0,
+      "scoop_ready_s": 17.0,
+      "lemon_supported_s": 20.4,
+      "pour_ready_s": 24.7,
+      "task_complete_s": 27.9
+    },
+    {
+      "episode_index": 97,
+      "status": "complete",
+      "frame_count": 303,
+      "frame_indices": {
+        "left_support_ready_s": 92,
+        "scoop_ready_s": 162,
+        "lemon_supported_s": 202,
+        "pour_ready_s": 252,
+        "task_complete_s": 279
+      },
+      "left_support_ready_s": 9.2,
+      "scoop_ready_s": 16.2,
+      "lemon_supported_s": 20.2,
+      "pour_ready_s": 25.2,
+      "task_complete_s": 27.9
+    },
+    {
+      "episode_index": 99,
+      "status": "complete",
+      "frame_count": 323,
+      "frame_indices": {
+        "left_support_ready_s": 113,
+        "scoop_ready_s": 164,
+        "lemon_supported_s": 224,
+        "pour_ready_s": 254,
+        "task_complete_s": 284
+      },
+      "left_support_ready_s": 11.3,
+      "scoop_ready_s": 16.4,
+      "lemon_supported_s": 22.4,
+      "pour_ready_s": 25.4,
+      "task_complete_s": 28.4
+    },
+    {
+      "episode_index": 100,
+      "status": "complete",
+      "frame_count": 332,
+      "frame_indices": {
+        "left_support_ready_s": 106,
+        "scoop_ready_s": 167,
+        "lemon_supported_s": 236,
+        "pour_ready_s": 266,
+        "task_complete_s": 301
+      },
+      "left_support_ready_s": 10.6,
+      "scoop_ready_s": 16.7,
+      "lemon_supported_s": 23.6,
+      "pour_ready_s": 26.6,
+      "task_complete_s": 30.1
+    },
+    {
+      "episode_index": 102,
+      "status": "complete",
+      "frame_count": 365,
+      "frame_indices": {
+        "left_support_ready_s": 120,
+        "scoop_ready_s": 190,
+        "lemon_supported_s": 230,
+        "pour_ready_s": 260,
+        "task_complete_s": 330
+      },
+      "left_support_ready_s": 12.0,
+      "scoop_ready_s": 19.0,
+      "lemon_supported_s": 23.0,
+      "pour_ready_s": 26.0,
+      "task_complete_s": 33.0
+    },
+    {
+      "episode_index": 103,
+      "status": "complete",
+      "frame_count": 338,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 197,
+        "lemon_supported_s": 229,
+        "pour_ready_s": 258,
+        "task_complete_s": 305
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 19.7,
+      "lemon_supported_s": 22.9,
+      "pour_ready_s": 25.8,
+      "task_complete_s": 30.5
+    },
+    {
+      "episode_index": 104,
+      "status": "complete",
+      "frame_count": 278,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 168,
+        "lemon_supported_s": 197,
+        "pour_ready_s": 219,
+        "task_complete_s": 249
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 16.8,
+      "lemon_supported_s": 19.7,
+      "pour_ready_s": 21.9,
+      "task_complete_s": 24.9
+    },
+    {
+      "episode_index": 105,
+      "status": "complete",
+      "frame_count": 407,
+      "frame_indices": {
+        "left_support_ready_s": 150,
+        "scoop_ready_s": 244,
+        "lemon_supported_s": 290,
+        "pour_ready_s": 331,
+        "task_complete_s": 379
+      },
+      "left_support_ready_s": 15.0,
+      "scoop_ready_s": 24.4,
+      "lemon_supported_s": 29.0,
+      "pour_ready_s": 33.1,
+      "task_complete_s": 37.9
+    },
+    {
+      "episode_index": 107,
+      "status": "complete",
+      "frame_count": 385,
+      "frame_indices": {
+        "left_support_ready_s": 102,
+        "scoop_ready_s": 202,
+        "lemon_supported_s": 266,
+        "pour_ready_s": 307,
+        "task_complete_s": 347
+      },
+      "left_support_ready_s": 10.2,
+      "scoop_ready_s": 20.2,
+      "lemon_supported_s": 26.6,
+      "pour_ready_s": 30.7,
+      "task_complete_s": 34.7
+    },
+    {
+      "episode_index": 108,
+      "status": "complete",
+      "frame_count": 349,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 184,
+        "lemon_supported_s": 234,
+        "pour_ready_s": 251,
+        "task_complete_s": 307
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 18.4,
+      "lemon_supported_s": 23.4,
+      "pour_ready_s": 25.1,
+      "task_complete_s": 30.7
+    },
+    {
+      "episode_index": 109,
+      "status": "complete",
+      "frame_count": 381,
+      "frame_indices": {
+        "left_support_ready_s": 113,
+        "scoop_ready_s": 222,
+        "lemon_supported_s": 273,
+        "pour_ready_s": 313,
+        "task_complete_s": 343
+      },
+      "left_support_ready_s": 11.3,
+      "scoop_ready_s": 22.2,
+      "lemon_supported_s": 27.3,
+      "pour_ready_s": 31.3,
+      "task_complete_s": 34.3
+    },
+    {
+      "episode_index": 110,
+      "status": "complete",
+      "frame_count": 333,
+      "frame_indices": {
+        "left_support_ready_s": 92,
+        "scoop_ready_s": 194,
+        "lemon_supported_s": 234,
+        "pour_ready_s": 264,
+        "task_complete_s": 294
+      },
+      "left_support_ready_s": 9.2,
+      "scoop_ready_s": 19.4,
+      "lemon_supported_s": 23.4,
+      "pour_ready_s": 26.4,
+      "task_complete_s": 29.4
+    },
+    {
+      "episode_index": 111,
+      "status": "complete",
+      "frame_count": 369,
+      "frame_indices": {
+        "left_support_ready_s": 112,
+        "scoop_ready_s": 204,
+        "lemon_supported_s": 264,
+        "pour_ready_s": 304,
+        "task_complete_s": 338
+      },
+      "left_support_ready_s": 11.2,
+      "scoop_ready_s": 20.4,
+      "lemon_supported_s": 26.4,
+      "pour_ready_s": 30.4,
+      "task_complete_s": 33.8
+    },
+    {
+      "episode_index": 112,
+      "status": "complete",
+      "frame_count": 349,
+      "frame_indices": {
+        "left_support_ready_s": 125,
+        "scoop_ready_s": 202,
+        "lemon_supported_s": 253,
+        "pour_ready_s": 275,
+        "task_complete_s": 320
+      },
+      "left_support_ready_s": 12.5,
+      "scoop_ready_s": 20.2,
+      "lemon_supported_s": 25.3,
+      "pour_ready_s": 27.5,
+      "task_complete_s": 32.0
+    },
+    {
+      "episode_index": 113,
+      "status": "complete",
+      "frame_count": 306,
+      "frame_indices": {
+        "left_support_ready_s": 87,
+        "scoop_ready_s": 157,
+        "lemon_supported_s": 217,
+        "pour_ready_s": 240,
+        "task_complete_s": 272
+      },
+      "left_support_ready_s": 8.7,
+      "scoop_ready_s": 15.7,
+      "lemon_supported_s": 21.7,
+      "pour_ready_s": 24.0,
+      "task_complete_s": 27.2
+    },
+    {
+      "episode_index": 114,
+      "status": "complete",
+      "frame_count": 305,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 154,
+        "lemon_supported_s": 201,
+        "pour_ready_s": 239,
+        "task_complete_s": 270
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 15.4,
+      "lemon_supported_s": 20.1,
+      "pour_ready_s": 23.9,
+      "task_complete_s": 27.0
+    },
+    {
+      "episode_index": 115,
+      "status": "complete",
+      "frame_count": 332,
+      "frame_indices": {
+        "left_support_ready_s": 96,
+        "scoop_ready_s": 173,
+        "lemon_supported_s": 216,
+        "pour_ready_s": 261,
+        "task_complete_s": 302
+      },
+      "left_support_ready_s": 9.6,
+      "scoop_ready_s": 17.3,
+      "lemon_supported_s": 21.6,
+      "pour_ready_s": 26.1,
+      "task_complete_s": 30.2
+    },
+    {
+      "episode_index": 116,
+      "status": "complete",
+      "frame_count": 343,
+      "frame_indices": {
+        "left_support_ready_s": 66,
+        "scoop_ready_s": 186,
+        "lemon_supported_s": 226,
+        "pour_ready_s": 281,
+        "task_complete_s": 311
+      },
+      "left_support_ready_s": 6.6,
+      "scoop_ready_s": 18.6,
+      "lemon_supported_s": 22.6,
+      "pour_ready_s": 28.1,
+      "task_complete_s": 31.1
+    },
+    {
+      "episode_index": 117,
+      "status": "complete",
+      "frame_count": 324,
+      "frame_indices": {
+        "left_support_ready_s": 95,
+        "scoop_ready_s": 185,
+        "lemon_supported_s": 225,
+        "pour_ready_s": 265,
+        "task_complete_s": 285
+      },
+      "left_support_ready_s": 9.5,
+      "scoop_ready_s": 18.5,
+      "lemon_supported_s": 22.5,
+      "pour_ready_s": 26.5,
+      "task_complete_s": 28.5
+    },
+    {
+      "episode_index": 118,
+      "status": "complete",
+      "frame_count": 298,
+      "frame_indices": {
+        "left_support_ready_s": 63,
+        "scoop_ready_s": 146,
+        "lemon_supported_s": 193,
+        "pour_ready_s": 243,
+        "task_complete_s": 268
+      },
+      "left_support_ready_s": 6.3,
+      "scoop_ready_s": 14.6,
+      "lemon_supported_s": 19.3,
+      "pour_ready_s": 24.3,
+      "task_complete_s": 26.8
+    },
+    {
+      "episode_index": 119,
+      "status": "complete",
+      "frame_count": 346,
+      "frame_indices": {
+        "left_support_ready_s": 104,
+        "scoop_ready_s": 204,
+        "lemon_supported_s": 238,
+        "pour_ready_s": 280,
+        "task_complete_s": 310
+      },
+      "left_support_ready_s": 10.4,
+      "scoop_ready_s": 20.4,
+      "lemon_supported_s": 23.8,
+      "pour_ready_s": 28.0,
+      "task_complete_s": 31.0
+    },
+    {
+      "episode_index": 120,
+      "status": "complete",
+      "frame_count": 327,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 163,
+        "lemon_supported_s": 193,
+        "pour_ready_s": 243,
+        "task_complete_s": 293
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 16.3,
+      "lemon_supported_s": 19.3,
+      "pour_ready_s": 24.3,
+      "task_complete_s": 29.3
+    },
+    {
+      "episode_index": 121,
+      "status": "complete",
+      "frame_count": 328,
+      "frame_indices": {
+        "left_support_ready_s": 114,
+        "scoop_ready_s": 184,
+        "lemon_supported_s": 214,
+        "pour_ready_s": 254,
+        "task_complete_s": 294
+      },
+      "left_support_ready_s": 11.4,
+      "scoop_ready_s": 18.4,
+      "lemon_supported_s": 21.4,
+      "pour_ready_s": 25.4,
+      "task_complete_s": 29.4
+    },
+    {
+      "episode_index": 122,
+      "status": "complete",
+      "frame_count": 339,
+      "frame_indices": {
+        "left_support_ready_s": 95,
+        "scoop_ready_s": 205,
+        "lemon_supported_s": 255,
+        "pour_ready_s": 284,
+        "task_complete_s": 304
+      },
+      "left_support_ready_s": 9.5,
+      "scoop_ready_s": 20.5,
+      "lemon_supported_s": 25.5,
+      "pour_ready_s": 28.4,
+      "task_complete_s": 30.4
+    },
+    {
+      "episode_index": 123,
+      "status": "complete",
+      "frame_count": 340,
+      "frame_indices": {
+        "left_support_ready_s": 110,
+        "scoop_ready_s": 215,
+        "lemon_supported_s": 255,
+        "pour_ready_s": 285,
+        "task_complete_s": 315
+      },
+      "left_support_ready_s": 11.0,
+      "scoop_ready_s": 21.5,
+      "lemon_supported_s": 25.5,
+      "pour_ready_s": 28.5,
+      "task_complete_s": 31.5
+    },
+    {
+      "episode_index": 124,
+      "status": "complete",
+      "frame_count": 296,
+      "frame_indices": {
+        "left_support_ready_s": 101,
+        "scoop_ready_s": 171,
+        "lemon_supported_s": 202,
+        "pour_ready_s": 232,
+        "task_complete_s": 267
+      },
+      "left_support_ready_s": 10.1,
+      "scoop_ready_s": 17.1,
+      "lemon_supported_s": 20.2,
+      "pour_ready_s": 23.2,
+      "task_complete_s": 26.7
+    },
+    {
+      "episode_index": 125,
+      "status": "complete",
+      "frame_count": 375,
+      "frame_indices": {
+        "left_support_ready_s": 145,
+        "scoop_ready_s": 226,
+        "lemon_supported_s": 276,
+        "pour_ready_s": 306,
+        "task_complete_s": 340
+      },
+      "left_support_ready_s": 14.5,
+      "scoop_ready_s": 22.6,
+      "lemon_supported_s": 27.6,
+      "pour_ready_s": 30.6,
+      "task_complete_s": 34.0
+    },
+    {
+      "episode_index": 126,
+      "status": "complete",
+      "frame_count": 317,
+      "frame_indices": {
+        "left_support_ready_s": 78,
+        "scoop_ready_s": 148,
+        "lemon_supported_s": 178,
+        "pour_ready_s": 208,
+        "task_complete_s": 275
+      },
+      "left_support_ready_s": 7.8,
+      "scoop_ready_s": 14.8,
+      "lemon_supported_s": 17.8,
+      "pour_ready_s": 20.8,
+      "task_complete_s": 27.5
+    },
+    {
+      "episode_index": 127,
+      "status": "complete",
+      "frame_count": 358,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 218,
+        "lemon_supported_s": 260,
+        "pour_ready_s": 300,
+        "task_complete_s": 322
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 21.8,
+      "lemon_supported_s": 26.0,
+      "pour_ready_s": 30.0,
+      "task_complete_s": 32.2
+    },
+    {
+      "episode_index": 128,
+      "status": "complete",
+      "frame_count": 324,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 174,
+        "lemon_supported_s": 209,
+        "pour_ready_s": 239,
+        "task_complete_s": 299
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 17.4,
+      "lemon_supported_s": 20.9,
+      "pour_ready_s": 23.9,
+      "task_complete_s": 29.9
+    },
+    {
+      "episode_index": 129,
+      "status": "complete",
+      "frame_count": 331,
+      "frame_indices": {
+        "left_support_ready_s": 105,
+        "scoop_ready_s": 205,
+        "lemon_supported_s": 235,
+        "pour_ready_s": 275,
+        "task_complete_s": 305
+      },
+      "left_support_ready_s": 10.5,
+      "scoop_ready_s": 20.5,
+      "lemon_supported_s": 23.5,
+      "pour_ready_s": 27.5,
+      "task_complete_s": 30.5
+    },
+    {
+      "episode_index": 130,
+      "status": "complete",
+      "frame_count": 362,
+      "frame_indices": {
+        "left_support_ready_s": 104,
+        "scoop_ready_s": 214,
+        "lemon_supported_s": 264,
+        "pour_ready_s": 304,
+        "task_complete_s": 338
+      },
+      "left_support_ready_s": 10.4,
+      "scoop_ready_s": 21.4,
+      "lemon_supported_s": 26.4,
+      "pour_ready_s": 30.4,
+      "task_complete_s": 33.8
+    },
+    {
+      "episode_index": 131,
+      "status": "complete",
+      "frame_count": 319,
+      "frame_indices": {
+        "left_support_ready_s": 102,
+        "scoop_ready_s": 172,
+        "lemon_supported_s": 195,
+        "pour_ready_s": 215,
+        "task_complete_s": 305
+      },
+      "left_support_ready_s": 10.2,
+      "scoop_ready_s": 17.2,
+      "lemon_supported_s": 19.5,
+      "pour_ready_s": 21.5,
+      "task_complete_s": 30.5
+    },
+    {
+      "episode_index": 132,
+      "status": "complete",
+      "frame_count": 332,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 173,
+        "lemon_supported_s": 219,
+        "pour_ready_s": 244,
+        "task_complete_s": 304
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 17.3,
+      "lemon_supported_s": 21.9,
+      "pour_ready_s": 24.4,
+      "task_complete_s": 30.4
+    },
+    {
+      "episode_index": 133,
+      "status": "complete",
+      "frame_count": 347,
+      "frame_indices": {
+        "left_support_ready_s": 86,
+        "scoop_ready_s": 186,
+        "lemon_supported_s": 226,
+        "pour_ready_s": 266,
+        "task_complete_s": 316
+      },
+      "left_support_ready_s": 8.6,
+      "scoop_ready_s": 18.6,
+      "lemon_supported_s": 22.6,
+      "pour_ready_s": 26.6,
+      "task_complete_s": 31.6
+    },
+    {
+      "episode_index": 134,
+      "status": "complete",
+      "frame_count": 270,
+      "frame_indices": {
+        "left_support_ready_s": 89,
+        "scoop_ready_s": 162,
+        "lemon_supported_s": 196,
+        "pour_ready_s": 218,
+        "task_complete_s": 238
+      },
+      "left_support_ready_s": 8.9,
+      "scoop_ready_s": 16.2,
+      "lemon_supported_s": 19.6,
+      "pour_ready_s": 21.8,
+      "task_complete_s": 23.8
+    },
+    {
+      "episode_index": 135,
+      "status": "complete",
+      "frame_count": 333,
+      "frame_indices": {
+        "left_support_ready_s": 143,
+        "scoop_ready_s": 195,
+        "lemon_supported_s": 235,
+        "pour_ready_s": 264,
+        "task_complete_s": 312
+      },
+      "left_support_ready_s": 14.3,
+      "scoop_ready_s": 19.5,
+      "lemon_supported_s": 23.5,
+      "pour_ready_s": 26.4,
+      "task_complete_s": 31.2
+    },
+    {
+      "episode_index": 136,
+      "status": "complete",
+      "frame_count": 369,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 204,
+        "lemon_supported_s": 269,
+        "pour_ready_s": 320,
+        "task_complete_s": 344
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 20.4,
+      "lemon_supported_s": 26.9,
+      "pour_ready_s": 32.0,
+      "task_complete_s": 34.4
+    },
+    {
+      "episode_index": 137,
+      "status": "complete",
+      "frame_count": 323,
+      "frame_indices": {
+        "left_support_ready_s": 123,
+        "scoop_ready_s": 203,
+        "lemon_supported_s": 243,
+        "pour_ready_s": 263,
+        "task_complete_s": 293
+      },
+      "left_support_ready_s": 12.3,
+      "scoop_ready_s": 20.3,
+      "lemon_supported_s": 24.3,
+      "pour_ready_s": 26.3,
+      "task_complete_s": 29.3
+    },
+    {
+      "episode_index": 138,
+      "status": "complete",
+      "frame_count": 372,
+      "frame_indices": {
+        "left_support_ready_s": 135,
+        "scoop_ready_s": 229,
+        "lemon_supported_s": 260,
+        "pour_ready_s": 305,
+        "task_complete_s": 341
+      },
+      "left_support_ready_s": 13.5,
+      "scoop_ready_s": 22.9,
+      "lemon_supported_s": 26.0,
+      "pour_ready_s": 30.5,
+      "task_complete_s": 34.1
+    },
+    {
+      "episode_index": 139,
+      "status": "complete",
+      "frame_count": 292,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 173,
+        "lemon_supported_s": 203,
+        "pour_ready_s": 233,
+        "task_complete_s": 273
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 17.3,
+      "lemon_supported_s": 20.3,
+      "pour_ready_s": 23.3,
+      "task_complete_s": 27.3
+    },
+    {
+      "episode_index": 140,
+      "status": "complete",
+      "frame_count": 322,
+      "frame_indices": {
+        "left_support_ready_s": 74,
+        "scoop_ready_s": 173,
+        "lemon_supported_s": 224,
+        "pour_ready_s": 264,
+        "task_complete_s": 298
+      },
+      "left_support_ready_s": 7.4,
+      "scoop_ready_s": 17.3,
+      "lemon_supported_s": 22.4,
+      "pour_ready_s": 26.4,
+      "task_complete_s": 29.8
+    },
+    {
+      "episode_index": 141,
+      "status": "complete",
+      "frame_count": 327,
+      "frame_indices": {
+        "left_support_ready_s": 113,
+        "scoop_ready_s": 207,
+        "lemon_supported_s": 238,
+        "pour_ready_s": 260,
+        "task_complete_s": 301
+      },
+      "left_support_ready_s": 11.3,
+      "scoop_ready_s": 20.7,
+      "lemon_supported_s": 23.8,
+      "pour_ready_s": 26.0,
+      "task_complete_s": 30.1
+    },
+    {
+      "episode_index": 142,
+      "status": "complete",
+      "frame_count": 319,
+      "frame_indices": {
+        "left_support_ready_s": 114,
+        "scoop_ready_s": 204,
+        "lemon_supported_s": 235,
+        "pour_ready_s": 260,
+        "task_complete_s": 296
+      },
+      "left_support_ready_s": 11.4,
+      "scoop_ready_s": 20.4,
+      "lemon_supported_s": 23.5,
+      "pour_ready_s": 26.0,
+      "task_complete_s": 29.6
+    },
+    {
+      "episode_index": 143,
+      "status": "complete",
+      "frame_count": 387,
+      "frame_indices": {
+        "left_support_ready_s": 111,
+        "scoop_ready_s": 211,
+        "lemon_supported_s": 270,
+        "pour_ready_s": 310,
+        "task_complete_s": 350
+      },
+      "left_support_ready_s": 11.1,
+      "scoop_ready_s": 21.1,
+      "lemon_supported_s": 27.0,
+      "pour_ready_s": 31.0,
+      "task_complete_s": 35.0
+    },
+    {
+      "episode_index": 144,
+      "status": "complete",
+      "frame_count": 275,
+      "frame_indices": {
+        "left_support_ready_s": 96,
+        "scoop_ready_s": 170,
+        "lemon_supported_s": 202,
+        "pour_ready_s": 222,
+        "task_complete_s": 252
+      },
+      "left_support_ready_s": 9.6,
+      "scoop_ready_s": 17.0,
+      "lemon_supported_s": 20.2,
+      "pour_ready_s": 22.2,
+      "task_complete_s": 25.2
+    },
+    {
+      "episode_index": 145,
+      "status": "complete",
+      "frame_count": 343,
+      "frame_indices": {
+        "left_support_ready_s": 128,
+        "scoop_ready_s": 205,
+        "lemon_supported_s": 247,
+        "pour_ready_s": 277,
+        "task_complete_s": 317
+      },
+      "left_support_ready_s": 12.8,
+      "scoop_ready_s": 20.5,
+      "lemon_supported_s": 24.7,
+      "pour_ready_s": 27.7,
+      "task_complete_s": 31.7
+    },
+    {
+      "episode_index": 146,
+      "status": "complete",
+      "frame_count": 293,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 156,
+        "lemon_supported_s": 200,
+        "pour_ready_s": 221,
+        "task_complete_s": 263
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 15.6,
+      "lemon_supported_s": 20.0,
+      "pour_ready_s": 22.1,
+      "task_complete_s": 26.3
+    },
+    {
+      "episode_index": 147,
+      "status": "complete",
+      "frame_count": 325,
+      "frame_indices": {
+        "left_support_ready_s": 114,
+        "scoop_ready_s": 200,
+        "lemon_supported_s": 234,
+        "pour_ready_s": 275,
+        "task_complete_s": 298
+      },
+      "left_support_ready_s": 11.4,
+      "scoop_ready_s": 20.0,
+      "lemon_supported_s": 23.4,
+      "pour_ready_s": 27.5,
+      "task_complete_s": 29.8
+    },
+    {
+      "episode_index": 148,
+      "status": "complete",
+      "frame_count": 343,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 197,
+        "lemon_supported_s": 257,
+        "pour_ready_s": 285,
+        "task_complete_s": 317
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 19.7,
+      "lemon_supported_s": 25.7,
+      "pour_ready_s": 28.5,
+      "task_complete_s": 31.7
+    },
+    {
+      "episode_index": 149,
+      "status": "complete",
+      "frame_count": 283,
+      "frame_indices": {
+        "left_support_ready_s": 74,
+        "scoop_ready_s": 166,
+        "lemon_supported_s": 193,
+        "pour_ready_s": 222,
+        "task_complete_s": 252
+      },
+      "left_support_ready_s": 7.4,
+      "scoop_ready_s": 16.6,
+      "lemon_supported_s": 19.3,
+      "pour_ready_s": 22.2,
+      "task_complete_s": 25.2
+    },
+    {
+      "episode_index": 150,
+      "status": "complete",
+      "frame_count": 324,
+      "frame_indices": {
+        "left_support_ready_s": 84,
+        "scoop_ready_s": 173,
+        "lemon_supported_s": 203,
+        "pour_ready_s": 233,
+        "task_complete_s": 289
+      },
+      "left_support_ready_s": 8.4,
+      "scoop_ready_s": 17.3,
+      "lemon_supported_s": 20.3,
+      "pour_ready_s": 23.3,
+      "task_complete_s": 28.9
+    },
+    {
+      "episode_index": 151,
+      "status": "complete",
+      "frame_count": 350,
+      "frame_indices": {
+        "left_support_ready_s": 130,
+        "scoop_ready_s": 209,
+        "lemon_supported_s": 249,
+        "pour_ready_s": 289,
+        "task_complete_s": 319
+      },
+      "left_support_ready_s": 13.0,
+      "scoop_ready_s": 20.9,
+      "lemon_supported_s": 24.9,
+      "pour_ready_s": 28.9,
+      "task_complete_s": 31.9
+    },
+    {
+      "episode_index": 152,
+      "status": "complete",
+      "frame_count": 341,
+      "frame_indices": {
+        "left_support_ready_s": 109,
+        "scoop_ready_s": 210,
+        "lemon_supported_s": 243,
+        "pour_ready_s": 283,
+        "task_complete_s": 312
+      },
+      "left_support_ready_s": 10.9,
+      "scoop_ready_s": 21.0,
+      "lemon_supported_s": 24.3,
+      "pour_ready_s": 28.3,
+      "task_complete_s": 31.2
+    },
+    {
+      "episode_index": 153,
+      "status": "complete",
+      "frame_count": 307,
+      "frame_indices": {
+        "left_support_ready_s": 95,
+        "scoop_ready_s": 190,
+        "lemon_supported_s": 227,
+        "pour_ready_s": 244,
+        "task_complete_s": 280
+      },
+      "left_support_ready_s": 9.5,
+      "scoop_ready_s": 19.0,
+      "lemon_supported_s": 22.7,
+      "pour_ready_s": 24.4,
+      "task_complete_s": 28.0
+    },
+    {
+      "episode_index": 154,
+      "status": "complete",
+      "frame_count": 310,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 174,
+        "lemon_supported_s": 225,
+        "pour_ready_s": 247,
+        "task_complete_s": 277
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 17.4,
+      "lemon_supported_s": 22.5,
+      "pour_ready_s": 24.7,
+      "task_complete_s": 27.7
+    },
+    {
+      "episode_index": 155,
+      "status": "complete",
+      "frame_count": 307,
+      "frame_indices": {
+        "left_support_ready_s": 84,
+        "scoop_ready_s": 174,
+        "lemon_supported_s": 219,
+        "pour_ready_s": 249,
+        "task_complete_s": 279
+      },
+      "left_support_ready_s": 8.4,
+      "scoop_ready_s": 17.4,
+      "lemon_supported_s": 21.9,
+      "pour_ready_s": 24.9,
+      "task_complete_s": 27.9
+    },
+    {
+      "episode_index": 156,
+      "status": "complete",
+      "frame_count": 284,
+      "frame_indices": {
+        "left_support_ready_s": 84,
+        "scoop_ready_s": 184,
+        "lemon_supported_s": 213,
+        "pour_ready_s": 230,
+        "task_complete_s": 257
+      },
+      "left_support_ready_s": 8.4,
+      "scoop_ready_s": 18.4,
+      "lemon_supported_s": 21.3,
+      "pour_ready_s": 23.0,
+      "task_complete_s": 25.7
+    },
+    {
+      "episode_index": 157,
+      "status": "complete",
+      "frame_count": 342,
+      "frame_indices": {
+        "left_support_ready_s": 95,
+        "scoop_ready_s": 205,
+        "lemon_supported_s": 252,
+        "pour_ready_s": 284,
+        "task_complete_s": 314
+      },
+      "left_support_ready_s": 9.5,
+      "scoop_ready_s": 20.5,
+      "lemon_supported_s": 25.2,
+      "pour_ready_s": 28.4,
+      "task_complete_s": 31.4
+    },
+    {
+      "episode_index": 158,
+      "status": "complete",
+      "frame_count": 471,
+      "frame_indices": {
+        "left_support_ready_s": 101,
+        "scoop_ready_s": 188,
+        "lemon_supported_s": 402,
+        "pour_ready_s": 418,
+        "task_complete_s": 449
+      },
+      "left_support_ready_s": 10.1,
+      "scoop_ready_s": 18.8,
+      "lemon_supported_s": 40.2,
+      "pour_ready_s": 41.8,
+      "task_complete_s": 44.9
+    },
+    {
+      "episode_index": 159,
+      "status": "complete",
+      "frame_count": 310,
+      "frame_indices": {
+        "left_support_ready_s": 86,
+        "scoop_ready_s": 172,
+        "lemon_supported_s": 212,
+        "pour_ready_s": 237,
+        "task_complete_s": 283
+      },
+      "left_support_ready_s": 8.6,
+      "scoop_ready_s": 17.2,
+      "lemon_supported_s": 21.2,
+      "pour_ready_s": 23.7,
+      "task_complete_s": 28.3
+    },
+    {
+      "episode_index": 160,
+      "status": "complete",
+      "frame_count": 348,
+      "frame_indices": {
+        "left_support_ready_s": 71,
+        "scoop_ready_s": 157,
+        "lemon_supported_s": 238,
+        "pour_ready_s": 266,
+        "task_complete_s": 318
+      },
+      "left_support_ready_s": 7.1,
+      "scoop_ready_s": 15.7,
+      "lemon_supported_s": 23.8,
+      "pour_ready_s": 26.6,
+      "task_complete_s": 31.8
+    },
+    {
+      "episode_index": 161,
+      "status": "complete",
+      "frame_count": 443,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 193,
+        "lemon_supported_s": 353,
+        "pour_ready_s": 375,
+        "task_complete_s": 414
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 19.3,
+      "lemon_supported_s": 35.3,
+      "pour_ready_s": 37.5,
+      "task_complete_s": 41.4
+    },
+    {
+      "episode_index": 162,
+      "status": "complete",
+      "frame_count": 344,
+      "frame_indices": {
+        "left_support_ready_s": 110,
+        "scoop_ready_s": 206,
+        "lemon_supported_s": 238,
+        "pour_ready_s": 262,
+        "task_complete_s": 309
+      },
+      "left_support_ready_s": 11.0,
+      "scoop_ready_s": 20.6,
+      "lemon_supported_s": 23.8,
+      "pour_ready_s": 26.2,
+      "task_complete_s": 30.9
+    },
+    {
+      "episode_index": 163,
+      "status": "complete",
+      "frame_count": 300,
+      "frame_indices": {
+        "left_support_ready_s": 85,
+        "scoop_ready_s": 157,
+        "lemon_supported_s": 200,
+        "pour_ready_s": 230,
+        "task_complete_s": 270
+      },
+      "left_support_ready_s": 8.5,
+      "scoop_ready_s": 15.7,
+      "lemon_supported_s": 20.0,
+      "pour_ready_s": 23.0,
+      "task_complete_s": 27.0
+    },
+    {
+      "episode_index": 164,
+      "status": "complete",
+      "frame_count": 334,
+      "frame_indices": {
+        "left_support_ready_s": 104,
+        "scoop_ready_s": 202,
+        "lemon_supported_s": 243,
+        "pour_ready_s": 277,
+        "task_complete_s": 309
+      },
+      "left_support_ready_s": 10.4,
+      "scoop_ready_s": 20.2,
+      "lemon_supported_s": 24.3,
+      "pour_ready_s": 27.7,
+      "task_complete_s": 30.9
+    },
+    {
+      "episode_index": 165,
+      "status": "complete",
+      "frame_count": 304,
+      "frame_indices": {
+        "left_support_ready_s": 85,
+        "scoop_ready_s": 158,
+        "lemon_supported_s": 215,
+        "pour_ready_s": 248,
+        "task_complete_s": 278
+      },
+      "left_support_ready_s": 8.5,
+      "scoop_ready_s": 15.8,
+      "lemon_supported_s": 21.5,
+      "pour_ready_s": 24.8,
+      "task_complete_s": 27.8
+    },
+    {
+      "episode_index": 166,
+      "status": "complete",
+      "frame_count": 330,
+      "frame_indices": {
+        "left_support_ready_s": 96,
+        "scoop_ready_s": 197,
+        "lemon_supported_s": 247,
+        "pour_ready_s": 277,
+        "task_complete_s": 307
+      },
+      "left_support_ready_s": 9.6,
+      "scoop_ready_s": 19.7,
+      "lemon_supported_s": 24.7,
+      "pour_ready_s": 27.7,
+      "task_complete_s": 30.7
+    },
+    {
+      "episode_index": 167,
+      "status": "complete",
+      "frame_count": 317,
+      "frame_indices": {
+        "left_support_ready_s": 75,
+        "scoop_ready_s": 150,
+        "lemon_supported_s": 195,
+        "pour_ready_s": 225,
+        "task_complete_s": 291
+      },
+      "left_support_ready_s": 7.5,
+      "scoop_ready_s": 15.0,
+      "lemon_supported_s": 19.5,
+      "pour_ready_s": 22.5,
+      "task_complete_s": 29.1
+    },
+    {
+      "episode_index": 168,
+      "status": "complete",
+      "frame_count": 292,
+      "frame_indices": {
+        "left_support_ready_s": 78,
+        "scoop_ready_s": 141,
+        "lemon_supported_s": 172,
+        "pour_ready_s": 207,
+        "task_complete_s": 263
+      },
+      "left_support_ready_s": 7.8,
+      "scoop_ready_s": 14.1,
+      "lemon_supported_s": 17.2,
+      "pour_ready_s": 20.7,
+      "task_complete_s": 26.3
+    },
+    {
+      "episode_index": 169,
+      "status": "complete",
+      "frame_count": 295,
+      "frame_indices": {
+        "left_support_ready_s": 83,
+        "scoop_ready_s": 173,
+        "lemon_supported_s": 202,
+        "pour_ready_s": 226,
+        "task_complete_s": 271
+      },
+      "left_support_ready_s": 8.3,
+      "scoop_ready_s": 17.3,
+      "lemon_supported_s": 20.2,
+      "pour_ready_s": 22.6,
+      "task_complete_s": 27.1
+    },
+    {
+      "episode_index": 170,
+      "status": "complete",
+      "frame_count": 336,
+      "frame_indices": {
+        "left_support_ready_s": 92,
+        "scoop_ready_s": 190,
+        "lemon_supported_s": 230,
+        "pour_ready_s": 262,
+        "task_complete_s": 312
+      },
+      "left_support_ready_s": 9.2,
+      "scoop_ready_s": 19.0,
+      "lemon_supported_s": 23.0,
+      "pour_ready_s": 26.2,
+      "task_complete_s": 31.2
+    },
+    {
+      "episode_index": 171,
+      "status": "complete",
+      "frame_count": 341,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 193,
+        "lemon_supported_s": 254,
+        "pour_ready_s": 284,
+        "task_complete_s": 314
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 19.3,
+      "lemon_supported_s": 25.4,
+      "pour_ready_s": 28.4,
+      "task_complete_s": 31.4
+    },
+    {
+      "episode_index": 172,
+      "status": "complete",
+      "frame_count": 340,
+      "frame_indices": {
+        "left_support_ready_s": 99,
+        "scoop_ready_s": 199,
+        "lemon_supported_s": 249,
+        "pour_ready_s": 280,
+        "task_complete_s": 316
+      },
+      "left_support_ready_s": 9.9,
+      "scoop_ready_s": 19.9,
+      "lemon_supported_s": 24.9,
+      "pour_ready_s": 28.0,
+      "task_complete_s": 31.6
+    },
+    {
+      "episode_index": 173,
+      "status": "complete",
+      "frame_count": 285,
+      "frame_indices": {
+        "left_support_ready_s": 72,
+        "scoop_ready_s": 174,
+        "lemon_supported_s": 207,
+        "pour_ready_s": 227,
+        "task_complete_s": 262
+      },
+      "left_support_ready_s": 7.2,
+      "scoop_ready_s": 17.4,
+      "lemon_supported_s": 20.7,
+      "pour_ready_s": 22.7,
+      "task_complete_s": 26.2
+    },
+    {
+      "episode_index": 174,
+      "status": "complete",
+      "frame_count": 284,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 184,
+        "lemon_supported_s": 216,
+        "pour_ready_s": 237,
+        "task_complete_s": 261
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 18.4,
+      "lemon_supported_s": 21.6,
+      "pour_ready_s": 23.7,
+      "task_complete_s": 26.1
+    },
+    {
+      "episode_index": 175,
+      "status": "complete",
+      "frame_count": 327,
+      "frame_indices": {
+        "left_support_ready_s": 119,
+        "scoop_ready_s": 206,
+        "lemon_supported_s": 241,
+        "pour_ready_s": 265,
+        "task_complete_s": 302
+      },
+      "left_support_ready_s": 11.9,
+      "scoop_ready_s": 20.6,
+      "lemon_supported_s": 24.1,
+      "pour_ready_s": 26.5,
+      "task_complete_s": 30.2
+    },
+    {
+      "episode_index": 176,
+      "status": "complete",
+      "frame_count": 318,
+      "frame_indices": {
+        "left_support_ready_s": 88,
+        "scoop_ready_s": 197,
+        "lemon_supported_s": 234,
+        "pour_ready_s": 257,
+        "task_complete_s": 292
+      },
+      "left_support_ready_s": 8.8,
+      "scoop_ready_s": 19.7,
+      "lemon_supported_s": 23.4,
+      "pour_ready_s": 25.7,
+      "task_complete_s": 29.2
+    },
+    {
+      "episode_index": 177,
+      "status": "complete",
+      "frame_count": 290,
+      "frame_indices": {
+        "left_support_ready_s": 84,
+        "scoop_ready_s": 183,
+        "lemon_supported_s": 221,
+        "pour_ready_s": 242,
+        "task_complete_s": 273
+      },
+      "left_support_ready_s": 8.4,
+      "scoop_ready_s": 18.3,
+      "lemon_supported_s": 22.1,
+      "pour_ready_s": 24.2,
+      "task_complete_s": 27.3
+    },
+    {
+      "episode_index": 179,
+      "status": "complete",
+      "frame_count": 308,
+      "frame_indices": {
+        "left_support_ready_s": 83,
+        "scoop_ready_s": 159,
+        "lemon_supported_s": 212,
+        "pour_ready_s": 240,
+        "task_complete_s": 271
+      },
+      "left_support_ready_s": 8.3,
+      "scoop_ready_s": 15.9,
+      "lemon_supported_s": 21.2,
+      "pour_ready_s": 24.0,
+      "task_complete_s": 27.1
+    },
+    {
+      "episode_index": 180,
+      "status": "complete",
+      "frame_count": 442,
+      "frame_indices": {
+        "left_support_ready_s": 85,
+        "scoop_ready_s": 163,
+        "lemon_supported_s": 336,
+        "pour_ready_s": 368,
+        "task_complete_s": 416
+      },
+      "left_support_ready_s": 8.5,
+      "scoop_ready_s": 16.3,
+      "lemon_supported_s": 33.6,
+      "pour_ready_s": 36.8,
+      "task_complete_s": 41.6
+    },
+    {
+      "episode_index": 181,
+      "status": "complete",
+      "frame_count": 349,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 184,
+        "lemon_supported_s": 231,
+        "pour_ready_s": 247,
+        "task_complete_s": 306
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 18.4,
+      "lemon_supported_s": 23.1,
+      "pour_ready_s": 24.7,
+      "task_complete_s": 30.6
+    },
+    {
+      "episode_index": 182,
+      "status": "complete",
+      "frame_count": 302,
+      "frame_indices": {
+        "left_support_ready_s": 74,
+        "scoop_ready_s": 167,
+        "lemon_supported_s": 220,
+        "pour_ready_s": 242,
+        "task_complete_s": 281
+      },
+      "left_support_ready_s": 7.4,
+      "scoop_ready_s": 16.7,
+      "lemon_supported_s": 22.0,
+      "pour_ready_s": 24.2,
+      "task_complete_s": 28.1
+    },
+    {
+      "episode_index": 183,
+      "status": "complete",
+      "frame_count": 339,
+      "frame_indices": {
+        "left_support_ready_s": 87,
+        "scoop_ready_s": 210,
+        "lemon_supported_s": 250,
+        "pour_ready_s": 282,
+        "task_complete_s": 317
+      },
+      "left_support_ready_s": 8.7,
+      "scoop_ready_s": 21.0,
+      "lemon_supported_s": 25.0,
+      "pour_ready_s": 28.2,
+      "task_complete_s": 31.7
+    },
+    {
+      "episode_index": 184,
+      "status": "complete",
+      "frame_count": 298,
+      "frame_indices": {
+        "left_support_ready_s": 95,
+        "scoop_ready_s": 180,
+        "lemon_supported_s": 217,
+        "pour_ready_s": 235,
+        "task_complete_s": 273
+      },
+      "left_support_ready_s": 9.5,
+      "scoop_ready_s": 18.0,
+      "lemon_supported_s": 21.7,
+      "pour_ready_s": 23.5,
+      "task_complete_s": 27.3
+    },
+    {
+      "episode_index": 185,
+      "status": "complete",
+      "frame_count": 306,
+      "frame_indices": {
+        "left_support_ready_s": 74,
+        "scoop_ready_s": 176,
+        "lemon_supported_s": 219,
+        "pour_ready_s": 252,
+        "task_complete_s": 278
+      },
+      "left_support_ready_s": 7.4,
+      "scoop_ready_s": 17.6,
+      "lemon_supported_s": 21.9,
+      "pour_ready_s": 25.2,
+      "task_complete_s": 27.8
+    },
+    {
+      "episode_index": 186,
+      "status": "complete",
+      "frame_count": 320,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 196,
+        "lemon_supported_s": 228,
+        "pour_ready_s": 249,
+        "task_complete_s": 302
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 19.6,
+      "lemon_supported_s": 22.8,
+      "pour_ready_s": 24.9,
+      "task_complete_s": 30.2
+    },
+    {
+      "episode_index": 187,
+      "status": "complete",
+      "frame_count": 278,
+      "frame_indices": {
+        "left_support_ready_s": 92,
+        "scoop_ready_s": 159,
+        "lemon_supported_s": 199,
+        "pour_ready_s": 217,
+        "task_complete_s": 254
+      },
+      "left_support_ready_s": 9.2,
+      "scoop_ready_s": 15.9,
+      "lemon_supported_s": 19.9,
+      "pour_ready_s": 21.7,
+      "task_complete_s": 25.4
+    },
+    {
+      "episode_index": 188,
+      "status": "complete",
+      "frame_count": 304,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 171,
+        "lemon_supported_s": 209,
+        "pour_ready_s": 239,
+        "task_complete_s": 279
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 17.1,
+      "lemon_supported_s": 20.9,
+      "pour_ready_s": 23.9,
+      "task_complete_s": 27.9
+    },
+    {
+      "episode_index": 189,
+      "status": "complete",
+      "frame_count": 319,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 154,
+        "lemon_supported_s": 210,
+        "pour_ready_s": 241,
+        "task_complete_s": 292
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 15.4,
+      "lemon_supported_s": 21.0,
+      "pour_ready_s": 24.1,
+      "task_complete_s": 29.2
+    },
+    {
+      "episode_index": 190,
+      "status": "complete",
+      "frame_count": 333,
+      "frame_indices": {
+        "left_support_ready_s": 99,
+        "scoop_ready_s": 192,
+        "lemon_supported_s": 234,
+        "pour_ready_s": 262,
+        "task_complete_s": 302
+      },
+      "left_support_ready_s": 9.9,
+      "scoop_ready_s": 19.2,
+      "lemon_supported_s": 23.4,
+      "pour_ready_s": 26.2,
+      "task_complete_s": 30.2
+    },
+    {
+      "episode_index": 191,
+      "status": "complete",
+      "frame_count": 260,
+      "frame_indices": {
+        "left_support_ready_s": 83,
+        "scoop_ready_s": 160,
+        "lemon_supported_s": 192,
+        "pour_ready_s": 215,
+        "task_complete_s": 237
+      },
+      "left_support_ready_s": 8.3,
+      "scoop_ready_s": 16.0,
+      "lemon_supported_s": 19.2,
+      "pour_ready_s": 21.5,
+      "task_complete_s": 23.7
+    },
+    {
+      "episode_index": 192,
+      "status": "complete",
+      "frame_count": 292,
+      "frame_indices": {
+        "left_support_ready_s": 83,
+        "scoop_ready_s": 160,
+        "lemon_supported_s": 198,
+        "pour_ready_s": 222,
+        "task_complete_s": 262
+      },
+      "left_support_ready_s": 8.3,
+      "scoop_ready_s": 16.0,
+      "lemon_supported_s": 19.8,
+      "pour_ready_s": 22.2,
+      "task_complete_s": 26.2
+    },
+    {
+      "episode_index": 193,
+      "status": "complete",
+      "frame_count": 356,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 216,
+        "lemon_supported_s": 257,
+        "pour_ready_s": 280,
+        "task_complete_s": 327
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 21.6,
+      "lemon_supported_s": 25.7,
+      "pour_ready_s": 28.0,
+      "task_complete_s": 32.7
+    },
+    {
+      "episode_index": 194,
+      "status": "complete",
+      "frame_count": 334,
+      "frame_indices": {
+        "left_support_ready_s": 107,
+        "scoop_ready_s": 162,
+        "lemon_supported_s": 224,
+        "pour_ready_s": 247,
+        "task_complete_s": 301
+      },
+      "left_support_ready_s": 10.7,
+      "scoop_ready_s": 16.2,
+      "lemon_supported_s": 22.4,
+      "pour_ready_s": 24.7,
+      "task_complete_s": 30.1
+    },
+    {
+      "episode_index": 195,
+      "status": "complete",
+      "frame_count": 325,
+      "frame_indices": {
+        "left_support_ready_s": 83,
+        "scoop_ready_s": 184,
+        "lemon_supported_s": 226,
+        "pour_ready_s": 254,
+        "task_complete_s": 301
+      },
+      "left_support_ready_s": 8.3,
+      "scoop_ready_s": 18.4,
+      "lemon_supported_s": 22.6,
+      "pour_ready_s": 25.4,
+      "task_complete_s": 30.1
+    },
+    {
+      "episode_index": 196,
+      "status": "complete",
+      "frame_count": 324,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 157,
+        "lemon_supported_s": 225,
+        "pour_ready_s": 252,
+        "task_complete_s": 295
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 15.7,
+      "lemon_supported_s": 22.5,
+      "pour_ready_s": 25.2,
+      "task_complete_s": 29.5
+    },
+    {
+      "episode_index": 197,
+      "status": "complete",
+      "frame_count": 339,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 192,
+        "lemon_supported_s": 248,
+        "pour_ready_s": 267,
+        "task_complete_s": 310
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 19.2,
+      "lemon_supported_s": 24.8,
+      "pour_ready_s": 26.7,
+      "task_complete_s": 31.0
+    },
+    {
+      "episode_index": 198,
+      "status": "complete",
+      "frame_count": 291,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 174,
+        "lemon_supported_s": 217,
+        "pour_ready_s": 236,
+        "task_complete_s": 268
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 17.4,
+      "lemon_supported_s": 21.7,
+      "pour_ready_s": 23.6,
+      "task_complete_s": 26.8
+    },
+    {
+      "episode_index": 199,
+      "status": "complete",
+      "frame_count": 361,
+      "frame_indices": {
+        "left_support_ready_s": 93,
+        "scoop_ready_s": 211,
+        "lemon_supported_s": 247,
+        "pour_ready_s": 291,
+        "task_complete_s": 331
+      },
+      "left_support_ready_s": 9.3,
+      "scoop_ready_s": 21.1,
+      "lemon_supported_s": 24.7,
+      "pour_ready_s": 29.1,
+      "task_complete_s": 33.1
+    },
+    {
+      "episode_index": 200,
+      "status": "complete",
+      "frame_count": 282,
+      "frame_indices": {
+        "left_support_ready_s": 67,
+        "scoop_ready_s": 165,
+        "lemon_supported_s": 196,
+        "pour_ready_s": 226,
+        "task_complete_s": 256
+      },
+      "left_support_ready_s": 6.7,
+      "scoop_ready_s": 16.5,
+      "lemon_supported_s": 19.6,
+      "pour_ready_s": 22.6,
+      "task_complete_s": 25.6
+    },
+    {
+      "episode_index": 201,
+      "status": "complete",
+      "frame_count": 273,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 162,
+        "lemon_supported_s": 194,
+        "pour_ready_s": 210,
+        "task_complete_s": 248
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 16.2,
+      "lemon_supported_s": 19.4,
+      "pour_ready_s": 21.0,
+      "task_complete_s": 24.8
+    },
+    {
+      "episode_index": 202,
+      "status": "complete",
+      "frame_count": 306,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 184,
+        "lemon_supported_s": 225,
+        "pour_ready_s": 250,
+        "task_complete_s": 281
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 18.4,
+      "lemon_supported_s": 22.5,
+      "pour_ready_s": 25.0,
+      "task_complete_s": 28.1
+    },
+    {
+      "episode_index": 203,
+      "status": "complete",
+      "frame_count": 281,
+      "frame_indices": {
+        "left_support_ready_s": 78,
+        "scoop_ready_s": 157,
+        "lemon_supported_s": 190,
+        "pour_ready_s": 213,
+        "task_complete_s": 253
+      },
+      "left_support_ready_s": 7.8,
+      "scoop_ready_s": 15.7,
+      "lemon_supported_s": 19.0,
+      "pour_ready_s": 21.3,
+      "task_complete_s": 25.3
+    },
+    {
+      "episode_index": 204,
+      "status": "complete",
+      "frame_count": 319,
+      "frame_indices": {
+        "left_support_ready_s": 89,
+        "scoop_ready_s": 167,
+        "lemon_supported_s": 209,
+        "pour_ready_s": 239,
+        "task_complete_s": 284
+      },
+      "left_support_ready_s": 8.9,
+      "scoop_ready_s": 16.7,
+      "lemon_supported_s": 20.9,
+      "pour_ready_s": 23.9,
+      "task_complete_s": 28.4
+    },
+    {
+      "episode_index": 205,
+      "status": "complete",
+      "frame_count": 350,
+      "frame_indices": {
+        "left_support_ready_s": 99,
+        "scoop_ready_s": 202,
+        "lemon_supported_s": 248,
+        "pour_ready_s": 284,
+        "task_complete_s": 325
+      },
+      "left_support_ready_s": 9.9,
+      "scoop_ready_s": 20.2,
+      "lemon_supported_s": 24.8,
+      "pour_ready_s": 28.4,
+      "task_complete_s": 32.5
+    },
+    {
+      "episode_index": 206,
+      "status": "complete",
+      "frame_count": 315,
+      "frame_indices": {
+        "left_support_ready_s": 92,
+        "scoop_ready_s": 152,
+        "lemon_supported_s": 189,
+        "pour_ready_s": 220,
+        "task_complete_s": 286
+      },
+      "left_support_ready_s": 9.2,
+      "scoop_ready_s": 15.2,
+      "lemon_supported_s": 18.9,
+      "pour_ready_s": 22.0,
+      "task_complete_s": 28.6
+    },
+    {
+      "episode_index": 207,
+      "status": "complete",
+      "frame_count": 309,
+      "frame_indices": {
+        "left_support_ready_s": 84,
+        "scoop_ready_s": 170,
+        "lemon_supported_s": 219,
+        "pour_ready_s": 246,
+        "task_complete_s": 282
+      },
+      "left_support_ready_s": 8.4,
+      "scoop_ready_s": 17.0,
+      "lemon_supported_s": 21.9,
+      "pour_ready_s": 24.6,
+      "task_complete_s": 28.2
+    },
+    {
+      "episode_index": 208,
+      "status": "complete",
+      "frame_count": 355,
+      "frame_indices": {
+        "left_support_ready_s": 89,
+        "scoop_ready_s": 225,
+        "lemon_supported_s": 262,
+        "pour_ready_s": 303,
+        "task_complete_s": 330
+      },
+      "left_support_ready_s": 8.9,
+      "scoop_ready_s": 22.5,
+      "lemon_supported_s": 26.2,
+      "pour_ready_s": 30.3,
+      "task_complete_s": 33.0
+    },
+    {
+      "episode_index": 209,
+      "status": "complete",
+      "frame_count": 328,
+      "frame_indices": {
+        "left_support_ready_s": 108,
+        "scoop_ready_s": 213,
+        "lemon_supported_s": 257,
+        "pour_ready_s": 272,
+        "task_complete_s": 304
+      },
+      "left_support_ready_s": 10.8,
+      "scoop_ready_s": 21.3,
+      "lemon_supported_s": 25.7,
+      "pour_ready_s": 27.2,
+      "task_complete_s": 30.4
+    },
+    {
+      "episode_index": 210,
+      "status": "complete",
+      "frame_count": 329,
+      "frame_indices": {
+        "left_support_ready_s": 103,
+        "scoop_ready_s": 187,
+        "lemon_supported_s": 233,
+        "pour_ready_s": 282,
+        "task_complete_s": 303
+      },
+      "left_support_ready_s": 10.3,
+      "scoop_ready_s": 18.7,
+      "lemon_supported_s": 23.3,
+      "pour_ready_s": 28.2,
+      "task_complete_s": 30.3
+    },
+    {
+      "episode_index": 211,
+      "status": "complete",
+      "frame_count": 342,
+      "frame_indices": {
+        "left_support_ready_s": 99,
+        "scoop_ready_s": 194,
+        "lemon_supported_s": 234,
+        "pour_ready_s": 260,
+        "task_complete_s": 305
+      },
+      "left_support_ready_s": 9.9,
+      "scoop_ready_s": 19.4,
+      "lemon_supported_s": 23.4,
+      "pour_ready_s": 26.0,
+      "task_complete_s": 30.5
+    },
+    {
+      "episode_index": 212,
+      "status": "complete",
+      "frame_count": 298,
+      "frame_indices": {
+        "left_support_ready_s": 79,
+        "scoop_ready_s": 153,
+        "lemon_supported_s": 196,
+        "pour_ready_s": 226,
+        "task_complete_s": 269
+      },
+      "left_support_ready_s": 7.9,
+      "scoop_ready_s": 15.3,
+      "lemon_supported_s": 19.6,
+      "pour_ready_s": 22.6,
+      "task_complete_s": 26.9
+    },
+    {
+      "episode_index": 213,
+      "status": "complete",
+      "frame_count": 329,
+      "frame_indices": {
+        "left_support_ready_s": 100,
+        "scoop_ready_s": 169,
+        "lemon_supported_s": 220,
+        "pour_ready_s": 252,
+        "task_complete_s": 296
+      },
+      "left_support_ready_s": 10.0,
+      "scoop_ready_s": 16.9,
+      "lemon_supported_s": 22.0,
+      "pour_ready_s": 25.2,
+      "task_complete_s": 29.6
+    },
+    {
+      "episode_index": 214,
+      "status": "complete",
+      "frame_count": 290,
+      "frame_indices": {
+        "left_support_ready_s": 88,
+        "scoop_ready_s": 174,
+        "lemon_supported_s": 205,
+        "pour_ready_s": 235,
+        "task_complete_s": 257
+      },
+      "left_support_ready_s": 8.8,
+      "scoop_ready_s": 17.4,
+      "lemon_supported_s": 20.5,
+      "pour_ready_s": 23.5,
+      "task_complete_s": 25.7
+    },
+    {
+      "episode_index": 215,
+      "status": "complete",
+      "frame_count": 338,
+      "frame_indices": {
+        "left_support_ready_s": 111,
+        "scoop_ready_s": 180,
+        "lemon_supported_s": 219,
+        "pour_ready_s": 277,
+        "task_complete_s": 311
+      },
+      "left_support_ready_s": 11.1,
+      "scoop_ready_s": 18.0,
+      "lemon_supported_s": 21.9,
+      "pour_ready_s": 27.7,
+      "task_complete_s": 31.1
+    },
+    {
+      "episode_index": 216,
+      "status": "complete",
+      "frame_count": 298,
+      "frame_indices": {
+        "left_support_ready_s": 87,
+        "scoop_ready_s": 190,
+        "lemon_supported_s": 221,
+        "pour_ready_s": 251,
+        "task_complete_s": 272
+      },
+      "left_support_ready_s": 8.7,
+      "scoop_ready_s": 19.0,
+      "lemon_supported_s": 22.1,
+      "pour_ready_s": 25.1,
+      "task_complete_s": 27.2
+    },
+    {
+      "episode_index": 217,
+      "status": "complete",
+      "frame_count": 307,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 181,
+        "lemon_supported_s": 222,
+        "pour_ready_s": 245,
+        "task_complete_s": 276
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 18.1,
+      "lemon_supported_s": 22.2,
+      "pour_ready_s": 24.5,
+      "task_complete_s": 27.6
+    },
+    {
+      "episode_index": 218,
+      "status": "complete",
+      "frame_count": 327,
+      "frame_indices": {
+        "left_support_ready_s": 102,
+        "scoop_ready_s": 183,
+        "lemon_supported_s": 224,
+        "pour_ready_s": 254,
+        "task_complete_s": 300
+      },
+      "left_support_ready_s": 10.2,
+      "scoop_ready_s": 18.3,
+      "lemon_supported_s": 22.4,
+      "pour_ready_s": 25.4,
+      "task_complete_s": 30.0
+    },
+    {
+      "episode_index": 219,
+      "status": "complete",
+      "frame_count": 293,
+      "frame_indices": {
+        "left_support_ready_s": 94,
+        "scoop_ready_s": 182,
+        "lemon_supported_s": 215,
+        "pour_ready_s": 227,
+        "task_complete_s": 267
+      },
+      "left_support_ready_s": 9.4,
+      "scoop_ready_s": 18.2,
+      "lemon_supported_s": 21.5,
+      "pour_ready_s": 22.7,
+      "task_complete_s": 26.7
+    },
+    {
+      "episode_index": 220,
+      "status": "complete",
+      "frame_count": 290,
+      "frame_indices": {
+        "left_support_ready_s": 77,
+        "scoop_ready_s": 163,
+        "lemon_supported_s": 202,
+        "pour_ready_s": 226,
+        "task_complete_s": 258
+      },
+      "left_support_ready_s": 7.7,
+      "scoop_ready_s": 16.3,
+      "lemon_supported_s": 20.2,
+      "pour_ready_s": 22.6,
+      "task_complete_s": 25.8
+    },
+    {
+      "episode_index": 221,
+      "status": "complete",
+      "frame_count": 361,
+      "frame_indices": {
+        "left_support_ready_s": 153,
+        "scoop_ready_s": 234,
+        "lemon_supported_s": 269,
+        "pour_ready_s": 290,
+        "task_complete_s": 337
+      },
+      "left_support_ready_s": 15.3,
+      "scoop_ready_s": 23.4,
+      "lemon_supported_s": 26.9,
+      "pour_ready_s": 29.0,
+      "task_complete_s": 33.7
+    },
+    {
+      "episode_index": 222,
+      "status": "complete",
+      "frame_count": 299,
+      "frame_indices": {
+        "left_support_ready_s": 79,
+        "scoop_ready_s": 178,
+        "lemon_supported_s": 219,
+        "pour_ready_s": 234,
+        "task_complete_s": 274
+      },
+      "left_support_ready_s": 7.9,
+      "scoop_ready_s": 17.8,
+      "lemon_supported_s": 21.9,
+      "pour_ready_s": 23.4,
+      "task_complete_s": 27.4
+    },
+    {
+      "episode_index": 223,
+      "status": "complete",
+      "frame_count": 348,
+      "frame_indices": {
+        "left_support_ready_s": 91,
+        "scoop_ready_s": 215,
+        "lemon_supported_s": 265,
+        "pour_ready_s": 297,
+        "task_complete_s": 327
+      },
+      "left_support_ready_s": 9.1,
+      "scoop_ready_s": 21.5,
+      "lemon_supported_s": 26.5,
+      "pour_ready_s": 29.7,
+      "task_complete_s": 32.7
+    }
+  ]
+}

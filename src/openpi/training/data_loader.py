@@ -295,7 +295,14 @@ def create_torch_dataset(
             delta_timestamps=dict.fromkeys(data_config.action_sequence_keys, action_delta_timestamps),
             video_backend=data_config.video_backend,
         )
-        if data_config.prompt_from_task:
+        view = getattr(data_config, "task_view", None)
+        if view is not None:
+            from openpi.training.task_view import TaskViewDataset
+
+            if len(data_config.lerobot_datasets) != 1 or action_hz != dataset_meta.fps:
+                raise ValueError("Task views require one dataset with action_hz equal to source FPS")
+            dataset = TaskViewDataset(dataset, view, action_horizon)
+        elif data_config.prompt_from_task:
             dataset = TransformedDataset(dataset, [_transforms.PromptFromLeRobotTask(dataset_meta.tasks)])
         return dataset, dataset_meta
 

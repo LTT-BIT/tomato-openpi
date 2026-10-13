@@ -22,6 +22,7 @@ import openpi.policies.aloha_policy as aloha_policy
 import openpi.policies.droid_policy as droid_policy
 import openpi.policies.fr3_sharpa_policy as fr3_sharpa_policy
 import openpi.policies.fr3_wuji_policy as fr3_wuji_policy
+import openpi.policies.lemon_policy as lemon_policy
 import openpi.policies.libero_policy as libero_policy
 import openpi.policies.single_franka_policy as single_franka_policy
 import openpi.shared.download as _download
@@ -31,6 +32,7 @@ import openpi.training.droid_rlds_dataset as droid_rlds_dataset
 import openpi.training.misc.polaris_config as polaris_config
 import openpi.training.misc.roboarena_config as roboarena_config
 import openpi.training.optimizer as _optimizer
+from openpi.training.task_view import TaskView
 import openpi.training.weight_loaders as weight_loaders
 import openpi.transforms as _transforms
 
@@ -138,6 +140,12 @@ class DataConfig:
 class GroupFactory(Protocol):
     def __call__(self, model_config: _model.BaseModelConfig) -> _transforms.Group:
         """Create a group."""
+
+
+@dataclasses.dataclass(frozen=True)
+class TaskDataConfig(DataConfig):
+    # Explicit subset/phase view, opt-in so existing baselines stay unchanged.
+    task_view: TaskView | None = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -553,6 +561,30 @@ class LeRobotSingleFrankaDataConfig(DataConfigFactory):
 
 
 @dataclasses.dataclass(frozen=True)
+class LeRobotLemonDataConfig(LeRobotSingleFrankaDataConfig):
+    """Dual UR/O30 vectors remain 52D state and 12D action until model padding."""
+
+    def create_vector_transforms(self, model_config):
+        if not model_config.pi05 or not model_config.discrete_state_input or model_config.action_dim not in (32, 64):
+            raise ValueError("Lemon requires PI05 discrete state tokens and a 32D or 64D action head")
+        repack = _transforms.Group(
+            inputs=[
+                _transforms.RepackTransform(
+                    {
+                        "observation/image": "observation.images.cam0",
+                        "observation/left_wrist_image": "observation.images.cam1",
+                        "observation/right_wrist_image": "observation.images.cam2",
+                        "observation/state": "observation.state",
+                        "actions": "action",
+                        "prompt": "prompt",
+                    }
+                )
+            ]
+        )
+        return repack, _transforms.Group(inputs=[lemon_policy.LemonInputs()], outputs=[lemon_policy.LemonOutputs()])
+
+
+@dataclasses.dataclass(frozen=True)
 class RLDSDroidDataConfig(DataConfigFactory):
     """
     Config for training on DROID, using RLDS data format (for efficient training on larger datasets).
@@ -782,6 +814,22 @@ class TrainConfig:
             raise ValueError("model.action_horizon must be a positive integer")
         if self.augmentation_seed is not None and not isinstance(self.model, pi0_config.Pi0Config):
             raise ValueError("Independent augmentation_seed is supported only by JAX Pi0/Pi05")
+
+
+@dataclasses.dataclass(frozen=True)
+class ScheduledTrainConfig(TrainConfig):
+    """Explicit early checkpoints followed by periodic saves, without validation."""
+
+    save_before_step: int = 20000
+    save_steps_before: tuple[int, ...] = (5000, 10000, 15000)
+    save_interval_after: int = 1000
+
+    def __post_init__(self):
+        super().__post_init__()
+        if self.save_before_step <= 0 or self.save_interval_after <= 0:
+            raise ValueError("Checkpoint schedule intervals must be positive")
+        if any(step <= 0 or step >= self.save_before_step for step in self.save_steps_before):
+            raise ValueError("Early checkpoint steps must be positive and below save_before_step")
 
 
 # Use `get_config` if you need to get a config by name in your code.

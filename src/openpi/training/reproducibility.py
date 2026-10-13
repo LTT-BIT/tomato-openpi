@@ -107,9 +107,11 @@ def _source_identity(data_config: _config.DataConfig, source: Any) -> tuple[dict
     if len(frame_ids) != len(source):
         raise ValueError("Loaded frame IDs do not match dataset length")
     info = json.loads(required[0].read_text())
-    if info["total_frames"] != len(source):
+    if info["total_frames"] != getattr(source, "source_total_frames", len(source)):
         raise ValueError("Dataset metadata total_frames does not match the loaded table")
+    view_identity = getattr(source, "view_identity", None)
     return {
+        **({"task_view": view_identity} if view_identity is not None else {}),
         "repo_id": spec.repo_id,
         "frames": len(source),
         "episodes": info["total_episodes"],

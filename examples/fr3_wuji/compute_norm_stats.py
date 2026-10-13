@@ -23,6 +23,7 @@ import tyro
 from openpi import transforms
 from openpi.policies import fr3_sharpa_policy
 from openpi.policies import fr3_wuji_policy
+from openpi.policies import lemon_policy
 from openpi.policies import single_franka_policy
 from openpi.shared import normalize
 from openpi.shared.local_storage import new_artifact_directory
@@ -78,6 +79,11 @@ def compute(config: training_config.TrainConfig, *, batch_size: int = 512):
 
 
 def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Path):
+    if getattr(config.data.base_config, "task_view", None) is not None:
+        from openpi.training import task_view_norm
+
+        task_view_norm.compute(config, batch_size=batch_size, output=output)
+        return
     data_config = config.data.create(config.assets_dirs, config.model)
     if data_config.local_dataset_loader is not None or tuple(data_config.action_sequence_keys) != ("action",):
         raise ValueError("Requires standard LeRobot data with the action sequence key 'action'")
@@ -89,6 +95,7 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
             fr3_wuji_policy.Fr3WujiInputs,
             fr3_sharpa_policy.Fr3SharpaInputs,
             single_franka_policy.SingleFrankaInputs,
+            lemon_policy.LemonInputs,
             transforms.DeltaActions,
         )
         for t in data_config.data_transforms.inputs
@@ -111,8 +118,9 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
     reference = data_loader.create_torch_dataset(data_config, config.model.action_horizon, config.model)
     stats = {key: normalize.RunningStats() for key in ("state", "actions")}
     norm_dim = (config.policy_metadata or {}).get("normalization_dim", config.model.action_dim)
-    totals = {key: np.zeros(norm_dim, dtype=np.float64) for key in stats}
-    squares = {key: np.zeros(norm_dim, dtype=np.float64) for key in stats}
+    norm_dims = (config.policy_metadata or {}).get("normalization_dims", dict.fromkeys(stats, norm_dim))
+    totals = {key: np.zeros(norm_dims[key], dtype=np.float64) for key in stats}
+    squares = {key: np.zeros(norm_dims[key], dtype=np.float64) for key in stats}
     counts = dict.fromkeys(stats, 0)
     offset = 0
     checked = 0
@@ -143,7 +151,7 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
                     state, actions, rows, config.model.action_horizon, transform, camera_keys=camera_keys
                 )
                 for key, running_stats in stats.items():
-                    values = np.asarray(batch[key], dtype=np.float64).reshape(-1, norm_dim)
+                    values = np.asarray(batch[key], dtype=np.float64).reshape(-1, norm_dims[key])
                     if not np.isfinite(values).all():
                         raise ValueError(f"Non-finite values in {spec.repo_id} episode {index}, {key}")
                     running_stats.update(values)

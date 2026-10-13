@@ -173,6 +173,17 @@ def train_step(
     return new_state, info
 
 
+def should_save_checkpoint(config, step, start_step):
+    if step == config.num_train_steps - 1:
+        return True
+    if isinstance(config, _config.ScheduledTrainConfig):
+        completed = step + 1
+        if completed < config.save_before_step:
+            return completed in config.save_steps_before
+        return completed % config.save_interval_after == 0
+    return step % config.save_interval == 0 and step > start_step
+
+
 def main(config: _config.TrainConfig):
     init_logging()
     logging.info(f"Running on: {platform.node()}")
@@ -276,8 +287,9 @@ def main(config: _config.TrainConfig):
                 if step + 1 < config.num_train_steps:
                     batch = next(data_iter)
 
-                if (step % config.save_interval == 0 and step > start_step) or step == config.num_train_steps - 1:
-                    _checkpoints.save_state(checkpoint_manager, train_state, data_loader, step)
+                if should_save_checkpoint(config, step, start_step):
+                    checkpoint_step = step + 1 if isinstance(config, _config.ScheduledTrainConfig) else step
+                    _checkpoints.save_state(checkpoint_manager, train_state, data_loader, checkpoint_step)
 
             logging.info("Waiting for checkpoint manager to finish")
             checkpoint_manager.wait_until_finished()

@@ -35,7 +35,8 @@ class TinyModel(model_lib.BaseModel):
         return jnp.zeros((*observation.state.shape[:-1], 2, 2))
 
 
-def test_interrupted_training_matches_uninterrupted(tmp_path, monkeypatch):
+@pytest.mark.parametrize("scheduled", [False, True])
+def test_interrupted_training_matches_uninterrupted(tmp_path, monkeypatch, scheduled):
     states = {}
     real_save = checkpoints.save_state
     real_session = train.tracking.session
@@ -87,15 +88,22 @@ def test_interrupted_training_matches_uninterrupted(tmp_path, monkeypatch):
         save_interval=1,
         log_interval=1,
     )
+    if scheduled:
+        cfg = config.ScheduledTrainConfig(
+            **{field.name: getattr(cfg, field.name) for field in dataclasses.fields(cfg)},
+            save_before_step=2,
+            save_steps_before=(1,),
+            save_interval_after=1,
+        )
     train.main(cfg)
-    expected = states[3]
+    expected = states[4 if scheduled else 3]
 
     class SimulatedInterruptionError(Exception):
         pass
 
     def interrupt_after_checkpoint(manager, state, loader, step):
         capture_save(manager, state, loader, step)
-        if step == 1:
+        if step == (2 if scheduled else 1):
             manager.wait_until_finished()
             manager.close()
             raise SimulatedInterruptionError
@@ -107,7 +115,7 @@ def test_interrupted_training_matches_uninterrupted(tmp_path, monkeypatch):
     monkeypatch.setattr(checkpoints, "save_state", capture_save)
     train.main(dataclasses.replace(interrupted_cfg, resume=True))
     assert session_starts == [(False, 0), (False, 0), (True, 2)]
-    actual = states[3]
+    actual = states[4 if scheduled else 3]
     for a, b in zip(jax.tree.leaves(actual.params), jax.tree.leaves(expected.params), strict=True):
         np.testing.assert_array_equal(a, b)
     for a, b in zip(jax.tree.leaves(actual.opt_state), jax.tree.leaves(expected.opt_state), strict=True):

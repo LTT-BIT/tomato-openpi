@@ -57,6 +57,12 @@ def build_contract(config: "cfg.TrainConfig", *, dataset_specs=None) -> dict:
         "vectors": vectors.inputs,
         "implementation": implementation,
     }
+    view = getattr(config.data.base_config, "task_view", None)
+    if view is not None:
+        from openpi.training import task_view
+
+        transform_values["task_view"] = view.identity()
+        implementation["openpi.training.task_view"] = reproducibility.file_sha256(Path(task_view.__file__))
     return {
         "repo_id": config.data.repo_id,
         "datasets": datasets,

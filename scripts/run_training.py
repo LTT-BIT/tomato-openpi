@@ -41,7 +41,7 @@ def load_experiment(module_name: str) -> cfg.TrainConfig:
 
 def resolve_experiment(module_name: str, overrides: list[str]) -> cfg.TrainConfig:
     config = load_experiment(module_name)
-    resolved = tyro.cli(cfg.TrainConfig, default=config, args=overrides)
+    resolved = tyro.cli(type(config), default=config, args=overrides)
     # A new model recipe must also regenerate its freeze filter and adapter contract.
     for field in ("paligemma_variant", "action_expert_variant", "pi05", "discrete_state_input"):
         if getattr(resolved.model, field) != getattr(config.model, field):
@@ -122,6 +122,18 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
         "prompts": prompts,
         "norm_stats_path": str(norm_dir / "norm_stats.json"),
     }
+    view = getattr(config.data.base_config, "task_view", None)
+    if view is not None:
+        from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+
+        from openpi.training.task_view import TaskViewDataset
+
+        dataset = LeRobotDataset(config.data.repo_id, root=root, video_backend="pyav")
+        selected = TaskViewDataset(dataset, view, config.model.action_horizon)
+        result["training_frames"] = len(selected)
+        result["training_episodes"] = len(np.unique(selected.ids[:, 0]))
+        result["task_view"] = view.identity()
+        result["effective_prompt_examples"] = [selected.vectors(i)["prompt"] for i in (0, len(selected) - 1)]
     if require_norm:
         norm_path = norm_dir / "norm_stats.json"
         digest = reproducibility.file_sha256(norm_path)
@@ -141,7 +153,12 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
                 array = getattr(value, field)
                 if (
                     array is None
-                    or array.shape != (metadata.get("normalization_dim", config.model.action_dim),)
+                    or array.shape
+                    != (
+                        metadata.get("normalization_dims", {}).get(
+                            key, metadata.get("normalization_dim", config.model.action_dim)
+                        ),
+                    )
                     or not np.isfinite(array).all()
                 ):
                     raise ValueError(f"Invalid normalization {key}.{field} shape or values")

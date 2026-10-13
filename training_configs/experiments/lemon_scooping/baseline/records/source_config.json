@@ -1,0 +1,53 @@
+{
+  "source_bundle": "pi05_lemon_source_bundle_20261013",
+  "source_files_sha256": {
+    "pi05/server_jobs/lemon_wrist_reset_full_ft_30k/task.json": "17439e6fca38cde28aaf70aa20e68bbf56f1f1f6d8a7e813edc894a720b57408",
+    "pi05/server_jobs/lemon_wrist_reset_full_ft_30k/env.sh": "163c09ed2e9dfa33681baf938eb021d66f608bd01ce7340e10a46155f9b0c52d",
+    "pi05/server_jobs/lemon_wrist_reset_full_ft_30k/splits.json": "08b21a677396c71cd9a020d9fe890fdd229e24f29d5da85533926e5d297d5569",
+    "pi05/server_jobs/lemon_wrist_reset_full_ft_30k/annotations.json": "3225dd4e8f9f10d43e506a5bd0aa416a9869960b190f8677b1f5ca347900ab24",
+    "pi05/scripts/train_lemon_server.py": "9387411f3e6c082c2891ddb466b597648e38600c8bb15e4fc77cf7ce4399e3ef",
+    "pi05/src/openpi/policies/lemon_policy.py": "b313d8ab2cf8076f9abde6b28cf8acc69e1c7395b5070365a6602624a65cd479"
+  },
+  "record_kind": "saved job configuration; completion unverified",
+  "task_id": "lemon_wrist_reset_full_ft_30k",
+  "dataset": {
+    "repo_id": "ur_o30/lemon_move_wrist_reset_20261008",
+    "total_episodes": 224,
+    "selected_episodes": 209,
+    "train_episodes": 188,
+    "val_episodes": 21,
+    "timestamps_used": false,
+    "prompt": "Scoop the lemon slice into the cup while the left hand supports it."
+  },
+  "training": {
+    "method": "Pi05 full fine-tuning; no frozen parameters; no LoRA-only freeze",
+    "model_action_dim": 32,
+    "real_action_dim": 12,
+    "action_semantics": "absolute_joint_target_rad",
+    "batch_size_per_gpu": 8,
+    "global_batch_size": 64,
+    "num_workers": 8,
+    "steps": 30000,
+    "learning_rate": "cosine: warmup 1000, peak 1e-5, decay 1e-6 over 30000 steps",
+    "optimizer": "AdamW default pi05_lemon_lora (b1=0.9, b2=0.95, eps=1e-8, weight_decay=1e-10, clip_gradient_norm=1.0)",
+    "ema": false,
+    "phase_endpoint_hold": false,
+    "vision_trainable": "all",
+    "language_and_action_trainable": "all"
+  },
+  "checkpoint_policy": {
+    "save_before_step": 20000,
+    "save_steps_before": [
+      5000,
+      10000,
+      15000
+    ],
+    "save_interval_after": 1000,
+    "validation_interval": 500,
+    "validation_batches": 64,
+    "metric": "val_loss_cosine_score",
+    "max_checkpoints": 11,
+    "keep_latest": true
+  },
+  "normalization": "recompute on selected train episodes; old stats not bundled"
+}
