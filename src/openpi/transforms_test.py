@@ -1,8 +1,33 @@
+import io
+
 import numpy as np
 import pytest
+import sentencepiece
 
 import openpi.models.tokenizer as _tokenizer
 import openpi.transforms as _transforms
+
+
+@pytest.fixture
+def local_tokenizer(tmp_path, monkeypatch):
+    """Exercise the real tokenizer without downloading its pretrained vocabulary."""
+    model = io.BytesIO()
+    sentencepiece.SentencePieceTrainer.train(
+        sentence_iterator=iter(["Hello, world!", "Pick up a tomato and place it in the basket."]),
+        model_writer=model,
+        model_type="char",
+        vocab_size=64,
+        hard_vocab_limit=False,
+        minloglevel=2,
+    )
+    path = tmp_path / "tokenizer.model"
+    path.write_bytes(model.getvalue())
+
+    def local_download(uri, **kwargs):
+        assert uri == "gs://big_vision/paligemma_tokenizer.model"
+        return path
+
+    monkeypatch.setattr(_tokenizer.download, "maybe_download", local_download)
 
 
 def test_repack_transform():
@@ -67,6 +92,7 @@ def test_make_bool_mask():
     assert _transforms.make_bool_mask(2, 0, 2) == (True, True, True, True)
 
 
+@pytest.mark.usefixtures("local_tokenizer")
 def test_tokenize_prompt():
     tokenizer = _tokenizer.PaligemmaTokenizer(max_len=12)
     transform = _transforms.TokenizePrompt(tokenizer)
@@ -78,6 +104,7 @@ def test_tokenize_prompt():
     assert np.allclose(tok_mask, data["tokenized_prompt_mask"])
 
 
+@pytest.mark.usefixtures("local_tokenizer")
 def test_tokenize_no_prompt():
     transform = _transforms.TokenizePrompt(_tokenizer.PaligemmaTokenizer())
 

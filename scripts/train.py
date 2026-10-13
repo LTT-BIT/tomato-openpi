@@ -203,8 +203,6 @@ def main(config: _config.TrainConfig):
             f"Batch size {config.batch_size} must be divisible by the number of devices {jax.device_count()}."
         )
 
-    jax.config.update("jax_compilation_cache_dir", str(epath.Path("~/.cache/jax").expanduser()))
-
     rng = jax.random.key(config.seed)
     train_rng, init_rng = jax.random.split(rng)
     if config.model_seed is not None:

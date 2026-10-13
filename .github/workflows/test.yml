@@ -16,16 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.12.10"
       - name: Install locked environment
         run: uv sync --frozen --python 3.11
-      - name: Check formatting
-        run: |
-          uv run --no-sync ruff check training_configs tests scripts/run_training.py scripts/compute_experiment_norm.py
-          uv run --no-sync ruff format --check training_configs tests scripts/run_training.py scripts/compute_experiment_norm.py
-      - name: Verify baselines, data contracts and exact resume
-        run: |
-          uv run --no-sync python -m pytest tests \
-            src/openpi/training/sampling_test.py src/openpi/training/reproducibility_test.py \
-            src/openpi/training/weight_loaders_test.py src/openpi/training/data_loader_test.py \
-            src/openpi/policies/fr3_wuji_policy_test.py src/openpi/transforms_test.py \
-            src/openpi/shared/normalize_test.py scripts/train_reproducibility_test.py -q
+      - name: Check formatting, configuration, regression and packaging
+        run: bash scripts/check_training.sh

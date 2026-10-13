@@ -41,6 +41,7 @@ def configure_environment() -> None:
         "HF_HUB_CACHE": cache / "huggingface/hub",
         "HF_DATASETS_CACHE": cache / "huggingface/datasets",
         "TORCH_HOME": cache / "torch",
+        "JAX_COMPILATION_CACHE_DIR": cache / "jax",
         "WANDB_DIR": repository,
         "WANDB_CACHE_DIR": cache / "wandb",
         "WANDB_DATA_DIR": cache / "wandb-data",

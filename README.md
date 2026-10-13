@@ -102,6 +102,7 @@ CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
 | 本地终端日志及运行清单 | `logs/<配置名>/<实验名>/` |
 | checkpoint 与恢复审计 | `checkpoints/<配置名>/<实验名>/` |
 | W&B 运行记录 | `wandb/` |
+| JAX 编译缓存 | `.cache/jax/` |
 
 表中路径均相对于仓库根目录。权重保存在每个 checkpoint 的 `<step>/params/`，完整恢复状态在 `<step>/train_state/`，对应统计在 `<step>/assets/`。
 
@@ -132,5 +133,7 @@ CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
 个人实验通过短期分支和合并请求进入 `main`；公共 recipe 或训练功能变更单独评审。每位训练者使用独立 checkout、GPU 分配和仓库内输出目录，训练固定已提交的 commit。数据集、权重、日志及密钥不提交 Git。
 
 完整配置示例、版本规则和协作流程见 [多人开发 README](docs/多人开发README.md)。
+
+推送分支或创建、更新 GitLab 合并请求会自动运行 `.gitlab-ci.yml` 中的验证：格式、锁文件、基准与模板配置展开、CPU 回归和 wheel 打包。安装环境后本地执行同一套检查：`bash scripts/check_training.sh`。结果在 GitLab 的 CI/CD → Pipelines 查看，具体 Runner 要求见多人开发 README。
 
 本项目基于 Physical Intelligence OpenPI，遵循 [LICENSE](LICENSE) 与 [Gemma 许可](LICENSE_GEMMA.txt)。

@@ -1,0 +1,48 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+stages:
+  - verify
+
+training-checks:
+  stage: verify
+  image: python:3.11-bookworm
+  timeout: 90m
+  variables:
+    UV_CACHE_DIR: "$CI_PROJECT_DIR/.cache/uv"
+    UV_PROJECT_ENVIRONMENT: "$CI_PROJECT_DIR/.venv"
+    UV_LINK_MODE: copy
+    PYTHONNOUSERSITE: "1"
+    PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+    JAX_PLATFORMS: cpu
+    XLA_PYTHON_CLIENT_PREALLOCATE: "false"
+    GIT_LFS_SKIP_SMUDGE: "1"
+    WANDB_MODE: offline
+  cache:
+    key:
+      prefix: python311
+      files:
+        - uv.lock
+        - pyproject.toml
+    paths:
+      - .cache/uv/
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends git ffmpeg libgl1 libglib2.0-0
+    - python -m pip install --no-cache-dir uv==0.12.10
+    - uv sync --frozen --python 3.11
+  script:
+    - bash scripts/check_training.sh
+  after_script:
+    - uv cache prune --ci
+  artifacts:
+    when: always
+    expire_in: 1 week
+    reports:
+      junit: .cache/ci/junit.xml
+    paths:
+      - .cache/ci/wheels/

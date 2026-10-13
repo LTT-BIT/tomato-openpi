@@ -2,6 +2,7 @@ import dataclasses
 
 import jax
 import numpy as np
+import pytest
 import torch
 
 from openpi.models import pi0_config
@@ -84,6 +85,7 @@ def test_with_fake_dataset():
         assert actions.shape == (config.batch_size, config.model.action_horizon, config.model.action_dim)
 
 
+@pytest.mark.manual
 def test_with_real_dataset():
     config = _config.get_config("pi0_aloha_sim")
     config = dataclasses.replace(config, batch_size=4)

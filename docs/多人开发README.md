@@ -132,9 +132,25 @@ PYTHONNOUSERSITE=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 JAX_PLATFORMS=cpu \
   src/openpi/training/sampling_test.py src/openpi/training/reproducibility_test.py \
   src/openpi/training/weight_loaders_test.py src/openpi/training/data_loader_test.py \
   src/openpi/policies/fr3_wuji_policy_test.py src/openpi/transforms_test.py \
-  src/openpi/shared/normalize_test.py scripts/train_reproducibility_test.py -q
+  src/openpi/shared/normalize_test.py scripts/train_reproducibility_test.py -q -m 'not manual'
 ```
 
 验证后在 docs/开发日志.md 记录变更、结果与未完成事项，用中文提交说明，只提交本任务文件。精确恢复保留原源码、数据、统计、完整 checkpoint 和采样审计。
+
+### GitLab 自动验证
+
+`.gitlab-ci.yml` 在分支推送、合并请求创建/更新时执行；有打开的合并请求时只运行合并请求流水线，避免重复运行。分支也可在 GitLab 手动运行流水线。GitLab 和 GitHub 共用 `scripts/check_training.sh`，本地安装环境后也可执行：
+
+```bash
+bash scripts/check_training.sh
+```
+
+检查包括 uv 锁一致性、配置/启动器/统计工具的 Ruff 与格式、Shell 语法、两个基准与模板 dry-run、数据与统计绑定/常量关节/采样/模型冻结/中断恢复等 CPU 回归，以及 wheel 打包。测试使用临时小数据、小模型及本地生成的 tokenizer，不读取真实数据、下载预训练权重或启动正式训练；依赖下载和 wheel 构建仍需要网络。外部真实数据测试标记 manual，自动验证使用 -m 'not manual' 排除；准备好对应数据后可单独手动执行。JUnit 报告与 wheel 在流水线保留一周。开发者仍需针对新增共享源码运行相应检查。
+
+项目需要启用一个能运行 `python:3.11-bookworm` 容器的 Linux Docker/Kubernetes Runner，允许无标签作业；本方案不要求 GPU、训练数据或 W&B 密钥。Runner 需要访问 PyPI、GitHub、PyTorch 包源及 Debian 包源。依赖仍按训练 uv.lock 安装，含 CUDA 包，即使测试只用 CPU，首次安装仍需较大空间；建议至少 16 GB 内存、30 GB 可用磁盘。若作业一直 pending，先检查 Settings → CI/CD → Runners 是否有可用 Runner；代码里的 CI 文件不会自动创建 Runner。
+
+合并请求在 CI/CD → Pipelines 查看结果，JUnit 结果可在 Tests 查看。若团队希望验证失败时禁止合并，维护者可在项目设置启用 Pipelines must succeed；本轮只配置仓库流水线，不修改项目权限或合并规则。
+
+触发与去重规则参考 [GitLab workflow 文档](https://docs.gitlab.com/ci/yaml/workflow/)，依赖缓存方式参考 [uv 的 GitLab 集成文档](https://docs.astral.sh/uv/guides/integration/gitlab/)。
 
 当前审计对训练源码、配置目录与工具生成哈希，新增其他实验文件也可能改变源码审计。续训必须使用原固定 checkout；代码升级后创建新实验，不在移动的主线上续训旧实验。

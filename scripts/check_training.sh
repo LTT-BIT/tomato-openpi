@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Shared local/GitLab/GitHub checks; use the already installed locked environment.
+set -euo pipefail
+REPOSITORY_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPOSITORY_DIR"
+export PYTHONNOUSERSITE=1
+export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+export JAX_PLATFORMS=cpu
+export XLA_PYTHON_CLIENT_PREALLOCATE=false
+export GIT_LFS_SKIP_SMUDGE=1
+export WANDB_MODE=offline
+export UV_CACHE_DIR="$REPOSITORY_DIR/.cache/uv"
+export UV_PROJECT_ENVIRONMENT="$REPOSITORY_DIR/.venv"
+export PYTHONPATH="$REPOSITORY_DIR/src:$REPOSITORY_DIR/packages/openpi-client/src"
+mkdir -p .cache/ci
+
+uv lock --check --offline
+CHECK_PATHS=(
+  training_configs tests
+  scripts/run_training.py scripts/compute_experiment_norm.py scripts/train.py
+  src/openpi/training/norm_provenance.py examples/fr3_wuji/compute_norm_stats.py
+  src/openpi/transforms_test.py src/openpi/training/data_loader_test.py
+)
+.venv/bin/ruff check "${CHECK_PATHS[@]}"
+.venv/bin/ruff format --check "${CHECK_PATHS[@]}"
+bash -n scripts/setup_training_env.sh scripts/check_training.sh
+
+for experiment in \
+  training_configs.experiments.baselines.tomato_fr3_lora_v1 \
+  training_configs.experiments.baselines.tomato_fr3_fullft_v1 \
+  training_configs.experiments.template.tomato_lora_lr1e5; do
+  .venv/bin/python -m scripts.run_training "$experiment" --dry-run
+done
+
+.venv/bin/python -m pytest tests \
+  src/openpi/training/sampling_test.py src/openpi/training/reproducibility_test.py \
+  src/openpi/training/weight_loaders_test.py src/openpi/training/data_loader_test.py \
+  src/openpi/policies/fr3_wuji_policy_test.py src/openpi/transforms_test.py \
+  src/openpi/shared/normalize_test.py scripts/train_reproducibility_test.py \
+  -q -m 'not manual' --junitxml=.cache/ci/junit.xml
+uv build --wheel --out-dir .cache/ci/wheels

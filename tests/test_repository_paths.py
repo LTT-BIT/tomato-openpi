@@ -45,6 +45,7 @@ def test_environment_uses_its_checkout_and_replaces_old_mount_paths(tmp_path, ol
         "HF_HUB_CACHE": repository / ".cache/huggingface/hub",
         "HF_DATASETS_CACHE": repository / ".cache/huggingface/datasets",
         "TORCH_HOME": repository / ".cache/torch",
+        "JAX_COMPILATION_CACHE_DIR": repository / ".cache/jax",
         "WANDB_DIR": repository,
         "WANDB_CACHE_DIR": repository / ".cache/wandb",
         "WANDB_DATA_DIR": repository / ".cache/wandb-data",
@@ -58,7 +59,11 @@ def test_environment_uses_its_checkout_and_replaces_old_mount_paths(tmp_path, ol
             environment.pop(key, None)
     environment["PYTHONPATH"] = str(repository)
     keys = [*paths, "PI05_RUNTIME_DIR"]
-    probe = f"import scripts; import os,json; print(json.dumps({{key: os.environ.get(key) for key in {keys!r}}}))"
+    probe = (
+        "import scripts; import os,json,jax; "
+        f"values = {{key: os.environ.get(key) for key in {keys!r}}}; "
+        "values['jax_effective_cache'] = jax.config.jax_compilation_cache_dir; print(json.dumps(values))"
+    )
     result = subprocess.run(
         [sys.executable, "-c", probe],
         cwd=tmp_path,
@@ -68,6 +73,7 @@ def test_environment_uses_its_checkout_and_replaces_old_mount_paths(tmp_path, ol
         check=True,
     )
     values = json.loads(result.stdout)
+    assert values.pop("jax_effective_cache") == str(repository / ".cache/jax")
     assert values.pop("PI05_RUNTIME_DIR") is None
     assert values == {key: str(path) for key, path in paths.items()}
     for directory in ("data", "assets", "checkpoints", "logs", "wandb", ".cache/tmp"):
