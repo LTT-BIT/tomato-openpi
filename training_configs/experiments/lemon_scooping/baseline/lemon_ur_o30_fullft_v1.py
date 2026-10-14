@@ -1,9 +1,8 @@
-"""Full tuning parameters from the saved wrist_reset_full_ft_30k job."""
+"""Recorded wrist-reset full tuning with the shared baseline learning rate."""
 
 from dataclasses import fields
 
 from openpi.training.config import ScheduledTrainConfig
-from openpi.training.optimizer import CosineDecaySchedule
 from training_configs.embodiments.dual_ur_o30 import DualURO30
 from training_configs.experiments.lemon_scooping.baseline.common import build_dataset
 from training_configs.experiments.lemon_scooping.baseline.common import with_recorded_split
@@ -27,7 +26,6 @@ def build_config():
         save_interval=1000,
         keep_period=1000,
         project_name="pi05-lemon-full-ft",
-        lr_schedule=CosineDecaySchedule(warmup_steps=1000, peak_lr=1e-5, decay_steps=30000, decay_lr=1e-6),
         policy_metadata={
             **base.policy_metadata,
             "recipe_version": "lemon_fullft_record_v1",

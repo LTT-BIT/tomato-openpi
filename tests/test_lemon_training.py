@@ -35,7 +35,10 @@ def test_recorded_parameters_and_real_parameter_scope(method):
     assert config.data.action_hz == 10
     assert config.num_train_steps == 30000
     assert config.batch_size == (8 if method == "lora" else 64)
-    assert config.lr_schedule.peak_lr == (2.5e-5 if method == "lora" else 1e-5)
+    assert config.lr_schedule.peak_lr == 2.5e-5
+    assert config.lr_schedule.decay_lr == 2.5e-6
+    assert config.lr_schedule.warmup_steps == 1000
+    assert config.lr_schedule.decay_steps == 30000
     params = jax.eval_shape(lambda: nnx.state(config.model.create(jax.random.key(42)), nnx.Param))
     trainable = params.filter(config.trainable_filter).flat_state()
     names = [str(path) for path in trainable]

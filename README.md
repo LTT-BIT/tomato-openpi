@@ -54,7 +54,7 @@ bash scripts/setup_training_env.sh
 | 铲柠檬 LoRA | [lemon_ur_o30_lora_v1.py](training_configs/experiments/lemon_scooping/baseline/lemon_ur_o30_lora_v1.py) | 12（模型 32，状态 52） | 30,000 | `data/lemon_wrist_reset_v1` |
 | 铲柠檬 全参 | [lemon_ur_o30_fullft_v1.py](training_configs/experiments/lemon_scooping/baseline/lemon_ur_o30_fullft_v1.py) | 12（模型 32，状态 52） | 30,000 | `data/lemon_wrist_reset_v1` |
 
-番茄与杯子六份配置共用以下训练参数；柠檬 LoRA 复用公共训练配方，柠檬全参按来源任务记录覆盖学习率和保存间隔，详见[柠檬说明](training_configs/experiments/lemon_scooping/README.md)。以下公共参数中的频率与动作语义以各任务协议为准。
+番茄与杯子六份配置共用以下训练参数；柠檬 LoRA 复用公共训练配方，柠檬全参学习率与公共配方一致，日志与 checkpoint 保存设置沿用来源任务记录，详见[柠檬说明](training_configs/experiments/lemon_scooping/README.md)。以下公共参数中的频率与动作语义以各任务协议为准。
 
 本体协议、数据身份、统计及英文 prompt 见对应任务说明。
 
