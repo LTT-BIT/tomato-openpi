@@ -296,6 +296,8 @@ def build_config():
 
 所有任务的全参数 baseline 默认全局 `batch_size=64`，LoRA 默认 `batch_size=8`；全局 batch 是所有参与训练 GPU 的合计，不是每张 GPU 的 batch。个人实验可显式覆盖，并使用新的实验名称；已经开始的实验续训时保持原 batch。
 
+JAX 多卡训练中的 W&B 样例图从单个本地设备分片读取，避免在正式训练步之前为图片记录触发跨卡 gather。训练 batch 本身仍按 `data`/`fsdp` mesh 正常分片。
+
 ## 公共环境管理
 
 500028 服务器的公共环境位于 `/mnt/data/public_tools/training/environments/pi05/20261011`，基础权重位于 `/mnt/data/public_ckpt/pi05/pi05_base/params`，使用入口见[根 README](README.md#500028-服务器复用公共环境)。环境按版本固定，升级依赖发布新目录，不原地更新正在使用的版本。

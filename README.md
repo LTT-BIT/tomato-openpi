@@ -171,6 +171,8 @@ CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training \
 
 GPU 编号按分配修改，全局 batch 必须能被可见设备数整除；单 GPU 命令仅为示例。可临时用 `--batch-size 4` 等 CLI 参数调试，正式实验将设置写入本地个人模块。个人模块不提交；训练启动器会把它自动复制到日志目录，并在运行清单中记录文件哈希和当前公共仓库 commit。训练期间不要修改正在运行的目录。
 
+多卡训练启动时，W&B 样例图只从一个本地 GPU 分片复制到主机，不会为了记录图片跨卡聚合整个 batch；这不影响实际训练数据和 FSDP 分片。
+
 无网络时使用 `--wandb-mode offline`，本地日志和 W&B 仍保存。恢复联网后逐个同步离线段：
 
 ```bash

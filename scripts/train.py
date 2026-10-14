@@ -184,6 +184,24 @@ def should_save_checkpoint(config, step, start_step):
     return step % config.save_interval == 0 and step > start_step
 
 
+def local_camera_views(images: dict[str, at.Array], *, max_images: int = 5) -> list[np.ndarray]:
+    """Copy camera samples from one device shard without a cross-device gather."""
+    if not images:
+        return []
+
+    local_images = {}
+    for name, image in images.items():
+        local_image = image
+        if isinstance(image, jax.Array):
+            if not image.addressable_shards:
+                raise ValueError(f"Camera image {name!r} has no addressable device shard")
+            local_image = image.addressable_shards[0].data
+        local_images[name] = np.asarray(jax.device_get(local_image))
+
+    num_images = min(max_images, *(len(image) for image in local_images.values()))
+    return [np.concatenate([image[index] for image in local_images.values()], axis=1) for index in range(num_images)]
+
+
 def main(config: _config.TrainConfig):
     init_logging()
     logging.info(f"Running on: {platform.node()}")
@@ -242,10 +260,7 @@ def main(config: _config.TrainConfig):
             data_iter = iter(data_loader)
             batch = next(data_iter)
             logging.info(f"Initialized data loader:\n{training_utils.array_tree_to_info(batch)}")
-            images_to_log = [
-                wandb.Image(np.concatenate([np.array(img[i]) for img in batch[0].images.values()], axis=1))
-                for i in range(min(5, len(next(iter(batch[0].images.values())))))
-            ]
+            images_to_log = [wandb.Image(image) for image in local_camera_views(batch[0].images)]
             wandb.log({"camera_views": images_to_log}, step=start_step)
 
             ptrain_step = jax.jit(
