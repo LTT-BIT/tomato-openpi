@@ -4,11 +4,59 @@
 
 本页说明下载安装和运行；创建个人配置、修改公共代码及分支管理见 [多人开发 README](多人开发README.md)。
 
-## 1. 按使用位置准备
+## 500028 服务器：复用公共环境
 
-选择下面一种方式。准备完成后，两种方式都在自己的仓库根目录执行第 2–5 节的命令，统一使用 `bash scripts/python.sh`。
+服务器环境已经准备好，直接使用以下路径和命令。账号需属于 `ai_researchers` 组。
 
-### 自己的电脑：安装本地环境
+| 内容 | 路径 |
+| --- | --- |
+| 公共环境 | `/mnt/data/public_tools/training/environments/pi05/20261011` |
+| 基础权重 | `/mnt/data/public_ckpt/pi05/pi05_base/params` |
+| 仓库启动入口 | `bash scripts/python.sh` |
+
+**下载代码**（已有仓库直接进入自己的仓库目录）：
+
+```bash
+git clone --branch main \
+  ssh://git@gitlab.litchibot.top:2222/fruit-train/tomato-openpi.git
+cd tomato-openpi
+```
+
+**选择环境、配置和权重**。在自己的仓库根目录执行，以下以番茄 Wuji LoRA 为例：
+
+```bash
+export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/20261011
+export BASE_PARAMS=/mnt/data/public_ckpt/pi05/pi05_base/params
+export MODULE=training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1
+export EXP=alice_tomato_wuji_lora_s42_run01
+
+bash scripts/python.sh -m scripts.run_training "$MODULE" \
+  --exp-name "$EXP" --weight-loader.params-path "$BASE_PARAMS" --dry-run
+```
+
+更换任务时修改 `MODULE`，每次新实验使用独立的 `EXP`。数据目录在实验配置的 `build_dataset()` 中设置，数据与统计要求见下文。新终端需重新设置这四个变量。
+
+**准备统计并检查数据**（已有匹配统计时跳过第一条）：
+
+```bash
+bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE" --stats-batch-size 512
+bash scripts/python.sh -m scripts.run_training "$MODULE" \
+  --exp-name "$EXP" --weight-loader.params-path "$BASE_PARAMS" --check
+```
+
+**启动训练**，将 GPU 编号改为分配给自己的设备：
+
+```bash
+CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training "$MODULE" \
+  --exp-name "$EXP" --weight-loader.params-path "$BASE_PARAMS" --wandb-mode offline
+```
+
+联网记录时先执行 `bash scripts/python.sh -m wandb login`，再将 `offline` 改为 `online`。恢复同一实验时，在上述训练命令后加 `--resume`，保留原配置、权重路径和实验名。
+
+这些命令直接使用公共环境与本地基础权重，不需要修改 baseline 的环境参数。tokenizer 首次使用仍需下载或预先准备仓库内缓存。每个人的源码、数据、统计、缓存和训练输出均使用自己的仓库。公共环境及基础权重由 `zhiwei` 维护，组内其他人只读使用。
+
+## 自己的电脑：安装本地环境
+
 
 适用于 Linux + NVIDIA GPU 训练机。先确认 `nvidia-smi` 正常，并将本机 SSH 公钥加入 GitLab 账号。环境使用 Python 3.11、JAX CUDA 12 和 PyTorch CUDA 12.8，驱动需支持对应版本。
 
@@ -34,44 +82,7 @@ bash scripts/setup_training_env.sh --local
 
 默认基础权重为 `gs://openpi-assets/checkpoints/pi05_base/params`，首次使用会下载权重和 tokenizer；离线训练前需准备好缓存。
 
-### 500028 服务器：复用公共环境
-
-服务器已安装公共环境，**无需安装 Python、uv 或再次运行环境安装脚本**。使用者须属于 `ai_researchers` 组，并已配置自己的 GitLab SSH 访问权限。
-
-登录服务器后，在自己的工作目录执行：
-
-```bash
-git clone --branch main \
-  ssh://git@gitlab.litchibot.top:2222/fruit-train/tomato-openpi.git
-cd tomato-openpi
-export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/20261011
-
-# 仅展开配置，验证启动入口；不需要数据或 GPU。
-bash scripts/python.sh -m scripts.run_training \
-  training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 --dry-run
-```
-
-已有仓库时直接进入仓库，无需重新 clone。每次打开新的终端，重新执行上面的 `export PI05_SHARED_ENV=...` 即可明确选用公共环境；它优先于仓库已有的 `.venv`。未设置该变量且仓库没有 `.venv` 时，启动器也会自动识别服务器公共环境。
-
-公共基础权重已放在 `/mnt/data/public_ckpt/pi05/pi05_base/params`。按[多人开发说明](多人开发README.md#创建个人实验)创建个人配置，在 `build_config()` 返回配置前加入以下设置，复用服务器权重：
-
-```python
-from dataclasses import replace
-
-config = replace(
-    config,
-    weight_loader=replace(
-        config.weight_loader,
-        params_path="/mnt/data/public_ckpt/pi05/pi05_base/params",
-    ),
-)
-```
-
-随后将第 2 节的 `MODULE` 设置为个人配置模块。公共权重不包含 tokenizer，首次训练仍需下载或预先准备仓库内缓存。动作/状态投影中形状不匹配的参数按原配方随机初始化，其余兼容参数加载基础权重。
-
-每个人使用自己的仓库，启动器自动加载当前仓库源码及公共环境内的 FFmpeg。数据、统计、缓存、日志和训练输出保存在各自仓库。公共环境与基础权重由 `zhiwei` 维护，组内其他成员只读使用；不要向公共环境安装依赖或执行 `uv sync`。管理约定见[多人开发说明](多人开发README.md#公共环境管理)。
-
-## 2. 选择任务与 baseline
+## 任务与 baseline
 
 | 任务 | 说明和配置 | 当前状态 |
 | --- | --- | --- |
@@ -127,7 +138,7 @@ bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry
 
 更换方案时修改 MODULE。个人修改数据、学习率或预算时，按 [多人开发 README](多人开发README.md) 复制 baseline 为独立配置，再将 MODULE 指向个人模块。
 
-## 3. 准备数据与统计
+## 数据与统计
 
 将数据仓库产出的 LeRobot v2.1 数据放入 `data/`，包含 `meta/`、`data/`、`videos/`。在所选实验的 `build_dataset()` 中确认 root、repo_id、来源、版本、assets_dir、asset_id 和英文 prompt 示例。`root` 是实际目录，`repo_id` 是数据身份；训练实际英文指令来自 `meta/tasks.jsonl`。
 
@@ -143,7 +154,9 @@ bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE" --stats-batc
 
 统计绑定数据文件、输入变换和 horizon。改变这些内容后重新计算；仅改学习率或 batch 可复用。常量关节允许 std=0，归一化使用 epsilon。Wuji 全参 baseline 固定了历史统计摘要并显式允许旧格式，若复制后换成新数据，应删除旧摘要和旧格式兼容设置，计算新统计。
 
-## 4. 检查与训练
+## 本机检查与训练
+
+服务器启动命令见上方“500028 服务器”部分，包含公共基础权重路径。以下命令用于本机默认基础权重。
 
 ```bash
 bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --check
@@ -163,9 +176,9 @@ bash scripts/python.sh -m wandb login
 bash scripts/python.sh -m wandb sync wandb/offline-run-实际编号
 ```
 
-## 5. 输出与续训
+## 输出与续训
 
-训练输出和可写缓存默认位于当前仓库；服务器公共环境与基础权重使用第 1 节的共享路径：
+训练输出和可写缓存默认位于当前仓库；服务器公共环境与基础权重使用上方服务器部分列出的共享路径：
 
 | 内容 | 位置 |
 | --- | --- |
@@ -178,7 +191,7 @@ bash scripts/python.sh -m wandb sync wandb/offline-run-实际编号
 
 每个 checkpoint 的 `params/` 保存权重，`train_state/` 保存优化器等恢复状态，`assets/` 保存配套统计。运行清单记录 commit、最终配置、数据来源、实际 prompt、统计摘要和运行结果。
 
-恢复未完成实验时使用原 commit、模块、配置、数据、统计和实验名：
+恢复未完成实验时使用原 commit、模块、配置、数据、统计和实验名。服务器使用上方服务器训练命令并加 `--resume`；本机执行：
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training \
