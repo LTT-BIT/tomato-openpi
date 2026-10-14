@@ -16,9 +16,96 @@
 
 当前任务为 tomato_wuji、tomato_sharpa、lemon_scooping、cup_grasping，四项均已有 LoRA / 全参 baseline；数据统一要求 LeRobot v2.1。template 目录当前仅保留空占位，有真实实验时再添加文件。启动器只导入指定模块并调用 `build_config()`，无需中央注册，不会运行其他配置。
 
+## 目录与配置的组合关系
+
+```text
+training_configs/
+├── common.py                  # Dataset 数据身份、仓库路径与缓存设置
+├── recipes/                   # 怎么训练
+│   ├── common.py              # Recipe，组装公共训练配置
+│   ├── pi05_fullft_v1.py       # 全参方案：batch 64、30k
+│   └── pi05_lora_v1.py         # LoRA 方案：batch 8、30k
+├── embodiments/               # 机器人协议：维度、频率、相机、数据工厂
+│   ├── fr3_wuji.py
+│   ├── fr3_sharpa.py
+│   ├── single_franka.py
+│   └── dual_ur_o30.py
+└── experiments/               # 具体任务和实验
+    ├── tomato_wuji/
+    ├── tomato_sharpa/
+    ├── cup_grasping/
+    └── lemon_scooping/
+        # 四项任务都按下面的结构组织：
+        ├── README.md          # 任务协议和使用说明
+        ├── baseline/          # 公共全参、LoRA 参考配置
+        └── template/          # 个人实验；当前预留空目录
+            └── <负责人>/     # 有实验时再创建
+```
+
+柠檬的 `baseline/common.py` 另外共享数据定义与样本选择，`baseline/records/` 保存真实来源、episode 清单和阶段标注。`records/` 中的原始参数表示历史记录，不一定等于当前 baseline 默认值。
+
+这些配置主要通过**组合**组织：实验选择一个 recipe、一个本体和一份数据定义，生成最终训练配置；并非目录每多一层就继承一层 Python 类。
+
+```text
+scripts/python.sh                       选择 Python 环境和当前仓库源码
+  → scripts.run_training MODULE         导入指定实验模块
+    → 实验模块.build_config()
+      ├── build_dataset() → Dataset     具体数据目录、身份和统计位置
+      ├── 本体对象                      维度、相机、频率、动作转换
+      └── recipe.build_config()         模型、优化器、学习率、训练预算
+        → TrainConfig                   实验还可用 replace 覆盖参数
+          → CLI 覆盖与检查 → scripts/train.py → 数据加载与训练循环
+```
+
+`compute_experiment_norm` 也加载同一个实验模块，复用对应数据选择和向量变换，保证统计与训练一致。
+
+### 主要类和字段分别负责什么
+
+| 类 / 对象 | 位置 | 职责 |
+| --- | --- | --- |
+| `Dataset` | `training_configs/common.py` | 数据目录、来源、版本、统计身份等声明；不是实际读取样本的 Dataset |
+| `Recipe` / `Embodiment` | `training_configs/recipes/common.py` | 前者组装训练配置；后者是本体需要提供的接口约定 |
+| `Fr3Wuji`、`Fr3Sharpa`、`SingleFranka`、`DualURO30` | `training_configs/embodiments/` | 定义四种本体协议，并创建对应的数据工厂 |
+| `TrainConfig` | `src/openpi/training/config.py` | 最终训练配置，包含模型、数据工厂、优化器、学习率、batch、步数和输出路径 |
+| `ScheduledTrainConfig` | 同上 | 扩展 TrainConfig 的 checkpoint 保存时间表，当前用于柠檬全参 |
+| `DataConfigFactory` 及各 `LeRobot…DataConfig` | 同上 | 根据本体和模型生成数据读取与变换配置；四类 baseline 使用各自的工厂 |
+| `DataConfig` / `TaskDataConfig` | 同上 | 数据读取与变换设置；TaskDataConfig 额外携带任务视图 |
+| `TaskView` | `src/openpi/training/task_view.py` | episode 选择、subtask 筛选、prompt 覆盖和阶段边界规则 |
+| `Pi0Config` | `src/openpi/models/pi0_config.py` | 模型维度、horizon、模型变体、精度等设置 |
+
+常用字段的嵌套位置：
+
+```text
+TrainConfig
+├── model                         Pi0Config
+├── data                          本体对应的 DataConfigFactory
+│   ├── lerobot_datasets          LeRobotDatasetSpec：repo_id、root 等
+│   ├── assets                    AssetsConfig：统计父目录、asset_id
+│   └── base_config               DataConfig 或 TaskDataConfig
+│       └── task_view             使用 TaskDataConfig 时才有
+├── lr_schedule                   学习率计划
+├── optimizer                     优化器设置
+├── weight_loader                 基础权重加载方式与路径
+└── batch_size / num_train_steps / exp_name / …
+```
+
+`src/openpi/training/config.py` 还保留部分上游数据工厂；它们的存在不表示当前四项任务会使用它们。实际使用哪一个，由实验选定的本体和 recipe 决定。
+
+### 平时改哪里
+
+| 要改什么 | 修改位置 |
+| --- | --- |
+| 某次实验的 batch、学习率、步数、实验名、基础权重 | 自己的 `template/<负责人>/<实验>.py` 中 build_config，用 replace 覆盖 |
+| 数据目录、数据身份和统计位置 | 该实验的 build_dataset；柠檬独立实验需要独立数据定义时复制公共定义到个人文件 |
+| subtask、真实训练 prompt | 个人配置中的 TaskDataConfig / TaskView，或数据任务标签；不是 Dataset.prompt_example |
+| 所有人共用的默认训练方案 | recipes，通过公共变更评审 |
+| 新本体或关节、相机、动作语义 | embodiments 及对应数据工厂、policies 变换；补充协议验证 |
+| 训练算法、采样或保存行为 | scripts/train.py、src/openpi/training 等共享代码 |
+| 使用本地还是公共 Python 环境 | scripts/python.sh 的选择规则和 PI05_SHARED_ENV；不放在实验参数中 |
+
 ## 创建个人实验
 
-每次工作建立短期分支。以番茄-Wuji LoRA 为例：
+在自己的独立仓库中建立短期分支；以下操作不要在正在训练的目录执行。以番茄-Wuji LoRA 为例：
 
 ```bash
 git switch main
@@ -87,13 +174,36 @@ bash scripts/check_training.sh
 
 ## 多人训练与有效记录
 
-每位训练者使用独立 checkout/worktree，显式分配 `CUDA_VISIBLE_DEVICES`。训练期间不切分支或拉取代码；环境、缓存和输出保存在各自仓库内。数据和统计发布后不原地修改，共享存储上的统计计算及 GPU 使用由团队统一分配。
+**默认每人独立 clone 到自己的目录，各自使用自己的分支，不要求使用 worktree。** 例如：
+
+```text
+/home/zhiwei/workspace/tomato-openpi/     # zhiwei 的代码和输出
+/home/pengyang/workspace/tomato-openpi/   # pengyang 的代码和输出
+```
+
+两份 clone 来自同一 GitLab 仓库，也各自拥有独立文件和 Git 状态。一个人在自己的目录切分支、拉代码，不会改动另一个人的目录。分支本身不能隔离同一个目录里的文件：多人若共用同一代码目录，任何人执行 `git switch` 都会改变这个目录。
+
+训练期间保持**正在训练的那份目录**不变，不在其中切分支、拉代码或编辑源码。已加载的 Python 代码通常不会自动更新，但后续导入、创建 worker、读取文件或重启续训可能接触到新内容。其他独立目录可以正常开发。
+
+服务器可共用只读 Python 环境和基础权重，启动器加载各自仓库源码；缓存、日志和输出仍各自保存。显式分配 `CUDA_VISIBLE_DEVICES`，协调 GPU 与存储资源。共享数据和统计发布后不原地修改。
+
+### 可选：同一个人同时训练和开发
+
+如果自己的一份目录正在训练，又需要开发另一分支，可以另 clone 一份，也可以用 worktree 创建第二份工作目录。worktree 共用 Git 对象和分支记录，但工作文件独立；不是多人训练的必选项。
+
+以下命令不会切换当前训练目录的分支：
 
 ```bash
-git worktree add /你的工作目录/pi05-alice "<已提交分支或commit>"
-cd /你的工作目录/pi05-alice
-bash scripts/setup_training_env.sh
+# 在自己的仓库执行；分支名和新目录需未被占用。
+git worktree add -b feat/alice-new-feature ../tomato-openpi-dev HEAD
+cd ../tomato-openpi-dev
+# 服务器直接复用公共环境。
+export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/20261011
+bash scripts/python.sh -m scripts.run_training \
+  training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 --dry-run
 ```
+
+新 worktree 不会自动复制原目录里未跟踪的数据、统计、日志或本地 `.venv`；正式训练前需单独准备数据与统计。自己的电脑可在新目录执行 `bash scripts/setup_training_env.sh --local`。不要删除仍有进程使用的工作目录。
 
 实验配置及其旁边的结果记录只保留可核对的信息：数据生产来源和版本、源码 commit、配置名、实验名、统计身份/摘要、实际英文 prompt、关键参数、checkpoint、W&B run，以及指标与评估条件。缺失项明确写未记录。区分数据准备完成、训练完成、实机验证；配置检查通过不能写成训练完成，训练 loss 不能代替任务成功率。
 
