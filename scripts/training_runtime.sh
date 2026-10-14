@@ -2,7 +2,7 @@
 # Internal helper shared by the installer and Python launcher.
 pi05_select_runtime() {
     PI05_REPOSITORY_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-    local shared_default=/mnt/data/public_tools/training/environments/pi05/20261011
+    local shared_default=/mnt/data/public_tools/training/environments/pi05/20261014
     PI05_RUNTIME_SHARED=""
     if [[ -n "${PI05_SHARED_ENV:-}" ]]; then
         PI05_RUNTIME_SHARED="$PI05_SHARED_ENV"

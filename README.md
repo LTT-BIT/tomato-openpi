@@ -12,7 +12,7 @@
 
 | 内容 | 路径 |
 | --- | --- |
-| 公共环境 | `/mnt/data/public_tools/training/environments/pi05/20261011` |
+| 公共环境 | `/mnt/data/public_tools/training/environments/pi05/20261014` |
 | 基础权重 | `/mnt/data/public_ckpt/pi05/pi05_base/params` |
 | 仓库启动入口 | `bash scripts/python.sh` |
 
@@ -27,7 +27,7 @@ cd tomato-openpi
 **启动图形界面**，在自己的仓库根目录执行：
 
 ```bash
-export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/20261011
+export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/20261014
 # 联网记录 W&B 时首次登录；选择 offline 时不需要登录。
 bash scripts/python.sh -m wandb login
 bash scripts/python.sh -m scripts.training_ui --port 8765
@@ -35,7 +35,7 @@ bash scripts/python.sh -m scripts.training_ui --port 8765
 
 在 VS Code 的“端口”面板转发 `8765`，打开终端打印的完整地址（包含 `#token=...`）。如果本地转发端口不同，替换地址中的端口号，保留 token。也可以使用 SSH 隧道 `ssh -L 8765:127.0.0.1:8765 zhiwei500028`。服务只监听服务器本机地址，每位使用者从自己的 clone 启动；同一服务器端口被占用时换一个端口。
 
-服务器无需重新安装 Python 环境或前端依赖。在界面中点击“使用服务器公共权重”，会填写 `/mnt/data/public_ckpt/pi05/pi05_base/params`。tokenizer 首次使用仍需下载或提前准备仓库缓存。
+服务器无需重新安装 Python 环境或前端依赖。`20261014` 环境为 RTX PRO Blackwell 多卡训练预加载已验证的 NCCL 2.31.2；必须通过 `bash scripts/python.sh` 进入，不能绕过公共 `run-python` 直接调用环境内 Python。在界面中点击“使用服务器公共权重”，会填写 `/mnt/data/public_ckpt/pi05/pi05_base/params`。tokenizer 首次使用仍需下载或提前准备仓库缓存。
 
 ## 图形界面：配置和启动训练
 

@@ -236,7 +236,7 @@ bash scripts/check_training.sh
 git worktree add -b feat/alice-new-feature ../tomato-openpi-dev HEAD
 cd ../tomato-openpi-dev
 # 服务器直接复用公共环境。
-export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/20261011
+export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/20261014
 bash scripts/python.sh -m scripts.run_training \
   training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 --dry-run
 ```
@@ -300,7 +300,7 @@ JAX 多卡训练中的 W&B 样例图从单个本地设备分片读取，避免�
 
 ## 公共环境管理
 
-500028 服务器的公共环境位于 `/mnt/data/public_tools/training/environments/pi05/20261011`，基础权重位于 `/mnt/data/public_ckpt/pi05/pi05_base/params`，使用入口见[根 README](README.md#500028-服务器复用公共环境)。环境按版本固定，升级依赖发布新目录，不原地更新正在使用的版本。
+500028 服务器的公共环境位于 `/mnt/data/public_tools/training/environments/pi05/20261014`，基础权重位于 `/mnt/data/public_ckpt/pi05/pi05_base/params`，使用入口见[根 README](README.md#500028-服务器复用公共环境)。环境按版本固定，升级依赖发布新目录，不原地更新正在使用的版本。`20261014` 复用上一版 Python 环境并在公共 `run-python` 中预加载 NCCL 2.31.2，用于修复 RTX PRO Blackwell 多卡训练的 CUDA 700；不要直接调用公共环境内的 `venv/bin/python`。
 
 - `zhiwei` 维护环境，`ai_researchers` 组成员读取和执行。新文件应允许组读取，目录和程序允许组执行，不允许组修改。
 - 每人维护自己的源码 checkout，通过 `bash scripts/python.sh` 启动，由脚本向公共 `run-python` 传入当前仓库路径；不要对公共环境执行 `pip install -e`，避免绑定某个人的代码。
