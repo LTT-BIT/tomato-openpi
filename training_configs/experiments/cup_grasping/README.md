@@ -4,7 +4,7 @@
 
 ## 本体与数据
 
-单臂 Franka，原始 state/action 均为 7 维关节向量。先按 7 维计算归一化统计，再补零到模型的 32 维；沿用数据中的动作，不额外转 delta。主相机为 `observation.images.cam_head`，左腕相机为 `observation.images.wrist_left`，右腕图像为空并屏蔽。
+单臂 Franka，原始 state/action 均为 7 维关节向量。先按 7 维计算归一化统计，再补零到模型的 32 维；使用数据中的 absolute 动作目标，不额外转 delta；数据 action 必须是绝对目标值。主相机为 `observation.images.cam_head`，左腕相机为 `observation.images.wrist_left`，右腕图像为空并屏蔽。
 
 定义来自提供的杯子任务 `config.py`，SHA-256 为 `3c7096905a694437c5ce020c76817a1c3fac5924e9c8a0bf179af05d3b0834a1`。源配置未提供完整关节顺序与单位，准备生产数据时须核对；其他训练参数复用公共 recipe：30 Hz、horizon 50、全局 batch：LoRA 8、全参 64；全参与 LoRA 均为 30,000 步。
 

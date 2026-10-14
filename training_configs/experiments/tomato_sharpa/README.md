@@ -11,13 +11,13 @@
 | state | 58 维实测关节位置，单位 rad |
 | 原始 action | 58 维目标关节位置，单位 rad |
 | 向量顺序 | 左 FR3 7 + 左 Sharpa 22 + 右 FR3 7 + 右 Sharpa 22 |
-| 训练 action | 两臂相对当前实测 state 的 delta，手部 absolute |
+| 训练 action | 两臂和手部均为 absolute 目标位置 |
 | 相机 | cam0 外部、cam2 左腕、cam1 右腕 |
 | 数据与窗口 | LeRobot v2.1，30 Hz，horizon 50，episode 边界内填充 |
 
 关节名称及顺序定义在 [fr3_sharpa_protocol.py](../../../src/openpi/policies/fr3_sharpa_protocol.py)，本体规格在 [fr3_sharpa.py](../../embodiments/fr3_sharpa.py)。向量已经是物理顺序，直接保留，不使用 Wuji 的 108 维切片或动作重排。原协议文件有 STATE_DIM=116 常量，但实际数据导出和输入变换均使用 58 维实测位置；本适配只接受实际导出的 58 维格式。
 
-meta/info.json 的 observation.state 和 action 的 shape 均为 [58]，names 必须与协议 ORDER 一致；校验拒绝缺失名称或错序。名称校验不能证明实际数值单位、左右语义或时间对齐正确，需数据生产者确认。适配复制向量后做 delta，避免修改原始目标位置。实际英文训练指令来自 meta/tasks.jsonl。
+meta/info.json 的 observation.state 和 action 的 shape 均为 [58]，names 必须与协议 ORDER 一致；校验拒绝缺失名称或错序。名称校验不能证明实际数值单位、左右语义或时间对齐正确，需数据生产者确认。适配保留绝对目标值，不执行 delta 转换，也不修改原始目标位置。实际英文训练指令来自 meta/tasks.jsonl。
 
 ## Baseline
 
@@ -36,10 +36,11 @@ meta/info.json 的 observation.state 和 action 的 shape 均为 [58]，names �
 | --- | --- |
 | 数据目录 | data/tomato_sharpa_fulltask_v1/ |
 | 数据身份 | fr3_sharpa/tomato_fulltask_v1 |
-| 数据版本及 asset_id | tomato_sharpa_fulltask_v1_30hz |
-| 统计目录 | assets/tomato_sharpa_fulltask_v1_30hz/ |
-| LoRA 配置/实验名 | pi05_fr3_sharpa_fulltask_lora_v1_30hz / tomato_sharpa_fulltask_lora_v1_30hz_s42 |
-| 全参配置/实验名 | pi05_fr3_sharpa_fulltask_fullft_v1_30hz / tomato_sharpa_fulltask_fullft_v1_30hz_s42 |
+| 数据版本 | tomato_sharpa_fulltask_v1_30hz |
+| asset_id | tomato_sharpa_fulltask_v1_absolute_30hz |
+| 统计目录 | assets/tomato_sharpa_fulltask_v1_absolute_30hz/ |
+| LoRA 配置/实验名 | pi05_fr3_sharpa_fulltask_lora_v1_absolute_30hz / tomato_sharpa_fulltask_lora_v1_absolute_30hz_s42 |
+| 全参配置/实验名 | pi05_fr3_sharpa_fulltask_fullft_v1_absolute_30hz / tomato_sharpa_fulltask_fullft_v1_absolute_30hz_s42 |
 
 数据路径和身份为配置占位，需自行准备真实数据；sources 默认记录数据目录，正式实验填写真实生产来源。Sharpa 不使用 Wuji 54 维统计或历史固定摘要，默认要求绑定统计；同一 Sharpa 数据的 LoRA 与全参经校验后可以共用配套统计。
 
@@ -63,3 +64,5 @@ baseline 可用 `PI05_SHARPA_DATASET_ROOT` / `PI05_SHARPA_ASSETS_DIR` 覆盖路�
 新数据按根 README 计算统计，再执行 check 并训练。统计必须是本 Sharpa 数据的 58 维统计，包含 norm_stats.json 和 norm_metadata.json；同一数据、输入变换和 horizon 可在 LoRA/全参间复用。日志、W&B offline 同步和原 commit 续训规则见根 README。
 
 当前生产数据待准备，未记录完整 GPU 训练或实机验证结果。
+
+当前两份 baseline 已切换为 absolute，统计身份与默认实验名增加 absolute。必须重新计算统计并开始新实验，不可复用旧 delta 统计或直接 resume 旧 delta checkpoint。

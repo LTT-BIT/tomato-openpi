@@ -12,7 +12,6 @@ PROMPT = (
     "Pick up a tomato truss with the right hand, then pick a cherry tomato "
     "with the left hand and place it in the left basket."
 )
-NORM_AUDIT_SHA256 = "f933853e8e1bfbf8a7f37e377bd9a5a87c57d37a437685a95e464bcc65c24e23"
 
 
 def build_dataset() -> Dataset:
@@ -23,18 +22,16 @@ def build_dataset() -> Dataset:
         repo_id="fr3_wuji/tomato_all_full_v1",
         root=os.environ.get("PI05_ALL_FULL_DATASET_ROOT", str(repository / "data/tomato_all_full_v1")),
         assets_dir=os.environ.get("PI05_ALL_FULL_ASSETS_DIR", str(repository / "assets")),
-        asset_id="tomato_all_full_v1_30hz",
+        asset_id="tomato_all_full_v1_absolute_30hz",
         sources=tuple(str((source_root / item).resolve()) for item in ("0925/A", "0925/B", "1002_AB_190/full")),
         prompt_example=PROMPT,
-        expected_norm_audit_sha256=NORM_AUDIT_SHA256,
-        allow_legacy_norm_stats=True,
     )
 
 
 def build_config():
     return build_recipe(
-        name="pi05_fr3_wuji_fulltask_fullft_v1_30hz",
-        exp_name="tomato_all_full_fullft_v1_30hz_s42",
+        name="pi05_fr3_wuji_fulltask_fullft_v1_absolute_30hz",
+        exp_name="tomato_all_full_fullft_v1_absolute_30hz_s42",
         embodiment=FR3_WUJI,
         dataset=build_dataset(),
     )

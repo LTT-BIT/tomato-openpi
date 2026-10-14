@@ -22,7 +22,7 @@ def build_dataset() -> Dataset:
         repo_id="fr3_wuji/tomato_fulltask_v1",
         root=root,
         assets_dir=os.environ.get("PI05_FULLTASK_ASSETS_DIR", str(repository / "assets/fulltask_c0")),
-        asset_id="tomato_fulltask_v1_30hz",
+        asset_id="tomato_fulltask_v1_absolute_30hz",
         sources=(root,),
         prompt_example=PROMPT,
     )
@@ -30,8 +30,8 @@ def build_dataset() -> Dataset:
 
 def build_config():
     return build_recipe(
-        name="pi05_fr3_wuji_fulltask_lora_v1_30hz",
-        exp_name="tomato_fulltask_lora_v1_30hz_s42",
+        name="pi05_fr3_wuji_fulltask_lora_v1_absolute_30hz",
+        exp_name="tomato_fulltask_lora_v1_absolute_30hz_s42",
         embodiment=FR3_WUJI,
         dataset=build_dataset(),
     )

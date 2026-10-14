@@ -37,7 +37,10 @@ def test_composition_preserves_baseline_training_semantics(module):
     current_values = json.loads(serialize_config(portable))["fields"]
     for key in snapshot["excluded_fields"]:
         current_values.pop(key)
-    # Keep historical snapshots intact; current recipes use 30k and full tuning uses global batch 64.
+    # Preserve historical delta snapshots; explicitly account for the absolute baseline migration.
+    snapshot["config_fields"]["data"]["fields"]["extra_delta_transform"] = False
+    old_assets = snapshot["config_fields"]["data"]["fields"]["assets"]["fields"]
+    old_assets["asset_id"] = old_assets["asset_id"].replace("_v1_30hz", "_v1_absolute_30hz")
     assert current_values == {
         **snapshot["config_fields"],
         "num_train_steps": 30_000,

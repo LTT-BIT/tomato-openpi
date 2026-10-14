@@ -1,4 +1,4 @@
-"""FR3/Sharpa v1: 7+22+7+22 measured/commanded radians, arms delta and hands absolute."""
+"""FR3/Sharpa v1: 7+22+7+22 measured/commanded radians, absolute joint targets."""
 
 from dataclasses import dataclass
 
@@ -8,7 +8,7 @@ from openpi.training import config as cfg
 
 @dataclass(frozen=True)
 class Fr3Sharpa:
-    version: str = "fr3_sharpa_v1"
+    version: str = "fr3_sharpa_absolute_v1"
     action_dim: int = protocol.ACTION_DIM
     raw_state_dims: tuple[int, ...] = (protocol.STATE_DIM,)
     action_hz: float = 30.0
@@ -30,7 +30,7 @@ class Fr3Sharpa:
             "joint_unit": protocol.UNIT,
             "state_semantics": "measured_joint_position",
             "source_action_semantics": "commanded_absolute_joint_position",
-            "training_action_semantics": "arms_delta_hands_absolute",
+            "training_action_semantics": "absolute_joint_target",
             "camera_roles": {"base": "cam0", "left_wrist": "cam2", "right_wrist": "cam1"},
         }
 
@@ -39,7 +39,7 @@ class Fr3Sharpa:
             repo_id=dataset.repo_id,
             assets=cfg.AssetsConfig(assets_dir=dataset.assets_dir, asset_id=dataset.asset_id),
             base_config=cfg.DataConfig(prompt_from_task=True),
-            extra_delta_transform=True,
+            extra_delta_transform=False,
             action_sequence_keys=("action",),
             action_hz=self.action_hz,
             video_backend="pyav",

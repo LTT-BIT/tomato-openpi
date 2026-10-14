@@ -184,7 +184,7 @@ def test_preflight_rejects_wrong_normalization_binding(prepared, change):
     elif change == "vectors":
         (root / "data/episode_000000.parquet").write_bytes(b"different vectors, same dataset name and frame count")
     elif change == "transform":
-        config = replace(config, data=replace(config.data, extra_delta_transform=False))
+        config = replace(config, data=replace(config.data, extra_delta_transform=True))
     else:
         stats = normalize.load(norm_dir)
         stats["state"].mean[0] += 1

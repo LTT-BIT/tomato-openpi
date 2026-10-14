@@ -69,7 +69,7 @@ def test_copied_sharpa_baselines_keep_recipe_and_independent_paths(
     assert run_training.load_experiment(BASE + f"tomato_fr3_sharpa_{scheme}_v1").data == baseline.data
 
 
-def test_joint_blocks_cameras_and_delta_roundtrip():
+def test_joint_blocks_cameras_and_absolute_actions():
     assert len(protocol.SHARPA_JOINTS) == 22
     assert len(set(protocol.ORDER)) == protocol.ACTION_DIM == protocol.STATE_DIM == 58
     assert protocol.ORDER[0] == "left_fr3_joint1"
@@ -91,8 +91,6 @@ def test_joint_blocks_cameras_and_delta_roundtrip():
     result = transforms.compose([*repack.inputs, *vectors.inputs])(raw)
     np.testing.assert_array_equal(result["state"], state)
     expected = actions.copy()
-    expected[:, :7] -= state[:7]
-    expected[:, 29:36] -= state[29:36]
     np.testing.assert_array_equal(result["actions"], expected)
     assert np.all(result["image"]["left_wrist_0_rgb"] == 204)
     assert result["image"]["left_wrist_0_rgb"].shape == (4, 5, 3)
@@ -216,6 +214,9 @@ def test_real_sharpa_lerobot_videos_windows_and_shared_statistics(tmp_path, monk
     fullft = run_training.load_experiment(BASE + "tomato_fr3_sharpa_fullft_v1")
     fullft = replace(fullft, model=replace(fullft.model, action_horizon=3))
     assert run_training.preflight(fullft)["norm_provenance"] == "verified"
+    # Statistics from a different action transform cannot be silently reused.
+    with pytest.raises(ValueError, match="vector transforms differ"):
+        run_training.preflight(replace(config, data=replace(config.data, extra_delta_transform=True)))
     directory = Path(config.data.assets.assets_dir) / config.data.assets.asset_id
     stats = normalize.load(directory)
     assert stats["state"].mean.shape == stats["actions"].mean.shape == (58,)
@@ -225,6 +226,6 @@ def test_real_sharpa_lerobot_videos_windows_and_shared_statistics(tmp_path, monk
     np.testing.assert_allclose(sample["image"]["right_wrist_0_rgb"].mean(), 40, atol=3)
     np.testing.assert_allclose(
         sample["actions"][0],
-        np.full(58, 0.2) + np.r_[np.zeros(7), np.arange(7, 29) / 100, np.zeros(7), np.arange(36, 58) / 100],
+        targets[0],
         atol=1e-6,
     )

@@ -119,7 +119,7 @@ bash scripts/setup_training_env.sh --local
 | 模型 / 精度 | π0.5，bfloat16；max_token_len=256，discrete_state_input=True |
 | LoRA | VLM `gemma_2b_lora` rank/alpha=16/16；Expert `gemma_300m_lora` rank/alpha=32/32；视觉及投影可训练 |
 | 全参 | `gemma_2b` + `gemma_300m`，所有参数可训练 |
-| 频率 / horizon | 30 Hz / 50；番茄双臂 delta、手部 absolute；杯子沿用原始动作，不额外转 delta |
+| 频率 / horizon | 30 Hz / 50；所有 baseline 使用 absolute 动作目标；数据 action 必须为绝对目标值 |
 | batch / workers / FSDP | 全局 batch：LoRA 8、全参 64 / workers 8 / fsdp_devices=1 |
 | 采样 / seed | epoch_shuffle；seed=42、model_seed=42、data_seed=42001、augmentation_seed=42002 |
 | 学习率 | cosine；warmup=1,000，peak=2.5e-5，decay_steps=30,000，end=2.5e-6 |
@@ -154,7 +154,7 @@ bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE" --stats-batc
 
 统计保存到 `<assets_dir>/<asset_id>/`，包含 `norm_stats.json` 和 `norm_metadata.json`。已有配套统计时跳过计算，迁移时两个文件一起复制。不要提前创建最终 asset_id 目录：工具拒绝覆盖已有目录，包括空目录；同一目标的重复计算进程也会被拒绝。
 
-统计绑定数据文件、输入变换和 horizon。改变这些内容后重新计算；仅改学习率或 batch 可复用。常量关节允许 std=0，归一化使用 epsilon。Wuji 全参 baseline 固定了历史统计摘要并显式允许旧格式，若复制后换成新数据，应删除旧摘要和旧格式兼容设置，计算新统计。
+统计绑定数据文件、输入变换和 horizon。改变这些内容后重新计算；仅改学习率或 batch 可复用。常量关节允许 std=0，归一化使用 epsilon。番茄 Wuji / Sharpa 已切换为 absolute，四份 baseline 使用带 absolute 的新 asset_id 与默认实验名。必须重新计算统计，不能复用旧 delta 统计或对旧 checkpoint 直接 resume。
 
 ## 本机检查与训练
 

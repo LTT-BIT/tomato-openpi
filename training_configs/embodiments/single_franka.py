@@ -28,7 +28,7 @@ class SingleFranka:
             "source_config_sha256": "3c7096905a694437c5ce020c76817a1c3fac5924e9c8a0bf179af05d3b0834a1",
             "model_action_dim": self.model_action_dim,
             "normalization_dim": self.action_dim,
-            "training_action_semantics": "source_joint_actions_without_extra_delta",
+            "training_action_semantics": "absolute_joint_target",
             "camera_roles": {"base": "cam_head", "left_wrist": "wrist_left"},
         }
 

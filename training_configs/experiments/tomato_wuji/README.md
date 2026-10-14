@@ -4,7 +4,7 @@
 
 ## 本体与数据协议
 
-使用 FR3 + Wuji，LeRobot v2.1，30 Hz、horizon 50，`meta/`、`data/`、`videos/` 必须齐备。原始 action 54 维，原始 state 可为 54 或 108 维；适配后的向量顺序为左臂 7、左手 20、右臂 7、右手 20。双臂使用相对当前 state 的 delta，手部使用 absolute；cam0 外部、cam1 左腕、cam2 右腕。关节顺序、单位和数据语义需由数据生产者确认，不能仅靠维度判断。
+使用 FR3 + Wuji，LeRobot v2.1，30 Hz、horizon 50，`meta/`、`data/`、`videos/` 必须齐备。原始 action 54 维，原始 state 可为 54 或 108 维；适配后的向量顺序为左臂 7、左手 20、右臂 7、右手 20。双臂与手部均使用 absolute 动作目标，不减去当前 state；cam0 外部、cam1 左腕、cam2 右腕。关节顺序、单位和数据语义需由数据生产者确认，不能仅靠维度判断。
 
 本体规格见 [fr3_wuji.py](../../embodiments/fr3_wuji.py)，完整适配见 [fr3_wuji_policy.py](../../../src/openpi/policies/fr3_wuji_policy.py)。Sharpa 有自己的关节和相机协议，不能直接复用 Wuji 数据或统计。
 
@@ -21,17 +21,18 @@
 | --- | --- | --- |
 | 默认数据目录 | `data/tomato_fulltask_v1` | `data/tomato_all_full_v1` |
 | repo_id | `fr3_wuji/tomato_fulltask_v1` | `fr3_wuji/tomato_all_full_v1` |
-| 数据版本 / asset_id | `tomato_fulltask_v1_30hz` | `tomato_all_full_v1_30hz` |
-| 统计目录 | `assets/fulltask_c0/tomato_fulltask_v1_30hz/` | `assets/tomato_all_full_v1_30hz/` |
-| 配置名 | `pi05_fr3_wuji_fulltask_lora_v1_30hz` | `pi05_fr3_wuji_fulltask_fullft_v1_30hz` |
-| 默认实验名 | `tomato_fulltask_lora_v1_30hz_s42` | `tomato_all_full_fullft_v1_30hz_s42` |
+| 数据版本 | `tomato_fulltask_v1_30hz` | `tomato_all_full_v1_30hz` |
+| asset_id | `tomato_fulltask_v1_absolute_30hz` | `tomato_all_full_v1_absolute_30hz` |
+| 统计目录 | `assets/fulltask_c0/tomato_fulltask_v1_absolute_30hz/` | `assets/tomato_all_full_v1_absolute_30hz/` |
+| 配置名 | `pi05_fr3_wuji_fulltask_lora_v1_absolute_30hz` | `pi05_fr3_wuji_fulltask_fullft_v1_absolute_30hz` |
+| 默认实验名 | `tomato_fulltask_lora_v1_absolute_30hz_s42` | `tomato_all_full_fullft_v1_absolute_30hz_s42` |
 | 准备状态 | 占位；原记录未确认数据准备或训练完成 | 历史数据已准备、训练已完成；新机器需迁移 |
 
 路径相对于仓库根目录。LoRA 的 sources 默认为数据目录；全参历史来源为 `data/harvest-tomato/0925/A`、`0925/B`、`1002_AB_190/full`，441 episode、481,223 帧。记录 sources 不会自动转换或合并数据。
 
 可选本机覆盖变量：LoRA 为 `PI05_FULLTASK_DATASET_ROOT` / `PI05_FULLTASK_ASSETS_DIR`；全参为 `PI05_ALL_FULL_DATASET_ROOT` / `PI05_ALL_FULL_ASSETS_DIR`，来源父目录为 `PI05_SOURCE_DATA_DIR`。旧 `PI05_V2_*` / `PI05_V3_*` 不再使用。个人实验可直接修改自己的路径，不必沿用公共基准的变量名。
 
-全参历史统计的规范对象审计摘要固定为 `f933853e8e1bfbf8a7f37e377bd9a5a87c57d37a437685a95e464bcc65c24e23`，通过 `expected_norm_audit_sha256` 校验，且显式允许 `allow_legacy_norm_stats=True`；该值不是 JSON 文件 SHA-256。复制全参 baseline 后若改用新数据，删除历史摘要和旧统计兼容设置，使用新的 asset_id 计算绑定统计，勿继承旧来源。
+当前 LoRA / 全参均使用 absolute 动作监督，asset_id 与默认实验名增加 absolute。历史 delta 统计固定摘要及旧格式兼容已取消；两份均须重新计算配套统计，并建立新实验，不能直接续训旧 delta checkpoint。
 
 英文 prompt 示例保留各自基准：
 

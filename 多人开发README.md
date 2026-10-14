@@ -120,7 +120,7 @@ cp training_configs/experiments/tomato_wuji/baseline/tomato_fr3_lora_v1.py \
 
 在同一个文件中修改 `build_dataset()` 的数据版本、root、repo_id、真实来源、asset_id、统计父目录和 prompt 示例。路径用 `repository_root() / "data/..."` 或 `"assets/..."`，换机器时可直接修改个人配置或使用自己定义的环境变量。
 
-同一数据只换路径可保留身份；采集来源、筛选或变换变化时使用新版本和新统计。复制 Wuji 全参 baseline 后若换新数据，删除 `NORM_AUDIT_SHA256`、`expected_norm_audit_sha256` 和 `allow_legacy_norm_stats=True`，重新记录来源并计算统计。
+同一数据只换路径可保留身份；采集来源、筛选或变换变化时使用新版本和新统计。当前番茄 baseline 已移除历史 delta 统计兼容和固定摘要，使用带 absolute 的新统计身份；不要恢复旧统计兼容设置。
 
 个人文件直接引用公共 Dataset、本体与 recipe，避免导入其他实验文件。需要覆盖参数时，在文件顶部添加 `from dataclasses import replace`，将 `build_config()` 改成下面的形式；保留复制文件自己的 `build_dataset()`：
 
