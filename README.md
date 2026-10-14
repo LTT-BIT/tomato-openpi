@@ -30,6 +30,42 @@ bash scripts/setup_training_env.sh
 
 初始权重为 `gs://openpi-assets/checkpoints/pi05_base/params`；首次使用需要下载权重及 tokenizer，离线机器须提前准备缓存。允许动作/状态投影中形状不匹配的参数随机初始化，其余兼容参数加载基础权重。
 
+### 500028 服务器：复用公共环境
+
+已加入服务器 `ai_researchers` 组的成员，可使用公共环境，无需在自己的仓库重复安装。每人仍独立 clone 仓库；此方式跳过上面的 `setup_training_env.sh`。
+
+在自己的仓库根目录执行：
+
+```bash
+export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/20261011
+export MODULE=training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1
+"$PI05_SHARED_ENV/run-python" "$PWD" -m scripts.run_training "$MODULE" --dry-run
+```
+
+后文所有 `.venv/bin/python` 都可替换为 `"$PI05_SHARED_ENV/run-python" "$PWD"`，例如计算统计：
+
+```bash
+"$PI05_SHARED_ENV/run-python" "$PWD" -m scripts.compute_experiment_norm "$MODULE"
+```
+
+公共基础权重路径为 `/mnt/data/public_ckpt/pi05/pi05_base/params`。在个人实验 `build_config()` 中返回配置前指定本地路径，避免重复下载：
+
+```python
+from dataclasses import replace
+
+config = replace(
+    config,
+    weight_loader=replace(
+        config.weight_loader,
+        params_path="/mnt/data/public_ckpt/pi05/pi05_base/params",
+    ),
+)
+```
+
+`run-python` 显式加载传入仓库的源码，不绑定维护者的 checkout。缓存、数据、统计、日志和训练输出仍保存在各自仓库；tokenizer 首次使用仍需要下载或预先准备本地缓存。
+
+公共环境与基础权重由 `zhiwei` 维护，其他组成员只读使用。不要将仓库 `.venv` 链接到公共环境后执行 `uv sync`，也不要向公共环境安装个人依赖；需要不同依赖时创建独立环境。环境验证范围和更新约定见[多人开发说明](多人开发README.md#公共环境管理)。
+
 ## 2. 选择任务与 baseline
 
 | 任务 | 说明和配置 | 当前状态 |

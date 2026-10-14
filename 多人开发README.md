@@ -147,3 +147,14 @@ def build_config():
 当前所有 baseline 都没有验证集。柠檬清单把原 188 train + 21 val 合并成 209 个训练 episode；`split_path` 在这里仅用于选取有效数据。将来换数据时同步修改目录、repo_id、清单、来源和统计身份；不能只换路径却保留旧 episode 编号。筛选、阶段边界、prompt 映射的配置或内容变化会使旧统计失效，续训校验也会检查样本视图身份，需作为新实验重新计算统计。
 
 所有任务的全参数 baseline 默认全局 `batch_size=64`，LoRA 默认 `batch_size=8`；全局 batch 是所有参与训练 GPU 的合计，不是每张 GPU 的 batch。个人实验可显式覆盖，并使用新的实验名称；已经开始的实验续训时保持原 batch。
+
+## 公共环境管理
+
+500028 服务器的公共环境位于 `/mnt/data/public_tools/training/environments/pi05/20261011`，基础权重位于 `/mnt/data/public_ckpt/pi05/pi05_base/params`，使用入口见[根 README](README.md#500028-服务器复用公共环境)。环境按版本固定，升级依赖发布新目录，不原地更新正在使用的版本。
+
+- `zhiwei` 维护环境，`ai_researchers` 组成员读取和执行。新文件应允许组读取，目录和程序允许组执行，不允许组修改。
+- 每人维护自己的源码 checkout，通过公共 `run-python` 显式传入仓库路径；不要对公共环境执行 `pip install -e`，避免绑定某个人的代码。
+- 个人缓存和训练输出位于自己的仓库。实验记录同时写明源码 commit 和公共环境版本；换环境后先验证再开始新实验。
+- 原始离线包来自 `/home/pengyang/workspace/pi05_env_bundle_20261011`。SHA-256 校验、源码验证快照及测试输出保存于服务器 `/mnt/data/public_tools/training/validation/pi05-20261014`。环境包含旧版本留下的额外仿真包，不表示本仓库提供仿真或部署入口。
+
+环境内 `system/` 补齐了宿主机缺失的 FFmpeg 6.1.1 动态库，`run-python` 自动设置其查找路径；没有修改服务器系统安装。不要绕过该启动器直接调用共享 Python，否则可能缺少视频解码库或仓库源码路径。

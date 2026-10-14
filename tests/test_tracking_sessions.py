@@ -96,7 +96,11 @@ print(json.dumps({'segments': len(records), 'resume_step': records[1]['start_ste
         "WANDB_MODE": "offline",
         "WANDB_SILENT": "true",
         "WANDB_DISABLE_GIT": "true",
-        "PYTHONPATH": os.pathsep.join([str(Path(__file__).resolve().parents[1] / "src")]),
+        # Shared environments intentionally have no editable checkout bindings.
+        "PYTHONPATH": os.pathsep.join(
+            str(Path(__file__).resolve().parents[1] / relative)
+            for relative in (".", "src", "packages/openpi-client/src")
+        ),
     }
     environment.pop("WANDB_API_KEY", None)
     environment.pop("WANDB_RESUME", None)
