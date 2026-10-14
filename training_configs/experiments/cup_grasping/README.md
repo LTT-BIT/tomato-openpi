@@ -33,10 +33,10 @@
 
 ```bash
 export MODULE=training_configs.experiments.cup_grasping.baseline.cup_single_franka_lora_v1
-.venv/bin/python -m scripts.run_training "$MODULE" --dry-run
-.venv/bin/python -m scripts.compute_experiment_norm "$MODULE"
-.venv/bin/python -m scripts.run_training "$MODULE" --check
-.venv/bin/python -m scripts.run_training "$MODULE" --wandb-mode offline
+bash scripts/python.sh -m scripts.run_training "$MODULE" --dry-run
+bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE"
+bash scripts/python.sh -m scripts.run_training "$MODULE" --check
+bash scripts/python.sh -m scripts.run_training "$MODULE" --wandb-mode offline
 ```
 
 联网时使用 `--wandb-mode online`；离线训练后按根 README 同步 W&B。多人实验先复制到 `template/<负责人>/` 并指定唯一实验名称；当前 template 保持为空。

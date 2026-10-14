@@ -55,7 +55,7 @@ meta/info.json 的 observation.state 和 action 的 shape 均为 [58]，names �
 ```bash
 export MODULE=training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1
 export EXP=alice_tomato_sharpa_lora_s42_run01
-.venv/bin/python -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
+bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
 ```
 
 baseline 可用 `PI05_SHARPA_DATASET_ROOT` / `PI05_SHARPA_ASSETS_DIR` 覆盖路径。修改数据身份、参数及实验记录时，按多人开发 README 复制为个人配置；当前 template 为空。

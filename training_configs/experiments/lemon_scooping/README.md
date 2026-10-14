@@ -52,10 +52,10 @@
 
 ```bash
 export MODULE=training_configs.experiments.lemon_scooping.baseline.lemon_ur_o30_lora_v1
-.venv/bin/python -m scripts.run_training "$MODULE" --dry-run
-.venv/bin/python -m scripts.compute_experiment_norm "$MODULE"
-.venv/bin/python -m scripts.run_training "$MODULE" --check
-.venv/bin/python -m scripts.run_training "$MODULE" --wandb-mode offline
+bash scripts/python.sh -m scripts.run_training "$MODULE" --dry-run
+bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE"
+bash scripts/python.sh -m scripts.run_training "$MODULE" --check
+bash scripts/python.sh -m scripts.run_training "$MODULE" --wandb-mode offline
 ```
 
 联网时改为 `--wandb-mode online`。全参的 batch 64 是全局 batch；显卡数量和显存改变时在个人实验中显式调整，不能将其理解为任意一张卡都能训练。

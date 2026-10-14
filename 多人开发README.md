@@ -57,7 +57,7 @@ def build_config():
 通过完整模块路径检查，后续统计与训练也使用这个模块：
 
 ```bash
-.venv/bin/python -m scripts.run_training \
+bash scripts/python.sh -m scripts.run_training \
   training_configs.experiments.tomato_wuji.template.alice.tomato_lora_lr1e5 --dry-run
 ```
 
@@ -153,7 +153,7 @@ def build_config():
 500028 服务器的公共环境位于 `/mnt/data/public_tools/training/environments/pi05/20261011`，基础权重位于 `/mnt/data/public_ckpt/pi05/pi05_base/params`，使用入口见[根 README](README.md#500028-服务器复用公共环境)。环境按版本固定，升级依赖发布新目录，不原地更新正在使用的版本。
 
 - `zhiwei` 维护环境，`ai_researchers` 组成员读取和执行。新文件应允许组读取，目录和程序允许组执行，不允许组修改。
-- 每人维护自己的源码 checkout，通过公共 `run-python` 显式传入仓库路径；不要对公共环境执行 `pip install -e`，避免绑定某个人的代码。
+- 每人维护自己的源码 checkout，通过 `bash scripts/python.sh` 启动，由脚本向公共 `run-python` 传入当前仓库路径；不要对公共环境执行 `pip install -e`，避免绑定某个人的代码。
 - 个人缓存和训练输出位于自己的仓库。实验记录同时写明源码 commit 和公共环境版本；换环境后先验证再开始新实验。
 - 原始离线包来自 `/home/pengyang/workspace/pi05_env_bundle_20261011`。SHA-256 校验、源码验证快照及测试输出保存于服务器 `/mnt/data/public_tools/training/validation/pi05-20261014`。环境包含旧版本留下的额外仿真包，不表示本仓库提供仿真或部署入口。
 

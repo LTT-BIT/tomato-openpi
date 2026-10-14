@@ -26,27 +26,32 @@ cd tomato-openpi
 bash scripts/setup_training_env.sh
 ```
 
-安装脚本按 `uv.lock` 创建 `.venv/`，打印 JAX 设备和 Torch CUDA 状态。正式训练前应看到 GPU 设备及 `CUDA=True`。以后在仓库根目录直接使用 `.venv/bin/python`，入口自动设置仓库内缓存和输出位置。
+安装脚本优先复用选中的公共环境；使用本地环境时按 `uv.lock` 安装到 `.venv/`，并打印 JAX 设备和 Torch CUDA 状态。正式训练前应看到 GPU 设备及 `CUDA=True`。以后在仓库根目录直接使用 `bash scripts/python.sh`，入口自动设置仓库内缓存和输出位置。
 
 初始权重为 `gs://openpi-assets/checkpoints/pi05_base/params`；首次使用需要下载权重及 tokenizer，离线机器须提前准备缓存。允许动作/状态投影中形状不匹配的参数随机初始化，其余兼容参数加载基础权重。
 
 ### 500028 服务器：复用公共环境
 
-已加入服务器 `ai_researchers` 组的成员，可使用公共环境，无需在自己的仓库重复安装。每人仍独立 clone 仓库；此方式跳过上面的 `setup_training_env.sh`。
+已加入服务器 `ai_researchers` 组的成员，可复用公共环境。每人独立 clone 仓库，安装、检查、统计和训练均使用仓库入口，无需修改 baseline 的环境参数。
 
-在自己的仓库根目录执行：
+`bash scripts/python.sh` 的环境选择顺序：
+
+1. 设置了 `PI05_SHARED_ENV` 时，使用指定公共环境；路径无效会直接报错。
+2. 否则优先使用仓库已有的 `.venv`。
+3. 没有 `.venv` 时，自动使用服务器的 `/mnt/data/public_tools/training/environments/pi05/20261011`。
+4. 没有可用环境时，先执行 `bash scripts/setup_training_env.sh` 安装本地环境。
+
+新 clone 的仓库在 500028 上自动复用公共环境。已有本地 `.venv`，但希望使用公共环境时，在当前终端设置：
 
 ```bash
 export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/20261011
+bash scripts/setup_training_env.sh
 export MODULE=training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1
-"$PI05_SHARED_ENV/run-python" "$PWD" -m scripts.run_training "$MODULE" --dry-run
+bash scripts/python.sh -m scripts.run_training "$MODULE" --dry-run
+bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE"
 ```
 
-后文所有 `.venv/bin/python` 都可替换为 `"$PI05_SHARED_ENV/run-python" "$PWD"`，例如计算统计：
-
-```bash
-"$PI05_SHARED_ENV/run-python" "$PWD" -m scripts.compute_experiment_norm "$MODULE"
-```
+共享模式下，安装脚本只检查环境，不执行 `uv sync`。需要独立安装依赖时执行 `bash scripts/setup_training_env.sh --local`，再 `unset PI05_SHARED_ENV` 使用本地 `.venv`。已有但损坏的 `.venv` 会报错，不会悄悄切换到公共环境。环境选择不修改系统 Python。
 
 公共基础权重路径为 `/mnt/data/public_ckpt/pi05/pi05_base/params`。在个人实验 `build_config()` 中返回配置前指定本地路径，避免重复下载：
 
@@ -62,7 +67,7 @@ config = replace(
 )
 ```
 
-`run-python` 显式加载传入仓库的源码，不绑定维护者的 checkout。缓存、数据、统计、日志和训练输出仍保存在各自仓库；tokenizer 首次使用仍需要下载或预先准备本地缓存。
+`scripts/python.sh` 在共享模式下调用公共 `run-python`，显式加载当前仓库的源码，不绑定维护者的 checkout。缓存、数据、统计、日志和训练输出仍保存在各自仓库；tokenizer 首次使用仍需要下载或预先准备本地缓存。
 
 公共环境与基础权重由 `zhiwei` 维护，其他组成员只读使用。不要将仓库 `.venv` 链接到公共环境后执行 `uv sync`，也不要向公共环境安装个人依赖；需要不同依赖时创建独立环境。环境验证范围和更新约定见[多人开发说明](多人开发README.md#公共环境管理)。
 
@@ -117,7 +122,7 @@ LoRA 和全参默认均训练 30,000 步，学习率计划的 decay_steps 同为
 ```bash
 export MODULE=training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1
 export EXP=alice_tomato_wuji_lora_s42_run01
-.venv/bin/python -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
+bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
 ```
 
 更换方案时修改 MODULE。个人修改数据、学习率或预算时，按 [多人开发 README](多人开发README.md) 复制 baseline 为独立配置，再将 MODULE 指向个人模块。
@@ -131,7 +136,7 @@ export EXP=alice_tomato_wuji_lora_s42_run01
 新数据先计算统计：
 
 ```bash
-.venv/bin/python -m scripts.compute_experiment_norm "$MODULE" --stats-batch-size 512
+bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE" --stats-batch-size 512
 ```
 
 统计保存到 `<assets_dir>/<asset_id>/`，包含 `norm_stats.json` 和 `norm_metadata.json`。已有配套统计时跳过计算，迁移时两个文件一起复制。不要提前创建最终 asset_id 目录：工具拒绝覆盖已有目录，包括空目录；同一目标的重复计算进程也会被拒绝。
@@ -141,9 +146,9 @@ export EXP=alice_tomato_wuji_lora_s42_run01
 ## 4. 检查与训练
 
 ```bash
-.venv/bin/python -m scripts.run_training "$MODULE" --exp-name "$EXP" --check
-.venv/bin/wandb login
-CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
+bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --check
+bash scripts/python.sh -m wandb login
+CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training \
   "$MODULE" --exp-name "$EXP" --wandb-mode online
 ```
 
@@ -154,8 +159,8 @@ GPU 编号按分配修改，全局 batch 必须能被可见设备数整除；单
 无网络时使用 `--wandb-mode offline`，本地日志和 W&B 仍保存。恢复联网后逐个同步离线段：
 
 ```bash
-.venv/bin/wandb login
-.venv/bin/wandb sync wandb/offline-run-实际编号
+bash scripts/python.sh -m wandb login
+bash scripts/python.sh -m wandb sync wandb/offline-run-实际编号
 ```
 
 ## 5. 输出与续训
@@ -175,7 +180,7 @@ GPU 编号按分配修改，全局 batch 必须能被可见设备数整除；单
 恢复未完成实验时使用原 commit、模块、配置、数据、统计和实验名：
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 .venv/bin/python -u -m scripts.run_training \
+CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training \
   "$MODULE" --exp-name "$EXP" --resume --wandb-mode online
 ```
 

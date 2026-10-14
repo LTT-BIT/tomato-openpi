@@ -27,9 +27,9 @@ CHECK_PATHS=(
   src/openpi/transforms_test.py src/openpi/training/data_loader_test.py
   examples/fr3_wuji/verify_dataset.py
 )
-.venv/bin/ruff check "${CHECK_PATHS[@]}"
-.venv/bin/ruff format --check "${CHECK_PATHS[@]}"
-bash -n scripts/setup_training_env.sh scripts/check_training.sh
+bash scripts/python.sh -m ruff check "${CHECK_PATHS[@]}"
+bash scripts/python.sh -m ruff format --check "${CHECK_PATHS[@]}"
+bash -n scripts/setup_training_env.sh scripts/check_training.sh scripts/python.sh scripts/training_runtime.sh
 
 for experiment in \
   training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 \
@@ -40,10 +40,10 @@ for experiment in \
   training_configs.experiments.cup_grasping.baseline.cup_single_franka_fullft_v1 \
   training_configs.experiments.lemon_scooping.baseline.lemon_ur_o30_lora_v1 \
   training_configs.experiments.lemon_scooping.baseline.lemon_ur_o30_fullft_v1; do
-  .venv/bin/python -m scripts.run_training "$experiment" --dry-run
+  bash scripts/python.sh -m scripts.run_training "$experiment" --dry-run
 done
 
-.venv/bin/python -m pytest tests \
+bash scripts/python.sh -m pytest tests \
   src/openpi/training/sampling_test.py src/openpi/training/reproducibility_test.py \
   src/openpi/training/weight_loaders_test.py src/openpi/training/data_loader_test.py \
   src/openpi/policies/fr3_wuji_policy_test.py src/openpi/transforms_test.py \

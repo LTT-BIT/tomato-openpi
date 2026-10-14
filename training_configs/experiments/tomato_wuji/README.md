@@ -47,7 +47,7 @@
 ```bash
 export MODULE=training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1
 export EXP=alice_tomato_wuji_lora_s42_run01
-.venv/bin/python -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
+bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
 ```
 
 按根 README 执行新数据统计 → check → 训练；已有配套统计时跳过计算。修改数据和参数时按多人开发 README 复制为个人配置，再更新 MODULE。当前 template 为空。
@@ -57,7 +57,7 @@ export EXP=alice_tomato_wuji_lora_s42_run01
 需要将数据与原始 FR3/Wuji 采集记录额外对照时，可以运行独立校验工具：
 
 ```bash
-.venv/bin/python -m examples.fr3_wuji.verify_dataset \
+bash scripts/python.sh -m examples.fr3_wuji.verify_dataset \
   --src-root data/raw_captures \
   --root data/tomato_fulltask_v1 \
   --repo-id fr3_wuji/tomato_fulltask_v1 \
