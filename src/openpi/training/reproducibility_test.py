@@ -131,3 +131,28 @@ def test_weighted_plan_audit_and_resume_reject_changes(run_inputs, change):
         cfg = dataclasses.replace(cfg, sampling_mode="epoch_shuffle", sampling_groups=())
     with pytest.raises(ValueError, match="contract changed"):
         reproducibility.prepare_run(cfg, data, source, plan, resuming=True)
+
+
+def test_personal_experiments_do_not_invalidate_other_runs(tmp_path, monkeypatch):
+    import types
+
+    for name in ("uv.lock", "pyproject.toml", "scripts/train.py"):
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("original")
+    personal = tmp_path / "training_configs/experiments/tomato_wuji/template/alice"
+    personal.mkdir(parents=True)
+    active = personal / "active_test.py"
+    active.write_text("active config")
+    monkeypatch.setattr(
+        reproducibility.importlib, "import_module", lambda _: types.SimpleNamespace(__file__=str(active))
+    )
+    cfg = dataclasses.replace(config.get_config("debug"), policy_metadata={"experiment_module": "active"})
+    before = reproducibility._code_inventory(cfg, root=tmp_path)  # noqa: SLF001
+    (personal / "another.py").write_text("another config")
+    assert reproducibility._code_inventory(cfg, root=tmp_path) == before  # noqa: SLF001
+    active.write_text("changed active config")
+    assert reproducibility._code_inventory(cfg, root=tmp_path) != before  # noqa: SLF001
+    active.write_text("active config")
+    (tmp_path / "scripts/train.py").write_text("changed shared code")
+    assert reproducibility._code_inventory(cfg, root=tmp_path) != before  # noqa: SLF001

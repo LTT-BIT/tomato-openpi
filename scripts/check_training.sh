@@ -17,6 +17,7 @@ mkdir -p .cache/ci
 uv lock --check --offline
 CHECK_PATHS=(
   training_configs tests
+  scripts/training_ui.py scripts/training_ui_config.py
   scripts/run_training.py scripts/compute_experiment_norm.py scripts/train.py scripts/train_reproducibility_test.py
   src/openpi/training/norm_provenance.py examples/fr3_wuji/compute_norm_stats.py
   src/openpi/shared/local_storage.py src/openpi/training/tracking.py

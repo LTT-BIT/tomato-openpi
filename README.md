@@ -24,38 +24,36 @@ git clone --branch main \
 cd tomato-openpi
 ```
 
-**选择环境、配置和权重**。在自己的仓库根目录执行，以下以番茄 Wuji LoRA 为例：
+**启动图形界面**，在自己的仓库根目录执行：
 
 ```bash
 export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/20261011
-export BASE_PARAMS=/mnt/data/public_ckpt/pi05/pi05_base/params
-export MODULE=training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1
-export EXP=alice_tomato_wuji_lora_s42_run01
-
-bash scripts/python.sh -m scripts.run_training "$MODULE" \
-  --exp-name "$EXP" --weight-loader.params-path "$BASE_PARAMS" --dry-run
+# 联网记录 W&B 时首次登录；选择 offline 时不需要登录。
+bash scripts/python.sh -m wandb login
+bash scripts/python.sh -m scripts.training_ui --port 8765
 ```
 
-更换任务时修改 `MODULE`，每次新实验使用独立的 `EXP`。数据目录在实验配置的 `build_dataset()` 中设置，数据与统计要求见下文。新终端需重新设置这四个变量。
+在 VS Code 的“端口”面板转发 `8765`，打开终端打印的完整地址（包含 `#token=...`）。如果本地转发端口不同，替换地址中的端口号，保留 token。也可以使用 SSH 隧道 `ssh -L 8765:127.0.0.1:8765 zhiwei500028`。服务只监听服务器本机地址，每位使用者从自己的 clone 启动；同一服务器端口被占用时换一个端口。
 
-**准备统计并检查数据**（已有匹配统计时跳过第一条）：
+服务器无需重新安装 Python 环境或前端依赖。在界面中点击“使用服务器公共权重”，会填写 `/mnt/data/public_ckpt/pi05/pi05_base/params`。tokenizer 首次使用仍需下载或提前准备仓库缓存。
 
-```bash
-bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE" --stats-batch-size 512
-bash scripts/python.sh -m scripts.run_training "$MODULE" \
-  --exp-name "$EXP" --weight-loader.params-path "$BASE_PARAMS" --check
-```
+## 图形界面：配置和启动训练
 
-**启动训练**，将 GPU 编号改为分配给自己的设备：
+自己的电脑完成下方环境安装后，同样执行 `bash scripts/python.sh -m scripts.training_ui --port 8765`，打开终端打印的地址。
 
-```bash
-CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training "$MODULE" \
-  --exp-name "$EXP" --weight-loader.params-path "$BASE_PARAMS" --wandb-mode offline
-```
+1. **选择 baseline**：八份公共方案自动读取默认参数，显示本体维度、频率和英文 prompt 示例。柠檬保留原有 episode 筛选及保存时间表。
+2. **选择数据**：输入或浏览训练服务器上的数据目录，确认数据版本、repo_id、来源和统计位置。浏览器不上传本机数据。更换数据路径或 horizon 时，界面会为新实验选择独立统计名称；也可手动选择已有的匹配统计。
+3. **修改参数**：可修改 batch、步数、学习率计划、workers、FSDP、随机种子、保存间隔、基础权重和 W&B 项目。支持 A/B 权重及 episode 分组有放回采样。本体、动作语义、模型结构和任务视图沿用所选 baseline。
+4. **选择 GPU 和 W&B 模式**：界面读取 `nvidia-smi` 的显存和利用率，可多选。全局 batch 必须能被卡数整除；卡数必须能被 FSDP 分片数整除。online 需要预先在终端登录，offline 明确保留本地记录，之后按下文同步。
+5. **保存配置并启动**：自动保存个人 Python 文件，后台依次校验数据、缺少时计算统计、核对统计绑定并启动训练。可先点击“检查数据与统计”或“查看最终配置”。任何阶段失败都会显示错误和日志，不继续下一阶段。
 
-联网记录时先执行 `bash scripts/python.sh -m wandb login`，再将 `offline` 改为 `online`。恢复同一实验时，在上述训练命令后加 `--resume`，保留原配置、权重路径和实验名。
+个人配置保存到所选任务的 `template/<用户名>/<实验名>.py`，与 `baseline/` 同级；已被 Git 忽略，不用创建分支或上传。文件内 `_UI_VALUES` 是实际参数，保留 baseline 的组合代码及来源摘要。实验名和用户名使用英文字母、数字、下划线，不能以数字开头；已有配置不覆盖，另取实验名。
 
-这些命令直接使用公共环境与本地基础权重，不需要修改 baseline 的环境参数。tokenizer 首次使用仍需下载或预先准备仓库内缓存。每个人的源码、数据、统计、缓存和训练输出均使用自己的仓库。公共环境及基础权重由 `zhiwei` 维护，组内其他人只读使用。
+关闭网页或退出 UI 服务不会停止后台任务；任务记录在重开界面后仍可读取。界面可停止任务、按原配置重试或续训。停止不保证额外保存一次权重，只能从已有 checkpoint 恢复；还未产生 checkpoint 但已创建实验目录时，请换实验名。续训不会应用当前表单修改，配置被改动时会拒绝续训。新增其他个人实验文件不影响本次续训；公共源码更新仍会触发严格校验，旧版本训练需保留原 checkout。共享磁盘上的任务需要回到原服务器 UI 操作。
+
+UI 流程日志和状态在 `logs/training_ui/<任务ID>/`；正式训练仍按现有规则写入 `logs/`、`checkpoints/`、`wandb/`，不会写入公共环境。GPU 占用检查用于提示，本仓库 UI 会预留自己任务使用的卡；其他 clone、其他用户及命令行训练仍需协调。运行期间不要修改正在使用的源码或配置。
+
+UI 只管理本仓库训练，不安装驱动或环境、不转换数据、不修改 W&B 登录凭据。除首次准备环境、登录 W&B 和启动 UI 外，日常数据准备检查、统计计算、参数选择及训练操作都可在页面完成。下面的命令行流程仍可使用。
 
 ## 自己的电脑：安装本地环境
 

@@ -11,6 +11,7 @@ import csv
 import dataclasses
 import enum
 import hashlib
+import importlib
 import json
 import logging
 import pathlib
@@ -76,15 +77,20 @@ def _inventory(root: pathlib.Path, files: list[pathlib.Path]) -> dict[str, str]:
     return result
 
 
-def _code_inventory() -> dict[str, str]:
-    root = pathlib.Path(__file__).resolve().parents[3]
+def _code_inventory(config, *, root: pathlib.Path | None = None) -> dict[str, str]:
+    root = root or pathlib.Path(__file__).resolve().parents[3]
+    module = (config.policy_metadata or {}).get("experiment_module")
+    experiment_path = pathlib.Path(importlib.import_module(module).__file__).resolve() if module else None
     files = [root / "uv.lock", root / "pyproject.toml"]
     for directory in (root / "src/openpi", root / "training_configs", root / "scripts"):
-        files.extend(
-            path
-            for path in directory.rglob("*.py")
-            if not path.name.endswith("_test.py") and not path.name.startswith("test_")
-        )
+        for path in directory.rglob("*.py"):
+            if path.resolve() != experiment_path and (path.name.endswith("_test.py") or path.name.startswith("test_")):
+                continue
+            relative = path.relative_to(root)
+            personal = relative.parts[:2] == ("training_configs", "experiments") and "template" in relative.parts[3:4]
+            if personal and path.resolve() != experiment_path:
+                continue
+            files.append(path)
     return _inventory(root, files)
 
 
@@ -180,7 +186,7 @@ def prepare_run(
         "dataset_sha256": hashlib.sha256(dataset_bytes).hexdigest(),
         "norm_sha256": hashlib.sha256(norm_bytes).hexdigest(),
         "plan_indices_sha256": hashlib.sha256(indices.astype("<i8").tobytes()).hexdigest(),
-        "code": _code_inventory(),
+        "code": _code_inventory(config),
     }
     unique = len(np.unique(indices))
     summary = {

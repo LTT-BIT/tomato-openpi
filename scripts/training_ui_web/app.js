@@ -1,0 +1,102 @@
+'use strict';
+const $ = id => document.getElementById(id);
+const fragment = new URLSearchParams(location.hash.slice(1));
+if (fragment.get('token')) { sessionStorage.setItem('training-token', fragment.get('token')); history.replaceState(null, '', location.pathname); }
+let baseline = null, initial = null, protocol = null, currentJob = null, gpuData = [], browseTarget = null, browseState = null, loadingVersion = 0;
+const fields = new Map();
+const terminal = new Set(['completed', 'failed', 'stopped', 'interrupted']);
+const statusNames = {queued:'等待中', running:'运行中', completed:'训练完成', failed:'失败', stopped:'已停止', interrupted:'已中断', orphaned:'管理进程中断，子进程仍运行'};
+const definitions = {
+  identity: [['owner','配置负责人','text'],['exp_name','实验名称','text']],
+  data: [['dataset_root','数据集目录','path'],['repo_id','数据集 repo_id','text'],['dataset_version','数据版本','text'],['sources','数据来源（每行一项）','lines'],['assets_dir','归一化统计父目录','path'],['asset_id','统计名称 asset_id','text']],
+  train: [['batch_size','全局 batch size','int'],['num_train_steps','训练步数','int'],['peak_lr','峰值学习率','float'],['decay_lr','末尾学习率','float'],['warmup_steps','Warmup 步数','int'],['decay_steps','学习率衰减步数','int'],['num_workers','数据 workers','int'],['fsdp_devices','FSDP 分片数','int'],['action_horizon','动作 horizon','int']],
+  advanced: [['log_interval','日志间隔','int'],['save_interval','权重保存间隔','int'],['keep_period','长期保留间隔（空=关闭）','optional-int'],['seed','总 seed','int'],['model_seed','模型 seed','int'],['data_seed','采样 seed','int'],['augmentation_seed','增强 seed','int'],['weight_decay','Weight decay','float'],['clip_gradient_norm','梯度裁剪','float'],['save_before_step','分阶段保存切换步数','int'],['save_steps_before','切换前保存步数（逗号分隔）','ints'],['save_interval_after','切换后保存间隔','int']],
+  runtime: [['weight_path','基础权重 params 路径 / URL','path'],['project_name','W&B 项目','text'],['stats_batch_size','统计计算 batch size','int']],
+};
+function node(tag, text, cls) { const el=document.createElement(tag); if(text!==undefined) el.textContent=text; if(cls) el.className=cls; return el; }
+function notice(text, error=false) { $('notice').textContent=text; $('notice').className='notice'+(error?' error':''); }
+async function api(path, data) {
+  const options={headers:{'X-Training-Token':sessionStorage.getItem('training-token')||''}};
+  if(data!==undefined){options.method='POST';options.headers['Content-Type']='application/json';options.body=JSON.stringify(data);}
+  const response=await fetch(path,options);const result=await response.json();if(!response.ok)throw Error(result.error||'请求失败');return result;
+}
+async function perform(callback, button) { if(button)button.disabled=true; try{await callback();}catch(error){notice(error.message,true);}finally{if(button)button.disabled=false;} }
+function selectedGPUs(){return [...document.querySelectorAll('#gpus input:checked')].map(input=>input.value);}
+function updatePath(){if(!baseline||!fields.has('owner'))return;const task=baseline.split('.')[2];$('save-location').textContent=`training_configs/experiments/${task}/template/${fields.get('owner').input.value}/${fields.get('exp_name').input.value}.py`;}
+function independentStats(){fields.get('asset_id').input.value='ui_'+fields.get('owner').input.value+'_'+fields.get('exp_name').input.value;fields.get('asset_id').input.dispatchEvent(new Event('input'));}
+function addField(container, definition, value, original) {
+  const [key,label,type]=definition; const wrapper=node('label',label,(type==='path'||type==='lines')?'full':'');
+  const input=document.createElement(type==='lines'?'textarea':'input');input.id='field-'+key;input.name=key;
+  if(['int','float','optional-int'].includes(type)){input.type='number';input.step=type==='float'?'any':'1';}
+  input.value=Array.isArray(value)?value.join(type==='lines'?'\n':', '):(value??'');
+  const wrap=type==='path'?node('div',undefined,'path-input'):wrapper;wrap.append(input);
+  if(type==='path'){const browse=node('button','浏览');browse.type='button';browse.addEventListener('click',()=>perform(()=>openBrowser(input)));wrap.append(browse);wrapper.append(wrap);}
+  if(original!==undefined){wrapper.append(node('small','baseline：'+(Array.isArray(original)?original.join(', '):(original??'关闭')),'default'));}
+  input.addEventListener('input',()=>{input.classList.toggle('changed',original!==undefined&&input.value!==(Array.isArray(original)?original.join(type==='lines'?'\n':', '):String(original??'')));updatePath();});
+  if(key==='dataset_root'){input.addEventListener('change',()=>{fields.get('sources').input.value=input.value;fields.get('sources').input.dispatchEvent(new Event('input'));if(input.value!==initial.dataset_root)independentStats();});}
+  if(key==='action_horizon'){input.addEventListener('change',()=>{if(Number(input.value)!==initial.action_horizon)independentStats();});}
+  fields.set(key,{input,type});container.append(wrapper);
+}
+function fillForm(result) {
+  initial=result.values;protocol=result.protocol;fields.clear();
+  for(const [section,defs] of Object.entries(definitions)){
+    const container=$(section+'-fields');container.replaceChildren();
+    for(const definition of defs){const key=definition[0];if(section==='advanced'&&!(key in initial))continue;let value=initial[key];if(key==='owner')value=result.owner;if(key==='exp_name')value=result.suggested_exp_name;if(key==='stats_batch_size')value=512;addField(container,definition,value,initial[key]);}
+  }
+  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
+  if(protocol.task_view)$('protocol').append(node('div','保留 baseline 的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
+  if(result.shared_weights){const button=node('button','使用服务器公共权重','text-button');button.addEventListener('click',()=>{fields.get('weight_path').input.value=result.shared_weights;fields.get('weight_path').input.dispatchEvent(new Event('input'));});$('runtime-fields').append(button);}
+  $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);
+  $('groups-panel').classList.toggle('hidden',initial.sampling_mode!=='weighted_replacement');
+  fields.get('exp_name').input.dispatchEvent(new Event('input'));updatePath();
+}
+async function chooseBaseline(module){
+  const version=++loadingVersion;$('start').disabled=true;
+  try{const result=await api('/api/baseline?id='+encodeURIComponent(module));if(version!==loadingVersion)return;baseline=module;fillForm(result);for(const el of $('baseline-list').children)el.classList.toggle('selected',el.dataset.id===module);}
+  finally{if(version===loadingVersion)$('start').disabled=false;}
+}
+function parseIds(text){
+  if(!text.trim())return [];
+  const result=[];for(const part of text.split(/[,，\s]+/).filter(Boolean)){
+    if(/^\d+$/.test(part)){result.push(Number(part));continue;}
+    const range=/^(\d+)-(\d+)$/.exec(part);if(!range)throw Error('episode 编号需为整数、逗号分隔或区间，例如 0,2,4-8');const start=Number(range[1]),end=Number(range[2]);if(end<start||end-start>100000)throw Error('episode 区间无效');for(let i=start;i<=end;i++)result.push(i);
+  }return result;
+}
+function addGroup(group={name:'',weight:1,episodes:[]}){
+  const row=node('div',undefined,'group');for(const [key,label,value] of [['name','组名',group.name],['weight','权重',group.weight],['episodes','episode 编号 / 区间',group.episodes.join(',')]]){
+    const wrapper=node('label',label),input=node('input');input.dataset.key=key;input.value=value;if(key==='weight'){input.type='number';input.step='any';}wrapper.append(input);row.append(wrapper);
+  }const remove=node('button','移除');remove.addEventListener('click',()=>row.remove());row.append(remove);$('groups').append(row);
+}
+function request(){
+  if(!baseline)throw Error('请先选择 baseline');const values={};let owner,statsBatch;
+  for(const [key,{input,type}] of fields){let value=input.value.trim();if(type==='int'||type==='float')value=value===''?NaN:Number(value);if(type==='optional-int')value=value===''?null:Number(value);if(type==='lines')value=value.split('\n').map(v=>v.trim()).filter(Boolean);if(type==='ints')value=parseIds(value);if(typeof value==='number'&&!Number.isFinite(value))throw Error(key+' 请输入有效数值');if(key==='owner')owner=value;else if(key==='stats_batch_size')statsBatch=value;else values[key]=value;}
+  values.sampling_mode=$('sampling-mode').value;values.sampling_groups=[];
+  if(values.sampling_mode==='weighted_replacement')for(const row of $('groups').children){values.sampling_groups.push({name:row.querySelector('[data-key=name]').value.trim(),weight:Number(row.querySelector('[data-key=weight]').value),episodes:parseIds(row.querySelector('[data-key=episodes]').value)});}
+  return {baseline,owner,values,gpus:selectedGPUs(),wandb_mode:$('wandb-mode').value,auto_norm:$('auto-norm').checked,allow_busy:$('allow-busy').checked,stats_batch_size:statsBatch};
+}
+async function refreshGPUs(){const old=new Set(selectedGPUs());const result=await api('/api/gpus');gpuData=result.gpus;$('gpus').replaceChildren();if(result.error){$('gpus').textContent=result.error;return;}
+  for(const gpu of gpuData){const card=node('div',undefined,'gpu'),label=node('label',undefined,'check'),input=node('input');input.type='checkbox';input.value=gpu.uuid;input.checked=old.has(gpu.uuid);label.append(input,node('span',`GPU ${gpu.index} · ${gpu.name}`));card.append(label);const meter=node('div',undefined,'meter'),progress=node('progress');progress.max=gpu.total_mb||1;progress.value=gpu.used_mb||0;meter.append(progress);card.append(meter,node('small',`显存 ${gpu.used_mb??'?'} / ${gpu.total_mb??'?'} MiB · 利用率 ${gpu.utilization??'?'}%`));$('gpus').append(card);}
+}
+async function refreshJobs(){const records=await api('/api/jobs');$('jobs').replaceChildren();if(!records.length)$('jobs').textContent='还没有任务。';for(const job of records){const button=node('button',job.exp_name,'job');button.append(node('small',`${statusNames[job.status]||job.status} · ${job.created_at}`));button.addEventListener('click',()=>perform(()=>showJob(job.id)));$('jobs').append(button);}}
+async function showJob(id){currentJob=id;const job=await api('/api/job?id='+id);if(currentJob!==id)return;$('output-title').textContent=job.exp_name;$('output').textContent=job.log||'后台任务准备中…';$('job-status').textContent=(statusNames[job.status]||job.status)+' · '+job.stage;$('job-status').classList.remove('hidden');$('stop').classList.toggle('hidden',terminal.has(job.status));$('resume').classList.toggle('hidden',!terminal.has(job.status)||job.status==='completed');$('job-info').textContent=`配置：${job.config_path}\n权重：${job.checkpoint_dir}`+(job.error?'\n错误：'+job.error:'');}
+async function showPreview(check){currentJob=null;const result=await api(check?'/api/check':'/api/preview',request());$('output-title').textContent=check?'数据与统计检查':'最终训练配置';$('output').textContent=JSON.stringify(result,null,2);$('job-info').textContent='个人配置保存位置：'+result.config_path;for(const id of ['job-status','stop','resume'])$(id).classList.add('hidden');notice(check?'数据检查完成。'+result.statistics:'配置已展开，可在下方核对。');$('output-section').scrollIntoView({behavior:'smooth',block:'start'});}
+async function openBrowser(input){browseTarget=input;try{await browse(input.value.includes('://')?'':input.value);}catch{await browse('');}$('browser').showModal();}
+async function browse(path){browseState=await api('/api/browse?path='+encodeURIComponent(path));$('browse-path').value=browseState.path;$('browse-list').replaceChildren();for(const entry of browseState.entries){const button=node('button','▸ '+entry.name);button.addEventListener('click',()=>perform(()=>browse(entry.path)));$('browse-list').append(button);}if(browseState.truncated)$('browse-list').append(node('p','仅显示前 500 个目录，请直接输入路径'));}
+$('preview').addEventListener('click',()=>perform(()=>showPreview(false),$('preview')));
+$('check').addEventListener('click',()=>perform(()=>showPreview(true),$('check')));
+$('start').addEventListener('click',()=>perform(async()=>{const job=await api('/api/start',request());notice('配置已保存，后台任务已启动；数据检查通过后进入训练。');await refreshJobs();await showJob(job.id);$('output-section').scrollIntoView({behavior:'smooth'});},$('start')));
+$('reset').addEventListener('click',()=>perform(()=>chooseBaseline(baseline),$('reset')));
+$('new-stats').addEventListener('click',independentStats);
+$('sampling-mode').addEventListener('change',()=>{const enabled=$('sampling-mode').value==='weighted_replacement';$('groups-panel').classList.toggle('hidden',!enabled);if(enabled&&!$('groups').children.length){addGroup({name:'A',weight:7,episodes:[]});addGroup({name:'B',weight:3,episodes:[]});}});
+$('add-group').addEventListener('click',()=>addGroup());
+$('refresh-gpus').addEventListener('click',()=>perform(refreshGPUs,$('refresh-gpus')));
+$('select-free').addEventListener('click',()=>{for(const input of document.querySelectorAll('#gpus input')){const gpu=gpuData.find(g=>g.uuid===input.value);input.checked=gpu.used_mb!==null&&gpu.utilization!==null&&gpu.used_mb<=1024&&gpu.utilization<=5;}});
+$('refresh-jobs').addEventListener('click',()=>perform(refreshJobs,$('refresh-jobs')));
+$('stop').addEventListener('click',()=>perform(async()=>{if(!confirm('停止这个任务？只保留已保存的 checkpoint。'))return;const result=await api('/api/stop',{id:currentJob});notice(result.message);},$('stop')));
+$('resume').addEventListener('click',()=>perform(async()=>{const selected=selectedGPUs();const payload={id:currentJob,allow_busy:$('allow-busy').checked};if(selected.length)payload.gpus=selected;const job=await api('/api/resume',payload);notice('使用原配置重试 / 续训，当前表单的参数修改不会应用到旧任务。');await refreshJobs();await showJob(job.id);},$('resume')));
+$('browse-close').addEventListener('click',()=>$('browser').close());
+$('browse-go').addEventListener('click',()=>perform(()=>browse($('browse-path').value)));
+$('browse-parent').addEventListener('click',()=>perform(()=>browse(browseState.parent)));
+$('browse-select').addEventListener('click',()=>{browseTarget.value=browseState.path;browseTarget.dispatchEvent(new Event('input'));browseTarget.dispatchEvent(new Event('change'));$('browser').close();});
+perform(async()=>{const info=await api('/api/baselines');$('runtime').textContent=info.repository+'\nPython: '+info.python;for(const entry of info.baselines){const button=node('button',entry.label,'baseline');button.dataset.id=entry.id;button.addEventListener('click',()=>perform(()=>chooseBaseline(entry.id)));$('baseline-list').append(button);}if(info.baselines.length)await chooseBaseline(info.baselines.find(e=>e.id.includes('tomato_wuji')&&e.id.includes('lora'))?.id||info.baselines[0].id);await Promise.all([refreshGPUs(),refreshJobs()]);});
+let polling=false;setInterval(async()=>{if(polling||document.hidden)return;polling=true;try{if(currentJob)await showJob(currentJob);await refreshJobs();}catch(error){notice('连接中断：'+error.message,true);}finally{polling=false;}},5000);

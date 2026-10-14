@@ -105,6 +105,16 @@ TrainConfig
 | 训练算法、采样或保存行为 | scripts/train.py、src/openpi/training 等共享代码 |
 | 使用本地还是公共 Python 环境 | scripts/python.sh 的选择规则和 PI05_SHARED_ENV；不放在实验参数中 |
 
+## 通过 UI 创建个人实验
+
+运行 `bash scripts/python.sh -m scripts.training_ui --port 8765`，使用终端打印的完整地址打开页面；远程服务器转发该端口。UI 的使用步骤见[根 README](README.md#图形界面配置和启动训练)。
+
+选择公共 baseline 并修改参数后，启动按钮会自动创建 `training_configs/experiments/<任务>/template/<用户名>/<实验名>.py`。不创建分支、不上传个人配置、不覆盖已有文件。生成文件复制 baseline 的组合代码，以 `_UI_VALUES` 固定本次参数，并记录 baseline 源码摘要；仍引用共享 recipe、本体与数据适配代码。手工编辑时可修改 `_UI_VALUES`，已有任务的续训要求文件摘要不变。续训源码清单记录公共代码及当前个人配置，其他个人配置的新增或修改不会干扰当前实验；共享逻辑应放在公共模块，不在个人实验之间交叉导入。
+
+UI 后端在 `scripts/training_ui.py`，字段校验和配置保存逻辑在 `scripts/training_ui_config.py`，静态页面在 `scripts/training_ui_web/`。不新增 Web 框架或 Node 环境依赖，使用仓库现有 Python 环境。后台通过现有 `compute_experiment_norm` / `run_training` 入口运行，保持原数据绑定检查、日志和 W&B 规则。
+
+页面只开放常用训练参数及分组采样。本体维度、LoRA 结构、TaskView/subtask 等高级改动仍按下方流程在个人 Python 配置或公共模块中定义。UI 不替代跨用户 GPU 调度；每人从自己的 clone 启动自己的服务，使用不同端口。
+
 ## 创建本地个人实验
 
 个人配置只保存在自己的 clone 中，不为它创建分支，也不上传 GitLab。以番茄-Wuji LoRA 为例：
