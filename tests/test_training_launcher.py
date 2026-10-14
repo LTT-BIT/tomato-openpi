@@ -123,6 +123,11 @@ def test_launch_writes_local_log_snapshot_and_explicit_offline_mode(prepared, mo
     assert manifest["status"] == "training_completed"
     assert manifest["wandb_mode"] == "offline"
     assert manifest["config"]["fields"]["model"]["fields"]["action_dim"] == 54
+    source = manifest["experiment_source"]
+    assert source["module"] == "training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1"
+    assert Path(source["snapshot_path"]).is_file()
+    assert source["sha256"] == reproducibility.file_sha256(Path(source["snapshot_path"]))
+    assert Path(source["snapshot_path"]).read_bytes() == Path(source["original_path"]).read_bytes()
     assert "test trainer output" in Path(manifest["log"]).read_text()
 
 

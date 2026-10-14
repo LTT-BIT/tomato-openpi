@@ -39,7 +39,7 @@ bash scripts/python.sh -m scripts.run_training "$MODULE" --check
 bash scripts/python.sh -m scripts.run_training "$MODULE" --wandb-mode offline
 ```
 
-联网时使用 `--wandb-mode online`；离线训练后按根 README 同步 W&B。多人实验先复制到 `template/<负责人>/` 并指定唯一实验名称；当前 template 保持为空。
+联网时使用 `--wandb-mode online`；离线训练后按根 README 同步 W&B。需要个人参数时，在自己的 clone 中复制到 `template/<负责人>/` 并指定唯一实验名称；个人文件由 Git 忽略，不创建分支或上传。
 
 ## 验证状态
 

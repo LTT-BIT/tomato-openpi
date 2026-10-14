@@ -216,11 +216,21 @@ def launch(config: cfg.TrainConfig, *, wandb_mode: str, inputs: dict) -> None:
     os.environ["WANDB_DIR"] = str(common.repository_root())
     os.environ["PI05_LAUNCH_ID"] = prefix.name
     revision = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False).stdout.strip()
+    module_name = config.policy_metadata["experiment_module"]
+    source_path = Path(importlib.import_module(module_name).__file__).resolve()
+    source_snapshot = prefix.with_suffix(".experiment.py")
+    source_snapshot.write_bytes(source_path.read_bytes())
     manifest = {
         "status": "starting",
         "launch_id": prefix.name,
         "started_at": stamp,
         "git_commit": revision,
+        "experiment_source": {
+            "module": module_name,
+            "original_path": str(source_path),
+            "snapshot_path": str(source_snapshot),
+            "sha256": reproducibility.file_sha256(source_snapshot),
+        },
         "wandb_mode": wandb_mode,
         "inputs": inputs,
         "config": json.loads(reproducibility.serialize_config(config)),

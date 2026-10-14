@@ -66,7 +66,7 @@ bash scripts/python.sh -m scripts.run_training "$MODULE" --wandb-mode offline
 
 包内提供[五时间戳标注](baseline/records/phase_annotations.json)，仅适用于这批 wrist_reset 数据。标注 JSON 的 `schema_version=3` 是阶段标注版本，**不是 LeRobot v3.0**。该标注保留原 episode/frame/时间戳，删除了旧机器视频绝对路径；原文件哈希见[来源记录](baseline/records/source_config.json)。
 
-复制 baseline 为个人实验后，可以替换 `config.data.base_config.task_view`：
+在本地 template 复制 baseline 后，可以替换 `config.data.base_config.task_view`；该个人文件不需要创建分支或上传：
 
 ```python
 from openpi.training.task_view import TaskView

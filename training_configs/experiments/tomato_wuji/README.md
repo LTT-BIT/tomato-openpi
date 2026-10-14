@@ -51,7 +51,7 @@ export EXP=alice_tomato_wuji_lora_s42_run01
 bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
 ```
 
-按根 README 执行新数据统计 → check → 训练；已有配套统计时跳过计算。修改数据和参数时按多人开发 README 复制为个人配置，再更新 MODULE。当前 template 为空。
+按根 README 执行新数据统计 → check → 训练；已有配套统计时跳过计算。修改数据和参数时按多人开发 README 在本地 template 复制个人配置，再更新 MODULE；无需创建分支或上传个人文件。
 
 ## 原始采集对照校验
 

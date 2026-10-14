@@ -2,9 +2,9 @@
 
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
-本页说明下载安装和运行；创建个人配置、修改公共代码及分支管理见 [多人开发 README](多人开发README.md)。
+本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。
 
-多人在同一服务器训练时，默认各自在自己的目录独立 clone、使用自己的分支；互不修改对方代码。worktree 仅用于同一个人需要额外工作目录的情况，不是必需步骤。目录和配置类的组合关系见[开发结构说明](多人开发README.md#目录与配置的组合关系)。
+多人在同一服务器训练时，各自在自己的目录独立 clone。日常训练直接使用公共 baseline，或在本地 `template/<负责人>/` 保存个人配置；个人配置已被 Git 忽略，不创建分支、不提交、不上传。只有团队决定新增或修改公共 baseline 时才进入公共开发流程。目录和配置类的组合关系见[开发结构说明](多人开发README.md#目录与配置的组合关系)。
 
 ## 500028 服务器：复用公共环境
 
@@ -93,7 +93,7 @@ bash scripts/setup_training_env.sh --local
 | 铲柠檬 | [lemon_scooping](training_configs/experiments/lemon_scooping/README.md) | 双 UR/O30 LoRA / 全参 v1 baseline；209 条有效数据全部训练 |
 | 抓取杯子 | [cup_grasping](training_configs/experiments/cup_grasping/README.md) | 单臂 Franka LoRA / 全参 v1 baseline；v2.1 数据待准备 |
 
-每个任务下的 `baseline/` 存放参考配置，`template/` 当前为空，后续按负责人保存实验。数据、统计和真实训练结果不随 Git 仓库分发。
+每个任务下的 `baseline/` 存放团队发布的参考配置，`template/` 供每个人在自己的机器上保存个人实验配置。`template/` 内容由 `.gitignore` 排除，不上传 GitLab；数据、统计和训练结果也不随仓库分发。
 
 当前八份 baseline：
 
@@ -138,7 +138,7 @@ export EXP=alice_tomato_wuji_lora_s42_run01
 bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
 ```
 
-更换方案时修改 MODULE。个人修改数据、学习率或预算时，按 [多人开发 README](多人开发README.md) 复制 baseline 为独立配置，再将 MODULE 指向个人模块。
+更换方案时修改 MODULE。个人修改数据路径、学习率或预算时，按 [多人开发 README](多人开发README.md) 在本地复制 baseline，再将 MODULE 指向本地模块；不需要创建分支或同步 GitLab。
 
 ## 数据与统计
 
@@ -169,7 +169,7 @@ CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training \
 
 `--check` 验证数据元信息、fps、维度、相机、英文 task、统计数值及数据/变换绑定，需要已有统计，不构建模型。正式启动还核对实际帧数并记录数据文件与采样审计。它们不能代替关节语义、单位及视频/动作时间对齐的验收。
 
-GPU 编号按分配修改，全局 batch 必须能被可见设备数整除；单 GPU 命令仅为示例。可临时用 `--batch-size 4` 等 CLI 参数调试，正式实验将设置写入个人模块并提交，训练期间固定该 commit。
+GPU 编号按分配修改，全局 batch 必须能被可见设备数整除；单 GPU 命令仅为示例。可临时用 `--batch-size 4` 等 CLI 参数调试，正式实验将设置写入本地个人模块。个人模块不提交；训练启动器会把它自动复制到日志目录，并在运行清单中记录文件哈希和当前公共仓库 commit。训练期间不要修改正在运行的目录。
 
 无网络时使用 `--wandb-mode offline`，本地日志和 W&B 仍保存。恢复联网后逐个同步离线段：
 
@@ -187,7 +187,7 @@ bash scripts/python.sh -m wandb sync wandb/offline-run-实际编号
 | 本地环境 | 自己电脑使用 `.venv/`；服务器使用公共环境 |
 | 缓存 | `.cache/`；JAX 编译缓存 `.cache/jax/` |
 | 数据 / 统计 | `data/`、`assets/` |
-| 本地日志及运行清单 | `logs/<配置名>/<实验名>/` |
+| 本地日志、运行清单及配置源码快照 | `logs/<配置名>/<实验名>/` |
 | checkpoint | `checkpoints/<配置名>/<实验名>/<step>/` |
 | W&B | `wandb/` |
 

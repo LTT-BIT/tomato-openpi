@@ -26,7 +26,7 @@ meta/info.json 的 observation.state 和 action 的 shape 均为 [58]，names �
 | LoRA | [tomato_fr3_sharpa_lora_v1.py](baseline/tomato_fr3_sharpa_lora_v1.py) | 30,000 步 |
 | 全参 | [tomato_fr3_sharpa_fullft_v1.py](baseline/tomato_fr3_sharpa_fullft_v1.py) | 30,000 步 |
 
-模块前缀为 `training_configs.experiments.tomato_sharpa.baseline.`。当前 `template/` 留空，只保留 `.gitkeep`；后续实验从 baseline 复制到 `template/<负责人>/`。两种方案分别引用既有 `pi05_lora_v1` 和 `pi05_fullft_v1`。LoRA 为 VLM rank 16、Expert rank 32，视觉及投影可训练；全参无 LoRA、全部参数可训练。
+模块前缀为 `training_configs.experiments.tomato_sharpa.baseline.`。个人实验可在自己的 clone 中从 baseline 复制到 `template/<负责人>/`；template 内容由 Git 忽略，不创建分支或上传。两种方案分别引用既有 `pi05_lora_v1` 和 `pi05_fullft_v1`。LoRA 为 VLM rank 16、Expert rank 32，视觉及投影可训练；全参无 LoRA、全部参数可训练。
 
 除本体定义、58 维模型投影及独立数据/统计/输出身份外，训练参数与各自 Wuji baseline 一致：全局 batch：LoRA 8、全参 64；workers 8、bfloat16、学习率 peak 2.5e-5/end 2.5e-6、warmup 1000、decay 30000、AdamW、无 EMA、epoch_shuffle、seed 42/42/42001/42002、每 2000 步保存、keep_period 10000、W&B 启用。初始权重仍为官方 pi05_base，维度不匹配的投影按现有 PartialCheckpointWeightLoader 初始化。全参预算沿用公共方案，不表示当前 Sharpa 数据恰好训练一遍。
 
@@ -59,7 +59,7 @@ export EXP=alice_tomato_sharpa_lora_s42_run01
 bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
 ```
 
-baseline 可用 `PI05_SHARPA_DATASET_ROOT` / `PI05_SHARPA_ASSETS_DIR` 覆盖路径。修改数据身份、参数及实验记录时，按多人开发 README 复制为个人配置；当前 template 为空。
+baseline 可用 `PI05_SHARPA_DATASET_ROOT` / `PI05_SHARPA_ASSETS_DIR` 覆盖路径。修改数据身份或参数时，按多人开发 README 复制本地个人配置；个人文件无需同步 GitLab。
 
 新数据按根 README 计算统计，再执行 check 并训练。统计必须是本 Sharpa 数据的 58 维统计，包含 norm_stats.json 和 norm_metadata.json；同一数据、输入变换和 horizon 可在 LoRA/全参间复用。日志、W&B offline 同步和原 commit 续训规则见根 README。
 

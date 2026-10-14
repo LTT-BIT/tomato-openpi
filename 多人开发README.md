@@ -8,13 +8,13 @@
 | --- | --- |
 | 任务协议、默认数据及训练说明 | `training_configs/experiments/<任务>/README.md` |
 | 公共参考配置 | `training_configs/experiments/<任务>/baseline/` |
-| 个人实验配置与结果记录 | `training_configs/experiments/<任务>/template/<负责人>/` |
+| 本地个人实验配置 | `training_configs/experiments/<任务>/template/<负责人>/`，Git 忽略，不上传 |
 | 公共训练方案 | `training_configs/recipes/` |
 | 本体规格和适配 | `training_configs/embodiments/`、`src/openpi/policies/` |
 | 模型、数据加载与训练循环 | `src/openpi/` |
 | 历史有效实验记录 | `docs/records/` |
 
-当前任务为 tomato_wuji、tomato_sharpa、lemon_scooping、cup_grasping，四项均已有 LoRA / 全参 baseline；数据统一要求 LeRobot v2.1。template 目录当前仅保留空占位，有真实实验时再添加文件。启动器只导入指定模块并调用 `build_config()`，无需中央注册，不会运行其他配置。
+当前任务为 tomato_wuji、tomato_sharpa、lemon_scooping、cup_grasping，四项均已有 LoRA / 全参 baseline；数据统一要求 LeRobot v2.1。日常训练直接使用 baseline。确实需要个人参数时，在本机或自己的服务器目录向 template 添加文件；这些文件由 `.gitignore` 排除，不创建分支、不提交、不上传。启动器只导入指定模块并调用 `build_config()`，无需中央注册，不会运行其他配置。
 
 ## 目录与配置的组合关系
 
@@ -38,8 +38,8 @@ training_configs/
         # 四项任务都按下面的结构组织：
         ├── README.md          # 任务协议和使用说明
         ├── baseline/          # 公共全参、LoRA 参考配置
-        └── template/          # 个人实验；当前预留空目录
-            └── <负责人>/     # 有实验时再创建
+        └── template/          # 本地个人实验；内容不进入 Git
+            └── <负责人>/     # 需要时在自己的 clone 中创建
 ```
 
 柠檬的 `baseline/common.py` 另外共享数据定义与样本选择，`baseline/records/` 保存真实来源、episode 清单和阶段标注。`records/` 中的原始参数表示历史记录，不一定等于当前 baseline 默认值。
@@ -103,20 +103,17 @@ TrainConfig
 | 训练算法、采样或保存行为 | scripts/train.py、src/openpi/training 等共享代码 |
 | 使用本地还是公共 Python 环境 | scripts/python.sh 的选择规则和 PI05_SHARED_ENV；不放在实验参数中 |
 
-## 创建个人实验
+## 创建本地个人实验
 
-在自己的独立仓库中建立短期分支；以下操作不要在正在训练的目录执行。以番茄-Wuji LoRA 为例：
+个人配置只保存在自己的 clone 中，不为它创建分支，也不上传 GitLab。以番茄-Wuji LoRA 为例：
 
 ```bash
-git switch main
-git pull --ff-only
-git switch -c exp/alice-tomato-lora
 mkdir -p training_configs/experiments/tomato_wuji/template/alice
-touch training_configs/experiments/tomato_wuji/template/__init__.py \
-  training_configs/experiments/tomato_wuji/template/alice/__init__.py
 cp training_configs/experiments/tomato_wuji/baseline/tomato_fr3_lora_v1.py \
   training_configs/experiments/tomato_wuji/template/alice/tomato_lora_lr1e5.py
 ```
+
+Python 可以直接导入该目录，不需要添加 `__init__.py`。`.gitignore` 已排除 template 下的个人文件；用 `git status` 不应看到它们。不要使用 `git add -f` 强制提交。
 
 在同一个文件中修改 `build_dataset()` 的数据版本、root、repo_id、真实来源、asset_id、统计父目录和 prompt 示例。路径用 `repository_root() / "data/..."` 或 `"assets/..."`，换机器时可直接修改个人配置或使用自己定义的环境变量。
 
@@ -148,19 +145,19 @@ bash scripts/python.sh -m scripts.run_training \
   training_configs.experiments.tomato_wuji.template.alice.tomato_lora_lr1e5 --dry-run
 ```
 
-数据和统计准备后执行 `--check`，通过后提交配置，再固定 commit 启动训练。实验名建议 `<负责人>_<任务>_<方案>_s<seed>_run<编号>`，新运行另用编号。
+数据和统计准备后执行 `--check`，通过后直接启动训练。个人配置不提交；启动器会在日志目录自动保存个人配置源码副本，并在运行清单中记录源码哈希、公共仓库 commit 和最终展开配置。实验名建议 `<负责人>_<任务>_<方案>_s<seed>_run<编号>`，新运行另用编号。
 
 ## 公共方案和本体变更
 
-公共 recipe 按版本发布，旧实验保留原引用；新学习率、batch 或预算先写在个人配置中。公共 bug 修复通过独立合并请求，说明行为影响。模型变体变化需要重建 freeze_filter，不能仅通过 CLI 改变变体。原始基准参数快照保留在 [tests/fixtures/baselines](tests/fixtures/baselines/README.md)，不能从新实现重新生成期望值来掩盖回归。
+公共 recipe 按版本发布，旧实验保留原引用；新学习率、batch 或预算可先在本地个人配置中验证。确认需要让所有人复用时，先讨论数据身份、参数和命名，再由维护者新增或升级 baseline。公共 bug 修复和 baseline 变更通过独立合并请求，说明行为影响。模型变体变化需要重建 freeze_filter，不能仅通过 CLI 改变变体。原始基准参数快照保留在 [tests/fixtures/baselines](tests/fixtures/baselines/README.md)，不能从新实现重新生成期望值来掩盖回归。
 
 新本体实现 `recipes/common.py` 的 Embodiment 接口，提供 action_dim、raw_state_dims、action_hz、camera_keys 和 data_config()。数据工厂须提供 `create_vector_transforms(model_config)`，使统计与训练复用同一输入变换；改维度、关节顺序、单位或相机时补充对应适配与验证，不能只修改数字。当前标准入口要求一个显式本地 LeRobot 数据集。
 
 `log_interval`、`save_interval`、`action_horizon` 必须为正整数；`keep_period` 为 None 或正整数。改数据、输入变换或 horizon 后重算统计，单纯修改学习率和 batch 可复用配套统计。
 
-## 分支、验证与合并
+## 公共代码的分支、验证与合并
 
-使用 `exp/<负责人>-<主题>`、`feat/<功能>`、`fix/<问题>` 短期分支，验证后提合并请求进入 main。个人实验不混入公共 recipe 改动；公共功能单独评审。合并后删除短期分支，不按本体或个人长期维护分叉。
+本地个人配置不使用分支。只有新增 baseline、修改公共 recipe、本体适配或训练代码时，维护者才使用 `feat/<功能>`、`fix/<问题>` 等短期分支，验证后合入 main。合并后删除短期分支，不按本体或个人长期维护分叉。
 
 配置改动执行 dry-run，有真实数据和统计时执行 check；共享代码变更运行相关回归，完整本地检查为：
 
@@ -174,14 +171,14 @@ bash scripts/check_training.sh
 
 ## 多人训练与有效记录
 
-**默认每人独立 clone 到自己的目录，各自使用自己的分支，不要求使用 worktree。** 例如：
+**默认每人独立 clone 到自己的目录，日常训练停留在相同的稳定 main，不要求创建分支或使用 worktree。** 例如：
 
 ```text
 /home/zhiwei/workspace/tomato-openpi/     # zhiwei 的代码和输出
 /home/pengyang/workspace/tomato-openpi/   # pengyang 的代码和输出
 ```
 
-两份 clone 来自同一 GitLab 仓库，也各自拥有独立文件和 Git 状态。一个人在自己的目录切分支、拉代码，不会改动另一个人的目录。分支本身不能隔离同一个目录里的文件：多人若共用同一代码目录，任何人执行 `git switch` 都会改变这个目录。
+两份 clone 来自同一 GitLab 仓库，也各自拥有独立文件和 Git 状态。个人 template 配置只存在于各自目录，互不影响，也不需要 GitLab 同步。不要多人共用同一个代码目录。
 
 训练期间保持**正在训练的那份目录**不变，不在其中切分支、拉代码或编辑源码。已加载的 Python 代码通常不会自动更新，但后续导入、创建 worker、读取文件或重启续训可能接触到新内容。其他独立目录可以正常开发。
 
@@ -205,7 +202,7 @@ bash scripts/python.sh -m scripts.run_training \
 
 新 worktree 不会自动复制原目录里未跟踪的数据、统计、日志或本地 `.venv`；正式训练前需单独准备数据与统计。自己的电脑可在新目录执行 `bash scripts/setup_training_env.sh --local`。不要删除仍有进程使用的工作目录。
 
-实验配置及其旁边的结果记录只保留可核对的信息：数据生产来源和版本、源码 commit、配置名、实验名、统计身份/摘要、实际英文 prompt、关键参数、checkpoint、W&B run，以及指标与评估条件。缺失项明确写未记录。区分数据准备完成、训练完成、实机验证；配置检查通过不能写成训练完成，训练 loss 不能代替任务成功率。
+个人配置虽然不上传，启动器仍会随本地日志自动保存其源码副本。训练记录还需保留可核对的信息：数据生产来源和版本、公共源码 commit、配置名、实验名、统计身份/摘要、实际英文 prompt、关键参数、checkpoint、W&B run，以及指标与评估条件。缺失项明确写未记录。区分数据准备完成、训练完成、实机验证；配置检查通过不能写成训练完成，训练 loss 不能代替任务成功率。
 
 训练同时保存本地日志并启用 W&B；无法联网明确用 offline，联网后逐段 sync。精确续训保持原 commit、配置、数据和完整 checkpoint；模块移动或新增配置也可能改变源码审计，因此运行期间固定整个 checkout。详细输出和续训步骤见仓库 README。
 
