@@ -32,6 +32,8 @@ import openpi.training.droid_rlds_dataset as droid_rlds_dataset
 import openpi.training.misc.polaris_config as polaris_config
 import openpi.training.misc.roboarena_config as roboarena_config
 import openpi.training.optimizer as _optimizer
+from openpi.training.sampling import SamplingGroup
+from openpi.training.sampling import validate_groups
 from openpi.training.task_view import TaskView
 import openpi.training.weight_loaders as weight_loaders
 import openpi.transforms as _transforms
@@ -737,7 +739,9 @@ class TrainConfig:
     augmentation_seed: int | None = None
     # epoch_shuffle: one LeRobot dataset, shuffled without replacement, full fixed-size batches.
     # Legacy configurations retain their existing weighted/random sampler.
-    sampling_mode: Literal["legacy", "epoch_shuffle"] = "legacy"
+    sampling_mode: Literal["legacy", "epoch_shuffle", "weighted_replacement"] = "legacy"
+    # Explicit episode groups within the single prepared dataset. Empty for epoch_shuffle.
+    sampling_groups: tuple[SamplingGroup, ...] = ()
     # Global batch size.
     batch_size: int = 32
     # Number of workers to use for the data loader. Increasing this number will speed up data loading but
@@ -794,8 +798,12 @@ class TrainConfig:
             value = getattr(self, name)
             if value is not None and not 0 <= value < 2**32:
                 raise ValueError(f"{name} must be in [0, 2**32), got {value}")
-        if self.sampling_mode not in ("legacy", "epoch_shuffle"):
+        if self.sampling_mode not in ("legacy", "epoch_shuffle", "weighted_replacement"):
             raise ValueError(f"Unknown sampling mode: {self.sampling_mode}")
+        if self.sampling_mode == "weighted_replacement":
+            validate_groups(self.sampling_groups)
+        elif self.sampling_groups:
+            raise ValueError("sampling_groups requires weighted_replacement mode")
         if self.batch_size <= 0 or self.num_train_steps <= 0:
             raise ValueError("batch_size and num_train_steps must be positive")
         for name in ("log_interval", "save_interval"):

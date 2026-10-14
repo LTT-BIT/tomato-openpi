@@ -12,7 +12,9 @@ import pytest
 from openpi.models import model as model_lib
 from openpi.training import checkpoints
 from openpi.training import config
+from openpi.training import data_loader
 from openpi.training import optimizer
+from openpi.training import sampling
 from openpi.training import utils
 from scripts import train
 
@@ -36,7 +38,8 @@ class TinyModel(model_lib.BaseModel):
 
 
 @pytest.mark.parametrize("scheduled", [False, True])
-def test_interrupted_training_matches_uninterrupted(tmp_path, monkeypatch, scheduled):
+@pytest.mark.parametrize("mode", sampling.PLAN_MODES)
+def test_interrupted_training_matches_uninterrupted(tmp_path, monkeypatch, scheduled, mode):
     states = {}
     real_save = checkpoints.save_state
     real_session = train.tracking.session
@@ -88,6 +91,18 @@ def test_interrupted_training_matches_uninterrupted(tmp_path, monkeypatch, sched
         save_interval=1,
         log_interval=1,
     )
+    if mode == "weighted_replacement":
+        import datasets
+
+        create_source = data_loader.create_torch_dataset
+
+        def fake_source(*args, **kwargs):
+            source = create_source(*args, **kwargs)
+            source.hf_dataset = datasets.Dataset.from_dict({"episode_index": [0] * len(source)})
+            return source
+
+        monkeypatch.setattr(data_loader, "create_torch_dataset", fake_source)
+        cfg = dataclasses.replace(cfg, sampling_mode=mode, sampling_groups=(sampling.SamplingGroup("all", (0,), 1),))
     if scheduled:
         cfg = config.ScheduledTrainConfig(
             **{field.name: getattr(cfg, field.name) for field in dataclasses.fields(cfg)},

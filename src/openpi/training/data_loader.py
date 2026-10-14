@@ -53,6 +53,9 @@ class DataLoader(Protocol[T_co]):
     def prepare_reproducibility(self, config: _config.TrainConfig, *, resuming: bool) -> dict:
         """Save or verify the deterministic sampling contract."""
 
+    def sampling_progress(self, completed_steps: int) -> dict:
+        """Report actual consumed sample coverage from a deterministic plan."""
+
     def data_config(self) -> _config.DataConfig:
         """Get the data config for this data loader."""
         raise NotImplementedError("Subclasses of DataLoader should implement data_config.")
@@ -264,12 +267,14 @@ def create_torch_dataset(
         raise ValueError("Repo ID is not set. Cannot create dataset.")
     if repo_id == "fake":
         return FakeDataset(model_config, num_samples=1024)
-    if sampling_mode == "epoch_shuffle" and (
+    if sampling_mode in _sampling.PLAN_MODES and (
         data_config.local_dataset_loader is not None
         or len(data_config.lerobot_datasets) != 1
         or data_config.lerobot_datasets[0].root is None
     ):
-        raise ValueError("epoch_shuffle requires exactly one standard LeRobot dataset with an explicit local root")
+        raise ValueError(
+            "Deterministic sampling requires exactly one standard LeRobot dataset with an explicit local root"
+        )
     if data_config.local_dataset_loader is not None and data_config.lerobot_datasets:
         raise ValueError("Weighted LeRobot datasets do not support local_dataset_loader")
     if data_config.local_dataset_loader is not None:
@@ -311,7 +316,7 @@ def create_torch_dataset(
 
     datasets_and_meta = [create_one(spec.repo_id, spec.root) for spec in data_config.lerobot_datasets]
     datasets = [item[0] for item in datasets_and_meta]
-    if sampling_mode == "epoch_shuffle":
+    if sampling_mode in _sampling.PLAN_MODES:
         return datasets[0]
     metas = [item[1] for item in datasets_and_meta]
     reference = metas[0]
@@ -429,8 +434,10 @@ def create_data_loader(
     data_config = config.data.create(config.assets_dirs, config.model)
     logging.info(f"data_config: {data_config}")
 
-    if config.sampling_mode == "epoch_shuffle" and (framework != "jax" or data_config.rlds_data_dir is not None):
-        raise ValueError("epoch_shuffle currently supports the JAX training entry point with a LeRobot dataset")
+    if config.sampling_mode in _sampling.PLAN_MODES and (framework != "jax" or data_config.rlds_data_dir is not None):
+        raise ValueError(
+            "Deterministic sampling currently supports the JAX training entry point with a LeRobot dataset"
+        )
     if framework != "jax" and (config.model_seed is not None or config.augmentation_seed is not None):
         raise ValueError("Independent model/augmentation seeds currently require the JAX training entry point")
 
@@ -458,6 +465,7 @@ def create_data_loader(
         skip_norm_stats=skip_norm_stats,
         framework=framework,
         sampling_mode=config.sampling_mode,
+        sampling_groups=config.sampling_groups,
         num_train_steps=config.num_train_steps,
     )
 
@@ -476,6 +484,7 @@ def create_torch_data_loader(
     seed: int = 0,
     framework: str = "jax",
     sampling_mode: str = "legacy",
+    sampling_groups: tuple[_sampling.SamplingGroup, ...] = (),
     num_train_steps: int | None = None,
 ) -> DataLoader[tuple[_model.Observation, _model.Actions]]:
     """Create a data loader for training.
@@ -500,6 +509,14 @@ def create_torch_data_loader(
     dataset = create_torch_dataset(data_config, action_horizon, model_config, sampling_mode=sampling_mode)
     source_dataset = dataset
     sample_weights = getattr(dataset, "sample_weights", None)
+    if sampling_mode == "weighted_replacement":
+        source = source_dataset
+        while isinstance(source, TransformedDataset):
+            source = source._dataset  # noqa: SLF001
+        episode_ids = source.hf_dataset.select_columns(["episode_index"]).with_format("numpy")[:]["episode_index"]
+        sample_weights = _sampling.group_frame_weights(episode_ids, sampling_groups)
+    elif sampling_groups:
+        raise ValueError("sampling_groups requires weighted_replacement mode")
     dataset = transform_dataset(dataset, data_config, skip_norm_stats=skip_norm_stats)
 
     # Use TorchDataLoader for both frameworks
@@ -641,12 +658,19 @@ class TorchDataLoader:
 
         generator = torch.Generator()
         generator.manual_seed(seed)
-        if sampling_mode == "epoch_shuffle":
-            if sampler is not None or sample_weights is not None or num_train_steps is None:
+        if sampling_mode in _sampling.PLAN_MODES:
+            if sampler is not None or num_train_steps is None:
+                raise ValueError("Deterministic sampling requires num_train_steps and no external sampler")
+            if sampling_mode == "epoch_shuffle" and sample_weights is not None:
                 raise ValueError("epoch_shuffle requires num_train_steps and cannot be combined with weighted sampling")
-            self.plan_sampler = _sampling.PlanSampler(
-                _sampling.epoch_shuffle_indices(len(dataset), seed=seed, num_samples=num_train_steps * local_batch_size)
-            )
+            budget = num_train_steps * local_batch_size
+            if sampling_mode == "weighted_replacement":
+                if sample_weights is None or len(sample_weights) != len(dataset):
+                    raise ValueError("weighted_replacement requires one weight per loaded frame")
+                plan = _sampling.weighted_replacement_indices(sample_weights, seed=seed, num_samples=budget)
+            else:
+                plan = _sampling.epoch_shuffle_indices(len(dataset), seed=seed, num_samples=budget)
+            self.plan_sampler = _sampling.PlanSampler(plan)
             sampler = self.plan_sampler
         elif sampling_mode != "legacy":
             raise ValueError(f"Unknown sampling mode: {sampling_mode}")
@@ -699,7 +723,7 @@ class TorchDataLoader:
 
     def seek(self, completed_steps: int) -> None:
         if self.plan_sampler is None:
-            raise ValueError("Exact sample-position resume requires epoch_shuffle")
+            raise ValueError("Exact sample-position resume requires deterministic sampling")
         self.plan_sampler.seek(completed_steps * self._local_batch_size)
 
 
@@ -786,12 +810,24 @@ class DataLoaderImpl(DataLoader):
             raise ValueError("Exact sample-position resume requires TorchDataLoader")
         self._data_loader.seek(completed_steps)
 
+    def sampling_progress(self, completed_steps: int) -> dict:
+        loader = self._data_loader
+        if not isinstance(loader, TorchDataLoader) or loader.plan_sampler is None:
+            raise ValueError("Sampling progress requires deterministic sampling")
+        consumed = completed_steps * loader._local_batch_size  # noqa: SLF001
+        unique = loader.plan_sampler.unique_count(consumed)
+        return {
+            "sampling/consumed_samples": consumed,
+            "sampling/consumed_unique_frames": unique,
+            "sampling/consumed_coverage": unique / len(self._source_dataset),
+        }
+
     def prepare_reproducibility(self, config: _config.TrainConfig, *, resuming: bool) -> dict:
         from openpi.training import reproducibility
 
         loader = self._data_loader
         if not isinstance(loader, TorchDataLoader) or loader.plan_sampler is None:
-            raise ValueError("Sampling audit requires epoch_shuffle")
+            raise ValueError("Sampling audit requires deterministic sampling")
         source = self._source_dataset
         while isinstance(source, TransformedDataset):
             source = source._dataset  # noqa: SLF001 -- unwrap our length-preserving transforms

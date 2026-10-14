@@ -85,6 +85,7 @@ TrainConfig
 │       └── task_view             使用 TaskDataConfig 时才有
 ├── lr_schedule                   学习率计划
 ├── optimizer                     优化器设置
+├── sampling_mode / sampling_groups 默认打乱循环，或按 episode 分组有放回采样
 ├── weight_loader                 基础权重加载方式与路径
 └── batch_size / num_train_steps / exp_name / …
 ```
@@ -98,6 +99,7 @@ TrainConfig
 | 某次实验的 batch、学习率、步数、实验名、基础权重 | 自己的 `template/<负责人>/<实验>.py` 中 build_config，用 replace 覆盖 |
 | 数据目录、数据身份和统计位置 | 该实验的 build_dataset；柠檬独立实验需要独立数据定义时复制公共定义到个人文件 |
 | subtask、真实训练 prompt | 个人配置中的 TaskDataConfig / TaskView，或数据任务标签；不是 Dataset.prompt_example |
+| A/B 采样比例、是否使用分组有放回采样 | 个人配置中的 sampling_mode / sampling_groups，见下方示例 |
 | 所有人共用的默认训练方案 | recipes，通过公共变更评审 |
 | 新本体或关节、相机、动作语义 | embodiments 及对应数据工厂、policies 变换；补充协议验证 |
 | 训练算法、采样或保存行为 | scripts/train.py、src/openpi/training 等共享代码 |
@@ -146,6 +148,35 @@ bash scripts/python.sh -m scripts.run_training \
 ```
 
 数据和统计准备后执行 `--check`，通过后直接启动训练。个人配置不提交；启动器会在日志目录自动保存个人配置源码副本，并在运行清单中记录源码哈希、公共仓库 commit 和最终展开配置。实验名建议 `<负责人>_<任务>_<方案>_s<seed>_run<编号>`，新运行另用编号。
+
+## 可选 A/B 采样比例
+
+默认 baseline 保持 `sampling_mode="epoch_shuffle"`、`sampling_groups=()`：每个有效帧作为一个动作窗口起点，一轮无放回打乱，取完再开始下一轮。A/B 占比自然由各自的有效帧数决定。
+
+需要 A:B=7:3 时，在本地个人配置的 `build_config()` 中，把原来的 `return build_recipe(...)` 改为 `config = build_recipe(...)`，并返回以下覆盖值。文件顶部增加两个 import：
+
+```python
+from dataclasses import replace
+from openpi.training.sampling import SamplingGroup
+
+# 在 build_config() 中创建 config 后：
+return replace(
+    config,
+    sampling_mode="weighted_replacement",
+    sampling_groups=(
+        SamplingGroup(name="A", episodes=(0, 2, 4), weight=7),
+        SamplingGroup(name="B", episodes=(1, 3, 5), weight=3),
+    ),
+)
+```
+
+这里的 0–5 **只是六条 episode 的示例**，必须换成当前合并数据集 `meta/episodes.jsonl` 中已确认的 `episode_index`。这不是原始采集文件夹名称中的编号。支持任意多个分组；每个权重必须有限且大于零。分组必须互不重叠，并覆盖全部有效训练 episode；缺漏、重复或不存在的编号会报错。使用 TaskView 时以视图选出的有效 episode 为准。当前接口用于单个已准备好的 LeRobot 数据集内部的分组，不会读取 `sources` 去合并多个目录，也不根据路径或 prompt 猜测 A/B。
+
+权重表示组的总采样概率：7/3 和 0.7/0.3 等价。组内每个有效帧窗口等概率抽取，因此长 episode 被抽中的机会更多。采样有放回，同一帧可以重复出现；长期比例接近 70%/30%，不保证每个 batch 精确配额，也不保证一轮覆盖全部数据。要恢复默认行为，将模式改回 `epoch_shuffle` 并清空 `sampling_groups`。
+
+统计仍覆盖所有有效训练帧，不按 A/B 权重重复计算；只改采样权重时可以复用通过绑定校验的归一化统计。更换数据、任务视图或动作变换则重新计算统计。权重、分组、种子或模式变化都应使用新实验名，不能直接续训旧实验。
+
+`--check` 会校验分组并显示概率；训练前根据 `data_seed` 生成固定计划，总抽样次数为 `num_train_steps × batch_size`。计划随 checkpoint 的 `reproducibility/` 保存，续训从已完成步数继续；`summary.json` 记录各组实际计划抽样数，日志和 W&B 记录实际独立帧覆盖率。现有 baseline 不启用该可选功能。
 
 ## 公共方案和本体变更
 

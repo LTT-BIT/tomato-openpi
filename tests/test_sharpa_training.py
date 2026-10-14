@@ -158,12 +158,21 @@ def test_preflight_rejects_same_dimension_wrong_joint_order(tmp_path, monkeypatc
         run_training.preflight(config, require_norm=False)
 
 
-def test_real_sharpa_lerobot_videos_windows_and_shared_statistics(tmp_path, monkeypatch):
+@pytest.mark.parametrize("sampling_mode", ["epoch_shuffle", "weighted_replacement"])
+def test_real_sharpa_lerobot_videos_windows_and_shared_statistics(tmp_path, monkeypatch, sampling_mode):
     from lerobot.common.datasets import lerobot_dataset
 
     monkeypatch.setattr(common, "repository_root", lambda: tmp_path)
     config = run_training.load_experiment(BASE + "tomato_fr3_sharpa_lora_v1")
     config = replace(config, model=replace(config.model, action_horizon=3))
+    from openpi.training.sampling import SamplingGroup
+
+    if sampling_mode == "weighted_replacement":
+        config = replace(
+            config,
+            sampling_mode=sampling_mode,
+            sampling_groups=(SamplingGroup("A", (0,), 7), SamplingGroup("B", (1,), 3)),
+        )
     root = Path(config.data.lerobot_datasets[0].root)
     features = {
         "observation.state": {"dtype": "float32", "shape": (58,), "names": list(protocol.ORDER)},
@@ -211,6 +220,14 @@ def test_real_sharpa_lerobot_videos_windows_and_shared_statistics(tmp_path, monk
     np.testing.assert_array_equal(reference[3]["action"], np.stack([targets[3], targets[4], targets[4]]))
     compute_norm_stats.compute(config, batch_size=2)
     assert run_training.preflight(config)["norm_provenance"] == "verified"
+    if sampling_mode == "weighted_replacement":
+        check = run_training.preflight(config)
+        assert [group["probability"] for group in check["sampling"]["groups"]] == pytest.approx([0.7, 0.3])
+        weighted_config = replace(config, num_workers=0, num_train_steps=2000)
+        loader = data_loader.create_data_loader(weighted_config)
+        summary = loader.prepare_reproducibility(weighted_config, resuming=False)
+        total = sum(summary["group_samples"].values())
+        assert summary["group_samples"]["A"] / total == pytest.approx(0.7, abs=0.02)
     fullft = run_training.load_experiment(BASE + "tomato_fr3_sharpa_fullft_v1")
     fullft = replace(fullft, model=replace(fullft.model, action_horizon=3))
     assert run_training.preflight(fullft)["norm_provenance"] == "verified"

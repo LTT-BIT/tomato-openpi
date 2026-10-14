@@ -27,6 +27,7 @@ from openpi.shared import normalize
 from openpi.training import config as cfg
 from openpi.training import norm_provenance
 from openpi.training import reproducibility
+from openpi.training import sampling
 from training_configs import common
 
 
@@ -57,8 +58,8 @@ def validate_config(config: cfg.TrainConfig) -> None:
         raise ValueError("Use a new exp_name instead of overwriting a shared experiment")
     if not config.wandb_enabled:
         raise ValueError("Training must log to W&B; use --wandb-mode offline without network")
-    if config.sampling_mode != "epoch_shuffle" or len(config.data.lerobot_datasets) != 1:
-        raise ValueError("The v1 baseline workflow requires epoch_shuffle and one explicit local dataset")
+    if config.sampling_mode not in sampling.PLAN_MODES or len(config.data.lerobot_datasets) != 1:
+        raise ValueError("The v1 baseline workflow requires deterministic sampling and one explicit local dataset")
     if config.batch_size <= 0 or config.num_train_steps <= 0 or config.num_workers < 0 or config.fsdp_devices <= 0:
         raise ValueError("batch_size, num_train_steps, fsdp_devices must be positive; num_workers must be nonnegative")
     if any(seed is None for seed in (config.model_seed, config.data_seed, config.augmentation_seed)):
@@ -134,6 +135,26 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
         result["training_episodes"] = len(np.unique(selected.ids[:, 0]))
         result["task_view"] = view.identity()
         result["effective_prompt_examples"] = [selected.vectors(i)["prompt"] for i in (0, len(selected) - 1)]
+    if config.sampling_mode == "weighted_replacement":
+        if view is not None:
+            episode_ids = selected.ids[:, 0]
+        else:
+            episodes = [json.loads(line) for line in required[1].read_text().splitlines() if line.strip()]
+            episode_ids = np.array([row["episode_index"] for row in episodes], dtype=np.int64)
+        sampling.group_frame_weights(episode_ids, config.sampling_groups)
+        max_weight = max(group.weight for group in config.sampling_groups)
+        total_weight = sum(group.weight / max_weight for group in config.sampling_groups)
+        result["sampling"] = {
+            "mode": config.sampling_mode,
+            "groups": [
+                {
+                    "name": group.name,
+                    "episodes": list(group.episodes),
+                    "probability": (group.weight / max_weight) / total_weight,
+                }
+                for group in config.sampling_groups
+            ],
+        }
     if require_norm:
         norm_path = norm_dir / "norm_stats.json"
         digest = reproducibility.file_sha256(norm_path)

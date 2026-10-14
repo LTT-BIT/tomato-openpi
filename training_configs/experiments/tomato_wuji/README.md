@@ -28,7 +28,7 @@
 | 默认实验名 | `tomato_fulltask_lora_v1_absolute_30hz_s42` | `tomato_all_full_fullft_v1_absolute_30hz_s42` |
 | 准备状态 | 占位；原记录未确认数据准备或训练完成 | 历史数据已准备、训练已完成；新机器需迁移 |
 
-路径相对于仓库根目录。LoRA 的 sources 默认为数据目录；全参历史来源为 `data/harvest-tomato/0925/A`、`0925/B`、`1002_AB_190/full`，441 episode、481,223 帧。记录 sources 不会自动转换或合并数据。
+路径相对于仓库根目录。LoRA 的 sources 默认为数据目录；全参历史来源为 `data/harvest-tomato/0925/A`、`0925/B`、`1002_AB_190/full`，441 episode、481,223 帧。记录 sources 不会自动转换或合并数据。默认采样不指定 A/B 比例；要按 7:3 等权重有放回采样，在本地个人配置设置分组，见[采样接口](../../../多人开发README.md#可选-ab-采样比例)。
 
 可选本机覆盖变量：LoRA 为 `PI05_FULLTASK_DATASET_ROOT` / `PI05_FULLTASK_ASSETS_DIR`；全参为 `PI05_ALL_FULL_DATASET_ROOT` / `PI05_ALL_FULL_ASSETS_DIR`，来源父目录为 `PI05_SOURCE_DATA_DIR`。旧 `PI05_V2_*` / `PI05_V3_*` 不再使用。个人实验可直接修改自己的路径，不必沿用公共基准的变量名。
 

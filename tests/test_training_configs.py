@@ -1,6 +1,7 @@
 """Guard baseline equivalence, real parameter freezing, and owner isolation."""
 
 from dataclasses import replace
+import importlib
 import json
 from pathlib import Path
 
@@ -10,6 +11,7 @@ import pytest
 
 from openpi.training import config as cfg
 from openpi.training.reproducibility import serialize_config
+from openpi.training.sampling import SamplingGroup
 from scripts.run_training import load_experiment
 from scripts.run_training import resolve_experiment
 from scripts.run_training import validate_config
@@ -43,6 +45,7 @@ def test_composition_preserves_baseline_training_semantics(module):
     old_assets["asset_id"] = old_assets["asset_id"].replace("_v1_30hz", "_v1_absolute_30hz")
     assert current_values == {
         **snapshot["config_fields"],
+        "sampling_groups": [],
         "num_train_steps": 30_000,
         "batch_size": 8 if "lora" in module else 64,
     }
@@ -131,6 +134,26 @@ def test_personal_override_does_not_mutate_baseline(monkeypatch, make_personal_e
     overridden = resolve_experiment(BASE + "tomato_fr3_lora_v1", ["--batch-size", "4", "--exp-name", "alice_run01"])
     assert overridden.batch_size == 4
     assert baseline.batch_size == 8
+
+
+def test_personal_sampling_groups_survive_cli(monkeypatch, make_personal_experiment):
+    module_name = make_personal_experiment(BASE + "tomato_fr3_lora_v1")
+    module = importlib.import_module(module_name)
+    config = replace(
+        module.build_config(),
+        sampling_mode="weighted_replacement",
+        sampling_groups=(
+            SamplingGroup(name="A", episodes=(0, 2), weight=7),
+            SamplingGroup(name="B", episodes=(1, 3), weight=3),
+        ),
+    )
+    monkeypatch.setattr(module, "build_config", lambda: config)
+    resolved = resolve_experiment(module_name, ["--exp-name", "weighted_trial", "--batch-size", "4"])
+    assert resolved.sampling_mode == "weighted_replacement"
+    assert resolved.sampling_groups == config.sampling_groups
+    assert resolved.exp_name == "weighted_trial"
+    assert resolved.batch_size == 4
+    assert load_experiment(BASE + "tomato_fr3_lora_v1").sampling_groups == ()
 
 
 def test_recipe_accepts_another_embodiment_without_fr3_dimension():

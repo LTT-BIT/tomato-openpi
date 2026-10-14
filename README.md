@@ -128,6 +128,8 @@ bash scripts/setup_training_env.sh --local
 | 日志 / checkpoint | log_interval=10、save_interval=2,000、keep_period=10,000 |
 | W&B | 启用，project=openpi；联网 online，离线显式 offline |
 
+需要 A/B 按 7:3 等比例有放回采样时，只需在本地个人配置中设置 `sampling_mode="weighted_replacement"` 和 `sampling_groups`，见[采样配置示例](多人开发README.md#可选-ab-采样比例)。不设置时沿用 baseline 的逐轮打乱采样。
+
 LoRA 和全参默认均训练 30,000 步，学习率计划的 decay_steps 同为 30,000；步数不随数据量自动调整。个人实验可按实际训练计划覆盖。
 
 以下以 Wuji LoRA 为例，选择模块并展开配置，无需数据、权重或 GPU：

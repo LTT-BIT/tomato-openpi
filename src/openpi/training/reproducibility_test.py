@@ -101,3 +101,33 @@ def test_stable_object_serialization():
             self.max_len = 256
 
     assert reproducibility._json_bytes(Tokenizer()) == reproducibility._json_bytes(Tokenizer())  # noqa: SLF001
+
+
+@pytest.mark.parametrize("change", ["ratio", "membership", "mode"])
+def test_weighted_plan_audit_and_resume_reject_changes(run_inputs, change):
+    cfg, data, source, _ = run_inputs
+    cfg = dataclasses.replace(
+        cfg,
+        sampling_mode="weighted_replacement",
+        sampling_groups=(sampling.SamplingGroup("A", (0,), 7), sampling.SamplingGroup("B", (1,), 3)),
+    )
+    weights = sampling.group_frame_weights(source.hf_dataset["episode_index"], cfg.sampling_groups)
+    plan = sampling.weighted_replacement_indices(weights, seed=42, num_samples=8)
+    summary = reproducibility.prepare_run(cfg, data, source, plan, resuming=False)
+    assert summary["sampler_version"] == sampling.WEIGHTED_SAMPLER_VERSION
+    assert summary["steps_for_first_pass"] is None
+    assert sum(summary["group_samples"].values()) == len(plan)
+    assert summary["group_samples"]["A"] == int((plan == 2).sum())
+    assert reproducibility.prepare_run(cfg, data, source, plan, resuming=True) == summary
+    if change == "ratio":
+        cfg = dataclasses.replace(
+            cfg, sampling_groups=(sampling.SamplingGroup("A", (0,), 3), sampling.SamplingGroup("B", (1,), 7))
+        )
+    elif change == "membership":
+        cfg = dataclasses.replace(
+            cfg, sampling_groups=(sampling.SamplingGroup("A", (1,), 7), sampling.SamplingGroup("B", (0,), 3))
+        )
+    else:
+        cfg = dataclasses.replace(cfg, sampling_mode="epoch_shuffle", sampling_groups=())
+    with pytest.raises(ValueError, match="contract changed"):
+        reproducibility.prepare_run(cfg, data, source, plan, resuming=True)

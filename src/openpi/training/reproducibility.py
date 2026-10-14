@@ -171,7 +171,11 @@ def prepare_run(
     norm_bytes = _json_bytes(data_config.norm_stats)
     dataset_bytes = _json_bytes(dataset)
     contract = {
-        "sampler_version": sampling.SAMPLER_VERSION,
+        "sampler_version": (
+            sampling.WEIGHTED_SAMPLER_VERSION
+            if config.sampling_mode == "weighted_replacement"
+            else sampling.SAMPLER_VERSION
+        ),
         "training": _training_contract(config, data_config),
         "dataset_sha256": hashlib.sha256(dataset_bytes).hexdigest(),
         "norm_sha256": hashlib.sha256(norm_bytes).hexdigest(),
@@ -180,16 +184,29 @@ def prepare_run(
     }
     unique = len(np.unique(indices))
     summary = {
-        "sampler_version": sampling.SAMPLER_VERSION,
+        "sampler_version": (
+            sampling.WEIGHTED_SAMPLER_VERSION
+            if config.sampling_mode == "weighted_replacement"
+            else sampling.SAMPLER_VERSION
+        ),
         "total_samples": len(indices),
         "dataset_frames": len(source),
         "planned_unique_frames": unique,
         "planned_coverage": unique / len(source),
-        "steps_for_first_pass": (len(source) + config.batch_size - 1) // config.batch_size,
+        "steps_for_first_pass": (
+            (len(source) + config.batch_size - 1) // config.batch_size
+            if config.sampling_mode == "epoch_shuffle"
+            else None
+        ),
         "dataset_sha256": contract["dataset_sha256"],
         "norm_sha256": contract["norm_sha256"],
         "plan_indices_sha256": contract["plan_indices_sha256"],
     }
+    if config.sampling_mode == "weighted_replacement":
+        sampling.group_frame_weights(frame_ids[:, 0], config.sampling_groups)
+        summary["group_samples"] = {
+            group.name: int(np.isin(frame_ids[indices, 0], group.episodes).sum()) for group in config.sampling_groups
+        }
     directory = pathlib.Path(config.checkpoint_dir) / "reproducibility"
     if directory.exists():
         manifest = json.loads((directory / "manifest.json").read_text())

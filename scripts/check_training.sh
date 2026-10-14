@@ -17,13 +17,16 @@ mkdir -p .cache/ci
 uv lock --check --offline
 CHECK_PATHS=(
   training_configs tests
-  scripts/run_training.py scripts/compute_experiment_norm.py scripts/train.py
+  scripts/run_training.py scripts/compute_experiment_norm.py scripts/train.py scripts/train_reproducibility_test.py
   src/openpi/training/norm_provenance.py examples/fr3_wuji/compute_norm_stats.py
   src/openpi/shared/local_storage.py src/openpi/training/tracking.py
   src/openpi/policies/fr3_sharpa_policy.py src/openpi/policies/fr3_sharpa_protocol.py
   src/openpi/policies/single_franka_policy.py src/openpi/policies/lemon_policy.py
   src/openpi/training/task_view.py src/openpi/training/task_view_norm.py
   src/openpi/training/config.py src/openpi/training/checkpoints.py
+  src/openpi/training/sampling.py src/openpi/training/sampling_test.py
+  src/openpi/training/data_loader.py src/openpi/training/reproducibility.py
+  src/openpi/training/reproducibility_test.py
   src/openpi/transforms_test.py src/openpi/training/data_loader_test.py
   examples/fr3_wuji/verify_dataset.py
 )

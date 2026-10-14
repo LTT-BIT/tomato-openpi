@@ -32,13 +32,15 @@ def test_seed_and_seek():
 
 
 @pytest.mark.parametrize("workers", [0, 2])
-def test_worker_prefetch_resume_and_tail(workers):
+@pytest.mark.parametrize("mode", sampling.PLAN_MODES)
+def test_worker_prefetch_resume_and_tail(workers, mode):
     def make_loader():
         return data_loader.TorchDataLoader(
             list(range(11)),
             local_batch_size=4,
             num_workers=workers,
-            sampling_mode="epoch_shuffle",
+            sampling_mode=mode,
+            sample_weights=np.arange(1, 12) if mode == "weighted_replacement" else None,
             num_train_steps=7,
             seed=42,
             framework="pytorch",
@@ -46,7 +48,8 @@ def test_worker_prefetch_resume_and_tail(workers):
 
     full = np.stack([batch.numpy() for batch in make_loader()])
     assert full.shape == (7, 4)
-    np.testing.assert_array_equal(np.sort(full.ravel()[:11]), np.arange(11))
+    if mode == "epoch_shuffle":
+        np.testing.assert_array_equal(np.sort(full.ravel()[:11]), np.arange(11))
     loader = make_loader()
     iterator = iter(loader)
     prefix = np.stack([next(iterator).numpy() for _ in range(3)])
@@ -101,3 +104,62 @@ def test_epoch_shuffle_rejects_mixtures_and_other_frameworks():
     )
     with pytest.raises(ValueError, match="exactly one"):
         data_loader.create_torch_dataset(data, 2, cfg.model, sampling_mode="epoch_shuffle")
+
+
+def test_group_probability_is_independent_of_group_frame_count():
+    # A has 2 frames, B has 18; weights describe group mass, not per-frame mass.
+    episodes = np.array([5, 5] + [9] * 18)
+    groups = (sampling.SamplingGroup("A", (5,), 7), sampling.SamplingGroup("B", (9,), 3))
+    weights = sampling.group_frame_weights(episodes, groups)
+    assert weights[:2].sum() == pytest.approx(0.7)
+    assert weights[2:].sum() == pytest.approx(0.3)
+    plan = sampling.weighted_replacement_indices(weights, seed=42001, num_samples=100_000)
+    assert np.mean(episodes[plan] == 5) == pytest.approx(0.7, abs=0.005)
+    assert np.mean(plan == 0) == pytest.approx(0.35, abs=0.005)
+    assert len(np.unique(plan)) < len(plan)  # with replacement
+    np.testing.assert_array_equal(
+        plan[:100], sampling.weighted_replacement_indices(weights, seed=42001, num_samples=100)
+    )
+    assert not np.array_equal(plan[:100], sampling.weighted_replacement_indices(weights, seed=42, num_samples=100))
+
+
+@pytest.mark.parametrize("episodes", [(0, 0), (), (-1,), (True,), (1.5,)])
+def test_invalid_group_episode_ids(episodes):
+    with pytest.raises(ValueError, match="episodes"):
+        sampling.SamplingGroup("A", episodes, 7)
+
+
+@pytest.mark.parametrize("weight", [0, -1, float("nan"), float("inf"), True])
+def test_invalid_group_weights(weight):
+    with pytest.raises(ValueError, match="weight"):
+        sampling.SamplingGroup("A", (0,), weight)
+
+
+@pytest.mark.parametrize(
+    ("groups", "match"),
+    [
+        ((), "requires sampling_groups"),
+        ((sampling.SamplingGroup("A", (0,), 7), sampling.SamplingGroup("A", (1,), 3)), "name"),
+        ((sampling.SamplingGroup("A", (0,), 7), sampling.SamplingGroup("B", (0, 1), 3)), "overlap"),
+        ((sampling.SamplingGroup("A", (0,), 7),), "cover exactly"),
+        ((sampling.SamplingGroup("A", (0, 1, 2), 7),), "cover exactly"),
+    ],
+)
+def test_invalid_group_partitions(groups, match):
+    with pytest.raises(ValueError, match=match):
+        sampling.group_frame_weights([0, 1, 1], groups)
+
+
+def test_group_mode_must_be_explicit():
+    cfg = config.get_config("debug")
+    with pytest.raises(ValueError, match="requires sampling_groups"):
+        dataclasses.replace(cfg, sampling_mode="weighted_replacement")
+    with pytest.raises(ValueError, match="requires weighted_replacement"):
+        dataclasses.replace(cfg, sampling_groups=(sampling.SamplingGroup("A", (0,), 1),))
+
+
+def test_replacement_coverage_counts_distinct_frames():
+    sampler = sampling.PlanSampler(np.array([2, 2, 0, 2, 1, 0]))
+    assert [sampler.unique_count(i) for i in range(7)] == [0, 1, 1, 2, 2, 3, 3]
+    sampler.seek(3)
+    assert sampler.unique_count(4) == 2

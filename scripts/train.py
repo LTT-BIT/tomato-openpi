@@ -215,7 +215,7 @@ def main(config: _config.TrainConfig):
             shuffle=True,
         )
         sampling_summary = None
-        if config.sampling_mode == "epoch_shuffle":
+        if config.sampling_mode in ("epoch_shuffle", "weighted_replacement"):
             sampling_summary = data_loader.prepare_reproducibility(config, resuming=resuming)
         train_state, train_state_sharding = init_train_state(config, init_rng, mesh, resume=resuming)
         jax.block_until_ready(train_state)
@@ -232,7 +232,7 @@ def main(config: _config.TrainConfig):
         with tracking.session(config, resuming=resuming, start_step=start_step):
             if sampling_summary is not None:
                 wandb.run.summary.update({f"sampling/{key}": value for key, value in sampling_summary.items()})
-            if config.sampling_mode == "epoch_shuffle":
+            if config.sampling_mode in ("epoch_shuffle", "weighted_replacement"):
                 data_loader.seek(start_step)
                 logging.info(
                     "Sampling resumes at completed step %d / sample position %d",
@@ -271,15 +271,7 @@ def main(config: _config.TrainConfig):
                     stacked_infos = common_utils.stack_forest(infos)
                     reduced_info = jax.device_get(jax.tree.map(jnp.mean, stacked_infos))
                     if sampling_summary is not None:
-                        consumed = (step + 1) * config.batch_size
-                        frames = sampling_summary["dataset_frames"]
-                        reduced_info.update(
-                            {
-                                "sampling/consumed_samples": consumed,
-                                "sampling/consumed_unique_frames": min(consumed, frames),
-                                "sampling/consumed_coverage": min(consumed, frames) / frames,
-                            }
-                        )
+                        reduced_info.update(data_loader.sampling_progress(step + 1))
                     info_str = ", ".join(f"{k}={v:.4f}" for k, v in reduced_info.items())
                     pbar.write(f"Step {step}: {info_str}")
                     wandb.log(reduced_info, step=step)
