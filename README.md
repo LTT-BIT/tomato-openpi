@@ -4,11 +4,15 @@
 
 本页说明下载安装和运行；创建个人配置、修改公共代码及分支管理见 [多人开发 README](多人开发README.md)。
 
-## 1. 下载与安装
+## 1. 按使用位置准备
 
-准备 Linux 训练机、NVIDIA 驱动和项目 SSH 读取权限。先确认 `nvidia-smi` 正常。依赖使用 Python 3.11、JAX CUDA 12、PyTorch CUDA 12.8；GPU 数量与显存按实际训练方案选择。
+选择下面一种方式。准备完成后，两种方式都在自己的仓库根目录执行第 2–5 节的命令，统一使用 `bash scripts/python.sh`。
 
-Ubuntu/Debian 安装基础工具、视频依赖和 uv：
+### 自己的电脑：安装本地环境
+
+适用于 Linux + NVIDIA GPU 训练机。先确认 `nvidia-smi` 正常，并将本机 SSH 公钥加入 GitLab 账号。环境使用 Python 3.11、JAX CUDA 12 和 PyTorch CUDA 12.8，驱动需支持对应版本。
+
+Ubuntu/Debian 安装基础工具和视频依赖：
 
 ```bash
 sudo apt-get update
@@ -16,44 +20,40 @@ sudo apt-get install -y git curl ca-certificates openssh-client ffmpeg libgl1 li
 curl -LsSf https://astral.sh/uv/0.12.10/install.sh | sh
 ```
 
-重新打开终端，确认 `uv --version` 可用。将本机 SSH 公钥加入 GitLab 账号后执行：
+重新打开终端，确认 `uv --version` 可用，然后下载仓库、安装环境：
 
 ```bash
-ssh -T -p 2222 git@gitlab.litchibot.top
 git clone --branch main \
   ssh://git@gitlab.litchibot.top:2222/fruit-train/tomato-openpi.git
 cd tomato-openpi
-bash scripts/setup_training_env.sh
+unset PI05_SHARED_ENV
+bash scripts/setup_training_env.sh --local
 ```
 
-安装脚本优先复用选中的公共环境；使用本地环境时按 `uv.lock` 安装到 `.venv/`，并打印 JAX 设备和 Torch CUDA 状态。正式训练前应看到 GPU 设备及 `CUDA=True`。以后在仓库根目录直接使用 `bash scripts/python.sh`，入口自动设置仓库内缓存和输出位置。
+安装脚本按 `uv.lock` 在当前仓库创建 `.venv/`，并打印 JAX 设备和 Torch CUDA 状态。正式训练前应看到 GPU 设备及 `CUDA=True`。以后使用 `bash scripts/python.sh` 自动读取本地 `.venv`。
 
-初始权重为 `gs://openpi-assets/checkpoints/pi05_base/params`；首次使用需要下载权重及 tokenizer，离线机器须提前准备缓存。允许动作/状态投影中形状不匹配的参数随机初始化，其余兼容参数加载基础权重。
+默认基础权重为 `gs://openpi-assets/checkpoints/pi05_base/params`，首次使用会下载权重和 tokenizer；离线训练前需准备好缓存。
 
 ### 500028 服务器：复用公共环境
 
-已加入服务器 `ai_researchers` 组的成员，可复用公共环境。每人独立 clone 仓库，安装、检查、统计和训练均使用仓库入口，无需修改 baseline 的环境参数。
+服务器已安装公共环境，**无需安装 Python、uv 或再次运行环境安装脚本**。使用者须属于 `ai_researchers` 组，并已配置自己的 GitLab SSH 访问权限。
 
-`bash scripts/python.sh` 的环境选择顺序：
-
-1. 设置了 `PI05_SHARED_ENV` 时，使用指定公共环境；路径无效会直接报错。
-2. 否则优先使用仓库已有的 `.venv`。
-3. 没有 `.venv` 时，自动使用服务器的 `/mnt/data/public_tools/training/environments/pi05/20261011`。
-4. 没有可用环境时，先执行 `bash scripts/setup_training_env.sh` 安装本地环境。
-
-新 clone 的仓库在 500028 上自动复用公共环境。已有本地 `.venv`，但希望使用公共环境时，在当前终端设置：
+登录服务器后，在自己的工作目录执行：
 
 ```bash
+git clone --branch main \
+  ssh://git@gitlab.litchibot.top:2222/fruit-train/tomato-openpi.git
+cd tomato-openpi
 export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/20261011
-bash scripts/setup_training_env.sh
-export MODULE=training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1
-bash scripts/python.sh -m scripts.run_training "$MODULE" --dry-run
-bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE"
+
+# 仅展开配置，验证启动入口；不需要数据或 GPU。
+bash scripts/python.sh -m scripts.run_training \
+  training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1 --dry-run
 ```
 
-共享模式下，安装脚本只检查环境，不执行 `uv sync`。需要独立安装依赖时执行 `bash scripts/setup_training_env.sh --local`，再 `unset PI05_SHARED_ENV` 使用本地 `.venv`。已有但损坏的 `.venv` 会报错，不会悄悄切换到公共环境。环境选择不修改系统 Python。
+已有仓库时直接进入仓库，无需重新 clone。每次打开新的终端，重新执行上面的 `export PI05_SHARED_ENV=...` 即可明确选用公共环境；它优先于仓库已有的 `.venv`。未设置该变量且仓库没有 `.venv` 时，启动器也会自动识别服务器公共环境。
 
-公共基础权重路径为 `/mnt/data/public_ckpt/pi05/pi05_base/params`。在个人实验 `build_config()` 中返回配置前指定本地路径，避免重复下载：
+公共基础权重已放在 `/mnt/data/public_ckpt/pi05/pi05_base/params`。按[多人开发说明](多人开发README.md#创建个人实验)创建个人配置，在 `build_config()` 返回配置前加入以下设置，复用服务器权重：
 
 ```python
 from dataclasses import replace
@@ -67,9 +67,9 @@ config = replace(
 )
 ```
 
-`scripts/python.sh` 在共享模式下调用公共 `run-python`，显式加载当前仓库的源码，不绑定维护者的 checkout。缓存、数据、统计、日志和训练输出仍保存在各自仓库；tokenizer 首次使用仍需要下载或预先准备本地缓存。
+随后将第 2 节的 `MODULE` 设置为个人配置模块。公共权重不包含 tokenizer，首次训练仍需下载或预先准备仓库内缓存。动作/状态投影中形状不匹配的参数按原配方随机初始化，其余兼容参数加载基础权重。
 
-公共环境与基础权重由 `zhiwei` 维护，其他组成员只读使用。不要将仓库 `.venv` 链接到公共环境后执行 `uv sync`，也不要向公共环境安装个人依赖；需要不同依赖时创建独立环境。环境验证范围和更新约定见[多人开发说明](多人开发README.md#公共环境管理)。
+每个人使用自己的仓库，启动器自动加载当前仓库源码及公共环境内的 FFmpeg。数据、统计、缓存、日志和训练输出保存在各自仓库。公共环境与基础权重由 `zhiwei` 维护，组内其他成员只读使用；不要向公共环境安装依赖或执行 `uv sync`。管理约定见[多人开发说明](多人开发README.md#公共环境管理)。
 
 ## 2. 选择任务与 baseline
 
@@ -131,7 +131,7 @@ bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry
 
 将数据仓库产出的 LeRobot v2.1 数据放入 `data/`，包含 `meta/`、`data/`、`videos/`。在所选实验的 `build_dataset()` 中确认 root、repo_id、来源、版本、assets_dir、asset_id 和英文 prompt 示例。`root` 是实际目录，`repo_id` 是数据身份；训练实际英文指令来自 `meta/tasks.jsonl`。
 
-数据应满足任务的关节顺序、单位、相机映射和 30 Hz 频率。新数据使用新的版本和 asset_id；同一内容仅搬迁路径时保留身份。
+数据应满足任务的关节顺序、单位、相机映射和采样频率：番茄与杯子为 30 Hz，柠檬为 10 Hz。新数据使用新的版本和 asset_id；同一内容仅搬迁路径时保留身份。
 
 新数据先计算统计：
 
@@ -165,11 +165,12 @@ bash scripts/python.sh -m wandb sync wandb/offline-run-实际编号
 
 ## 5. 输出与续训
 
-所有默认目录均位于当前仓库：
+训练输出和可写缓存默认位于当前仓库；服务器公共环境与基础权重使用第 1 节的共享路径：
 
 | 内容 | 位置 |
 | --- | --- |
-| 环境 / 缓存 | `.venv/`、`.cache/`；JAX 编译缓存 `.cache/jax/` |
+| 本地环境 | 自己电脑使用 `.venv/`；服务器使用公共环境 |
+| 缓存 | `.cache/`；JAX 编译缓存 `.cache/jax/` |
 | 数据 / 统计 | `data/`、`assets/` |
 | 本地日志及运行清单 | `logs/<配置名>/<实验名>/` |
 | checkpoint | `checkpoints/<配置名>/<实验名>/<step>/` |
