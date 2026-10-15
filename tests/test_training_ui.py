@@ -94,6 +94,11 @@ def test_grouped_sampling_and_data_identity_are_saved():
 @pytest.fixture
 def workspace(tmp_path, monkeypatch):
     catalog = editor.baseline_catalog()
+    for entry in catalog:
+        source = common.repository_root() / entry["file"]
+        destination = tmp_path / entry["file"]
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(source.read_bytes())
     monkeypatch.setattr(editor, "baseline_catalog", lambda: catalog)
     monkeypatch.setattr(common, "repository_root", lambda: tmp_path)
     monkeypatch.setattr(
@@ -116,6 +121,7 @@ def workspace(tmp_path, monkeypatch):
     )
     values = editor.defaults(BASE)["values"]
     values["exp_name"] = "alice_test_ui"
+    values["peak_lr"] = 1e-5
     return {
         "baseline": BASE,
         "owner": "alice",
@@ -134,6 +140,8 @@ def fake_launch(monkeypatch):
         directory.mkdir(parents=True)
         state.update(worker_pid=os.getpid(), worker_start=ui.process_identity(os.getpid()))
         ui.atomic_json(directory / "state.json", state)
+        if "values" in state:
+            ui.atomic_json(directory / "run.json", {k: state[k] for k in ("module", "config_sha256", "values")})
         (directory / "ready").touch()
         (directory / "console.log").touch()
         return state
@@ -151,6 +159,10 @@ def test_launch_saves_personal_file_without_mutating_baseline(workspace, fake_la
         ui.start_job({**workspace, "values": {**workspace["values"], "exp_name": "another"}})
     with pytest.raises(ValueError, match="正在使用"):
         ui.start_job({**workspace, "gpus": ["GPU-test1"]})
+    with pytest.raises(ValueError, match="同一实验已有任务"):
+        ui.start_job({**workspace, "gpus": ["GPU-test1"], "allow_busy": True})
+    state["status"] = "completed"
+    ui.atomic_json(ui.job_directory(state["id"]) / "state.json", state)
     with pytest.raises(FileExistsError):
         ui.start_job({**workspace, "gpus": ["GPU-test1"], "allow_busy": True})
 
@@ -328,3 +340,97 @@ def test_living_training_child_keeps_gpu_reserved_after_supervisor_exit(workspac
     assert ui.read_job(state["id"])["status"] == "orphaned"
     with pytest.raises(ValueError, match="预留"):
         ui.validate_devices(["GPU-test0"], editor.baseline_config(BASE))
+
+
+def test_reuse_records_each_run_without_new_personal_file(workspace, fake_launch):
+    workspace["values"] = {**editor.defaults(BASE)["values"], "exp_name": "reuse_one", "dataset_root": "/tmp/data_one"}
+    first = ui.start_job(workspace)
+    assert first["creates_config"] is False
+    assert first["module"] == BASE
+    assert not list((common.repository_root() / "training_configs/experiments").glob("*/template/*/*.py"))
+    record = json.loads((ui.job_directory(first["id"]) / "run.json").read_text())
+    assert record["values"]["dataset_root"] == "/tmp/data_one"
+    first["status"] = "completed"
+    ui.atomic_json(ui.job_directory(first["id"]) / "state.json", first)
+    workspace["values"].update(exp_name="reuse_two", dataset_root="/tmp/data_two")
+    second = ui.start_job(workspace)
+    assert second["id"] != first["id"]
+    assert second["checkpoint_dir"] != first["checkpoint_dir"]
+    assert second["config_sha256"] == first["config_sha256"]
+    assert ui.job_config(second).data.lerobot_datasets[0].root == "/tmp/data_two"
+    assert record["values"]["exp_name"] == "reuse_one"
+
+
+def test_personal_discovery_fresh_load_and_copy_preserve_custom_settings(workspace):
+    path = editor.personal_path(BASE, "alice", "handwritten")
+    path.parent.mkdir(parents=True)
+    path.write_text(
+        f"from {BASE} import build_config as base\n"
+        "from dataclasses import replace\n"
+        "def build_config():\n"
+        "    c = base()\n"
+        "    return replace(c, batch_size=4, model=replace(c.model, max_token_len=128))\n"
+    )
+    module = ".".join(path.relative_to(common.repository_root()).with_suffix("").parts)
+    assert module in {entry["id"] for entry in editor.personal_catalog()}
+    assert editor.defaults(module)["values"]["batch_size"] == 4
+    path.write_text(path.read_text().replace("batch_size=4", "batch_size=2"))
+    assert editor.defaults(module)["values"]["batch_size"] == 2
+    values = editor.defaults(module)["values"]
+    assert editor.changed_parameters(module, {**values, "exp_name": "next", "dataset_root": "/tmp/relocated"}) == []
+    assert editor.changed_parameters(module, {**values, "peak_lr": 1e-5}) == ["peak_lr"]
+    first = editor.personal_path(module, "alice", "copy_one")
+    first.write_text(editor.personal_source(module, "alice", {**values, "peak_lr": 1e-5}))
+    first_module = ".".join(first.relative_to(common.repository_root()).with_suffix("").parts)
+    second_values = {**editor.defaults(first_module)["values"], "batch_size": 8}
+    scope = {}
+    exec(editor.personal_source(first_module, "alice", second_values), scope)
+    copied = scope["build_config"]()
+    assert copied.model.max_token_len == 128
+    assert copied.batch_size == 8
+    assert copied.lr_schedule.peak_lr == 1e-5
+    assert editor.source_config(module).batch_size == 2
+
+
+def test_run_override_matches_all_stages_and_resume(workspace, fake_launch, monkeypatch):
+    workspace["values"] = {
+        **editor.defaults(BASE)["values"],
+        "exp_name": "run_override",
+        "dataset_root": "/tmp/relocated",
+    }
+    state = ui.start_job(workspace)
+    config = ui.job_config(state)
+    assert config.exp_name == "run_override"
+    assert config.policy_metadata["dataset_root"] == config.data.lerobot_datasets[0].root == "/tmp/relocated"
+    calls = []
+    monkeypatch.setattr(ui, "run_stage", lambda directory, state, label, command, env: calls.append(command))
+    ui.worker(state["id"])
+    assert len(calls) == 4
+    assert all(
+        "--ui-run" in command and str(ui.job_directory(state["id"]) / "run.json") in command for command in calls
+    )
+    state["status"] = "failed"
+    ui.atomic_json(ui.job_directory(state["id"]) / "state.json", state)
+    resumed = ui.resume_job({"id": state["id"]})
+    assert ui.job_config(resumed) == config
+    path = Path(resumed["config_path"])
+    path.write_text(path.read_text() + "\n# changed\n")
+    with pytest.raises(ValueError, match="does not match"):
+        ui.job_config(resumed)
+
+
+def test_source_change_after_form_load_is_rejected(workspace):
+    workspace["source_sha256"] = editor.defaults(BASE)["source_sha256"]
+    path = editor.source_path(BASE)
+    path.write_text(path.read_text() + "\n# edited\n")
+    with pytest.raises(ValueError, match="来源配置已修改"):
+        ui.build_request(workspace)
+
+
+def test_personal_catalog_skips_broken_and_external_files(workspace, tmp_path):
+    directory = tmp_path / "training_configs/experiments/tomato_wuji/template/alice"
+    directory.mkdir(parents=True)
+    (directory / "broken.py").write_text("def broken(")
+    (directory / "helper.py").write_text("VALUE = 1")
+    (directory / "external.py").symlink_to(Path(__file__).resolve())
+    assert editor.personal_catalog() == []

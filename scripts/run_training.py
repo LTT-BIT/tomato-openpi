@@ -41,7 +41,19 @@ def load_experiment(module_name: str) -> cfg.TrainConfig:
 
 
 def resolve_experiment(module_name: str, overrides: list[str]) -> cfg.TrainConfig:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--ui-run", type=Path)
+    args, overrides = parser.parse_known_args(overrides)
     config = load_experiment(module_name)
+    if args.ui_run is not None:
+        from scripts.training_ui_config import apply_overrides
+        from scripts.training_ui_config import source_path
+
+        record = json.loads(args.ui_run.read_text())
+        path = source_path(module_name)
+        if record["module"] != module_name or reproducibility.file_sha256(path) != record["config_sha256"]:
+            raise ValueError("Run record does not match the configuration source")
+        config = apply_overrides(config, record["values"])
     resolved = tyro.cli(type(config), default=config, args=overrides)
     # A new model recipe must also regenerate its freeze filter and adapter contract.
     for field in ("paligemma_variant", "action_expert_variant", "pi05", "discrete_state_input"):

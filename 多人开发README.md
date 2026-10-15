@@ -109,7 +109,11 @@ TrainConfig
 
 运行 `bash scripts/python.sh -m scripts.training_ui --port 8765`，使用终端打印的完整地址打开页面；远程服务器转发该端口。UI 的使用步骤见[根 README](README.md#图形界面配置和启动训练)。
 
-选择公共 baseline 并修改参数后，启动按钮会自动创建 `training_configs/experiments/<任务>/template/<用户名>/<实验名>.py`。不创建分支、不上传个人配置、不覆盖已有文件。生成文件复制 baseline 的组合代码，以 `_UI_VALUES` 固定本次参数，并记录 baseline 源码摘要；仍引用共享 recipe、本体与数据适配代码。手工编辑时可修改 `_UI_VALUES`，已有任务的续训要求文件摘要不变。续训源码清单记录公共代码及当前个人配置，其他个人配置的新增或修改不会干扰当前实验；共享逻辑应放在公共模块，不在个人实验之间交叉导入。
+UI 支持公共 baseline 和当前仓库 `template/<用户名>/*.py` 下的手写/UI 个人配置。未改变训练参数时复用所选文件；修改 batch、学习率、步数、采样策略、基础权重或数据身份等参数时，在同任务的 `template/<用户名>/<实验名>.py` 创建新配置，不覆盖原文件。仅修改实验名、数据目录、统计目录/名称、W&B 项目、GPU、W&B 模式时不新建配置，使用任务目录 `logs/training_ui/<任务ID>/run.json` 保存本次运行设置。
+
+每次从头训练使用独立实验名，自动记录来源配置、源码哈希、最终参数和运行状态；训练启动器仍保存源码快照、数据与统计审计、W&B 和 checkpoint 信息。校验、统计计算、训练及重试/续训都读取同一份运行设置。搬迁同一数据集可以核验复用统计，换数据集则使用匹配的新统计；路径变更不会绕过数据绑定校验。修改个人文件后，重新选择该配置加载最新参数。
+
+新配置内 `_UI_VALUES` 保存选定参数，来源 Python 源码被嵌入独立命名空间，连续从个人配置派生时仍保留模型和 TaskView 等高级设置。共享逻辑应放在公共模块，不在个人实验之间交叉导入。已有任务续训要求原文件摘要不变，其他个人配置新增或修改不会干扰该实验。
 
 UI 后端在 `scripts/training_ui.py`，字段校验和配置保存逻辑在 `scripts/training_ui_config.py`，静态页面在 `scripts/training_ui_web/`。不新增 Web 框架或 Node 环境依赖，使用仓库现有 Python 环境。后台通过现有 `compute_experiment_norm` / `run_training` 入口运行，保持原数据绑定检查、日志和 W&B 规则。
 

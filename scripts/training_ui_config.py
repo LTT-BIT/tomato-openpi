@@ -7,7 +7,6 @@ from dataclasses import replace
 from datetime import datetime
 import getpass
 import hashlib
-import importlib
 import math
 from pathlib import Path
 import pprint
@@ -80,8 +79,69 @@ def baseline_config(module: str):
     return load_experiment(module)
 
 
-def defaults(module: str) -> dict:
-    config = baseline_config(module)
+def personal_catalog() -> list[dict]:
+    root = common.repository_root().resolve()
+    entries = []
+    for path in sorted((root / "training_configs/experiments").glob("*/template/*/*.py")):
+        if path.name.startswith("_") or not path.resolve().is_relative_to(root):
+            continue
+        try:
+            tree = ast.parse(path.read_text())
+        except (OSError, SyntaxError, UnicodeError):
+            continue
+        if not any(isinstance(n, ast.FunctionDef) and n.name == "build_config" for n in tree.body):
+            continue
+        parts = path.relative_to(root).with_suffix("").parts
+        if not all(part.isidentifier() for part in parts):
+            continue
+        entries.append(
+            {
+                "id": ".".join(parts),
+                "label": f"{TASK_LABELS.get(parts[2], parts[2])} / {parts[4]} / {path.stem}",
+                "task": parts[2],
+                "file": str(path.relative_to(root)),
+            }
+        )
+    return entries
+
+
+def source_path(module: str) -> Path:
+    entries = baseline_catalog() + personal_catalog()
+    entry = next((item for item in entries if item["id"] == module), None)
+    if entry is None:
+        raise ValueError("请选择当前仓库的 baseline 或个人配置")
+    return common.repository_root() / entry["file"]
+
+
+def config_from_source(source: str, module: str, filename: str):
+    # A separate namespace keeps repeated UI copies from overwriting earlier wrappers.
+    scope = {"__name__": module, "__package__": module.rpartition(".")[0], "__file__": filename}
+    exec(compile(source, filename, "exec"), scope)
+    return scope["build_config"]()
+
+
+def source_config(module: str):
+    if module in {item["id"] for item in baseline_catalog()}:
+        return baseline_config(module)
+    path = source_path(module)
+    config = config_from_source(path.read_text(), module, str(path))
+    validate_config(config)
+    return replace(config, policy_metadata={**config.policy_metadata, "experiment_module": module})
+
+
+# Run identity and storage selection are recorded per launch, not new training recipes.
+RUN_FIELDS = {"exp_name", "dataset_root", "assets_dir", "asset_id", "project_name"}
+
+
+def changed_parameters(module: str, values: dict) -> list[str]:
+    original = defaults(module)["values"]
+    # Resolve paths and normalize tuple/list representations before comparing.
+    before = config_values(apply_overrides(source_config(module), original))
+    after = config_values(apply_overrides(source_config(module), values))
+    return sorted(key for key in after if key not in RUN_FIELDS and after[key] != before[key])
+
+
+def config_values(config) -> dict:
     values = {key: getattr(config, key) for key in TRAIN_INTS}
     values.update({key: getattr(config.lr_schedule, key) for key in LR_FIELDS})
     values.update({key: getattr(config.optimizer, key) for key in OPT_FIELDS})
@@ -100,12 +160,19 @@ def defaults(module: str) -> dict:
         sampling_mode=config.sampling_mode,
         sampling_groups=[asdict(group) for group in config.sampling_groups],
     )
+    return values
+
+
+def defaults(module: str) -> dict:
+    config = source_config(module)
+    values = config_values(config)
     owner = re.sub(r"\W", "_", getpass.getuser())
     if not owner or owner[0].isdigit():
         owner = "user_" + owner
     shared = Path("/mnt/data/public_ckpt/pi05/pi05_base/params")
     return {
         "values": values,
+        "source_sha256": hashlib.sha256(source_path(module).read_bytes()).hexdigest(),
         "owner": owner,
         "suggested_exp_name": f"{owner}_{config.exp_name}_{datetime.now(ZoneInfo('Asia/Shanghai')):%m%d_%H%M%S}",
         "shared_weights": str(shared) if shared.is_dir() else None,
@@ -260,7 +327,7 @@ def apply_overrides(config, values: dict):
 
 
 def personal_path(module: str, owner: str, exp_name: str) -> Path:
-    baseline_config(module)
+    source_path(module)
     identifier(owner, "用户名")
     identifier(exp_name, "实验名称")
     task = module.split(".")[2]
@@ -272,35 +339,27 @@ def personal_path(module: str, owner: str, exp_name: str) -> Path:
 
 
 def personal_source(module: str, owner: str, values: dict) -> str:
-    config = apply_overrides(baseline_config(module), values)
+    config = apply_overrides(source_config(module), values)
     identifier(owner, "用户名")
-    source_path = Path(importlib.import_module(module).__file__)
-    source = source_path.read_text()
-    tree = ast.parse(source)
-    for node in tree.body:
-        if isinstance(node, ast.FunctionDef) and node.name == "build_config":
-            node.name = "_baseline_config"
-    copied = ast.unparse(tree)
-    # Resolve filesystem fields at save time; local personal files remain in this checkout.
-    values = {
-        **values,
-        "dataset_root": config.data.lerobot_datasets[0].root,
-        "assets_dir": config.data.assets.assets_dir,
-        "weight_path": config.weight_loader.params_path,
-    }
+    path = source_path(module)
+    source = path.read_text()
+    values = config_values(config)
     metadata = {
         "ui_owner": owner,
         "ui_baseline": module,
         "ui_baseline_sha256": hashlib.sha256(source.encode()).hexdigest(),
     }
     return (
-        "# UI 保存的个人实验；不修改公共 baseline。\n"
-        + copied
-        + "\n\nfrom scripts.training_ui_config import apply_overrides as _ui_apply\n"
-        + "from dataclasses import replace as _ui_replace\n\n"
-        + f"_UI_VALUES = {pprint.pformat(values, width=100, sort_dicts=False)}\n"
-        + f"_UI_METADATA = {metadata!r}\n\n"
-        + "def build_config():\n"
-        + "    config = _ui_apply(_baseline_config(), _UI_VALUES)\n"
-        + "    return _ui_replace(config, policy_metadata={**config.policy_metadata, **_UI_METADATA})\n"
+        "# UI 保存的个人配置；来源源码独立保存，避免依赖其他个人文件。\n"
+        "from dataclasses import replace\n"
+        "from scripts.training_ui_config import apply_overrides, config_from_source\n"
+        f"_SOURCE = {source!r}\n"
+        f"_SOURCE_MODULE = {module!r}\n"
+        f"_SOURCE_FILE = {str(path)!r}\n"
+        f"_UI_VALUES = {pprint.pformat(values, width=100, sort_dicts=False)}\n"
+        f"_UI_METADATA = {metadata!r}\n\n"
+        "def build_config():\n"
+        "    original = config_from_source(_SOURCE, _SOURCE_MODULE, _SOURCE_FILE)\n"
+        "    config = apply_overrides(original, _UI_VALUES)\n"
+        "    return replace(config, policy_metadata={**config.policy_metadata, **_UI_METADATA})\n"
     )

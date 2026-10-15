@@ -153,8 +153,12 @@ def build_request(request):
     from scripts import training_ui_config as config_ui
 
     module, owner, values = request["baseline"], request["owner"], request["values"]
-    config = config_ui.apply_overrides(config_ui.baseline_config(module), values)
-    path = config_ui.personal_path(module, owner, config.exp_name)
+    config = config_ui.apply_overrides(config_ui.source_config(module), values)
+    path = config_ui.source_path(module)
+    if request.get("source_sha256") and hashlib.sha256(path.read_bytes()).hexdigest() != request["source_sha256"]:
+        raise ValueError("来源配置已修改，请重新选择并核对参数")
+    if config_ui.changed_parameters(module, values):
+        path = config_ui.personal_path(module, owner, config.exp_name)
     if request.get("wandb_mode") not in ("online", "offline"):
         raise ValueError("请选择 W&B online 或 offline")
     if type(request.get("auto_norm", True)) is not bool or type(request.get("allow_busy", False)) is not bool:
@@ -167,11 +171,14 @@ def build_request(request):
 
 def preview(request, *, check_data=False):
     from openpi.training.reproducibility import serialize_config
+    from scripts import training_ui_config as config_ui
     from scripts.run_training import preflight
 
     config, path = build_request(request)
     result = {
         "config_path": str(path),
+        "creates_config": bool(config_ui.changed_parameters(request["baseline"], request["values"])),
+        "changed_parameters": config_ui.changed_parameters(request["baseline"], request["values"]),
         "checkpoint_dir": str(config.checkpoint_dir),
         "norm_dir": str(Path(config.data.assets.assets_dir) / config.data.assets.asset_id),
         "config": json.loads(serialize_config(config)),
@@ -195,6 +202,15 @@ def launch_worker(state):
     directory = job_directory(state["id"])
     directory.mkdir(parents=True, exist_ok=True)
     atomic_json(directory / "state.json", state)
+    if "values" in state:
+        atomic_json(
+            directory / "run.json",
+            {
+                "module": state["module"],
+                "config_sha256": state["config_sha256"],
+                "values": state["values"],
+            },
+        )
     env = os.environ.copy()
     env["JAX_PLATFORMS"] = "cpu"
     with (directory / "console.log").open("ab", buffering=0) as stream:
@@ -227,17 +243,24 @@ def launch_worker(state):
 
 
 def start_job(request):
+    from openpi.training.reproducibility import serialize_config
     from scripts import training_ui_config as config_ui
 
     config, path = build_request(request)
     with submit_lock():
         validate_devices(request.get("gpus"), config, allow_busy=request.get("allow_busy", False))
+        if any(job["status"] not in TERMINAL and job["checkpoint_dir"] == str(config.checkpoint_dir) for job in jobs()):
+            raise ValueError("同一实验已有任务正在运行，请更换实验名称")
         if config.checkpoint_dir.exists():
             raise ValueError("实验 checkpoint 已存在；请换实验名，或从任务记录续训")
-        source = config_ui.personal_source(request["baseline"], request["owner"], request["values"])
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("x") as stream:
-            stream.write(source)
+        creates_config = bool(config_ui.changed_parameters(request["baseline"], request["values"]))
+        if creates_config:
+            source = config_ui.personal_source(request["baseline"], request["owner"], request["values"])
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with path.open("x") as stream:
+                stream.write(source)
+        else:
+            source = path.read_text()
         module = ".".join(path.relative_to(common.repository_root()).with_suffix("").parts)
         state = {
             "id": uuid.uuid4().hex,
@@ -247,6 +270,9 @@ def start_job(request):
             "created_at": now(),
             "updated_at": now(),
             "baseline": request["baseline"],
+            "creates_config": creates_config,
+            "values": config_ui.config_values(config),
+            "resolved_config": json.loads(serialize_config(config)),
             "owner": request["owner"],
             "exp_name": config.exp_name,
             "module": module,
@@ -268,8 +294,6 @@ def start_job(request):
 
 
 def resume_job(request):
-    from scripts.run_training import load_experiment
-
     with submit_lock():
         original = read_job(request["id"])
         if original.get("host") != socket.gethostname():
@@ -279,8 +303,8 @@ def resume_job(request):
         path = Path(original["config_path"])
         if hashlib.sha256(path.read_bytes()).hexdigest() != original["config_sha256"]:
             raise ValueError("配置文件已修改，不能直接续训；请新建实验")
-        config = load_experiment(original["module"])
-        if any(job["status"] not in TERMINAL and job["config_path"] == original["config_path"] for job in jobs()):
+        config = job_config(original)
+        if any(job["status"] not in TERMINAL and job["checkpoint_dir"] == original["checkpoint_dir"] for job in jobs()):
             raise ValueError("同一实验已有任务正在运行")
         selected = request.get("gpus", original["gpus"])
         validate_devices(selected, config, allow_busy=request.get("allow_busy", False))
@@ -355,6 +379,18 @@ def run_stage(directory, state, label, command, env):
                 child.wait()
 
 
+def job_overrides(state):
+    if "values" not in state:  # Older UI records remain usable.
+        return []
+    return ["--ui-run", str(job_directory(state["id"]) / "run.json")]
+
+
+def job_config(state):
+    from scripts.run_training import resolve_experiment
+
+    return resolve_experiment(state["module"], job_overrides(state))
+
+
 def worker(job_id):
     directory = job_directory(job_id)
     # The creator publishes the PID before releasing this handshake.
@@ -375,9 +411,8 @@ def worker(job_id):
         path = Path(state["config_path"])
         if hashlib.sha256(path.read_bytes()).hexdigest() != state["config_sha256"]:
             raise ValueError("保存后配置被修改，请新建实验")
-        from scripts.run_training import load_experiment
-
-        config = load_experiment(state["module"])
+        config = job_config(state)
+        overrides = job_overrides(state)
         python = ["bash", str(common.repository_root() / "scripts/python.sh"), "-u", "-m"]
         cpu_env = {**os.environ, "JAX_PLATFORMS": "cpu", "CUDA_VISIBLE_DEVICES": "", "PYTHONUNBUFFERED": "1"}
         # Metadata validation is in a separate process so stop remains responsive.
@@ -385,7 +420,7 @@ def worker(job_id):
             directory,
             state,
             "校验数据",
-            [*python, "scripts.training_ui", "--validate-module", state["module"]],
+            [*python, "scripts.training_ui", "--validate-module", state["module"], *overrides],
             cpu_env,
         )
         norm = Path(config.data.assets.assets_dir) / config.data.assets.asset_id
@@ -400,13 +435,18 @@ def worker(job_id):
                     *python,
                     "scripts.compute_experiment_norm",
                     state["module"],
+                    *overrides,
                     "--stats-batch-size",
                     str(state["stats_batch_size"]),
                 ],
                 cpu_env,
             )
         run_stage(
-            directory, state, "核对数据与统计", [*python, "scripts.run_training", state["module"], "--check"], cpu_env
+            directory,
+            state,
+            "核对数据与统计",
+            [*python, "scripts.run_training", state["module"], *overrides, "--check"],
+            cpu_env,
         )
         env = {**os.environ, "CUDA_VISIBLE_DEVICES": ",".join(state["gpus"]), "PYTHONUNBUFFERED": "1"}
         env.pop("JAX_PLATFORMS", None)
@@ -415,7 +455,7 @@ def worker(job_id):
         env["JAX_PLATFORMS"] = "cuda"
         if hashlib.sha256(path.read_bytes()).hexdigest() != state["config_sha256"]:
             raise ValueError("准备过程中配置被修改，请新建实验")
-        command = [*python, "scripts.run_training", state["module"], "--wandb-mode", state["wandb_mode"]]
+        command = [*python, "scripts.run_training", state["module"], *overrides, "--wandb-mode", state["wandb_mode"]]
         if state["resume"]:
             command.append("--resume")
         run_stage(directory, state, "训练中", command, env)
@@ -492,6 +532,7 @@ def handler_class(token):
                 if url.path == "/api/baselines":
                     value = {
                         "baselines": config_ui.baseline_catalog(),
+                        "personal": config_ui.personal_catalog(),
                         "repository": str(common.repository_root()),
                         "python": sys.executable,
                     }
@@ -548,6 +589,7 @@ def main():
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--worker", help=argparse.SUPPRESS)
     parser.add_argument("--validate-module", help=argparse.SUPPRESS)
+    parser.add_argument("--ui-run", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args()
     os.environ["JAX_PLATFORMS"] = "cpu"
     common.configure_environment()
@@ -555,12 +597,17 @@ def main():
         worker(args.worker)
         return
     if args.validate_module:
-        from scripts.run_training import load_experiment
         from scripts.run_training import preflight
+        from scripts.run_training import resolve_experiment
 
         print(
             json.dumps(
-                preflight(load_experiment(args.validate_module), require_norm=False), ensure_ascii=False, indent=2
+                preflight(
+                    resolve_experiment(args.validate_module, ["--ui-run", str(args.ui_run)] if args.ui_run else []),
+                    require_norm=False,
+                ),
+                ensure_ascii=False,
+                indent=2,
             )
         )
         return
@@ -568,7 +615,10 @@ def main():
     server = ThreadingHTTPServer(("127.0.0.1", args.port), handler_class(token))
     server.daemon_threads = True
     print(f"训练 UI：http://127.0.0.1:{server.server_port}/#token={token}", flush=True)
-    print("远程使用时，在 VS Code 转发此端口后打开以上完整地址。关闭页面不停止后台任务。", flush=True)
+    print(
+        "远程使用时，用 VS Code 转发端口，或在本地运行 ssh -N -L 本地端口:127.0.0.1:服务端口 服务器。打开带 token 的地址。",
+        flush=True,
+    )
     try:
         server.serve_forever()
     except KeyboardInterrupt:
