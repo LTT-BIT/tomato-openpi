@@ -4,6 +4,8 @@ from dataclasses import dataclass
 import os
 from pathlib import Path
 
+SERVER_BASE_PARAMS = "/mnt/data/public_ckpt/pi05/pi05_base/params"
+
 
 @dataclass(frozen=True)
 class Dataset:

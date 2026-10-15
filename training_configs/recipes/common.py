@@ -51,7 +51,7 @@ class Recipe:
             exp_name=exp_name,
             model=model,
             weight_loader=weight_loaders.PartialCheckpointWeightLoader(
-                params_path="gs://openpi-assets/checkpoints/pi05_base/params",
+                params_path=common.SERVER_BASE_PARAMS,
                 skip_on_mismatch_regex=".*(action_in_proj|action_out_proj|state_proj).*",
             ),
             freeze_filter=model.get_freeze_filter(),

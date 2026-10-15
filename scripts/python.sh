@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run this checkout with an explicit shared environment, existing .venv, or server default.
+# Run this checkout with an explicit shared environment, server default, or local .venv.
 set -euo pipefail
 source "$(dirname -- "${BASH_SOURCE[0]}")/training_runtime.sh"
 pi05_select_runtime

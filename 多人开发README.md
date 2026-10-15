@@ -105,6 +105,8 @@ TrainConfig
 | 训练算法、采样或保存行为 | scripts/train.py、src/openpi/training 等共享代码 |
 | 使用本地还是公共 Python 环境 | scripts/python.sh 的选择规则和 PI05_SHARED_ENV；不放在实验参数中 |
 
+全部 baseline 的基础权重统一默认使用 `training_configs.common.SERVER_BASE_PARAMS`（服务器公共 `params` 目录）。旧个人配置不自动改写；需要切换时在 UI 或个人配置中明确更改权重路径。环境选择顺序为显式 `PI05_SHARED_ENV`、服务器公共 `20261014`、本地 `.venv`，服务器上的旧 `.venv` 不会抢占默认公共环境。
+
 ## 通过 UI 创建个人实验
 
 运行 `bash scripts/python.sh -m scripts.training_ui --port 8765`，使用终端打印的完整地址打开页面；远程服务器转发该端口。UI 的使用步骤见[根 README](README.md#图形界面配置和启动训练)。

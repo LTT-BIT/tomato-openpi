@@ -27,6 +27,7 @@ BASE = "training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1"
 def test_all_baseline_defaults_roundtrip_and_personal_snapshot(entry):
     module = entry["id"]
     baseline = editor.baseline_config(module)
+    assert baseline.weight_loader.params_path == common.SERVER_BASE_PARAMS
     values = editor.defaults(module)["values"]
     restored = editor.apply_overrides(baseline, values)
     assert restored == baseline

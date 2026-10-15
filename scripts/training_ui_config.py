@@ -169,7 +169,7 @@ def defaults(module: str) -> dict:
     owner = re.sub(r"\W", "_", getpass.getuser())
     if not owner or owner[0].isdigit():
         owner = "user_" + owner
-    shared = Path("/mnt/data/public_ckpt/pi05/pi05_base/params")
+    shared = Path(common.SERVER_BASE_PARAMS)
     return {
         "values": values,
         "source_sha256": hashlib.sha256(source_path(module).read_bytes()).hexdigest(),

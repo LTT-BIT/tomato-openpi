@@ -110,9 +110,26 @@ function request(){
 async function refreshGPUs(){const old=new Set(selectedGPUs());const result=await api('/api/gpus');gpuData=result.gpus;$('gpus').replaceChildren();if(result.error){$('gpus').textContent=result.error;return;}
   for(const gpu of gpuData){const card=node('div',undefined,'gpu'),label=node('label',undefined,'check'),input=node('input');input.type='checkbox';input.value=gpu.uuid;input.checked=old.has(gpu.uuid);label.append(input,node('span',`GPU ${gpu.index} · ${gpu.name}`));card.append(label);const meter=node('div',undefined,'meter'),progress=node('progress');progress.max=gpu.total_mb||1;progress.value=gpu.used_mb||0;meter.append(progress);card.append(meter,node('small',`显存 ${gpu.used_mb??'?'} / ${gpu.total_mb??'?'} MiB · 利用率 ${gpu.utilization??'?'}%`));$('gpus').append(card);}
 }
-async function refreshJobs(){const records=await api('/api/jobs');$('jobs').replaceChildren();if(!records.length)$('jobs').textContent='还没有任务。';for(const job of records){const button=node('button',job.exp_name,'job');button.append(node('small',`${statusNames[job.status]||job.status} · ${job.created_at}`));button.addEventListener('click',()=>perform(()=>showJob(job.id)));$('jobs').append(button);}}
-async function showJob(id){currentJob=id;const job=await api('/api/job?id='+id);if(currentJob!==id)return;$('output-title').textContent=job.exp_name;$('output').textContent=job.log||'后台任务准备中…';$('job-status').textContent=(statusNames[job.status]||job.status)+' · '+job.stage;$('job-status').classList.remove('hidden');$('stop').classList.toggle('hidden',terminal.has(job.status));$('resume').classList.toggle('hidden',!terminal.has(job.status)||job.status==='completed');$('job-info').textContent=`配置：${job.config_path}\n权重：${job.checkpoint_dir}`+(job.error?'\n错误：'+job.error:'');}
-async function showPreview(check){currentJob=null;const result=await api(check?'/api/check':'/api/preview',request());$('output-title').textContent=check?'数据与统计检查':'最终训练配置';$('output').textContent=JSON.stringify(result,null,2);$('job-info').textContent=(result.creates_config?'将新建个人配置：':'复用配置：')+result.config_path;for(const id of ['job-status','stop','resume'])$(id).classList.add('hidden');notice(check?'数据检查完成。'+result.statistics:'配置已展开，可在下方核对。');$('output-section').scrollIntoView({behavior:'smooth',block:'start'});}
+async function stopTask(id){
+  if(!id)throw Error('请先在任务记录中选择运行中的任务');
+  const job=await api('/api/job?id='+id);
+  if(terminal.has(job.status))throw Error('该任务已结束');
+  if(!confirm('停止任务 '+job.exp_name+'？准备/下载过程也会停止，只保留已保存的 checkpoint。'))return;
+  const result=await api('/api/stop',{id});notice(result.message);
+  await refreshJobs();await showJob(id);
+}
+async function refreshJobs(){
+  const records=await api('/api/jobs');$('jobs').replaceChildren();if(!records.length)$('jobs').textContent='还没有任务。';
+  for(const job of records){
+    const row=node('div',undefined,'job-row'),button=node('button',job.exp_name,'job');
+    button.append(node('small',`${statusNames[job.status]||job.status} · ${job.stage||''} · ${job.created_at}`));
+    button.addEventListener('click',()=>perform(async()=>{await showJob(job.id);$('output-section').scrollIntoView({behavior:'smooth',block:'start'});}));row.append(button);
+    if(!terminal.has(job.status)){const stop=node('button','停止任务','danger');stop.addEventListener('click',()=>perform(()=>stopTask(job.id),stop));row.append(stop);}
+    $('jobs').append(row);
+  }
+}
+async function showJob(id){currentJob=id;const job=await api('/api/job?id='+id);if(currentJob!==id)return;$('stop-active').disabled=terminal.has(job.status);$('active-task').textContent=job.exp_name+' · '+(statusNames[job.status]||job.status);$('output-title').textContent=job.exp_name;$('output').textContent=job.log||'后台任务准备中…';$('job-status').textContent=(statusNames[job.status]||job.status)+' · '+job.stage;$('job-status').classList.remove('hidden');$('stop').classList.toggle('hidden',terminal.has(job.status));$('resume').classList.toggle('hidden',!terminal.has(job.status)||job.status==='completed');$('job-info').textContent=`配置：${job.config_path}\n权重：${job.checkpoint_dir}`+(job.error?'\n错误：'+job.error:'');}
+async function showPreview(check){currentJob=null;$('stop-active').disabled=true;$('active-task').textContent='在任务记录中选择要停止的任务。';const result=await api(check?'/api/check':'/api/preview',request());$('output-title').textContent=check?'数据与统计检查':'最终训练配置';$('output').textContent=JSON.stringify(result,null,2);$('job-info').textContent=(result.creates_config?'将新建个人配置：':'复用配置：')+result.config_path;for(const id of ['job-status','stop','resume'])$(id).classList.add('hidden');notice(check?'数据检查完成。'+result.statistics:'配置已展开，可在下方核对。');$('output-section').scrollIntoView({behavior:'smooth',block:'start'});}
 async function openBrowser(input){browseTarget=input;try{await browse(input.value.includes('://')?'':input.value);}catch{await browse('');}$('browser').showModal();}
 async function browse(path){browseState=await api('/api/browse?path='+encodeURIComponent(path));$('browse-path').value=browseState.path;$('browse-list').replaceChildren();for(const entry of browseState.entries){const button=node('button','▸ '+entry.name);button.addEventListener('click',()=>perform(()=>browse(entry.path)));$('browse-list').append(button);}if(browseState.truncated)$('browse-list').append(node('p','仅显示前 500 个目录，请直接输入路径'));}
 $('preview').addEventListener('click',()=>perform(()=>showPreview(false),$('preview')));
@@ -126,7 +143,7 @@ $('add-group').addEventListener('click',()=>addGroup());
 $('refresh-gpus').addEventListener('click',()=>perform(refreshGPUs,$('refresh-gpus')));
 $('select-free').addEventListener('click',()=>{for(const input of document.querySelectorAll('#gpus input')){const gpu=gpuData.find(g=>g.uuid===input.value);input.checked=gpu.used_mb!==null&&gpu.utilization!==null&&gpu.used_mb<=1024&&gpu.utilization<=5;}});
 $('refresh-jobs').addEventListener('click',()=>perform(refreshJobs,$('refresh-jobs')));
-$('stop').addEventListener('click',()=>perform(async()=>{if(!confirm('停止这个任务？只保留已保存的 checkpoint。'))return;const result=await api('/api/stop',{id:currentJob});notice(result.message);},$('stop')));
+for(const id of ['stop','stop-active'])$(id).addEventListener('click',()=>perform(()=>stopTask(currentJob),$(id)));
 $('resume').addEventListener('click',()=>perform(async()=>{const selected=selectedGPUs();const payload={id:currentJob,allow_busy:$('allow-busy').checked};if(selected.length)payload.gpus=selected;const job=await api('/api/resume',payload);notice('使用原配置重试 / 续训，当前表单的参数修改不会应用到旧任务。');await refreshJobs();await showJob(job.id);},$('resume')));
 $('browse-close').addEventListener('click',()=>$('browser').close());
 $('browse-go').addEventListener('click',()=>perform(()=>browse($('browse-path').value)));

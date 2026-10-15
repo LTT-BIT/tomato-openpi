@@ -6,9 +6,9 @@ pi05_select_runtime() {
     PI05_RUNTIME_SHARED=""
     if [[ -n "${PI05_SHARED_ENV:-}" ]]; then
         PI05_RUNTIME_SHARED="$PI05_SHARED_ENV"
-    elif [[ -e "$PI05_REPOSITORY_DIR/.venv" || -L "$PI05_REPOSITORY_DIR/.venv" ]]; then
-        : # Preserve an existing checkout environment, including reporting a broken one.
-    elif [[ -x "$shared_default/run-python" ]]; then
+    elif [[ -e "$shared_default" || -L "$shared_default" ]]; then
+        # Prefer the server environment even if this checkout has a stale .venv.
+        # A broken shared installation must fail explicitly, not silently fall back.
         PI05_RUNTIME_SHARED="$shared_default"
     fi
     if [[ -n "$PI05_RUNTIME_SHARED" ]]; then

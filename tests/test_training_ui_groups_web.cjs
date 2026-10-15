@@ -67,3 +67,23 @@ for(const mutation of ["fields.get('dataset_root').input.value='/new'",'loadingV
     assert.equal(run('JSON.stringify(groupInputs())'),changed);
   });
 }
+
+test('stop from a task row targets that job, including download/preparation stages',async()=>{
+  const {context,run}=setup(); context.calls=[];context.confirm=()=>true;
+  run(`currentJob='another-job';
+    api=async(path,data)=>{calls.push([path,data]);return path.startsWith('/api/job?')?{status:'running',stage:'下载权重',exp_name:'selected'}:{message:'已请求停止'};};
+    refreshJobs=async()=>{};showJob=async id=>{calls.push(['shown',id]);};`);
+  await run("stopTask('selected-job')");
+  assert.equal(context.calls[1][0],'/api/stop');
+  assert.equal(context.calls[1][1].id,'selected-job');
+  assert.equal(context.calls[2][1],'selected-job');
+});
+
+test('stop cancellation and completed jobs do not send stop requests',async()=>{
+  const {context,run}=setup();context.calls=[];context.confirm=()=>false;
+  run("api=async(path,data)=>{calls.push(path);return {status:'running',exp_name:'test'};}");
+  await run("stopTask('id')");
+  assert.equal(context.calls.length,1);
+  run("api=async()=>({status:'completed'})");
+  await assert.rejects(run("stopTask('id')"),/已结束/);
+});

@@ -16,6 +16,13 @@ def checkout(tmp_path):
     source = Path(__file__).resolve().parents[1] / "scripts"
     for name in ("python.sh", "training_runtime.sh", "setup_training_env.sh"):
         shutil.copy(source / name, scripts / name)
+    runtime = scripts / "training_runtime.sh"
+    runtime.write_text(
+        runtime.read_text().replace(
+            "local shared_default=/mnt/data/public_tools/training/environments/pi05/20261014",
+            'local shared_default="' + str(tmp_path / "server environment") + '"',
+        )
+    )
     return root
 
 
@@ -64,6 +71,23 @@ def test_existing_local_environment_uses_this_checkout(checkout):
 def test_explicit_missing_shared_environment_does_not_fall_back(checkout, tmp_path):
     executable(checkout / ".venv/bin/python", "exit 0\n")
     result = run(checkout, "python.sh", shared=tmp_path / "missing")
+    assert result.returncode != 0
+    assert "Shared environment unavailable" in result.stderr
+
+
+def test_server_environment_wins_over_existing_local_environment(checkout):
+    shared = checkout.parent / "server environment"
+    executable(shared / "run-python", 'printf "%s\\n" "$@"\n')
+    executable(checkout / ".venv/bin/python", "exit 99\n")
+    result = run(checkout, "python.sh", "-m", "scripts.training_ui")
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.splitlines() == [str(checkout), "-m", "scripts.training_ui"]
+
+
+def test_broken_server_environment_does_not_fall_back_to_local(checkout):
+    (checkout.parent / "server environment").mkdir()
+    executable(checkout / ".venv/bin/python", "exit 0\n")
+    result = run(checkout, "python.sh")
     assert result.returncode != 0
     assert "Shared environment unavailable" in result.stderr
 
