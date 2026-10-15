@@ -487,6 +487,16 @@ def browse(path):
     }
 
 
+def detect_sampling_groups(request):
+    from scripts import training_ui_config as config_ui
+    from scripts.training_ui_groups import detect_groups
+
+    config = config_ui.source_config(request["baseline"])
+    if getattr(config.data.base_config, "task_view", None) is not None:
+        raise ValueError("当前配置有任务或阶段筛选，请按有效训练 episode 手动填写分组；自动读取目前用于全数据训练")
+    return detect_groups(request["dataset_root"])
+
+
 def handler_class(token):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, _format, *args):
@@ -567,6 +577,8 @@ def handler_class(token):
                 path = urlsplit(self.path).path
                 if path == "/api/preview":
                     result = preview(request)
+                elif path == "/api/sampling-groups":
+                    result = detect_sampling_groups(request)
                 elif path == "/api/check":
                     result = preview(request, check_data=True)
                 elif path == "/api/start":

@@ -333,6 +333,46 @@ def test_http_requires_token_and_json_for_mutations(workspace, monkeypatch):
         thread.join()
 
 
+def test_group_detection_endpoint_requires_token_and_returns_errors(monkeypatch):
+    def detect(payload):
+        if payload["dataset_root"] == "/missing":
+            raise ValueError("missing provenance")
+        return {"groups": [{"name": "A", "episodes": [0, 2]}]}
+
+    monkeypatch.setattr(ui, "detect_sampling_groups", detect)
+    server = ui.ThreadingHTTPServer(("127.0.0.1", 0), ui.handler_class("test-token"))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    url = f"http://127.0.0.1:{server.server_port}/api/sampling-groups"
+    headers = {"Content-Type": "application/json"}
+    try:
+        with pytest.raises(HTTPError) as error:
+            urlopen(Request(url, data=b'{"dataset_root":"/data"}', headers=headers), timeout=5)
+        assert error.value.code == 403
+        headers["X-Training-Token"] = "test-token"
+        with urlopen(Request(url, data=b'{"dataset_root":"/data"}', headers=headers), timeout=5) as response:
+            assert json.load(response)["groups"][0]["episodes"] == [0, 2]
+        with pytest.raises(HTTPError) as error:
+            urlopen(Request(url, data=b'{"dataset_root":"/missing"}', headers=headers), timeout=5)
+        assert error.value.code == 400
+        assert json.load(error.value)["error"] == "missing provenance"
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join()
+
+
+def test_group_detection_rejects_filtered_task_view(monkeypatch):
+    config = editor.baseline_config(BASE)
+    from openpi.training.config import TaskDataConfig
+    from openpi.training.task_view import TaskView
+
+    config = replace(config, data=replace(config.data, base_config=TaskDataConfig(task_view=TaskView())))
+    monkeypatch.setattr(editor, "source_config", lambda _: config)
+    with pytest.raises(ValueError, match="episode"):
+        ui.detect_sampling_groups({"baseline": BASE, "dataset_root": "/unused"})
+
+
 def test_living_training_child_keeps_gpu_reserved_after_supervisor_exit(workspace, fake_launch):
     state = ui.start_job(workspace)
     state.update(worker_start="dead-supervisor", child_pid=os.getpid(), child_start=ui.process_identity(os.getpid()))

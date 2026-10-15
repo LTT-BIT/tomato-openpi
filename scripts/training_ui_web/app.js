@@ -44,10 +44,12 @@ function addField(container, definition, value, original) {
   if(type==='path'){const browse=node('button','浏览');browse.type='button';browse.addEventListener('click',()=>perform(()=>openBrowser(input)));wrap.append(browse);wrapper.append(wrap);}
   if(original!==undefined){wrapper.append(node('small','来源值：'+(Array.isArray(original)?original.join(', '):(original??'关闭')),'default'));}
   input.addEventListener('input',()=>{input.classList.toggle('changed',original!==undefined&&input.value!==(Array.isArray(original)?original.join(type==='lines'?'\n':', '):String(original??'')));updatePath();});
+  if(key==='dataset_root')input.addEventListener('input',()=>{$('groups-result').textContent='数据目录已变更，请重新读取或核对分组编号。';});
   if(key==='action_horizon'){input.addEventListener('change',()=>{if(Number(input.value)!==initial.action_horizon)independentStats();});}
   fields.set(key,{input,type});container.append(wrapper);
 }
 function fillForm(result) {
+  $('groups-result').textContent='';
   initial=result.values;sourceHash=result.source_sha256;protocol=result.protocol;fields.clear();
   for(const [section,defs] of Object.entries(definitions)){
     const container=$(section+'-fields');container.replaceChildren();
@@ -72,8 +74,29 @@ function parseIds(text){
     const range=/^(\d+)-(\d+)$/.exec(part);if(!range)throw Error('episode 编号需为整数、逗号分隔或区间，例如 0,2,4-8');const start=Number(range[1]),end=Number(range[2]);if(end<start||end-start>100000)throw Error('episode 区间无效');for(let i=start;i<=end;i++)result.push(i);
   }return result;
 }
+function formatIds(ids){
+  const sorted=[...new Set(ids)].sort((a,b)=>a-b), ranges=[];
+  for(let i=0;i<sorted.length;i++){const start=sorted[i];let end=start;while(i+1<sorted.length&&sorted[i+1]===end+1)end=sorted[++i];ranges.push(start===end?String(start):start+'-'+end);}
+  return ranges.join(',');
+}
+function groupInputs(){return [...$('groups').children].map(row=>Object.fromEntries([...row.querySelectorAll('input')].map(input=>[input.dataset.key,input.value])));}
+async function detectGroups(){
+  if(!baseline)throw Error('请先选择配置');
+  const module=baseline, version=loadingVersion, root=fields.get('dataset_root').input.value.trim(), previous=groupInputs();
+  const mode=$('sampling-mode').value;
+  $('groups-result').textContent='正在读取并核对转换来源记录…';
+  try{
+    const result=await api('/api/sampling-groups',{baseline:module,dataset_root:root});
+    if(version!==loadingVersion||baseline!==module||fields.get('dataset_root').input.value.trim()!==root||$('sampling-mode').value!==mode||JSON.stringify(groupInputs())!==JSON.stringify(previous))throw Error('读取期间配置、目录或分组已修改，请重新读取。');
+    const weights=new Map(previous.map(g=>[g.name.trim(),Number(g.weight)]));
+    $('groups').replaceChildren();
+    for(const group of result.groups){const weight=weights.get(group.name);addGroup({...group,episode_text:formatIds(group.episodes),weight:Number.isFinite(weight)&&weight>0?weight:1});}
+    $('groups-result').textContent=`已核对 ${result.episodes} 条 episode / ${result.frames} 帧。`+result.groups.map(g=>`${g.name}：${g.episodes.length} 条 / ${g.frames} 帧（来源 ${g.source_root}）`).join('；')+'。请确认各组采样权重。';
+    updatePath();notice('已从转换来源填入分组；同名组保留原权重，新组权重为 1。');
+  }catch(error){if(version===loadingVersion)$('groups-result').textContent='未应用识别结果，现有分组保留。';throw error;}
+}
 function addGroup(group={name:'',weight:1,episodes:[]}){
-  const row=node('div',undefined,'group');for(const [key,label,value] of [['name','组名',group.name],['weight','权重',group.weight],['episodes','episode 编号 / 区间',group.episodes.join(',')]]){
+  const row=node('div',undefined,'group');for(const [key,label,value] of [['name','组名',group.name],['weight','权重',group.weight],['episodes','episode 编号 / 区间',group.episode_text??group.episodes.join(',')]]){
     const wrapper=node('label',label),input=node('input');input.dataset.key=key;input.value=value;input.addEventListener('input',updatePath);if(key==='weight'){input.type='number';input.step='any';}wrapper.append(input);row.append(wrapper);
   }const remove=node('button','移除');remove.addEventListener('click',()=>{row.remove();updatePath();});row.append(remove);$('groups').append(row);
 }
@@ -98,6 +121,7 @@ $('start').addEventListener('click',()=>perform(async()=>{const job=await api('/
 $('reset').addEventListener('click',()=>perform(()=>chooseBaseline(baseline),$('reset')));
 $('new-stats').addEventListener('click',independentStats);
 $('sampling-mode').addEventListener('change',()=>{const enabled=$('sampling-mode').value==='weighted_replacement';$('groups-panel').classList.toggle('hidden',!enabled);if(enabled&&!$('groups').children.length){addGroup({name:'A',weight:7,episodes:[]});addGroup({name:'B',weight:3,episodes:[]});}updatePath();});
+$('detect-groups').addEventListener('click',()=>perform(detectGroups,$('detect-groups')));
 $('add-group').addEventListener('click',()=>addGroup());
 $('refresh-gpus').addEventListener('click',()=>perform(refreshGPUs,$('refresh-gpus')));
 $('select-free').addEventListener('click',()=>{for(const input of document.querySelectorAll('#gpus input')){const gpu=gpuData.find(g=>g.uuid===input.value);input.checked=gpu.used_mb!==null&&gpu.utilization!==null&&gpu.used_mb<=1024&&gpu.utilization<=5;}});
