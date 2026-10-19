@@ -157,7 +157,24 @@ async function refreshJobs(){
   }
 }
 async function showJob(id){currentJob=id;const job=await api('/api/job?id='+id);if(currentJob!==id)return;$('stop-active').disabled=terminal.has(job.status);$('active-task').textContent=job.exp_name+' · '+(statusNames[job.status]||job.status);$('output-title').textContent=job.exp_name;$('output').textContent=job.log||'后台任务准备中…';$('job-status').textContent=(statusNames[job.status]||job.status)+' · '+job.stage;$('job-status').classList.remove('hidden');$('stop').classList.toggle('hidden',terminal.has(job.status));$('resume').classList.toggle('hidden',!terminal.has(job.status)||job.status==='completed');$('job-info').textContent=`配置：${job.config_path}\n权重：${job.checkpoint_dir}`+(job.error?'\n错误：'+job.error:'');}
-async function showPreview(check){currentJob=null;$('stop-active').disabled=true;$('active-task').textContent='在任务记录中选择要停止的任务。';const result=await api(check?'/api/check':'/api/preview',request());$('output-title').textContent=check?'数据与统计检查':'最终训练配置';$('output').textContent=JSON.stringify(result,null,2);$('job-info').textContent=(result.creates_config?'将新建个人配置：':'复用配置：')+result.config_path;for(const id of ['job-status','stop','resume'])$(id).classList.add('hidden');notice(check?'数据检查完成。'+result.statistics:'配置已展开，可在下方核对。');$('output-section').scrollIntoView({behavior:'smooth',block:'start'});}
+async function showPreview(check){
+  currentJob=null;$('stop-active').disabled=true;$('active-task').textContent='在任务记录中选择要停止的任务。';
+  $('output-title').textContent=check?'数据与统计检查':'最终训练配置';
+  $('output').textContent=check?'正在校验数据目录、元信息和归一化统计…':'正在生成最终配置…';
+  $('job-info').textContent='请等待检查结果。';
+  for(const id of ['job-status','stop','resume'])$(id).classList.add('hidden');
+  $('output-section').scrollIntoView({behavior:'smooth',block:'start'});
+  try{
+    const result=await api(check?'/api/check':'/api/preview',request());
+    $('output').textContent=JSON.stringify(result,null,2);
+    $('job-info').textContent=(result.creates_config?'将新建个人配置：':'复用配置：')+result.config_path;
+    notice(check?'数据检查完成。'+result.statistics:'配置已展开，可在下方核对。');
+  }catch(error){
+    $('output').textContent=(check?'数据与统计检查失败：':'配置预览失败：')+error.message;
+    $('job-info').textContent='请修正表单后重新检查。';
+    throw error;
+  }
+}
 async function openBrowser(input){browseTarget=input;try{await browse(input.value.includes('://')?'':input.value.split('\n').filter(Boolean).at(-1));}catch{await browse('');}$('browser').showModal();}
 async function browse(path){browseState=await api('/api/browse?path='+encodeURIComponent(path));$('browse-path').value=browseState.path;$('browse-list').replaceChildren();for(const entry of browseState.entries){const button=node('button','▸ '+entry.name);button.addEventListener('click',()=>perform(()=>browse(entry.path)));$('browse-list').append(button);}if(browseState.truncated)$('browse-list').append(node('p','仅显示前 500 个目录，请直接输入路径'));}
 $('preview').addEventListener('click',()=>perform(()=>showPreview(false),$('preview')));
