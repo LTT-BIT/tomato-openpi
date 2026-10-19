@@ -34,6 +34,8 @@
 
 当前 LoRA / 全参均使用 absolute 动作监督，asset_id 与默认实验名增加 absolute。历史 delta 统计固定摘要及旧格式兼容已取消；两份均须重新计算配套统计，并建立新实验，不能直接续训旧 delta checkpoint。
 
+个人实验可在 Train UI 中改选 delta：仅双臂各 7 维转为相对当前 state 的目标，手部仍为 absolute；原始 LeRobot action 必须为绝对目标。切换后使用新的 asset_id 重新计算统计，并用新的实验名训练，不能复用这两份 absolute baseline 的统计或 checkpoint。
+
 英文 prompt 示例保留各自基准：
 
 - LoRA：`Pick up a tomato truss with the right hand and hold it steady between both hands, then pick a single cherry tomato from the truss with the left hand and place the picked tomato into the plate on the left.`

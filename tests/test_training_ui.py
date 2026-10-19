@@ -13,8 +13,10 @@ from urllib.error import HTTPError
 from urllib.request import Request
 from urllib.request import urlopen
 
+import numpy as np
 import pytest
 
+from openpi import transforms
 from scripts import run_training
 from scripts import training_ui as ui
 from scripts import training_ui_config as editor
@@ -66,6 +68,61 @@ def test_invalid_edits_fail_before_saving(change):
     values = {**editor.defaults(BASE)["values"], **change}
     with pytest.raises((ValueError, TypeError)):
         editor.apply_overrides(editor.baseline_config(BASE), values)
+
+
+@pytest.mark.parametrize(("task", "dimension", "second_arm"), [("tomato_wuji", 54, 27), ("tomato_sharpa", 58, 29)])
+@pytest.mark.parametrize("method", ["lora", "fullft"])
+def test_ui_delta_selection_preserves_arm_and_hand_semantics(task, dimension, second_arm, method):
+    module = next(entry["id"] for entry in editor.baseline_catalog() if entry["task"] == task and method in entry["id"])
+    original = editor.baseline_config(module)
+    defaults = editor.defaults(module)
+    assert defaults["protocol"]["actions"] == "absolute"
+    assert defaults["protocol"]["delta_available"]
+    values = {**defaults["values"], "action_semantics": "delta", "asset_id": "ui_delta_test"}
+    assert editor.changed_parameters(module, values) == ["action_semantics"]
+    config = editor.apply_overrides(original, values)
+    assert config.data.extra_delta_transform
+    assert "delta" in config.name
+    assert "absolute" not in config.name
+    assert config.policy_metadata["training_action_semantics"] == "delta_arm_joint_target_absolute_hand"
+    assert config.data.assets.asset_id == "ui_delta_test"
+    _, vectors = config.data.create_vector_transforms(config.model)
+    assert isinstance(vectors.inputs[-1], transforms.DeltaActions)
+    assert isinstance(vectors.outputs[0], transforms.AbsoluteActions)
+    state = np.arange(dimension, dtype=np.float32)
+    absolute = np.stack((state + 2, state + 3))
+    delta = vectors.inputs[-1]({"state": state, "actions": absolute.copy()})["actions"]
+    for start in (0, second_arm):
+        np.testing.assert_allclose(delta[:, start : start + 7], [[2] * 7, [3] * 7])
+    np.testing.assert_allclose(delta[:, 7:second_arm], absolute[:, 7:second_arm])
+    np.testing.assert_allclose(delta[:, second_arm + 7 :], absolute[:, second_arm + 7 :])
+    restored = vectors.outputs[0]({"state": state, "actions": delta.copy()})["actions"]
+    np.testing.assert_allclose(restored, absolute)
+    scope = {}
+    exec(compile(editor.personal_source(module, "alice", values), "personal.py", "exec"), scope)
+    saved = scope["build_config"]()
+    assert saved.data == config.data
+    assert saved.name == config.name
+    assert saved.policy_metadata["training_action_semantics"] == config.policy_metadata["training_action_semantics"]
+    assert editor.baseline_config(module) == original
+
+
+def test_ui_delta_rejects_old_stats_and_unsupported_tasks():
+    baseline = editor.baseline_config(BASE)
+    values = editor.defaults(BASE)["values"]
+    with pytest.raises(ValueError, match="新的 asset_id"):
+        editor.apply_overrides(baseline, {**values, "action_semantics": "delta"})
+    with pytest.raises(ValueError, match="只能选择"):
+        editor.apply_overrides(baseline, {**values, "action_semantics": "unknown"})
+    legacy = {key: value for key, value in values.items() if key != "action_semantics"}
+    assert editor.apply_overrides(baseline, legacy) == baseline
+    cup = next(entry["id"] for entry in editor.baseline_catalog() if entry["task"] == "cup_grasping")
+    assert not editor.defaults(cup)["protocol"]["delta_available"]
+    with pytest.raises(ValueError, match="仅番茄"):
+        editor.apply_overrides(
+            editor.baseline_config(cup),
+            {**editor.defaults(cup)["values"], "action_semantics": "delta", "asset_id": "new"},
+        )
 
 
 def test_grouped_sampling_and_data_identity_are_saved():
@@ -166,6 +223,26 @@ def test_launch_saves_personal_file_without_mutating_baseline(workspace, fake_la
     ui.atomic_json(ui.job_directory(state["id"]) / "state.json", state)
     with pytest.raises(FileExistsError):
         ui.start_job({**workspace, "gpus": ["GPU-test1"], "allow_busy": True})
+
+
+def test_ui_delta_launch_records_mode_and_independent_statistics(workspace, fake_launch):
+    original = editor.defaults(BASE)["values"]
+    workspace["values"] = {
+        **original,
+        "exp_name": "alice_delta_trial",
+        "asset_id": "alice_delta_trial_stats",
+        "action_semantics": "delta",
+    }
+    state = ui.start_job(workspace)
+    assert state["creates_config"]
+    assert "template.alice.alice_delta_trial" in state["module"]
+    assert state["values"]["action_semantics"] == "delta"
+    assert state["values"]["asset_id"] == "alice_delta_trial_stats"
+    resolved = editor.config_from_source(Path(state["config_path"]).read_text(), state["module"], state["config_path"])
+    assert resolved.data.extra_delta_transform
+    assert resolved.policy_metadata["training_action_semantics"] == "delta_arm_joint_target_absolute_hand"
+    record = json.loads((ui.job_directory(state["id"]) / "run.json").read_text())
+    assert record["values"]["action_semantics"] == "delta"
 
 
 def test_config_path_rejects_escape_and_symlink(workspace, tmp_path):

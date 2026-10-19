@@ -10,7 +10,7 @@ const statusNames = {queued:'等待中', running:'运行中', completed:'训练�
 const definitions = {
   identity: [['owner','配置负责人','text'],['exp_name','实验名称','text']],
   data: [['dataset_root','数据集目录（每行一个，可先添加父目录再识别）','paths'],['repo_id','数据集 repo_id','text'],['dataset_version','数据版本','text'],['sources','数据来源（每行一项）','lines'],['assets_dir','归一化统计父目录','path'],['asset_id','统计名称 asset_id','text']],
-  train: [['batch_size','全局 batch size','int'],['num_train_steps','训练步数','int'],['peak_lr','峰值学习率','float'],['decay_lr','末尾学习率','float'],['warmup_steps','Warmup 步数','int'],['decay_steps','学习率衰减步数','int'],['num_workers','数据 workers','int'],['fsdp_devices','FSDP 分片数','int'],['action_horizon','动作 horizon','int']],
+  train: [['action_semantics','动作监督','action-semantics'],['batch_size','全局 batch size','int'],['num_train_steps','训练步数','int'],['peak_lr','峰值学习率','float'],['decay_lr','末尾学习率','float'],['warmup_steps','Warmup 步数','int'],['decay_steps','学习率衰减步数','int'],['num_workers','数据 workers','int'],['fsdp_devices','FSDP 分片数','int'],['action_horizon','动作 horizon','int']],
   advanced: [['log_interval','日志间隔','int'],['save_interval','权重保存间隔','int'],['keep_period','长期保留间隔（空=关闭）','optional-int'],['seed','总 seed','int'],['model_seed','模型 seed','int'],['data_seed','采样 seed','int'],['augmentation_seed','增强 seed','int'],['weight_decay','Weight decay','float'],['clip_gradient_norm','梯度裁剪','float'],['save_before_step','分阶段保存切换步数','int'],['save_steps_before','切换前保存步数（逗号分隔）','ints'],['save_interval_after','切换后保存间隔','int']],
   runtime: [['weight_path','基础权重 params 路径 / URL','path'],['project_name','W&B 项目','text'],['stats_batch_size','统计计算 batch size','int']],
 };
@@ -34,10 +34,14 @@ function updatePath(){
       : '复用配置：'+baseline.replaceAll('.','/')+'.py（本次运行单独记录）';
   }catch{$('save-location').textContent='填写完整参数后可预览保存方式。';}
 }
-function independentStats(){fields.get('asset_id').input.value='ui_'+fields.get('owner').input.value+'_'+fields.get('exp_name').input.value;fields.get('asset_id').input.dispatchEvent(new Event('input'));}
+function independentStats(){const suffix=fields.get('action_semantics').input.value==='delta'?'_delta':'';fields.get('asset_id').input.value='ui_'+fields.get('owner').input.value+'_'+fields.get('exp_name').input.value+suffix;fields.get('asset_id').input.dispatchEvent(new Event('input'));}
 function addField(container, definition, value, original) {
   const [key,label,type]=definition; const wrapper=node('label',label,(['path','paths','lines'].includes(type))?'full':'');
-  const input=document.createElement(['lines','paths'].includes(type)?'textarea':'input');input.id='field-'+key;input.name=key;
+  const input=document.createElement(['lines','paths'].includes(type)?'textarea':type==='action-semantics'?'select':'input');input.id='field-'+key;input.name=key;
+  if(type==='action-semantics'){
+    for(const [mode,text] of [['absolute','absolute · 原始绝对目标'],['delta','delta · 关节目标减当前状态']]){const option=node('option',text);option.value=mode;input.append(option);}
+    if(!protocol.delta_available){input.querySelector('[value=delta]').disabled=true;wrapper.append(node('small','当前仅番茄 Wuji / Sharpa 支持 delta。','default'));}
+  }
   if(['int','float','optional-int'].includes(type)){input.type='number';input.step=type==='float'?'any':'1';}
   input.value=Array.isArray(value)?value.join(type==='lines'?'\n':', '):(value??'');
   const wrap=['path','paths'].includes(type)?node('div',undefined,'path-input'):wrapper;wrap.append(input);
@@ -46,6 +50,12 @@ function addField(container, definition, value, original) {
   input.addEventListener('input',()=>{input.classList.toggle('changed',original!==undefined&&input.value!==(Array.isArray(original)?original.join(type==='lines'?'\n':', '):String(original??'')));updatePath();});
   if(key==='dataset_root')input.addEventListener('input',()=>{$('groups-result').textContent='数据目录已变更，请重新读取或核对分组编号。';});
   if(key==='action_horizon'){input.addEventListener('change',()=>{if(Number(input.value)!==initial.action_horizon)independentStats();});}
+  if(key==='action_semantics')input.addEventListener('change',()=>{
+    const old=input.dataset.previous||initial.action_semantics, name=fields.get('exp_name').input;
+    if(name.value.includes('_'+old+'_'))name.value=name.value.replace('_'+old+'_','_'+input.value+'_');
+    else if(name.value.endsWith('_'+old))name.value=name.value.slice(0,-old.length)+input.value;
+    name.dispatchEvent(new Event('input'));input.dataset.previous=input.value;input.dispatchEvent(new Event('input'));independentStats();
+  });
   fields.set(key,{input,type});container.append(wrapper);
 }
 function fillForm(result) {
@@ -56,7 +66,7 @@ function fillForm(result) {
     const container=$(section+'-fields');container.replaceChildren();
     for(const definition of defs){const key=definition[0];if(section==='advanced'&&!(key in initial))continue;let value=initial[key];if(key==='dataset_root')value=(initial.dataset_roots||[initial.dataset_root]).join('\n');if(key==='owner')value=result.owner;if(key==='exp_name')value=result.suggested_exp_name;if(key==='stats_batch_size')value=512;addField(container,definition,value,initial[key]);}
   }
-  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
+  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
   if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
   if(result.shared_weights){const button=node('button','使用服务器公共权重','text-button');button.addEventListener('click',()=>{fields.get('weight_path').input.value=result.shared_weights;fields.get('weight_path').input.dispatchEvent(new Event('input'));});$('runtime-fields').append(button);}
   $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);

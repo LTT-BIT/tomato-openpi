@@ -13,6 +13,7 @@ import pprint
 import re
 from zoneinfo import ZoneInfo
 
+from openpi.training import config as train_config
 from openpi.training.sampling import SamplingGroup
 from scripts.run_training import load_experiment
 from scripts.run_training import validate_config
@@ -141,6 +142,10 @@ def changed_parameters(module: str, values: dict) -> list[str]:
     return sorted(key for key in after if key not in RUN_FIELDS and after[key] != before[key])
 
 
+def delta_supported(config) -> bool:
+    return isinstance(config.data, train_config.LeRobotFr3WujiDataConfig | train_config.LeRobotFr3SharpaDataConfig)
+
+
 def config_values(config) -> dict:
     values = {key: getattr(config, key) for key in TRAIN_INTS}
     values.update({key: getattr(config.lr_schedule, key) for key in LR_FIELDS})
@@ -157,6 +162,7 @@ def config_values(config) -> dict:
         weight_path=config.weight_loader.params_path,
         project_name=config.project_name,
         action_horizon=config.model.action_horizon,
+        action_semantics="delta" if getattr(config.data, "extra_delta_transform", False) else "absolute",
         sampling_mode=config.sampling_mode,
         sampling_groups=[asdict(group) for group in config.sampling_groups],
     )
@@ -187,7 +193,8 @@ def defaults(module: str) -> dict:
             "task_view": asdict(config.data.base_config.task_view)
             if getattr(config.data.base_config, "task_view", None)
             else None,
-            "actions": "absolute",
+            "actions": values["action_semantics"],
+            "delta_available": delta_supported(config),
         },
     }
 
@@ -202,6 +209,7 @@ def apply_overrides(config, values: dict):
     """Only allow presentation fields; preserve embodiment, task view and freeze filter."""
     allowed = set(TRAIN_INTS + LR_FIELDS + OPT_FIELDS + TEXT_FIELDS + SCHEDULE_FIELDS) | {
         "action_horizon",
+        "action_semantics",
         "sources",
         "sampling_mode",
         "sampling_groups",
@@ -218,6 +226,15 @@ def apply_overrides(config, values: dict):
     }
     if missing := required - set(values):
         raise ValueError(f"缺少参数: {sorted(missing)}")
+    source_semantics = "delta" if getattr(config.data, "extra_delta_transform", False) else "absolute"
+    action_semantics = values.get("action_semantics", source_semantics)
+    if action_semantics not in ("absolute", "delta"):
+        raise ValueError("动作监督只能选择 absolute 或 delta")
+    delta_available = delta_supported(config)
+    if action_semantics == "delta" and not delta_available:
+        raise ValueError("当前仅番茄 Wuji / Sharpa 支持 delta 动作监督")
+    if action_semantics != source_semantics and values["asset_id"] == config.data.assets.asset_id:
+        raise ValueError("切换动作监督后必须使用新的 asset_id，并重新计算归一化统计")
     for key in TEXT_FIELDS:
         if not isinstance(values[key], str) or not values[key].strip():
             raise ValueError(f"{key} 不能为空")
@@ -318,7 +335,17 @@ def apply_overrides(config, values: dict):
         repo_id=values["repo_id"],
         lerobot_datasets=specs,
         assets=replace(config.data.assets, assets_dir=paths["assets_dir"], asset_id=values["asset_id"]),
+        **({"extra_delta_transform": action_semantics == "delta"} if delta_available else {}),
     )
+    name = config.name
+    if action_semantics != source_semantics:
+        old, new = source_semantics, action_semantics
+        if f"_{old}_" in name:
+            name = name.replace(f"_{old}_", f"_{new}_", 1)
+        elif name.endswith(f"_{old}"):
+            name = f"{name[: -len(old)]}{new}"
+        else:
+            name = f"{name}_{new}"
     scheduled = {
         key: tuple(values[key]) if key == "save_steps_before" else values[key]
         for key in SCHEDULE_FIELDS
@@ -326,6 +353,7 @@ def apply_overrides(config, values: dict):
     }
     result = replace(
         config,
+        name=name,
         **{key: values[key] for key in TRAIN_INTS},
         **scheduled,
         exp_name=values["exp_name"],
@@ -342,6 +370,13 @@ def apply_overrides(config, values: dict):
         wandb_enabled=True,
         policy_metadata={
             **{key: value for key, value in config.policy_metadata.items() if key != "dataset_roots"},
+            **(
+                {"training_action_semantics": "delta_arm_joint_target_absolute_hand"}
+                if action_semantics == "delta"
+                else {"training_action_semantics": "absolute_joint_target"}
+                if action_semantics != source_semantics
+                else {}
+            ),
             "dataset_root": paths["dataset_root"],
             **({"dataset_roots": roots} if len(roots) > 1 else {}),
             "dataset_repo_id": values["repo_id"],

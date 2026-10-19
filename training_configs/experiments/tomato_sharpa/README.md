@@ -66,3 +66,5 @@ baseline 可用 `PI05_SHARPA_DATASET_ROOT` / `PI05_SHARPA_ASSETS_DIR` 覆盖路�
 当前生产数据待准备，未记录完整 GPU 训练或实机验证结果。
 
 当前两份 baseline 已切换为 absolute，统计身份与默认实验名增加 absolute。必须重新计算统计并开始新实验，不可复用旧 delta 统计或直接 resume 旧 delta checkpoint。
+
+个人实验可在 Train UI 中改选 delta：仅双臂各 7 维转为相对当前 state 的目标，手部仍为 absolute；原始 LeRobot action 必须为绝对目标。切换后使用新的 asset_id 重新计算统计，并用新的实验名训练，不能复用这两份 absolute baseline 的统计或 checkpoint。
