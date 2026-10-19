@@ -515,6 +515,19 @@ class LeRobotFr3SharpaDataConfig(DataConfigFactory):
 
 
 @dataclasses.dataclass(frozen=True)
+class LeRobotFr3SharpaMultimodalDataConfig(LeRobotFr3SharpaDataConfig):
+    """Opt-in converter adapter; legacy measured-only Sharpa recipes stay strict."""
+
+    def create_vector_transforms(self, model_config):
+        from openpi.policies.fr3_sharpa_multimodal_policy import Fr3SharpaMultimodalInputs
+
+        repack, vectors = super().create_vector_transforms(model_config)
+        return repack, dataclasses.replace(
+            vectors, inputs=[Fr3SharpaMultimodalInputs(model_config.model_type), *vectors.inputs[1:]]
+        )
+
+
+@dataclasses.dataclass(frozen=True)
 class LeRobotSingleFrankaDataConfig(DataConfigFactory):
     """Seven physical joints and two cameras, normalized before padding to model width."""
 

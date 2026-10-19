@@ -123,10 +123,10 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     if features["observation.state"]["shape"] not in [[dim] for dim in metadata["raw_state_dims"]]:
         raise ValueError("Dataset raw state shape is not supported by the embodiment")
     joint_names = metadata.get("joint_names")
-    if joint_names is not None:
-        for key in ("observation.state", "action"):
-            if features[key].get("names") != joint_names:
-                raise ValueError(f"Dataset {key} joint names/order differ from the embodiment protocol")
+    for key, source_names in (("observation.state", "source_state_joint_names"), ("action", "source_action_joint_names")):
+        expected_names = metadata.get(source_names, joint_names)
+        if expected_names is not None and features[key].get("names") != expected_names:
+            raise ValueError(f"Dataset {key} joint names/order differ from the embodiment protocol")
     if any(key not in features for key in metadata["camera_keys"]):
         raise ValueError("Dataset camera roles differ from the embodiment")
     if info.get("total_frames", 0) <= 0 or info.get("total_episodes", 0) <= 0:

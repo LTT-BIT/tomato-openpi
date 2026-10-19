@@ -63,8 +63,25 @@ baseline 可用 `PI05_SHARPA_DATASET_ROOT` / `PI05_SHARPA_ASSETS_DIR` 覆盖路�
 
 新数据按根 README 计算统计，再执行 check 并训练。统计必须是本 Sharpa 数据的 58 维统计，包含 norm_stats.json 和 norm_metadata.json；同一数据、输入变换和 horizon 可在 LoRA/全参间复用。日志、W&B offline 同步和原 commit 续训规则见根 README。
 
-当前生产数据待准备，未记录完整 GPU 训练或实机验证结果。
+以上 baseline 仍只接受 58D 实测位置格式，不能直接用于转换器的 116D 位置/速度格式。未记录完整 GPU 训练或实机验证结果。
 
 当前两份 baseline 已切换为 absolute，统计身份与默认实验名增加 absolute。必须重新计算统计并开始新实验，不可复用旧 delta 统计或直接 resume 旧 delta checkpoint。
 
-个人实验可在 Train UI 中改选 delta：仅双臂各 7 维转为相对当前 state 的目标，手部仍为 absolute；原始 LeRobot action 必须为绝对目标。切换后使用新的 asset_id 重新计算统计，并用新的实验名训练，不能复用这两份 absolute baseline 的统计或 checkpoint。
+## 自动转换器的多模态数据：只训练 RGB
+
+转换器保留 `observation.state[116]`（双臂、双手的位置/速度）、`action[58]`（左臂、右臂、左手、右手），以及三路 RGB、深度和二十路触觉。使用独立模块前缀 `training_configs.experiments.tomato_sharpa.multimodal_rgb.`，尾名仍为 `tomato_fr3_sharpa_lora_v1` 或 `tomato_fr3_sharpa_fullft_v1`。旧 baseline、旧 58D 协议和训练循环不变。
+
+新适配按元数据严格核对原始关节名称/顺序，从 116D 状态中选取实测位置，并把状态与动作重排为“左臂 7 + 左手 22 + 右臂 7 + 右手 22”。模型仍使用 58D absolute 目标、30 Hz、horizon 50；相机仍为 cam0 外部、cam2 左腕、cam1 右腕。深度、触觉、速度和审计列保留在文件中，经过 repack 后不进入当前模型；底层 LeRobot loader 仍会读取额外列，因此这不是专门优化过的 RGB 列裁剪 loader。
+
+用 `PI05_SHARPA_MULTIMODAL_DATASET_ROOT` 指定**一套已封存批次的实际数据集根目录**，不是 A/B 父目录；`PI05_SHARPA_MULTIMODAL_ASSETS_DIR` 指定统计父目录。新 asset_id 为 `tomato_sharpa_multimodal_rgb_absolute_v1_30hz`，必须重新计算与该固定批次、转换规则和 horizon 绑定的统计；不能复用旧 58D 或旧 delta 统计，也不能直接续训旧格式 checkpoint。英文任务文本继续来自该数据集的 `meta/tasks.jsonl`。
+
+可独立做真实数据兼容性检查，不加载模型权重、不启动训练：
+
+```bash
+bash scripts/python.sh -m scripts.check_converter_dataset \
+  --robot sharpa --dataset /path/to/36_68_data_lerobot \
+  --norm-assets /path/to/new-validation-assets \
+  --output /path/to/new-validation-report.json
+```
+
+该命令会计算独立归一化统计，核对 provenance，检查每个 episode 的首/中/尾向量映射，并实际生成一个含 RGB、位置和文本 token 的标准模型输入 batch。统计目录和报告应使用新路径，不覆盖既有训练资产；`--robot wuji` 使用现有 Wuji absolute 适配。这个检查通过表示数据/输入链路可用，不表示已经完成训练、效果评估或实机验证。可核对的真实检查结果位于本目录 `multimodal_rgb/records/`。

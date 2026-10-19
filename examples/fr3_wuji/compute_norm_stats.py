@@ -25,6 +25,7 @@ from openpi.policies import fr3_sharpa_policy
 from openpi.policies import fr3_wuji_policy
 from openpi.policies import lemon_policy
 from openpi.policies import single_franka_policy
+from openpi.policies.fr3_sharpa_multimodal_policy import Fr3SharpaMultimodalInputs
 from openpi.shared import normalize
 from openpi.shared.local_storage import new_artifact_directory
 from openpi.training import config as training_config
@@ -94,6 +95,7 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
         not in (
             fr3_wuji_policy.Fr3WujiInputs,
             fr3_sharpa_policy.Fr3SharpaInputs,
+            Fr3SharpaMultimodalInputs,
             single_franka_policy.SingleFrankaInputs,
             lemon_policy.LemonInputs,
             transforms.DeltaActions,

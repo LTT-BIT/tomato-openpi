@@ -1,0 +1,89 @@
+{
+  "status": "passed",
+  "robot": "sharpa",
+  "dataset": "/home/user/convert_data_job-worker/outputs/jobs/sharpa_stage2/dataset",
+  "experiment_module": "training_configs.experiments.tomato_sharpa.multimodal_rgb.tomato_fr3_sharpa_lora_v1",
+  "frames": 7094,
+  "episodes": 6,
+  "fps": 30,
+  "normalization_provenance": "verified",
+  "raw_state_shape": [
+    116
+  ],
+  "model_state_shape": [
+    1,
+    58
+  ],
+  "model_action_shape": [
+    1,
+    50,
+    58
+  ],
+  "model_images": {
+    "base_0_rgb": [
+      1,
+      224,
+      224,
+      3
+    ],
+    "left_wrist_0_rgb": [
+      1,
+      224,
+      224,
+      3
+    ],
+    "right_wrist_0_rgb": [
+      1,
+      224,
+      224,
+      3
+    ]
+  },
+  "tokenized_prompt_shape": [
+    1,
+    256
+  ],
+  "depth_features_stored": [
+    "observation.depths.cam0"
+  ],
+  "tactile_features_stored": [
+    "observation.tactile.left.thumb.deformation",
+    "observation.tactile.left.thumb.wrench",
+    "observation.tactile.left.index.deformation",
+    "observation.tactile.left.index.wrench",
+    "observation.tactile.left.middle.deformation",
+    "observation.tactile.left.middle.wrench",
+    "observation.tactile.left.ring.deformation",
+    "observation.tactile.left.ring.wrench",
+    "observation.tactile.left.pinky.deformation",
+    "observation.tactile.left.pinky.wrench",
+    "observation.tactile.right.thumb.deformation",
+    "observation.tactile.right.thumb.wrench",
+    "observation.tactile.right.index.deformation",
+    "observation.tactile.right.index.wrench",
+    "observation.tactile.right.middle.deformation",
+    "observation.tactile.right.middle.wrench",
+    "observation.tactile.right.ring.deformation",
+    "observation.tactile.right.ring.wrench",
+    "observation.tactile.right.pinky.deformation",
+    "observation.tactile.right.pinky.wrench"
+  ],
+  "boundary_middle_samples_checked": 18,
+  "input_metadata_sha256": {
+    "episodes.jsonl": "2d8e6d0198609fd6925dfd0394c531f4718ed0b9799f0c19762773bbfb4ef320",
+    "episodes_stats.jsonl": "ebab971b439ed8843043ee27c4b5a9d1faffbef2a6ee2f6c182e10254597b4d0",
+    "info.json": "015e6647e73752e878dc59b424f0fe86fc957f0b2ab19a84bc69934650c46dd4",
+    "tasks.jsonl": "215abb61c0958b797f694ac2f029d5cccbde8b87b553837548165cf7a130361c"
+  },
+  "training_started": false,
+  "model_weights_loaded": false,
+  "dataset_version": "tomato_sharpa_multimodal_rgb_absolute_v1_30hz",
+  "exp_name": "tomato_sharpa_multimodal_rgb_lora_v1_absolute_30hz_s42",
+  "prompts": [
+    "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+  ],
+  "norm_stats_sha256": "2de06cc4a805e711a79e01291b296a5e7a21365f557f9796ddb498badc97e7c5",
+  "norm_metadata_sha256": "9bc298837c3d921e4d6ffb904ae6e71c2a82fb4437171fbdc485dcb5e8296863",
+  "loader_framework": "jax",
+  "sampling_mode": "epoch_shuffle"
+}

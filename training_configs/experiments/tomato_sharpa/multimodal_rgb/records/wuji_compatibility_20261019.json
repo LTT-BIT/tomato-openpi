@@ -1,0 +1,68 @@
+{
+  "status": "passed",
+  "robot": "wuji",
+  "dataset": "/home/user/convert_data_job-worker/outputs/jobs/wuji_stage2/dataset",
+  "experiment_module": "training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1",
+  "frames": 2763,
+  "episodes": 3,
+  "fps": 30,
+  "normalization_provenance": "verified",
+  "raw_state_shape": [
+    108
+  ],
+  "model_state_shape": [
+    1,
+    54
+  ],
+  "model_action_shape": [
+    1,
+    50,
+    54
+  ],
+  "model_images": {
+    "base_0_rgb": [
+      1,
+      224,
+      224,
+      3
+    ],
+    "left_wrist_0_rgb": [
+      1,
+      224,
+      224,
+      3
+    ],
+    "right_wrist_0_rgb": [
+      1,
+      224,
+      224,
+      3
+    ]
+  },
+  "tokenized_prompt_shape": [
+    1,
+    256
+  ],
+  "depth_features_stored": [
+    "observation.depths.cam0"
+  ],
+  "tactile_features_stored": [],
+  "boundary_middle_samples_checked": 9,
+  "input_metadata_sha256": {
+    "episodes.jsonl": "a8a919d08aa37802473325fa68bd22fba11002c52041568da872c3bcd418d539",
+    "episodes_stats.jsonl": "ea6fd030b026ed74c5affb12a87a391d420e17bdcce7176e45bd53febe31d2d3",
+    "info.json": "b545ee2c12bcab36a482455646fa7d544e3d4a62c0e3e117b69a8a30d6139393",
+    "tasks.jsonl": "215abb61c0958b797f694ac2f029d5cccbde8b87b553837548165cf7a130361c"
+  },
+  "training_started": false,
+  "model_weights_loaded": false,
+  "dataset_version": "tomato_fulltask_v1_30hz",
+  "exp_name": "tomato_fulltask_lora_v1_absolute_30hz_s42",
+  "prompts": [
+    "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+  ],
+  "norm_stats_sha256": "bfb1bab4c7ef11f8673b7de937db40eed6212517c60ce157a76630e5da5e30c0",
+  "norm_metadata_sha256": "2122e29af63bb60d398b24e4e74fbc8ac34f34ede6efb32dede627432d6c0849",
+  "loader_framework": "jax",
+  "sampling_mode": "epoch_shuffle"
+}

@@ -128,7 +128,7 @@ baseline 默认基础权重为服务器路径 `/mnt/data/public_ckpt/pi05/pi05_b
 | 任务 | 说明和配置 | 当前状态 |
 | --- | --- | --- |
 | 番茄-Wuji | [tomato_wuji](training_configs/experiments/tomato_wuji/README.md) | LoRA / 全参 v1 baseline |
-| 番茄-Sharpa | [tomato_sharpa](training_configs/experiments/tomato_sharpa/README.md) | LoRA / 全参 v1 baseline；生产数据待准备 |
+| 番茄-Sharpa | [tomato_sharpa](training_configs/experiments/tomato_sharpa/README.md) | 58D baseline；另有转换器 116D 多模态存储的 RGB-only 适配，已验证读取，未训练 |
 | 铲柠檬 | [lemon_scooping](training_configs/experiments/lemon_scooping/README.md) | 双 UR/O30 LoRA / 全参 v1 baseline；209 条有效数据全部训练 |
 | 抓取杯子 | [cup_grasping](training_configs/experiments/cup_grasping/README.md) | 单臂 Franka LoRA / 全参 v1 baseline；v2.1 数据待准备 |
 
