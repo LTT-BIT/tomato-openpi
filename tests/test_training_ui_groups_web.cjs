@@ -6,17 +6,18 @@ const vm = require('node:vm');
 const {test} = require('node:test');
 
 class Element {
-  constructor(tag) { this.tag=tag; this.children=[]; this.dataset={}; this.value=''; }
+  constructor(tag) { this.tag=tag; this.children=[]; this.dataset={}; this.value=''; this.classList={add(){},remove(){}}; }
   append(...children) { this.children.push(...children); }
   replaceChildren(...children) { this.children=children; }
   addEventListener() {}
-  querySelectorAll(tag) { return this.children.flatMap(el=>[...(el.tag===tag?[el]:[]),...el.querySelectorAll(tag)]); }
+  dispatchEvent() {}
+  querySelectorAll(tag) { return this.children.flatMap(el=>[...((el.tag===tag||(tag==='input:checked'&&el.tag==='input'&&el.checked))?[el]:[]),...el.querySelectorAll(tag)]); }
 }
 function setup() {
-  const elements=new Map(['groups','groups-result','sampling-mode'].map(id=>[id,new Element('div')]));
+  const elements=new Map(['groups','groups-result','sampling-mode','dataset-candidates','apply-datasets','wandb-mode','auto-norm','allow-busy'].map(id=>[id,new Element('div')]));
   elements.get('sampling-mode').value='weighted_replacement';
-  const context=vm.createContext({URLSearchParams,location:{hash:''},document:{
-    getElementById:id=>elements.get(id), createElement:tag=>new Element(tag),
+  const context=vm.createContext({URLSearchParams,Event:class {},location:{hash:''},document:{
+    getElementById:id=>elements.get(id), createElement:tag=>new Element(tag), querySelectorAll:()=>[],
   }});
   const source=fs.readFileSync(path.join(__dirname,'../scripts/training_ui_web/app.js'),'utf8');
   // Load the actual form logic; startup/polling bindings are exercised by the browser.
@@ -86,4 +87,39 @@ test('stop cancellation and completed jobs do not send stop requests',async()=>{
   assert.equal(context.calls.length,1);
   run("api=async()=>({status:'completed'})");
   await assert.rejects(run("stopTask('id')"),/已结束/);
+});
+
+test('parent discovery keeps full selected and subtasks unchecked, then applies only checked roots',async()=>{
+  const {context,run,elements}=setup();
+  context.discovery={datasets:[
+    {root:'/0924/A',episodes:106,frames:10,fps:30,selected:true},
+    {root:'/1010/full',episodes:191,frames:20,fps:30,selected:true},
+    {root:'/1010/subtasks',episodes:760,frames:20,fps:30,selected:false,note:'alternative'},
+  ],warnings:[]};
+  run("api=async()=>discovery;fields.get('dataset_root').input.dispatchEvent=()=>{};fields.set('sources',{input:{value:'',dispatchEvent(){}}});independentStats=()=>{};");
+  await run('discoverDatasets()');
+  assert.equal(elements.get('dataset-candidates').querySelectorAll('input:checked').length,2);
+  run('applyDatasets()');
+  assert.equal(run("fields.get('dataset_root').input.value"),'/0924/A\n/1010/full');
+  assert.equal(run("fields.get('sources').input.value"),'/0924/A\n/1010/full');
+  assert.equal(elements.get('groups').children.length,0);
+});
+
+test('changed directory cannot apply stale discovery, and browser can append multiple paths',async()=>{
+  const {context,run}=setup();context.discovery={datasets:[],warnings:[]};
+  run("api=async()=>discovery;initial={dataset_root:'/default'};");
+  assert.equal(run("appendDatasetPath('/default','/0924')"),'/0924');
+  assert.equal(run("appendDatasetPath('/0924','/1010')"),'/0924\n/1010');
+  await run('discoverDatasets()');
+  run("fields.get('dataset_root').input.value='/changed'");
+  assert.throws(()=>run('applyDatasets()'),/目录已修改/);
+});
+
+test('launch request carries every selected root in order while one root keeps legacy shape',()=>{
+  const {run}=setup();
+  run("$('sampling-mode').value='epoch_shuffle';fields.get('dataset_root').input.value='/a\\n/b';fields.set('owner',{input:{value:'tester'},type:'text'});");
+  assert.equal(run('JSON.stringify(request().values.dataset_roots)'),'["/a","/b"]');
+  assert.equal(run('request().values.dataset_root'),'/a');
+  run("fields.get('dataset_root').input.value='/a'");
+  assert.equal(run('request().values.dataset_roots'),undefined);
 });

@@ -119,6 +119,10 @@ UI 支持公共 baseline 和当前仓库 `template/<用户名>/*.py` 下的手�
 
 UI 后端在 `scripts/training_ui.py`，字段校验和配置保存逻辑在 `scripts/training_ui_config.py`，静态页面在 `scripts/training_ui_web/`。不新增 Web 框架或 Node 环境依赖，使用仓库现有 Python 环境。后台通过现有 `compute_experiment_norm` / `run_training` 入口运行，保持原数据绑定检查、日志和 W&B 规则。
 
+UI 支持多个本地 LeRobot v2.1 数据集：父目录发现逻辑在 `scripts/training_ui_datasets.py`，共享的全局 episode 映射在 `src/openpi/training/dataset_collection.py`。表单和实验运行记录通过有序 `dataset_roots` 保存多个实际数据集根目录，`dataset_root` 保留为第一项以兼容旧个人配置；训练配置展开为多个 `LeRobotDatasetSpec`。每个目录使用独立的数据加载器和英文任务表，动作窗口不会跨目录；全局采样计划在联合帧索引上生成。
+
+修改或移动目录路径本身仍不强制新建个人配置；修改来源记录、数据身份或采样参数按原规则新建。UI“应用选中数据集”会同步实际来源并建议独立统计目录。目录顺序影响全局编号和采样计划，续训不能改变顺序、来源内容或归一化绑定。多目录采样分组中的编号是全局编号，不直接使用各源重复的 episode_index；单目录行为和编号保持兼容。默认统计对全部来源的每一帧计算一次，不按采样权重重复统计。目前多目录不支持 TaskView 筛选。
+
 页面只开放常用训练参数及分组采样。本体维度、LoRA 结构、TaskView/subtask 等高级改动仍按下方流程在个人 Python 配置或公共模块中定义。UI 不替代跨用户 GPU 调度；每人从自己的 clone 启动自己的服务，使用不同端口。
 
 ## 创建本地个人实验

@@ -130,7 +130,7 @@ def source_config(module: str):
 
 
 # Run identity and storage selection are recorded per launch, not new training recipes.
-RUN_FIELDS = {"exp_name", "dataset_root", "assets_dir", "asset_id", "project_name"}
+RUN_FIELDS = {"exp_name", "dataset_root", "dataset_roots", "assets_dir", "asset_id", "project_name"}
 
 
 def changed_parameters(module: str, values: dict) -> list[str]:
@@ -160,6 +160,8 @@ def config_values(config) -> dict:
         sampling_mode=config.sampling_mode,
         sampling_groups=[asdict(group) for group in config.sampling_groups],
     )
+    if len(config.data.lerobot_datasets) > 1:
+        values["dataset_roots"] = [spec.root for spec in config.data.lerobot_datasets]
     return values
 
 
@@ -203,6 +205,7 @@ def apply_overrides(config, values: dict):
         "sources",
         "sampling_mode",
         "sampling_groups",
+        "dataset_roots",
     }
     if unknown := set(values) - allowed:
         raise ValueError(f"不支持的参数: {sorted(unknown)}")
@@ -286,11 +289,34 @@ def apply_overrides(config, values: dict):
         SamplingGroup(name=g["name"], episodes=tuple(g["episodes"]), weight=g["weight"])
         for g in values["sampling_groups"]
     )
-    spec = replace(config.data.lerobot_datasets[0], root=paths["dataset_root"], repo_id=values["repo_id"])
+    roots = values.get("dataset_roots", [paths["dataset_root"]])
+    if not isinstance(roots, list) or not roots or any(not isinstance(root, str) or not root.strip() for root in roots):
+        raise ValueError("dataset_roots 必须是非空目录列表")
+    roots = [
+        str(
+            (
+                Path(root).expanduser() if Path(root).expanduser().is_absolute() else common.repository_root() / root
+            ).resolve()
+        )
+        for root in roots
+    ]
+    if len(set(roots)) != len(roots):
+        raise ValueError("数据目录不能重复（含指向同一位置的链接）")
+    if roots[0] != paths["dataset_root"]:
+        raise ValueError("dataset_root 必须与 dataset_roots 的第一项一致")
+    specs = tuple(
+        replace(
+            config.data.lerobot_datasets[0],
+            root=root,
+            repo_id=values["repo_id"] if len(roots) == 1 else f"{values['repo_id']}_part{i:03d}",
+            weight=1.0,
+        )
+        for i, root in enumerate(roots)
+    )
     data = replace(
         config.data,
         repo_id=values["repo_id"],
-        lerobot_datasets=(spec,),
+        lerobot_datasets=specs,
         assets=replace(config.data.assets, assets_dir=paths["assets_dir"], asset_id=values["asset_id"]),
     )
     scheduled = {
@@ -315,8 +341,9 @@ def apply_overrides(config, values: dict):
         overwrite=False,
         wandb_enabled=True,
         policy_metadata={
-            **config.policy_metadata,
+            **{key: value for key, value in config.policy_metadata.items() if key != "dataset_roots"},
             "dataset_root": paths["dataset_root"],
+            **({"dataset_roots": roots} if len(roots) > 1 else {}),
             "dataset_repo_id": values["repo_id"],
             "dataset_version": values["dataset_version"],
             "source_datasets": values["sources"],

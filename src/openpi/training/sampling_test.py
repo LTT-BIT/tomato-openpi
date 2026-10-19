@@ -91,7 +91,7 @@ def test_independent_data_seed():
         np.testing.assert_array_equal(a, b)
 
 
-def test_epoch_shuffle_rejects_mixtures_and_other_frameworks():
+def test_epoch_shuffle_rejects_missing_local_roots_and_other_frameworks():
     cfg = dataclasses.replace(config.get_config("debug"), sampling_mode="epoch_shuffle")
     with pytest.raises(ValueError, match="JAX"):
         data_loader.create_data_loader(cfg, framework="pytorch")
@@ -99,10 +99,10 @@ def test_epoch_shuffle_rejects_mixtures_and_other_frameworks():
         repo_id="mixture",
         lerobot_datasets=(
             config.LeRobotDatasetSpec(repo_id="a", root="/unused/a"),
-            config.LeRobotDatasetSpec(repo_id="b", root="/unused/b"),
+            config.LeRobotDatasetSpec(repo_id="b"),
         ),
     )
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(ValueError, match="explicit local roots"):
         data_loader.create_torch_dataset(data, 2, cfg.model, sampling_mode="epoch_shuffle")
 
 

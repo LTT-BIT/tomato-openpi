@@ -28,6 +28,8 @@ from openpi.training import config as cfg
 from openpi.training import norm_provenance
 from openpi.training import reproducibility
 from openpi.training import sampling
+from openpi.training.dataset_collection import collection_layout
+from openpi.training.dataset_collection import validate_collection_features
 from training_configs import common
 
 
@@ -70,8 +72,8 @@ def validate_config(config: cfg.TrainConfig) -> None:
         raise ValueError("Use a new exp_name instead of overwriting a shared experiment")
     if not config.wandb_enabled:
         raise ValueError("Training must log to W&B; use --wandb-mode offline without network")
-    if config.sampling_mode not in sampling.PLAN_MODES or len(config.data.lerobot_datasets) != 1:
-        raise ValueError("The v1 baseline workflow requires deterministic sampling and one explicit local dataset")
+    if config.sampling_mode not in sampling.PLAN_MODES or not config.data.lerobot_datasets:
+        raise ValueError("The v1 baseline workflow requires deterministic sampling and explicit local datasets")
     if config.batch_size <= 0 or config.num_train_steps <= 0 or config.num_workers < 0 or config.fsdp_devices <= 0:
         raise ValueError("batch_size, num_train_steps, fsdp_devices must be positive; num_workers must be nonnegative")
     if any(seed is None for seed in (config.model_seed, config.data_seed, config.augmentation_seed)):
@@ -85,14 +87,25 @@ def validate_config(config: cfg.TrainConfig) -> None:
         raise ValueError("Model action_dim differs from the embodiment adapter; define a new embodiment")
     if not config.data.base_config or not config.data.base_config.prompt_from_task:
         raise ValueError("Read English prompts from dataset task labels")
-    spec = config.data.lerobot_datasets[0]
-    if not spec.root or spec.repo_id != config.data.repo_id or spec.repo_id != metadata.get("dataset_repo_id"):
+    specs = config.data.lerobot_datasets
+    if any(not spec.root for spec in specs) or len(
+        {str(Path(spec.root).expanduser().resolve()) for spec in specs}
+    ) != len(specs):
+        raise ValueError("Dataset roots must be explicit and unique")
+    if len(specs) > 1 and getattr(config.data.base_config, "task_view", None) is not None:
+        raise ValueError("Task views currently require one dataset; select a full-task configuration for collections")
+    spec = specs[0]
+    if config.data.repo_id != metadata.get("dataset_repo_id") or (
+        len(specs) == 1 and spec.repo_id != config.data.repo_id
+    ):
         raise ValueError("Dataset identity differs from the experiment; create a new dataset configuration")
 
 
 def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     """Check metadata/statistics without constructing models or downloading tokenizers."""
     validate_config(config)
+    if len(config.data.lerobot_datasets) > 1:
+        return preflight_collection(config, require_norm=require_norm)
     metadata = config.policy_metadata
     root = Path(config.data.lerobot_datasets[0].root).expanduser().resolve()
     required = [root / "meta" / name for name in ("info.json", "episodes.jsonl", "tasks.jsonl")]
@@ -168,39 +181,83 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
             ],
         }
     if require_norm:
-        norm_path = norm_dir / "norm_stats.json"
-        digest = reproducibility.file_sha256(norm_path)
-        expected = metadata.get("expected_norm_sha256")
-        if expected and digest != expected:
-            raise ValueError(
-                "Normalization digest differs from the recorded data version; create a new dataset version"
-            )
-        stats = normalize.load(norm_dir)
-        audit_digest = hashlib.sha256(reproducibility.serialize_config(stats)).hexdigest()
-        expected_audit = metadata.get("expected_norm_audit_sha256")
-        if expected_audit and audit_digest != expected_audit:
-            raise ValueError("Normalization audit digest differs from the recorded data version")
-        for key in ("state", "actions"):
-            value = stats[key]
-            for field in ("mean", "std", "q01", "q99"):
-                array = getattr(value, field)
-                if (
-                    array is None
-                    or array.shape
-                    != (
-                        metadata.get("normalization_dims", {}).get(
-                            key, metadata.get("normalization_dim", config.model.action_dim)
-                        ),
-                    )
-                    or not np.isfinite(array).all()
-                ):
-                    raise ValueError(f"Invalid normalization {key}.{field} shape or values")
-            if np.any(value.std < 0) or np.any(value.q99 < value.q01):
-                raise ValueError(f"Invalid normalization range for {key}")
-        result["norm_provenance"] = norm_provenance.validate_metadata(config, norm_dir, stats_sha256=digest)
-        result["norm_stats_sha256"] = digest
-        result["norm_audit_sha256"] = audit_digest
+        check_norm(config, result)
     return result
+
+
+def preflight_collection(config, *, require_norm=True):
+    layout = collection_layout([spec.root for spec in config.data.lerobot_datasets])
+    validate_collection_features([item["info"] for item in layout])
+    reports = []
+    for spec in config.data.lerobot_datasets:
+        child = replace(
+            config,
+            data=replace(config.data, repo_id=spec.repo_id, lerobot_datasets=(spec,)),
+            sampling_mode="epoch_shuffle",
+            sampling_groups=(),
+            policy_metadata={**config.policy_metadata, "dataset_repo_id": spec.repo_id},
+        )
+        reports.append(preflight(child, require_norm=False))
+    result = {
+        "datasets": reports,
+        "dataset_repo_id": config.data.repo_id,
+        "source_datasets": config.policy_metadata["source_datasets"],
+        "frames": sum(row["frames"] for row in reports),
+        "episodes": sum(row["episodes"] for row in reports),
+        "prompts": list(dict.fromkeys(p for row in reports for p in row["prompts"])),
+        "episode_mappings": [{"root": item["root"], "local_to_global": item["mapping"]} for item in layout],
+    }
+    if config.sampling_mode == "weighted_replacement":
+        ids = np.array([i for item in layout for i in item["mapping"].values()], dtype=np.int64)
+        sampling.group_frame_weights(ids, config.sampling_groups)
+        max_weight = max(g.weight for g in config.sampling_groups)
+        total_weight = sum(g.weight / max_weight for g in config.sampling_groups)
+        result["sampling"] = {
+            "mode": config.sampling_mode,
+            "groups": [
+                {"name": g.name, "episodes": list(g.episodes), "probability": (g.weight / max_weight) / total_weight}
+                for g in config.sampling_groups
+            ],
+        }
+    if require_norm:
+        check_norm(config, result)
+    return result
+
+
+def check_norm(config, result):
+    metadata = config.policy_metadata
+    norm_dir = Path(config.data.assets.assets_dir or config.assets_dirs) / config.data.assets.asset_id
+    result["norm_stats_path"] = str(norm_dir / "norm_stats.json")
+    norm_path = norm_dir / "norm_stats.json"
+    digest = reproducibility.file_sha256(norm_path)
+    expected = metadata.get("expected_norm_sha256")
+    if expected and digest != expected:
+        raise ValueError("Normalization digest differs from the recorded data version; create a new dataset version")
+    stats = normalize.load(norm_dir)
+    audit_digest = hashlib.sha256(reproducibility.serialize_config(stats)).hexdigest()
+    expected_audit = metadata.get("expected_norm_audit_sha256")
+    if expected_audit and audit_digest != expected_audit:
+        raise ValueError("Normalization audit digest differs from the recorded data version")
+    for key in ("state", "actions"):
+        value = stats[key]
+        for field in ("mean", "std", "q01", "q99"):
+            array = getattr(value, field)
+            if (
+                array is None
+                or array.shape
+                != (
+                    metadata.get("normalization_dims", {}).get(
+                        key, metadata.get("normalization_dim", config.model.action_dim)
+                    ),
+                )
+                or not np.isfinite(array).all()
+            ):
+                raise ValueError(f"Invalid normalization {key}.{field} shape or values")
+        if np.any(value.std < 0) or np.any(value.q99 < value.q01):
+            raise ValueError(f"Invalid normalization range for {key}")
+    result["norm_provenance"] = norm_provenance.validate_metadata(config, norm_dir, stats_sha256=digest)
+    result["norm_stats_sha256"] = digest
+    result["norm_audit_sha256"] = audit_digest
 
 
 @contextmanager

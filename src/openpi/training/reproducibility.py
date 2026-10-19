@@ -99,6 +99,21 @@ def _source_identity(data_config: _config.DataConfig, source: Any) -> tuple[dict
         size = len(source)
         return {"repo_id": "fake", "frames": size}, np.column_stack((np.zeros(size, dtype=np.int64), np.arange(size)))
 
+    if len(data_config.lerobot_datasets) > 1:
+        identities = []
+        for spec, child, layout in zip(data_config.lerobot_datasets, source.sources, source.layout, strict=True):
+            identity, _ = _source_identity(dataclasses.replace(data_config, lerobot_datasets=(spec,)), child)
+            identity["episode_mapping"] = [[local, global_id] for local, global_id in layout["mapping"].items()]
+            identities.append(identity)
+        frame_ids = source.frame_ids
+        return {
+            "repo_id": data_config.repo_id,
+            "frames": len(source),
+            "sources": identities,
+            "episodes": sum(item["episodes"] for item in identities),
+            "frame_ids_sha256": hashlib.sha256(frame_ids.astype("<i8").tobytes()).hexdigest(),
+        }, frame_ids
+
     spec = data_config.lerobot_datasets[0]
     root = pathlib.Path(spec.root)
     required = [root / "meta" / name for name in ("info.json", "episodes.jsonl", "tasks.jsonl")]

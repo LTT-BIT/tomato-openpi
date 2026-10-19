@@ -494,6 +494,11 @@ def detect_sampling_groups(request):
     config = config_ui.source_config(request["baseline"])
     if getattr(config.data.base_config, "task_view", None) is not None:
         raise ValueError("当前配置有任务或阶段筛选，请按有效训练 episode 手动填写分组；自动读取目前用于全数据训练")
+    roots = request.get("dataset_roots", [request["dataset_root"]])
+    if len(roots) > 1:
+        from scripts.training_ui_datasets import dataset_groups
+
+        return dataset_groups(roots)
     return detect_groups(request["dataset_root"])
 
 
@@ -579,6 +584,10 @@ def handler_class(token):
                     result = preview(request)
                 elif path == "/api/sampling-groups":
                     result = detect_sampling_groups(request)
+                elif path == "/api/discover-datasets":
+                    from scripts.training_ui_datasets import discover_datasets
+
+                    result = discover_datasets(request["roots"])
                 elif path == "/api/check":
                     result = preview(request, check_data=True)
                 elif path == "/api/start":

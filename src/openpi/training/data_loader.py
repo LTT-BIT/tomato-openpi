@@ -17,6 +17,8 @@ import torch
 
 import openpi.models.model as _model
 import openpi.training.config as _config
+from openpi.training.dataset_collection import collection_layout
+from openpi.training.dataset_collection import validate_collection_features
 from openpi.training.droid_rlds_dataset import DroidRldsDataset
 import openpi.training.sampling as _sampling
 import openpi.transforms as _transforms
@@ -98,6 +100,30 @@ class WeightedConcatDataset(torch.utils.data.ConcatDataset):
             ]
         )
         self.dataset_probabilities = tuple(float(weight) for weight in normalized)
+
+
+class CollectionDataset(torch.utils.data.ConcatDataset):
+    """Concatenate independent windows, with collision-free IDs for sampling/audit."""
+
+    def __init__(self, datasets, specs):
+        super().__init__(datasets)
+        self.sources = []
+        ids = []
+        self.layout = collection_layout([spec.root for spec in specs])
+        validate_collection_features([item["info"] for item in self.layout])
+        for dataset, layout in zip(datasets, self.layout, strict=True):
+            source = dataset
+            while isinstance(source, TransformedDataset):
+                source = source._dataset  # noqa: SLF001
+            self.sources.append(source)
+            columns = source.hf_dataset.select_columns(["episode_index", "frame_index"]).with_format("numpy")[:]
+            episodes = np.asarray(columns["episode_index"], dtype=np.int64)
+            unique, counts = np.unique(episodes, return_counts=True)
+            expected = {row["episode_index"]: row["length"] for row in layout["episodes"]}
+            if dict(zip(unique.tolist(), counts.tolist(), strict=True)) != expected or len(episodes) != len(source):
+                raise ValueError("Loaded collection episode lengths differ from metadata")
+            ids.append(np.column_stack(([layout["mapping"][int(e)] for e in episodes], columns["frame_index"])))
+        self.frame_ids = np.concatenate(ids).astype(np.int64)
 
 
 class IterableTransformedDataset(IterableDataset[T_co]):
@@ -269,12 +295,10 @@ def create_torch_dataset(
         return FakeDataset(model_config, num_samples=1024)
     if sampling_mode in _sampling.PLAN_MODES and (
         data_config.local_dataset_loader is not None
-        or len(data_config.lerobot_datasets) != 1
-        or data_config.lerobot_datasets[0].root is None
+        or not data_config.lerobot_datasets
+        or any(spec.root is None for spec in data_config.lerobot_datasets)
     ):
-        raise ValueError(
-            "Deterministic sampling requires exactly one standard LeRobot dataset with an explicit local root"
-        )
+        raise ValueError("Deterministic sampling requires standard LeRobot datasets with explicit local roots")
     if data_config.local_dataset_loader is not None and data_config.lerobot_datasets:
         raise ValueError("Weighted LeRobot datasets do not support local_dataset_loader")
     if data_config.local_dataset_loader is not None:
@@ -316,7 +340,7 @@ def create_torch_dataset(
 
     datasets_and_meta = [create_one(spec.repo_id, spec.root) for spec in data_config.lerobot_datasets]
     datasets = [item[0] for item in datasets_and_meta]
-    if sampling_mode in _sampling.PLAN_MODES:
+    if sampling_mode in _sampling.PLAN_MODES and len(datasets) == 1:
         return datasets[0]
     metas = [item[1] for item in datasets_and_meta]
     reference = metas[0]
@@ -340,6 +364,8 @@ def create_torch_dataset(
             for spec, dataset in zip(data_config.lerobot_datasets, datasets, strict=True)
         ),
     )
+    if sampling_mode in _sampling.PLAN_MODES:
+        return CollectionDataset(datasets, data_config.lerobot_datasets)
     return WeightedConcatDataset(datasets, [spec.weight for spec in data_config.lerobot_datasets])
 
 
@@ -513,7 +539,11 @@ def create_torch_data_loader(
         source = source_dataset
         while isinstance(source, TransformedDataset):
             source = source._dataset  # noqa: SLF001
-        episode_ids = source.hf_dataset.select_columns(["episode_index"]).with_format("numpy")[:]["episode_index"]
+        episode_ids = (
+            source.frame_ids[:, 0]
+            if isinstance(source, CollectionDataset)
+            else source.hf_dataset.select_columns(["episode_index"]).with_format("numpy")[:]["episode_index"]
+        )
         sample_weights = _sampling.group_frame_weights(episode_ids, sampling_groups)
     elif sampling_groups:
         raise ValueError("sampling_groups requires weighted_replacement mode")
