@@ -21,13 +21,15 @@ from training_configs import common
 @pytest.mark.parametrize("module", ["tomato_fr3_lora_v1", "tomato_fr3_sharpa_lora_v1"])
 def test_statistics_save_constant_joints_and_bind_to_vectors(tmp_path, monkeypatch, caplog, all_constant, module):
     monkeypatch.setattr(common, "repository_root", lambda: tmp_path)
+    monkeypatch.setenv("PI05_SHARPA_MULTIMODAL_DATASET_ROOT", str(tmp_path / "sharpa_dataset"))
     task = "tomato_sharpa" if "_sharpa_" in module else "tomato_wuji"
     config = run_training.load_experiment(f"training_configs.experiments.{task}.baseline.{module}")
     config = replace(config, model=replace(config.model, action_horizon=3))
     root = Path(config.data.lerobot_datasets[0].root)
     dim = config.model.action_dim
     raw_dim = config.policy_metadata["raw_state_dims"][-1]
-    names = {"names": config.policy_metadata["joint_names"]} if dim == 58 else {}
+    action_names = {"names": config.policy_metadata["source_action_joint_names"]} if dim == 58 else {}
+    state_names = {"names": config.policy_metadata["source_state_joint_names"]} if dim == 58 else {}
     for folder in ("meta", "data", "videos"):
         (root / folder).mkdir(parents=True, exist_ok=True)
     info = {
@@ -38,8 +40,8 @@ def test_statistics_save_constant_joints_and_bind_to_vectors(tmp_path, monkeypat
         "chunks_size": 1000,
         "data_path": "data/episode_{episode_index:06d}.parquet",
         "features": {
-            "action": {"shape": [dim], **names},
-            "observation.state": {"shape": [raw_dim], **names},
+            "action": {"shape": [dim], **action_names},
+            "observation.state": {"shape": [raw_dim], **state_names},
             **{key: {"shape": [1, 1, 3]} for key in config.policy_metadata["camera_keys"]},
         },
     }

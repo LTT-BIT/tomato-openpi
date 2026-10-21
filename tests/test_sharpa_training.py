@@ -13,6 +13,8 @@ from openpi import transforms
 from openpi.models import model
 from openpi.policies import fr3_sharpa_policy
 from openpi.policies import fr3_sharpa_protocol as protocol
+from openpi.policies.fr3_sharpa_multimodal_policy import SOURCE_ACTION_NAMES
+from openpi.policies.fr3_sharpa_multimodal_policy import SOURCE_STATE_NAMES
 from openpi.shared import normalize
 from openpi.training import config as cfg
 from openpi.training import data_loader
@@ -37,6 +39,11 @@ def test_sharpa_changes_only_adapter_and_experiment_identity(scheme):
         sharpa_fields.pop(key)
     assert sharpa_fields["model"]["fields"]["action_dim"] == 58
     sharpa_fields["model"]["fields"]["action_dim"] = 54
+    if scheme == "fullft":
+        assert sharpa_fields.pop("batch_size") == 32
+        assert sharpa_fields.pop("fsdp_devices") == 8
+        wuji_fields.pop("batch_size")
+        wuji_fields.pop("fsdp_devices")
     assert sharpa_fields == wuji_fields
     wuji_data = json.loads(serialize_config(wuji.data))["fields"]
     sharpa_data = json.loads(serialize_config(sharpa.data))["fields"]
@@ -44,29 +51,37 @@ def test_sharpa_changes_only_adapter_and_experiment_identity(scheme):
         wuji_data.pop(key)
         sharpa_data.pop(key)
     assert sharpa_data == wuji_data
-    assert sharpa.policy_metadata["prompt_example"] == wuji.policy_metadata["prompt_example"]
+    assert sharpa.policy_metadata["raw_state_dims"] == [116]
+    assert sharpa.policy_metadata["dataset_version"] == "tomato_sharpa_1016_2_multimodal_rgb_absolute_v1_30hz"
+    assert sharpa.policy_metadata["prompt_example"].isascii()
     assert sharpa.policy_metadata["joint_names"] == list(protocol.ORDER)
     assert sharpa.policy_metadata["joint_unit"] == "rad"
     assert not sharpa.policy_metadata["allow_legacy_norm_stats"]
 
 
 @pytest.mark.parametrize("scheme", ["lora", "fullft"])
-def test_copied_sharpa_baselines_keep_recipe_and_independent_paths(
-    tmp_path, monkeypatch, scheme, make_personal_experiment
-):
-    baseline = run_training.load_experiment(BASE + f"tomato_fr3_sharpa_{scheme}_v1")
-    monkeypatch.setenv("PI05_DATASET_ROOT", str(tmp_path / "personal_dataset"))
-    monkeypatch.setenv("PI05_ASSETS_DIR", str(tmp_path / "personal_assets"))
-    template = run_training.load_experiment(make_personal_experiment(BASE + f"tomato_fr3_sharpa_{scheme}_v1"))
+def test_copied_sharpa_baselines_keep_recipe_and_independent_paths(tmp_path, scheme):
+    from scripts import training_ui_config as ui
+
+    module = BASE + f"tomato_fr3_sharpa_{scheme}_v1"
+    baseline = run_training.load_experiment(module)
+    values = {
+        **ui.defaults(module)["values"],
+        "dataset_root": str(tmp_path / "personal_dataset"),
+        "assets_dir": str(tmp_path / "personal_assets"),
+        "exp_name": "alice_trial_s42_run01",
+    }
+    source = ui.personal_source(module, "alice", values)
+    template = ui.config_from_source(source, "personal_experiment", str(tmp_path / "personal.py"))
     run_training.validate_config(template)
-    assert template.data.lerobot_datasets[0].root == str(tmp_path / "personal_dataset")
-    assert template.data.assets.assets_dir == str(tmp_path / "personal_assets")
+    assert template.data.lerobot_datasets[0].root == values["dataset_root"]
+    assert template.data.assets.assets_dir == values["assets_dir"]
     assert template.exp_name != baseline.exp_name
     assert template.checkpoint_dir != baseline.checkpoint_dir
     assert template.lr_schedule == baseline.lr_schedule
     assert template.num_train_steps == baseline.num_train_steps
-    assert template.policy_metadata["owner"] == "alice"
-    assert run_training.load_experiment(BASE + f"tomato_fr3_sharpa_{scheme}_v1").data == baseline.data
+    assert template.policy_metadata["ui_owner"] == "alice"
+    assert run_training.load_experiment(module).data == baseline.data
 
 
 def test_joint_blocks_cameras_and_absolute_actions():
@@ -78,7 +93,7 @@ def test_joint_blocks_cameras_and_absolute_actions():
     assert protocol.ORDER[36] == "right_thumb_CMC_FE"
     config = run_training.load_experiment(BASE + "tomato_fr3_sharpa_lora_v1")
     repack, vectors = config.data.create_vector_transforms(config.model)
-    state = np.arange(58, dtype=np.float32) + 100
+    state = np.arange(116, dtype=np.float32) + 100
     actions = np.arange(2 * 58, dtype=np.float32).reshape(2, 58)
     raw = {
         "observation.state": state,
@@ -89,8 +104,12 @@ def test_joint_blocks_cameras_and_absolute_actions():
         "observation.images.cam2": np.full((3, 4, 5), 0.8, dtype=np.float32),
     }
     result = transforms.compose([*repack.inputs, *vectors.inputs])(raw)
-    np.testing.assert_array_equal(result["state"], state)
-    expected = actions.copy()
+    state_indices = [SOURCE_STATE_NAMES.index(f"{name}.position") for name in protocol.ORDER]
+    action_indices = [
+        {name.rsplit(".", 1)[0]: i for i, name in enumerate(SOURCE_ACTION_NAMES)}[name] for name in protocol.ORDER
+    ]
+    np.testing.assert_array_equal(result["state"], state[state_indices])
+    expected = actions[:, action_indices]
     np.testing.assert_array_equal(result["actions"], expected)
     assert np.all(result["image"]["left_wrist_0_rgb"] == 204)
     assert result["image"]["left_wrist_0_rgb"].shape == (4, 5, 3)
@@ -98,7 +117,7 @@ def test_joint_blocks_cameras_and_absolute_actions():
     assert all(result["image_mask"].values())
     assert result["prompt"] == raw["prompt"]
     restored = transforms.compose(vectors.outputs)(result)
-    np.testing.assert_array_equal(restored["actions"], actions)
+    np.testing.assert_array_equal(restored["actions"], expected)
     np.testing.assert_array_equal(raw["action"], actions)
 
 
@@ -127,6 +146,7 @@ def test_sharpa_contract_requires_new_adapter_for_dimension_changes(change):
 @pytest.mark.parametrize("field", ["action", "observation.state"])
 def test_preflight_rejects_same_dimension_wrong_joint_order(tmp_path, monkeypatch, field):
     monkeypatch.setattr(common, "repository_root", lambda: tmp_path)
+    monkeypatch.setenv("PI05_SHARPA_MULTIMODAL_DATASET_ROOT", str(tmp_path / "dataset"))
     config = run_training.load_experiment(BASE + "tomato_fr3_sharpa_lora_v1")
     root = Path(config.data.lerobot_datasets[0].root)
     for folder in ("meta", "data", "videos"):
@@ -137,8 +157,8 @@ def test_preflight_rejects_same_dimension_wrong_joint_order(tmp_path, monkeypatc
         "total_frames": 4,
         "total_episodes": 1,
         "features": {
-            "action": {"shape": [58], "names": list(protocol.ORDER)},
-            "observation.state": {"shape": [58], "names": list(protocol.ORDER)},
+            "action": {"shape": [58], "names": list(SOURCE_ACTION_NAMES)},
+            "observation.state": {"shape": [116], "names": list(SOURCE_STATE_NAMES)},
             **{key: {"shape": [4, 5, 3]} for key in config.policy_metadata["camera_keys"]},
         },
     }
@@ -163,6 +183,7 @@ def test_real_sharpa_lerobot_videos_windows_and_shared_statistics(tmp_path, monk
     from lerobot.common.datasets import lerobot_dataset
 
     monkeypatch.setattr(common, "repository_root", lambda: tmp_path)
+    monkeypatch.setenv("PI05_SHARPA_MULTIMODAL_DATASET_ROOT", str(tmp_path / "dataset"))
     config = run_training.load_experiment(BASE + "tomato_fr3_sharpa_lora_v1")
     config = replace(config, model=replace(config.model, action_horizon=3))
     from openpi.training.sampling import SamplingGroup
@@ -175,8 +196,8 @@ def test_real_sharpa_lerobot_videos_windows_and_shared_statistics(tmp_path, monk
         )
     root = Path(config.data.lerobot_datasets[0].root)
     features = {
-        "observation.state": {"dtype": "float32", "shape": (58,), "names": list(protocol.ORDER)},
-        "action": {"dtype": "float32", "shape": (58,), "names": list(protocol.ORDER)},
+        "observation.state": {"dtype": "float32", "shape": (116,), "names": list(SOURCE_STATE_NAMES)},
+        "action": {"dtype": "float32", "shape": (58,), "names": list(SOURCE_ACTION_NAMES)},
         **{
             key: {"dtype": "video", "shape": (64, 64, 3), "names": ["height", "width", "channel"]}
             for key in config.policy_metadata["camera_keys"]
@@ -194,8 +215,8 @@ def test_real_sharpa_lerobot_videos_windows_and_shared_statistics(tmp_path, monk
     targets = []
     for episode, length in enumerate((3, 2)):
         for row in range(length):
-            state = np.arange(58, dtype=np.float32) / 100 + row / 10 + episode
-            action = state + 0.2
+            state = np.arange(116, dtype=np.float32) / 100 + row / 10 + episode
+            action = np.arange(58, dtype=np.float32) / 100 + row / 10 + episode + 0.2
             targets.append(action.copy())
             dataset.add_frame(
                 {
@@ -243,6 +264,6 @@ def test_real_sharpa_lerobot_videos_windows_and_shared_statistics(tmp_path, monk
     np.testing.assert_allclose(sample["image"]["right_wrist_0_rgb"].mean(), 40, atol=3)
     np.testing.assert_allclose(
         sample["actions"][0],
-        targets[0],
+        targets[0][list(range(7)) + list(range(14, 36)) + list(range(7, 14)) + list(range(36, 58))],
         atol=1e-6,
     )

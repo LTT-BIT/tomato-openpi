@@ -47,11 +47,11 @@ def test_converter_blocks_and_cameras_are_selected_without_changing_source():
 
 
 @pytest.mark.parametrize("scheme", ["lora", "fullft"])
-def test_new_recipe_identity_and_old_baseline_are_separate(scheme):
+def test_converter_recipe_and_official_baseline_have_separate_batch_identity(scheme):
     new = load_experiment(MODULE.replace("lora", scheme))
     old = load_experiment(f"training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_{scheme}_v1")
     assert new.policy_metadata["raw_state_dims"] == [116]
-    assert old.policy_metadata["raw_state_dims"] == [58]
+    assert old.policy_metadata["raw_state_dims"] == [116]
     assert new.data.assets.asset_id != old.data.assets.asset_id
     assert new.checkpoint_dir != old.checkpoint_dir
     assert new.policy_metadata["training_action_semantics"] == "absolute_joint_target"
@@ -65,7 +65,10 @@ def test_preflight_checks_raw_names_and_rejects_wrong_order(tmp_path, monkeypatc
     for name in ("meta", "data", "videos"):
         (tmp_path / name).mkdir()
     info = {
-        "codebase_version": "v2.1", "fps": 30, "total_frames": 2, "total_episodes": 1,
+        "codebase_version": "v2.1",
+        "fps": 30,
+        "total_frames": 2,
+        "total_episodes": 1,
         "features": {
             "observation.state": {"shape": [116], "names": list(SOURCE_STATE_NAMES)},
             "action": {"shape": [58], "names": list(SOURCE_ACTION_NAMES)},

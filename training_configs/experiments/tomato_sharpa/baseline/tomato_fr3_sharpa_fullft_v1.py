@@ -1,36 +1,17 @@
-"""Reference Sharpa fullft v1: current public recipe with the 58D physical adapter."""
+"""Official Sharpa fullft: converter 116D storage projected to 58D RGB training."""
 
-import os
+from dataclasses import replace
 
-from training_configs import common
-from training_configs.common import Dataset
-from training_configs.embodiments.fr3_sharpa import FR3_SHARPA
+from training_configs.embodiments.fr3_sharpa_multimodal import FR3_SHARPA_MULTIMODAL
+from training_configs.experiments.tomato_sharpa.baseline.dataset import build_dataset
 from training_configs.recipes.pi05_fullft_v1 import build_config as build_recipe
-
-PROMPT = (
-    "Pick up a tomato truss with the right hand, then pick a cherry tomato "
-    "with the left hand and place it in the left basket."
-)
-
-
-def build_dataset() -> Dataset:
-    repository = common.repository_root()
-    root = os.environ.get("PI05_SHARPA_DATASET_ROOT", str(repository / "data/tomato_sharpa_fulltask_v1"))
-    return Dataset(
-        version="tomato_sharpa_fulltask_v1_30hz",
-        repo_id="fr3_sharpa/tomato_fulltask_v1",
-        root=root,
-        assets_dir=os.environ.get("PI05_SHARPA_ASSETS_DIR", str(repository / "assets")),
-        asset_id="tomato_sharpa_fulltask_v1_absolute_30hz",
-        sources=(root,),
-        prompt_example=PROMPT,
-    )
 
 
 def build_config():
-    return build_recipe(
-        name="pi05_fr3_sharpa_fulltask_fullft_v1_absolute_30hz",
-        exp_name="tomato_sharpa_fulltask_fullft_v1_absolute_30hz_s42",
-        embodiment=FR3_SHARPA,
+    config = build_recipe(
+        name="pi05_fr3_sharpa_1016_2_multimodal_rgb_fullft_v1_absolute_30hz",
+        exp_name="tomato_sharpa_1016_2_multimodal_fullft_absolute_s42",
+        embodiment=FR3_SHARPA_MULTIMODAL,
         dataset=build_dataset(),
     )
+    return replace(config, batch_size=32, fsdp_devices=8)

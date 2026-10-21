@@ -128,7 +128,7 @@ baseline 默认基础权重为服务器路径 `/mnt/data/public_ckpt/pi05/pi05_b
 | 任务 | 说明和配置 | 当前状态 |
 | --- | --- | --- |
 | 番茄-Wuji | [tomato_wuji](training_configs/experiments/tomato_wuji/README.md) | LoRA / 全参 v1 baseline |
-| 番茄-Sharpa | [tomato_sharpa](training_configs/experiments/tomato_sharpa/README.md) | 58D baseline；另有转换器 116D 多模态存储的 RGB-only 适配，已验证读取，未训练 |
+| 番茄-Sharpa | [tomato_sharpa](training_configs/experiments/tomato_sharpa/README.md) | LoRA / 全参 baseline 支持转换器 116D→58D RGB 输入；完整训练和实机待验证 |
 | 铲柠檬 | [lemon_scooping](training_configs/experiments/lemon_scooping/README.md) | 双 UR/O30 LoRA / 全参 v1 baseline；209 条有效数据全部训练 |
 | 抓取杯子 | [cup_grasping](training_configs/experiments/cup_grasping/README.md) | 单臂 Franka LoRA / 全参 v1 baseline；v2.1 数据待准备 |
 
@@ -140,14 +140,14 @@ baseline 默认基础权重为服务器路径 `/mnt/data/public_ckpt/pi05/pi05_b
 | --- | --- | ---: | ---: | --- |
 | 番茄-Wuji LoRA | [tomato_fr3_lora_v1.py](training_configs/experiments/tomato_wuji/baseline/tomato_fr3_lora_v1.py) | 54 | 30,000 | `data/tomato_fulltask_v1` |
 | 番茄-Wuji 全参 | [tomato_fr3_fullft_v1.py](training_configs/experiments/tomato_wuji/baseline/tomato_fr3_fullft_v1.py) | 54 | 30,000 | `data/tomato_all_full_v1` |
-| 番茄-Sharpa LoRA | [tomato_fr3_sharpa_lora_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_lora_v1.py) | 58 | 30,000 | `data/tomato_sharpa_fulltask_v1` |
-| 番茄-Sharpa 全参 | [tomato_fr3_sharpa_fullft_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_fullft_v1.py) | 58 | 30,000 | `data/tomato_sharpa_fulltask_v1` |
+| 番茄-Sharpa LoRA | [tomato_fr3_sharpa_lora_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_lora_v1.py) | 58 | 30,000 | `/mnt/data/users/tairan/workspace/data/10.16_2_data_lerobot` |
+| 番茄-Sharpa 全参 | [tomato_fr3_sharpa_fullft_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_fullft_v1.py) | 58 | 30,000 | `/mnt/data/users/tairan/workspace/data/10.16_2_data_lerobot` |
 | 抓取杯子 LoRA | [cup_single_franka_lora_v1.py](training_configs/experiments/cup_grasping/baseline/cup_single_franka_lora_v1.py) | 7（模型补零至 32） | 30,000 | `data/cup_grasping_v1` |
 | 抓取杯子 全参 | [cup_single_franka_fullft_v1.py](training_configs/experiments/cup_grasping/baseline/cup_single_franka_fullft_v1.py) | 7（模型补零至 32） | 30,000 | `data/cup_grasping_v1` |
 | 铲柠檬 LoRA | [lemon_ur_o30_lora_v1.py](training_configs/experiments/lemon_scooping/baseline/lemon_ur_o30_lora_v1.py) | 12（模型 32，状态 52） | 30,000 | `data/lemon_wrist_reset_v1` |
 | 铲柠檬 全参 | [lemon_ur_o30_fullft_v1.py](training_configs/experiments/lemon_scooping/baseline/lemon_ur_o30_fullft_v1.py) | 12（模型 32，状态 52） | 30,000 | `data/lemon_wrist_reset_v1` |
 
-番茄与杯子六份配置共用以下训练参数；柠檬 LoRA 复用公共训练配方，柠檬全参学习率与公共配方一致，日志与 checkpoint 保存设置沿用来源任务记录，详见[柠檬说明](training_configs/experiments/lemon_scooping/README.md)。以下公共参数中的频率与动作语义以各任务协议为准。
+番茄与杯子配置采用以下公共训练参数；Sharpa 全参覆盖为 batch 32、FSDP 8（默认 8 卡），Sharpa LoRA 保持 batch 8、FSDP 1，两者从转换器 116D 状态提取 58D 位置并重排动作，详见 [Sharpa 说明](training_configs/experiments/tomato_sharpa/README.md)。柠檬 LoRA 复用公共训练配方，柠檬全参学习率与公共配方一致，日志与 checkpoint 保存设置沿用来源任务记录，详见[柠檬说明](training_configs/experiments/lemon_scooping/README.md)。以下公共参数中的频率与动作语义以各任务协议为准。
 
 本体协议、数据身份、统计及英文 prompt 见对应任务说明。
 

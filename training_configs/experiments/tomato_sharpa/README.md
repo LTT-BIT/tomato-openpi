@@ -1,87 +1,67 @@
-# FR3 + Sharpa 训练说明
+# FR3 + Sharpa 番茄训练
 
-安装、数据校验、统计、日志与续训见 [仓库 README](../../../README.md)，个人配置和协作规则见 [多人开发 README](../../../多人开发README.md)。
+环境、日志和续训见[根 README](../../../README.md)，个人配置见[多人开发 README](../../../多人开发README.md)。官方 LoRA 和全参 baseline 现在直接读取 `10.16_2_data_lerobot` 的转换器格式。UI 中选择“番茄 · Sharpa / LoRA”或“番茄 · Sharpa / 全参”即可使用，不再需要 tairan 临时配置。
 
-## 本体来源与协议
+## 数据和向量协议
 
-本体协议来源：franka3-sharpa-pi05，commit `de2d187c17aaf64ee67a1501c9f7369944563729`。训练参数采用本仓库公共 recipe。
+原始 LeRobot v2.1 数据为 30 Hz，`observation.state` 是 116 维位置/速度，`action` 是 58 维绝对关节目标。必须严格匹配[转换器适配器](../../../src/openpi/policies/fr3_sharpa_multimodal_policy.py)中的原始名称和顺序；不能只修改 `info.json`。
 
-| 项目 | Sharpa v1 |
-| --- | --- |
-| state | 58 维实测关节位置，单位 rad |
-| 原始 action | 58 维目标关节位置，单位 rad |
-| 向量顺序 | 左 FR3 7 + 左 Sharpa 22 + 右 FR3 7 + 右 Sharpa 22 |
-| 训练 action | 两臂和手部均为 absolute 目标位置 |
-| 相机 | cam0 外部、cam2 左腕、cam1 右腕 |
-| 数据与窗口 | LeRobot v2.1，30 Hz，horizon 50，episode 边界内填充 |
-
-关节名称及顺序定义在 [fr3_sharpa_protocol.py](../../../src/openpi/policies/fr3_sharpa_protocol.py)，本体规格在 [fr3_sharpa.py](../../embodiments/fr3_sharpa.py)。向量已经是物理顺序，直接保留，不使用 Wuji 的 108 维切片或动作重排。原协议文件有 STATE_DIM=116 常量，但实际数据导出和输入变换均使用 58 维实测位置；本适配只接受实际导出的 58 维格式。
-
-meta/info.json 的 observation.state 和 action 的 shape 均为 [58]，names 必须与协议 ORDER 一致；校验拒绝缺失名称或错序。名称校验不能证明实际数值单位、左右语义或时间对齐正确，需数据生产者确认。适配保留绝对目标值，不执行 delta 转换，也不修改原始目标位置。实际英文训练指令来自 meta/tasks.jsonl。
-
-## Baseline
-
-| 方案 | baseline 文件 | 默认预算 |
+| 向量 | 原始布局 | 读取时的 Python 切片拼接 |
 | --- | --- | --- |
-| LoRA | [tomato_fr3_sharpa_lora_v1.py](baseline/tomato_fr3_sharpa_lora_v1.py) | 30,000 步 |
-| 全参 | [tomato_fr3_sharpa_fullft_v1.py](baseline/tomato_fr3_sharpa_fullft_v1.py) | 30,000 步 |
+| state | 左臂位置/速度、右臂位置/速度、左手位置/速度、右手位置/速度 | `[0:7] + [28:50] + [14:21] + [72:94]` |
+| action | 左臂、右臂、左手、右手 | `[0:7] + [14:36] + [7:14] + [36:58]` |
 
-模块前缀为 `training_configs.experiments.tomato_sharpa.baseline.`。个人实验可在自己的 clone 中从 baseline 复制到 `template/<负责人>/`；template 内容由 Git 忽略，不创建分支或上传。两种方案分别引用既有 `pi05_lora_v1` 和 `pi05_fullft_v1`。LoRA 为 VLM rank 16、Expert rank 32，视觉及投影可训练；全参无 LoRA、全部参数可训练。
+模型输入和输出统一为左臂 7 + 左手 22 + 右臂 7 + 右手 22，共 58 维，单位 rad；状态只保留实测位置，action 默认保持 absolute 目标。相机使用 cam0 外部、cam2 左腕、cam1 右腕 RGB。深度、触觉、速度及审计列保留在文件中，不进入当前模型；底层 loader 仍可能读取这些列。名称检查不能证明数值单位、左右语义或时间对齐正确，需要数据生产者确认。
 
-除本体定义、58 维模型投影及独立数据/统计/输出身份外，训练参数与各自 Wuji baseline 一致：全局 batch：LoRA 8、全参 64；workers 8、bfloat16、学习率 peak 2.5e-5/end 2.5e-6、warmup 1000、decay 30000、AdamW、无 EMA、epoch_shuffle、seed 42/42/42001/42002、每 2000 步保存、keep_period 10000、W&B 启用。初始权重仍为官方 pi05_base，维度不匹配的投影按现有 PartialCheckpointWeightLoader 初始化。全参预算沿用公共方案，不表示当前 Sharpa 数据恰好训练一遍。
+旧 `Fr3Sharpa` 58D 实测位置适配器仍保留，其严格检查不变；这两份官方 baseline 使用 `FR3_SHARPA_MULTIMODAL`。独立的 `multimodal_rgb/` 配置也保留，使用自己的批次身份。
 
-这两份 baseline 要求 30 Hz 数据。使用 20 Hz 或其他频率时，应建立对应个人配置并检查频率、horizon 与统计绑定。
+## 官方配置和数据身份
 
-| 设置 | 默认值 |
+| 项目 | 设置 |
 | --- | --- |
-| 数据目录 | data/tomato_sharpa_fulltask_v1/ |
-| 数据身份 | fr3_sharpa/tomato_fulltask_v1 |
-| 数据版本 | tomato_sharpa_fulltask_v1_30hz |
-| asset_id | tomato_sharpa_fulltask_v1_absolute_30hz |
-| 统计目录 | assets/tomato_sharpa_fulltask_v1_absolute_30hz/ |
-| LoRA 配置/实验名 | pi05_fr3_sharpa_fulltask_lora_v1_absolute_30hz / tomato_sharpa_fulltask_lora_v1_absolute_30hz_s42 |
-| 全参配置/实验名 | pi05_fr3_sharpa_fulltask_fullft_v1_absolute_30hz / tomato_sharpa_fulltask_fullft_v1_absolute_30hz_s42 |
+| 数据来源 | `sshfs://user@192.168.10.202/data/data-fruits/real/harvest-tomato/data/clean-rosbag/sharpa/10.16_2_data_lerobot` |
+| 默认训练目录 | `/mnt/data/users/tairan/workspace/data/10.16_2_data_lerobot` |
+| repo_id | `fr3_sharpa/tomato_1016_2_multimodal_rgb_v1` |
+| 数据版本 / asset_id | `tomato_sharpa_1016_2_multimodal_rgb_absolute_v1_30hz` |
+| 统计目录 | `<当前仓库>/assets/tomato_sharpa_1016_2_multimodal_rgb_absolute_v1_30hz/` |
+| 全参配置名 | `pi05_fr3_sharpa_1016_2_multimodal_rgb_fullft_v1_absolute_30hz` |
+| 全参默认实验名 | `tomato_sharpa_1016_2_multimodal_fullft_absolute_s42` |
+| LoRA 配置名 | `pi05_fr3_sharpa_1016_2_multimodal_rgb_lora_v1_absolute_30hz` |
+| LoRA 默认实验名 | `tomato_sharpa_1016_2_multimodal_lora_absolute_s42` |
 
-数据路径和身份为配置占位，需自行准备真实数据；sources 默认记录数据目录，正式实验填写真实生产来源。Sharpa 不使用 Wuji 54 维统计或历史固定摘要，默认要求绑定统计；同一 Sharpa 数据的 LoRA 与全参经校验后可以共用配套统计。
+路径和身份由[共享数据定义](baseline/dataset.py)提供。优先使用 `PI05_SHARPA_MULTIMODAL_DATASET_ROOT` / `PI05_SHARPA_MULTIMODAL_ASSETS_DIR`，兼容旧 `PI05_SHARPA_DATASET_ROOT` / `PI05_SHARPA_ASSETS_DIR`。只搬迁相同数据可以保留身份；更换批次必须设置独立版本、来源和统计身份。
 
-英文 prompt 示例分别与对应公共方案一致：
+两种方案采用同一个英文 prompt 示例，实际训练文本来自 `meta/tasks.jsonl`：
 
-- LoRA：`Pick up a tomato truss with the right hand and hold it steady between both hands, then pick a single cherry tomato from the truss with the left hand and place the picked tomato into the plate on the left.`
-- 全参：`Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket.`
+> Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket.
 
-## 选择模块并训练
+## 训练参数
 
-在仓库根目录设置模块，全参将尾名换为 `tomato_fr3_sharpa_fullft_v1`：
+| 方案 | 文件 | 全局 batch | FSDP 分片 | 步数 |
+| --- | --- | --- | --- | --- |
+| 全参 | [tomato_fr3_sharpa_fullft_v1.py](baseline/tomato_fr3_sharpa_fullft_v1.py) | 32 | 8 | 30,000 |
+| LoRA | [tomato_fr3_sharpa_lora_v1.py](baseline/tomato_fr3_sharpa_lora_v1.py) | 8 | 1 | 30,000 |
+
+全参默认按 8 张 GPU 分片，减少参数、梯度及优化器状态的每卡显存占用；选择较少 GPU 时必须覆盖 FSDP 参数，GPU 数量需能被分片数整除，全局 batch 需能被 GPU 数量整除。LoRA 保留公共配方的 batch 和 FSDP 设置，不强制使用 8 张卡。
+
+其余沿用各自公共 recipe：pi05、bfloat16、58D 模型、horizon 50、workers 8、epoch_shuffle、seed 42/42/42001/42002、warmup 1000、peak 2.5e-5/end 2.5e-6、AdamW、无 EMA，每 2000 步保存。LoRA 使用 VLM rank 16、Expert rank 32，视觉及投影可训练；全参不使用 LoRA，全部参数可训练。基础权重为 `/mnt/data/public_ckpt/pi05/pi05_base/params`，投影形状不匹配时按公共 PartialCheckpointWeightLoader 初始化。
+
+## 统计、启动和状态
 
 ```bash
-export MODULE=training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1
-export EXP=alice_tomato_sharpa_lora_s42_run01
+export MODULE=training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_fullft_v1
+export EXP=tairan_sharpa_1016_fullft_fsdp8_b32_s42_run01
 bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
+# 仅在没有配套统计时计算；工具拒绝覆盖已有目录。
+bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE" --stats-batch-size 128
+bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --check
+# 只选择分配给自己的 GPU；示例默认 8 卡。
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 bash scripts/python.sh -u -m scripts.run_training \
+  "$MODULE" --exp-name "$EXP" --wandb-mode online
 ```
 
-baseline 可用 `PI05_SHARPA_DATASET_ROOT` / `PI05_SHARPA_ASSETS_DIR` 覆盖路径。修改数据身份或参数时，按多人开发 README 复制本地个人配置；个人文件无需同步 GitLab。
+LoRA 将 MODULE 尾名换为 `tomato_fr3_sharpa_lora_v1`，按分配选择 GPU。W&B online 需预先登录，不能联网时显式使用 offline，恢复联网后 sync；本地日志和运行清单保存在 `logs/`，权重保存在 `checkpoints/`。
 
-新数据按根 README 计算统计，再执行 check 并训练。统计必须是本 Sharpa 数据的 58 维统计，包含 norm_stats.json 和 norm_metadata.json；同一数据、输入变换和 horizon 可在 LoRA/全参间复用。日志、W&B offline 同步和原 commit 续训规则见根 README。
+统计必须同时包含 `norm_stats.json` 和 `norm_metadata.json`，并通过数据、变换及 horizon 的绑定校验。LoRA 与全参可在绑定一致时共用统计；batch 和 FSDP 的改变不改变统计。与此前临时配置相同的批次和适配规则可以校验复用已有统计；旧 58D 或 delta 统计不能直接使用。UI 切换 delta 时必须选新 asset_id 并重新统计。
 
-以上 baseline 仍只接受 58D 实测位置格式，不能直接用于转换器的 116D 位置/速度格式。未记录完整 GPU 训练或实机验证结果。
-
-当前两份 baseline 已切换为 absolute，统计身份与默认实验名增加 absolute。必须重新计算统计并开始新实验，不可复用旧 delta 统计或直接 resume 旧 delta checkpoint。
-
-## 自动转换器的多模态数据：只训练 RGB
-
-转换器保留 `observation.state[116]`（双臂、双手的位置/速度）、`action[58]`（左臂、右臂、左手、右手），以及三路 RGB、深度和二十路触觉。使用独立模块前缀 `training_configs.experiments.tomato_sharpa.multimodal_rgb.`，尾名仍为 `tomato_fr3_sharpa_lora_v1` 或 `tomato_fr3_sharpa_fullft_v1`。旧 baseline、旧 58D 协议和训练循环不变。
-
-新适配按元数据严格核对原始关节名称/顺序，从 116D 状态中选取实测位置，并把状态与动作重排为“左臂 7 + 左手 22 + 右臂 7 + 右手 22”。模型仍使用 58D absolute 目标、30 Hz、horizon 50；相机仍为 cam0 外部、cam2 左腕、cam1 右腕。深度、触觉、速度和审计列保留在文件中，经过 repack 后不进入当前模型；底层 LeRobot loader 仍会读取额外列，因此这不是专门优化过的 RGB 列裁剪 loader。
-
-用 `PI05_SHARPA_MULTIMODAL_DATASET_ROOT` 指定**一套已封存批次的实际数据集根目录**，不是 A/B 父目录；`PI05_SHARPA_MULTIMODAL_ASSETS_DIR` 指定统计父目录。新 asset_id 为 `tomato_sharpa_multimodal_rgb_absolute_v1_30hz`，必须重新计算与该固定批次、转换规则和 horizon 绑定的统计；不能复用旧 58D 或旧 delta 统计，也不能直接续训旧格式 checkpoint。英文任务文本继续来自该数据集的 `meta/tasks.jsonl`。
-
-可独立做真实数据兼容性检查，不加载模型权重、不启动训练：
-
-```bash
-bash scripts/python.sh -m scripts.check_converter_dataset \
-  --robot sharpa --dataset /path/to/36_68_data_lerobot \
-  --norm-assets /path/to/new-validation-assets \
-  --output /path/to/new-validation-report.json
-```
-
-该命令会计算独立归一化统计，核对 provenance，检查每个 episode 的首/中/尾向量映射，并实际生成一个含 RGB、位置和文本 token 的标准模型输入 batch。统计目录和报告应使用新路径，不覆盖既有训练资产；`--robot wuji` 使用现有 Wuji absolute 适配。这个检查通过表示数据/输入链路可用，不表示已经完成训练、效果评估或实机验证。可核对的真实检查结果位于本目录 `multimodal_rgb/records/`。
+新 baseline 已准备输入适配；这不代表已经完成完整训练、效果评估或实机验证。独立 `multimodal_rgb/records/` 中的真实检查结果属于其中记录的批次，不是本批次完整训练完成的证明。服务器既有临时配置、运行中的任务及其代码未随本地更新修改。续训必须使用原代码、配置、数据、统计及实验名；应用本地新版本后请创建新实验。

@@ -36,6 +36,8 @@ def test_absolute_targets_are_preserved_for_statistics_and_training(module):
     expected = actions
     if "tomato_wuji" in module:
         expected = np.concatenate([actions[:, :7], actions[:, 14:34], actions[:, 7:14], actions[:, 34:54]], axis=-1)
+    if "tomato_sharpa" in module:
+        expected = np.concatenate([actions[:, :7], actions[:, 14:36], actions[:, 7:14], actions[:, 36:58]], axis=-1)
     np.testing.assert_array_equal(apply(raw)["actions"], expected)
     np.testing.assert_array_equal(apply({**raw, "observation.state": state + 100})["actions"], expected)
     np.testing.assert_array_equal(raw["action"], actions)
