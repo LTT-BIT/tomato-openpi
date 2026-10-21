@@ -13,7 +13,7 @@ from openpi.policies.fr3_sharpa_multimodal_policy import Fr3SharpaMultimodalInpu
 from scripts.run_training import load_experiment
 from scripts.run_training import preflight
 
-MODULE = "training_configs.experiments.tomato_sharpa.multimodal_rgb.tomato_fr3_sharpa_lora_v1"
+MODULE = "training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1"
 
 
 def test_converter_blocks_and_cameras_are_selected_without_changing_source():
@@ -46,17 +46,22 @@ def test_converter_blocks_and_cameras_are_selected_without_changing_source():
     assert raw["observation.depths.cam0"].dtype == np.uint16
 
 
-@pytest.mark.parametrize("scheme", ["lora", "fullft"])
-def test_converter_recipe_and_official_baseline_have_separate_batch_identity(scheme):
-    new = load_experiment(MODULE.replace("lora", scheme))
-    old = load_experiment(f"training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_{scheme}_v1")
-    assert new.policy_metadata["raw_state_dims"] == [116]
-    assert old.policy_metadata["raw_state_dims"] == [116]
-    assert new.data.assets.asset_id != old.data.assets.asset_id
-    assert new.checkpoint_dir != old.checkpoint_dir
-    assert new.policy_metadata["training_action_semantics"] == "absolute_joint_target"
-    assert new.model.action_dim == old.model.action_dim == 58
-    assert new.model.action_horizon == old.model.action_horizon == 50
+def test_only_official_sharpa_baselines_are_published_and_share_statistics():
+    from scripts.training_ui_config import baseline_catalog
+
+    lora = load_experiment(MODULE)
+    fullft = load_experiment(MODULE.replace("lora", "fullft"))
+    assert lora.data == fullft.data
+    assert lora.policy_metadata["raw_state_dims"] == fullft.policy_metadata["raw_state_dims"] == [116]
+    assert lora.checkpoint_dir != fullft.checkpoint_dir
+    for config in (lora, fullft):
+        assert config.policy_metadata["training_action_semantics"] == "absolute_joint_target"
+        assert config.model.action_dim == 58
+        assert config.model.action_horizon == 50
+    assert (lora.batch_size, lora.fsdp_devices) == (8, 1)
+    assert (fullft.batch_size, fullft.fsdp_devices) == (32, 8)
+    entries = [entry["id"] for entry in baseline_catalog() if entry["task"] == "tomato_sharpa"]
+    assert set(entries) == {MODULE, MODULE.replace("lora", "fullft")}
 
 
 def test_preflight_checks_raw_names_and_rejects_wrong_order(tmp_path, monkeypatch):

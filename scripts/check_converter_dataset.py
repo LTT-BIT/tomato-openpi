@@ -18,7 +18,7 @@ from scripts.run_training import preflight
 def check(robot, root, assets_root):
     root = root.resolve(strict=True)
     if robot == "sharpa":
-        module = "training_configs.experiments.tomato_sharpa.multimodal_rgb.tomato_fr3_sharpa_lora_v1"
+        module = "training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1"
     else:
         module = "training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1"
     config = load_experiment(module)
@@ -51,10 +51,13 @@ def check(robot, root, assets_root):
             action_names = info["features"]["action"]["names"]
             canonical = config.policy_metadata.get("joint_names")
             if canonical is None:
-                canonical = [name.rsplit(".", 1)[0] for name in (
-                    action_names[:7] + action_names[14:34] + action_names[7:14] + action_names[34:54]
-                )]
-            expected_state = [info["features"]["observation.state"]["names"].index(f"{name}.position") for name in canonical]
+                canonical = [
+                    name.rsplit(".", 1)[0]
+                    for name in (action_names[:7] + action_names[14:34] + action_names[7:14] + action_names[34:54])
+                ]
+            expected_state = [
+                info["features"]["observation.state"]["names"].index(f"{name}.position") for name in canonical
+            ]
             lookup = {name.rsplit(".", 1)[0]: n for n, name in enumerate(action_names)}
             np.testing.assert_array_equal(selected["state"], state[expected_state])
             np.testing.assert_array_equal(selected["actions"], actions[:, [lookup[name] for name in canonical]])
@@ -63,9 +66,16 @@ def check(robot, root, assets_root):
             checked += 1
         offset += ep["length"]
     loader = data_loader.create_torch_data_loader(
-        data_config, config.model, config.model.action_horizon, 1,
-        num_batches=1, num_workers=0, framework="jax", seed=config.data_seed,
-        sampling_mode=config.sampling_mode, num_train_steps=config.num_train_steps,
+        data_config,
+        config.model,
+        config.model.action_horizon,
+        1,
+        num_batches=1,
+        num_workers=0,
+        framework="jax",
+        seed=config.data_seed,
+        sampling_mode=config.sampling_mode,
+        num_train_steps=config.num_train_steps,
     )
     observation, actions = next(iter(loader))
     if not np.isfinite(np.asarray(observation.state)).all() or not np.isfinite(np.asarray(actions)).all():
@@ -74,22 +84,34 @@ def check(robot, root, assets_root):
     if before != after:
         raise ValueError("Input dataset metadata changed")
     return {
-        "status": "passed", "robot": robot, "dataset": str(root), "experiment_module": module,
-        "dataset_version": config.policy_metadata["dataset_version"], "exp_name": config.exp_name,
+        "status": "passed",
+        "robot": robot,
+        "dataset": str(root),
+        "experiment_module": module,
+        "dataset_version": config.policy_metadata["dataset_version"],
+        "exp_name": config.exp_name,
         "prompts": basic["prompts"],
-        "frames": basic["frames"], "episodes": basic["episodes"], "fps": info["fps"],
+        "frames": basic["frames"],
+        "episodes": basic["episodes"],
+        "fps": info["fps"],
         "normalization_provenance": verified["norm_provenance"],
-        "loader_framework": "jax", "sampling_mode": config.sampling_mode,
+        "loader_framework": "jax",
+        "sampling_mode": config.sampling_mode,
         "norm_stats_sha256": hashlib.sha256(Path(verified["norm_stats_path"]).read_bytes()).hexdigest(),
-        "norm_metadata_sha256": hashlib.sha256(Path(verified["norm_stats_path"]).with_name("norm_metadata.json").read_bytes()).hexdigest(),
+        "norm_metadata_sha256": hashlib.sha256(
+            Path(verified["norm_stats_path"]).with_name("norm_metadata.json").read_bytes()
+        ).hexdigest(),
         "raw_state_shape": info["features"]["observation.state"]["shape"],
-        "model_state_shape": list(observation.state.shape), "model_action_shape": list(actions.shape),
+        "model_state_shape": list(observation.state.shape),
+        "model_action_shape": list(actions.shape),
         "model_images": {key: list(value.shape) for key, value in observation.images.items()},
         "tokenized_prompt_shape": list(observation.tokenized_prompt.shape),
         "depth_features_stored": [k for k in info["features"] if k.startswith("observation.depths.")],
         "tactile_features_stored": [k for k in info["features"] if k.startswith("observation.tactile.")],
-        "boundary_middle_samples_checked": checked, "input_metadata_sha256": before,
-        "training_started": False, "model_weights_loaded": False,
+        "boundary_middle_samples_checked": checked,
+        "input_metadata_sha256": before,
+        "training_started": False,
+        "model_weights_loaded": False,
     }
 
 
