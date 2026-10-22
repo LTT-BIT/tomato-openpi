@@ -151,7 +151,51 @@ baseline 默认基础权重为服务器路径 `/mnt/data/public_ckpt/pi05/pi05_b
 
 本体协议、数据身份、统计及英文 prompt 见对应任务说明。
 
-公共训练参数：
+## π0.5 全参微调加入 Train RTC
+
+JAX 入口支持 training-time RTC，依据 [Physical Intelligence 官方实现（9296f31）](https://github.com/Physical-Intelligence/real-time-chunking-kinetix/blob/9296f31d62d5bfeb5779dcb2f9bcf71ca37f448b/src/model.py)和[训练时动作条件论文](https://arxiv.org/abs/2512.05964)。当前状态：**代码及小模型前向、反向、采样验证已完成；任务完整训练和实机验证尚未完成。**不改变现有八份 baseline，默认 `model.rtc_max_delay=0` 关闭；PyTorch 入口遇到启用 RTC 的配置会明确报错。
+
+开启后，每条样本独立均匀抽取整数延迟 `d ∈ [0, rtc_max_delay]`（含上限）。前 `d` 个动作使用同一动作窗口中的干净真值，后缀保持原有 Beta 时间分布和 flow matching 噪声；每个动作 token 单独接收时间编码和 adaRMS 条件。OpenPI 的干净动作时间为 **0**，与官方 Kinetix 的 **1** 相反。仅后缀参与损失，按 batch 内有效后缀 token 总数归一化，再对动作维度取平均。模型参数名称、形状和全参可训练范围保持不变，可加载普通 π0.5 全参权重。
+
+这里的均匀延迟分布采用论文实机实验的设置；官方 Kinetix 模拟代码使用指数递减采样，并以 `simulated_delay` 表示不包含的上界，不能直接照搬其数值。`rtc_max_delay` 必须小于动作 horizon；例如 30 Hz 下设为 10 覆盖约 333 ms 的延迟，10 Hz 下则是 1 s。应依据部署端测得的端到端延迟选择，`10` 只是配置示例。
+
+**图形界面**：选择对应任务的全参 baseline 或个人全参配置，在“Train RTC 最大延迟（动作步，0=关闭）”填写上限，并使用新的实验名称。修改会保存到独立个人配置、最终配置预览和运行记录中。只改变 RTC 不改变数据变换，因此数据、horizon、动作语义均相同时可继续使用经过来源校验的原归一化统计；同时更换数据、horizon 或 absolute/delta 时仍需按现有规则重新统计。
+
+**命令行**：以下以 Wuji 全参为例，Sharpa / 杯子 / 柠檬替换为各自全参模块。先按任务说明准备数据、英文 `tasks.jsonl` 和归一化统计，再检查最终配置：
+
+```bash
+export MODULE=training_configs.experiments.tomato_wuji.baseline.tomato_fr3_fullft_v1
+export EXP=tomato_fullft_rtc_d10_s42_run01
+bash scripts/python.sh -m scripts.run_training "$MODULE" \
+  --exp-name "$EXP" --model.rtc-max-delay 10 --dry-run
+```
+
+启动时使用完全相同的参数，把 `--dry-run` 换为 `--wandb-mode online`；无法联网时明确使用 `--wandb-mode offline`。本地日志、完整生效配置、数据来源、实际英文 prompt、统计路径和哈希仍由统一入口保存，W&B 同时记录；离线 run 联网后执行 `bash scripts/python.sh -m wandb sync wandb/offline-run-...`。
+
+上例默认从所选配置的基础权重开始全参 RTC 微调。若要在**已经训练好的同本体全参 checkpoint** 上追加 RTC 训练，复制该实验配置为新的个人配置（保留它的数据、动作监督、统计和模型设置），将权重加载器设置为严格加载：
+
+```python
+from dataclasses import replace
+from openpi.training.weight_loaders import CheckpointWeightLoader
+
+# config 为原全参实验的 TrainConfig；路径替换为实际 checkpoint 的 params 目录。
+config = replace(
+    config,
+    name=config.name + "_rtc_v1_d10",
+    exp_name="tomato_fullft_rtc_stage2_s42_run01",
+    model=replace(config.model, rtc_max_delay=10),
+    weight_loader=CheckpointWeightLoader("/path/to/checkpoints/config/experiment/step/params"),
+    resume=False,
+)
+```
+
+这是一个从已有模型权重初始化的新训练阶段，优化器、学习率计划和步数重新开始；按实验预算设置，不自动假定 30,000 步合适。不能用普通实验的 `--resume` 来切换 RTC；`--resume` 仅用于配置保持一致的 RTC 实验中断恢复。旧数据、checkpoint 和统计不会随代码分发。
+
+训练后的模型提供 `sample_actions(..., prefix_actions=..., prefix_length=d)`，逐次去噪并在最终输出保留已提交前缀。`prefix_actions` 必须是与**当前观测**一致的归一化模型动作空间，形状为 `[batch, horizon, action_dim]`，仅前 `d` 步有效；不能直接传物理单位或旧观测下的 delta 动作。`d` 是不超过训练上限的静态整数；使用 `module_jit` 时加 `static_argnames=("prefix_length",)`。初次推理可使用 `d=0`。
+
+该接口返回完整动作窗口。部署端还需按观测时刻对齐旧队列中的已提交动作，在后台生成后缀，并避免重复执行前缀；执行步数 `s` 需满足 `d <= horizon - s`。本仓库没有接入机器人异步执行队列，接口测试不能替代实机衔接、延迟和任务成功率验证。
+
+## 公共训练参数
 
 | 参数 | 默认值 |
 | --- | --- |

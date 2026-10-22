@@ -77,6 +77,8 @@ def test_independent_augmentation_preserves_flow_randomness(monkeypatch):
         pass
 
     class StopBeforeNetwork:
+        rtc_max_delay = 0
+
         def embed_prefix(self, observation):
             del observation
             raise StopBeforeNetworkError
