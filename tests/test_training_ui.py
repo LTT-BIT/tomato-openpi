@@ -56,6 +56,10 @@ def test_all_baseline_defaults_roundtrip_and_personal_snapshot(entry):
         {"peak_lr": float("nan")},
         {"decay_steps": 1000},
         {"action_horizon": 0},
+        {"rtc_max_delay": -1},
+        {"rtc_max_delay": 50},
+        {"rtc_max_delay": True},
+        {"rtc_max_delay": 1.5},
         {"exp_name": "../escape"},
         {"asset_id": "../escape"},
         {"asset_id": "/escape"},
@@ -68,6 +72,27 @@ def test_invalid_edits_fail_before_saving(change):
     values = {**editor.defaults(BASE)["values"], **change}
     with pytest.raises((ValueError, TypeError)):
         editor.apply_overrides(editor.baseline_config(BASE), values)
+
+
+@pytest.mark.parametrize("entry", [e for e in editor.baseline_catalog() if "fullft" in e["id"]])
+def test_rtc_fullft_ui_and_cli_preserve_dataset_and_trainable_scope(entry):
+    module = entry["id"]
+    baseline = editor.baseline_config(module)
+    values = {**editor.defaults(module)["values"], "rtc_max_delay": 10, "exp_name": "rtc_fullft_test"}
+    assert editor.changed_parameters(module, values) == ["rtc_max_delay"]
+    scope = {}
+    exec(compile(editor.personal_source(module, "alice", values), "personal.py", "exec"), scope)
+    saved = scope["build_config"]()
+    assert saved.model.rtc_max_delay == 10
+    assert saved.freeze_filter == baseline.freeze_filter
+    assert saved.data == baseline.data  # Includes normalization assets and English prompt handling.
+    assert saved.checkpoint_dir != baseline.checkpoint_dir
+    assert editor.baseline_config(module).model.rtc_max_delay == 0
+    resolved = run_training.resolve_experiment(module, ["--model.rtc-max-delay", "10", "--exp-name", "rtc_cli"])
+    assert resolved.model.rtc_max_delay == 10
+    run_training.validate_config(resolved)
+    legacy = {key: value for key, value in editor.defaults(module)["values"].items() if key != "rtc_max_delay"}
+    assert editor.apply_overrides(baseline, legacy) == baseline
 
 
 @pytest.mark.parametrize(("task", "dimension", "second_arm"), [("tomato_wuji", 54, 27), ("tomato_sharpa", 58, 29)])

@@ -162,6 +162,7 @@ def config_values(config) -> dict:
         weight_path=config.weight_loader.params_path,
         project_name=config.project_name,
         action_horizon=config.model.action_horizon,
+        rtc_max_delay=config.model.rtc_max_delay,
         action_semantics="delta" if getattr(config.data, "extra_delta_transform", False) else "absolute",
         sampling_mode=config.sampling_mode,
         sampling_groups=[asdict(group) for group in config.sampling_groups],
@@ -209,6 +210,7 @@ def apply_overrides(config, values: dict):
     """Only allow presentation fields; preserve embodiment, task view and freeze filter."""
     allowed = set(TRAIN_INTS + LR_FIELDS + OPT_FIELDS + TEXT_FIELDS + SCHEDULE_FIELDS) | {
         "action_horizon",
+        "rtc_max_delay",
         "action_semantics",
         "sources",
         "sampling_mode",
@@ -359,7 +361,11 @@ def apply_overrides(config, values: dict):
         exp_name=values["exp_name"],
         project_name=values["project_name"],
         data=data,
-        model=replace(config.model, action_horizon=values["action_horizon"]),
+        model=replace(
+            config.model,
+            action_horizon=values["action_horizon"],
+            rtc_max_delay=values.get("rtc_max_delay", config.model.rtc_max_delay),
+        ),
         lr_schedule=replace(config.lr_schedule, **{key: values[key] for key in LR_FIELDS}),
         optimizer=replace(config.optimizer, **{key: values[key] for key in OPT_FIELDS}),
         weight_loader=replace(config.weight_loader, params_path=weight_path),
