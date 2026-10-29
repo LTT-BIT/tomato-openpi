@@ -252,3 +252,7 @@ CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training \
 历史训练参数、checkpoint 与指标见 [历史实验记录](docs/records/历史实验记录.md)。本仓库不包含这些历史运行产物。
 
 GitLab 自动验证目前暂停。本地代码检查命令为 `bash scripts/check_training.sh`，协作与验证规则见 [多人开发 README](多人开发README.md)。本项目遵循 [LICENSE](LICENSE) 和 [Gemma 许可](LICENSE_GEMMA.txt)。
+
+## 显式选择的 Delta 论文训练实验
+
+Sharpa可在本地 `template/<负责人>/` 选择双臂Delta、逐未来时间位置归一化和Correlated Noise的新实验；八份baseline及recipe默认值不变。共享代码与个人配置分开，个人文件不提交、不上传；首次可用 `scripts.create_delta_paper_experiments --owner <负责人>` 在固定任务目录创建。对照设计、独立统计、训练命令和新权重部署限制见 [Sharpa论文算法实验](training_configs/experiments/tomato_sharpa/README.md#本地-delta-论文算法实验不修改-baseline)。目前仅完成离线代码验证，未执行真实数据完整训练。

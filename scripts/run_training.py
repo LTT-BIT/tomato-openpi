@@ -225,6 +225,10 @@ def preflight_collection(config, *, require_norm=True):
 
 
 def check_norm(config, result):
+    custom_validate = getattr(config.data, "validate_normalization", None)
+    if custom_validate is not None:
+        custom_validate(config, result)
+        return
     metadata = config.policy_metadata
     norm_dir = Path(config.data.assets.assets_dir or config.assets_dirs) / config.data.assets.asset_id
     result["norm_stats_path"] = str(norm_dir / "norm_stats.json")
