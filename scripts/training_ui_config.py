@@ -384,6 +384,10 @@ def apply_overrides(config, values: dict):
             "source_datasets": values["sources"],
         },
     )
+    if getattr(config.data, "paper_contract", None) is not None:
+        from openpi.training.delta_paper_ui import adapt_ui_config
+
+        result = adapt_ui_config(config, result)
     validate_config(result)
     return result
 

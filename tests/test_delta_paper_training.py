@@ -566,6 +566,26 @@ def test_six_original_directories_joint_stats_loader_and_audit(prepared, tmp_pat
     compute(before, batch_size=3)
     current = config()
     result = run_training.preflight(current)
+    from scripts import training_ui_config as editor
+
+    ui_config = editor.apply_overrides(current, editor.config_values(current))
+    assert ui_config.data.lerobot_datasets == current.data.lerobot_datasets
+    assert ui_config.model.paper_asset_sha256 == current.model.paper_asset_sha256
+    assert run_training.preflight(ui_config)["norm_provenance"] == "verified"
+    changed = editor.config_values(current)
+    changed["asset_id"] += "_fresh_ui"
+    fresh = editor.apply_overrides(current, changed)
+    assert fresh.model.paper_asset_dir == str(Path(changed["assets_dir"]) / changed["asset_id"])
+    assert fresh.model.paper_asset_sha256 is None
+    with pytest.raises(ValueError, match="个人配置"):
+        editor.apply_overrides(
+            current,
+            {
+                **changed,
+                "dataset_roots": list(reversed(changed["dataset_roots"])),
+                "dataset_root": changed["dataset_roots"][-1],
+            },
+        )
     directory = current.data.asset_directory(current.assets_dirs)
     manifest, arrays = paper.load_bundle(
         directory, mode="timestamp_zscore_arms", beta=beta, horizon=horizon, std_floor=1e-4

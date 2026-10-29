@@ -103,7 +103,7 @@ bash scripts/python.sh -m scripts.create_delta_paper_experiments --owner ma39non
 
 相关矩阵从同一训练集的归一化动作窗口按 `[time,dimension]` 展平估计，大小2900×2900；按特征中心化并标准化为相关矩阵，常量维度独立，使用 `beta*Sigma+(1-beta)*I` 做Cholesky。训练和推理初始化使用同一噪声定义；beta=0保持原随机流与计算路径。默认均匀无放回抽取最多20000个完整窗口拟合相关性，seed=42；逐时间统计及global统计使用全部训练窗口。计算可能占用约GB级RAM及较长CPU时间，可在个人配置调整 `correlation_max_windows`，需新统计身份。当前实验支持单个或显式列出的多个30Hz数据集，采用epoch_shuffle和JAX全参入口；不支持TaskView、加权重复采样或PyTorch。多源按完整窗口统一打乱，每个有效起点同权，不按源等概率重复采样。
 
-修改数据来源/版本、root、repo_id、asset_id和统计父目录：在**个人文件的 `build_dataset()`** 返回值上用 `dataclasses.replace` 调整；只搬迁相同数据可用 `PI05_SHARPA_MULTIMODAL_DATASET_ROOT`，论文统计父目录可用 `PI05_PAPER_ASSETS_DIR`。换批次须记录新的来源、版本与asset_id。算法开关在个人 `build_config()` 的 `mode/beta`；batch、FSDP、预算等也用replace覆盖。不要修改公共baseline。UI可以选择个人模块，但本轮不增加算法按钮；数据/统计路径应先在个人文件或上述环境变量中确定，不要只改UI统计路径而保留旧模型资产路径，预检查会拒绝这种不匹配。
+修改数据来源/版本、root、repo_id、asset_id和统计父目录：在**个人文件的 `build_dataset()`** 返回值上用 `dataclasses.replace` 调整；只搬迁相同数据可用 `PI05_SHARPA_MULTIMODAL_DATASET_ROOT`，论文统计父目录可用 `PI05_PAPER_ASSETS_DIR`。换批次须记录新的来源、版本与asset_id。算法开关在个人 `build_config()` 的 `mode/beta`；batch、FSDP、预算等也用replace覆盖。不要修改公共baseline。UI可以选择个人模块，无需另加算法按钮；论文UI适配保留个人配置中的数据源身份和顺序，修改统计存储位置时同步更新模型资产路径和摘要。更换数据须在个人文件定义新数据版本，UI不能直接改论文数据目录、顺序、repo_id或切换加权采样。
 
 ### 统计、检查和训练
 
@@ -162,3 +162,10 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 bash scripts/python.sh -u -m scripts.run_tr
 ```
 
 无法联网时显式采用 `--wandb-mode offline`，日志仍写本地，之后sync。此处不修改baseline、main、共享环境或数据权限。当前仅完成多源代码与合成数据离线验证、服务器六源元数据只读预检查，尚未同步服务器代码、计算真实联合统计或启动训练。新训练权重依旧需要单独的论文部署profile适配。
+
+
+### UI使用现有论文统计
+
+服务器启动 `bash scripts/python.sh -m scripts.training_ui --port 8765`，通过SSH转发端口后，在个人配置选择 `mengxiang / delta_paper_no_block_one_t3`。保留六个数据目录、逐时间/相关噪声T3算法、horizon50、epoch_shuffle以及现有asset_id，可修改实验名、batch/FSDP和保存步数等训练参数。UI预检查应显示现有统计通过校验，不需要重新计算。选择8张卡、batch32/FSDP8、W&B offline后，点击开始才会启动训练。
+
+UI专用适配位于 `src/openpi/training/delta_paper_ui.py`；默认baseline UI行为不变，论文统计代码及其源码摘要也未改变，所以能复用命令行计算的资产。改变统计目录/asset_id时模型路径和摘要同步更新；原目录不存在统计时可由UI自动计算。UI保存的个人副本继续保留完整T3类型与六源身份，不依赖其他个人文件。代码同步或修改后须重启本工程UI进程；不停止其他用户的UI或训练。
