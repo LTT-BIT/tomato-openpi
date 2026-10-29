@@ -1,5 +1,6 @@
 """Compose personal experiments from public recipe/data types, never from a baseline file."""
 
+from dataclasses import dataclass
 from dataclasses import fields
 from dataclasses import replace
 import os
@@ -10,6 +11,7 @@ from openpi.models.pi0_config import Pi0Config
 from openpi.models.pi0_delta_paper import PaperPi0Config
 from openpi.models.pi0_delta_paper import PaperWeightLoader
 from openpi.shared import delta_paper as paper
+from openpi.training.config import LeRobotDatasetSpec
 from openpi.training.delta_paper import PaperSharpaData
 from training_configs import common
 from training_configs.embodiments.fr3_sharpa_multimodal import FR3_SHARPA_MULTIMODAL
@@ -44,14 +46,70 @@ def build_default_dataset(*, owner, trial):
     )
 
 
+NO_BLOCK_ONE_ROOT = "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one"
+NO_BLOCK_ONE_MEMBERS = (
+    "A/1022_121_430_normal_lerobot",
+    "A/1022_54_120_normal_lerobot",
+    "A/1026_444_513_normal_lerobot",
+    "B/1022_130_423_normal_lerobot",
+    "B/1022_56_106_normal_lerobot",
+    "B/1026_446_510_normal_lerobot",
+)
+
+
+@dataclass(frozen=True)
+class PaperDatasetCollection(common.Dataset):
+    members: tuple[common.Dataset, ...] = ()
+
+    def __post_init__(self):
+        super().__post_init__()
+        roots = [str(Path(member.root).expanduser().resolve()) for member in self.members]
+        if len(roots) < 2 or len(set(roots)) != len(roots):
+            raise ValueError("Paper collection requires distinct source roots")
+        if len({member.repo_id for member in self.members}) != len(self.members):
+            raise ValueError("Paper collection source identities must be unique")
+
+
+def build_no_block_one_dataset(*, owner, trial, root=NO_BLOCK_ONE_ROOT):
+    """Explicit source list; never move, merge, link or rewrite original data."""
+    _validate_labels(owner, trial)
+    root = Path(root)
+    identity = f"tomato_sharpa_no_block_one_{owner}_delta_paper_{trial}_v1_30hz"
+    assets_dir = os.environ.get("PI05_PAPER_ASSETS_DIR", str(common.repository_root() / "assets"))
+    members = tuple(
+        common.Dataset(
+            version=f"no_block_one_{relative.replace('/', '_')}_v1",
+            repo_id=f"fr3_sharpa/no_block_one_{relative.replace('/', '_')}",
+            root=str(root / relative),
+            assets_dir=assets_dir,
+            asset_id=identity,
+            sources=(str(root / relative),),
+            prompt_example=PROMPT,
+        )
+        for relative in NO_BLOCK_ONE_MEMBERS
+    )
+    return PaperDatasetCollection(
+        version=identity,
+        repo_id="fr3_sharpa/no_block_one_v1",
+        root=str(root),
+        assets_dir=assets_dir,
+        asset_id=identity,
+        sources=tuple(member.root for member in members),
+        prompt_example=PROMPT,
+        members=members,
+    )
+
+
 def build_experiment(*, owner, trial, mode, beta, dataset=None):
     _validate_labels(owner, trial)
     if mode not in paper.MODES or not 0 <= beta < 1:
         raise ValueError("Unknown paper mode/beta")
     dataset = dataset or build_default_dataset(owner=owner, trial=trial)
+    collection = isinstance(dataset, PaperDatasetCollection)
+    label = "no_block_one_" if collection else ""
     base = build_recipe(
-        name=f"pi05_{owner}_sharpa_delta_paper_{trial}_fullft_v1",
-        exp_name=f"{owner}_sharpa_delta_paper_{trial}_s42_run01",
+        name=f"pi05_{owner}_sharpa_{label}delta_paper_{trial}_fullft_v1",
+        exp_name=f"{owner}_sharpa_{label}delta_paper_{trial}_s42_run01",
         embodiment=FR3_SHARPA_MULTIMODAL,
         dataset=dataset,
     )
@@ -68,7 +126,11 @@ def build_experiment(*, owner, trial, mode, beta, dataset=None):
         repo_id=dataset.repo_id,
         assets=base.data.assets,
         base_config=base.data.base_config,
-        lerobot_datasets=base.data.lerobot_datasets,
+        lerobot_datasets=tuple(
+            LeRobotDatasetSpec(repo_id=member.repo_id, root=member.root, weight=1.0) for member in dataset.members
+        )
+        if collection
+        else base.data.lerobot_datasets,
         action_hz=30,
         video_backend="pyav",
         paper_mode=mode,

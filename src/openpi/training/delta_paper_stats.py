@@ -12,6 +12,8 @@ from openpi.shared import normalize
 from openpi.shared.local_storage import new_artifact_directory
 from openpi.training import data_loader
 from openpi.training import norm_provenance
+from openpi.training.dataset_collection import collection_layout
+from openpi.training.dataset_collection import validate_collection_features
 from openpi.training.delta_paper import PaperDataView
 from openpi.training.delta_paper import PaperSharpaData
 
@@ -26,13 +28,21 @@ def compute(config, *, batch_size=128):
 
 def _compute(config, *, batch_size, output):
     data, horizon = config.data, config.model.action_horizon
-    spec = data.lerobot_datasets[0]
-    root = Path(spec.root).expanduser().resolve()
-    info = json.loads((root / "meta/info.json").read_text())
-    episodes = [json.loads(line) for line in (root / "meta/episodes.jsonl").read_text().splitlines() if line.strip()]
-    if info["fps"] != 30 or sum(row["length"] for row in episodes) != info["total_frames"]:
+    layout = collection_layout([spec.root for spec in data.lerobot_datasets])
+    validate_collection_features([item["info"] for item in layout])
+    if any(item["info"]["fps"] != 30 for item in layout):
         raise ValueError("Paper episode metadata/FPS mismatch")
-    total = sum(max(0, row["length"] - horizon + 1) for row in episodes)
+    total = sum(max(0, row["length"] - horizon + 1) for item in layout for row in item["episodes"])
+    source_reports = [
+        {
+            "repo_id": spec.repo_id,
+            "root": item["root"],
+            "frames": item["info"]["total_frames"],
+            "episodes": item["info"]["total_episodes"],
+            "training_windows": sum(max(0, row["length"] - horizon + 1) for row in item["episodes"]),
+        }
+        for spec, item in zip(data.lerobot_datasets, layout, strict=True)
+    ]
     if total < 2:
         raise ValueError("Paper statistics require at least two complete training windows")
     contract = norm_provenance.build_contract(config)
@@ -64,45 +74,47 @@ def _compute(config, *, batch_size, output):
     )
     sampled = np.empty((len(chosen), horizon, 58), np.float32)
     offset, checked = 0, 0
-    for episode in episodes:
-        index, length = episode["episode_index"], episode["length"]
-        count = max(0, length - horizon + 1)
-        if not count:
-            continue
-        path = root / info["data_path"].format(episode_chunk=index // info["chunks_size"], episode_index=index)
-        table = pq.read_table(path, columns=["observation.state", "action", "frame_index", "episode_index"])
-        if (
-            len(table) != length
-            or not np.array_equal(table["frame_index"].to_numpy(), np.arange(length))
-            or not np.all(table["episode_index"].to_numpy() == index)
-        ):
-            raise ValueError("Paper episode frame IDs/length differ from metadata")
-        state = np.asarray(table["observation.state"].to_pylist(), np.float32)
-        action = np.asarray(table["action"].to_pylist(), np.float32)
-        for start in range(0, count, batch_size):
-            rows = np.arange(start, min(start + batch_size, count))
-            inputs = {
-                "observation.state": state[rows],
-                "action": action[rows[:, None] + np.arange(horizon)],
-                "prompt": "",
-                **dict.fromkeys(cameras, dummy),
-            }
-            values = vector(inputs)
-            if not np.isfinite(values["state"]).all() or not np.isfinite(values["actions"]).all():
-                raise ValueError("Nonfinite paper training window")
-            stats["state"].update(values["state"])
-            stats["actions"].update(values["actions"])
-            arms.update(values["actions"][..., paper.ARMS])
-            low, high = np.searchsorted(chosen, [offset + start, offset + start + len(rows)])
-            if high > low:
-                sampled[low:high] = values["actions"][chosen[low:high] - offset - start]
-            for local in (0, count // 2, count - 1):
-                if start <= local < start + len(rows):
-                    actual = vector(reference[offset + local])
-                    for key in stats:
-                        np.testing.assert_array_equal(actual[key], values[key][local - start])
-                    checked += 1
-        offset += count
+    for item in layout:
+        root, info = Path(item["root"]), item["info"]
+        for episode in sorted(item["episodes"], key=lambda row: row["episode_index"]):
+            index, length = episode["episode_index"], episode["length"]
+            count = max(0, length - horizon + 1)
+            if not count:
+                continue
+            path = root / info["data_path"].format(episode_chunk=index // info["chunks_size"], episode_index=index)
+            table = pq.read_table(path, columns=["observation.state", "action", "frame_index", "episode_index"])
+            if (
+                len(table) != length
+                or not np.array_equal(table["frame_index"].to_numpy(), np.arange(length))
+                or not np.all(table["episode_index"].to_numpy() == index)
+            ):
+                raise ValueError("Paper episode frame IDs/length differ from metadata")
+            state = np.asarray(table["observation.state"].to_pylist(), np.float32)
+            action = np.asarray(table["action"].to_pylist(), np.float32)
+            for start in range(0, count, batch_size):
+                rows = np.arange(start, min(start + batch_size, count))
+                inputs = {
+                    "observation.state": state[rows],
+                    "action": action[rows[:, None] + np.arange(horizon)],
+                    "prompt": "",
+                    **dict.fromkeys(cameras, dummy),
+                }
+                values = vector(inputs)
+                if not np.isfinite(values["state"]).all() or not np.isfinite(values["actions"]).all():
+                    raise ValueError("Nonfinite paper training window")
+                stats["state"].update(values["state"])
+                stats["actions"].update(values["actions"])
+                arms.update(values["actions"][..., paper.ARMS])
+                low, high = np.searchsorted(chosen, [offset + start, offset + start + len(rows)])
+                if high > low:
+                    sampled[low:high] = values["actions"][chosen[low:high] - offset - start]
+                for local in (0, count // 2, count - 1):
+                    if start <= local < start + len(rows):
+                        actual = vector(reference[offset + local])
+                        for key in stats:
+                            np.testing.assert_array_equal(actual[key], values[key][local - start])
+                        checked += 1
+            offset += count
     if offset != total or norm_provenance.build_contract(config) != contract:
         raise ValueError("Paper data changed during statistics or window count differs")
     results = {key: value.get_statistics() for key, value in stats.items()}
@@ -139,8 +151,9 @@ def _compute(config, *, batch_size, output):
                 "norm_stats_sha256": digest,
                 "config_name": config.name,
                 "repo_id": data.repo_id,
-                "frames": info["total_frames"],
-                "episodes": info["total_episodes"],
+                "frames": sum(item["frames"] for item in source_reports),
+                "episodes": sum(item["episodes"] for item in source_reports),
+                "datasets": source_reports,
                 "action_horizon": horizon,
                 "training_windows": total,
                 "vector_counts": {"state": total, "actions": total * horizon},
@@ -156,7 +169,8 @@ def _compute(config, *, batch_size, output):
         "shape": [horizon, 58],
         "flatten_order": "time-major",
         "training_windows": total,
-        "excluded_tail_starts": info["total_frames"] - total,
+        "excluded_tail_starts": sum(item["frames"] for item in source_reports) - total,
+        "datasets": source_reports,
         "correlation_samples": len(chosen),
         "correlation_estimator": "centered unit-diagonal correlation; constant dims independent",
         "norm_stats_sha256": digest,

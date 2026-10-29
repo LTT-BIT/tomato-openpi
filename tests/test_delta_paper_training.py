@@ -461,3 +461,167 @@ def test_personal_dataset_definition_controls_all_model_and_statistics_paths(tmp
     assert config.data.lerobot_datasets[0].root == dataset.root
     assert config.policy_metadata["source_datasets"] == list(dataset.sources)
     assert config.policy_metadata["dataset_version"] == dataset.version
+
+
+@pytest.mark.parametrize("prepared", [3, 50], indirect=True)
+@pytest.mark.parametrize("beta", [0.0, 0.5])
+def test_six_original_directories_joint_stats_loader_and_audit(prepared, tmp_path, monkeypatch, beta):
+    import shutil
+
+    from openpi.training.delta_paper_experiment import NO_BLOCK_ONE_MEMBERS
+    from openpi.training.delta_paper_experiment import build_no_block_one_dataset
+    from openpi.training.reproducibility import _source_identity
+
+    build, original, _ = prepared
+    horizon = build().model.action_horizon
+    parent = tmp_path / "no-block-one"
+    all_windows = []
+    fingerprints = {}
+    for number, relative in enumerate(NO_BLOCK_ONE_MEMBERS):
+        root = parent / relative
+        shutil.copytree(original, root)
+        info = json.loads((root / "meta/info.json").read_text())
+        for key, value in info["features"].items():
+            value["dtype"] = "video" if "images" in key else "float32"
+        length0 = horizon + 4 + number
+        episodes = [{"episode_index": 0, "length": length0}, {"episode_index": 1, "length": horizon + 2}]
+        info["total_frames"] = sum(row["length"] for row in episodes)
+        (root / "meta/info.json").write_text(json.dumps(info))
+        (root / "meta/episodes.jsonl").write_text("".join(json.dumps(row) + "\n" for row in episodes))
+        for row in episodes:
+            length, ep = row["length"], row["episode_index"]
+            state = np.zeros((length, 116), np.float32)
+            action = np.zeros((length, 58), np.float32)
+            state[:, 0] = np.arange(length) * 0.01
+            action[:, 0] = number * 0.1 + ep * 0.01 + np.arange(length) * 0.02
+            action[:, 14:36] = 0.1
+            pq.write_table(
+                pa.table(
+                    {
+                        "observation.state": state.tolist(),
+                        "action": action.tolist(),
+                        "frame_index": list(range(length)),
+                        "episode_index": [ep] * length,
+                    }
+                ),
+                root / f"data/episode_{ep:06d}.parquet",
+            )
+            for start in range(length - horizon + 1):
+                chunk = np.zeros((horizon, 58), np.float32)
+                chunk[:, 0] = action[start : start + horizon, 0] - state[start, 0]
+                all_windows.append(chunk)
+        for path in root.rglob("*"):
+            if path.is_file():
+                fingerprints[path] = paper.sha256(path)
+
+    def metadata(repo_id, *, root):
+        info = json.loads((Path(root) / "meta/info.json").read_text())
+        return SimpleNamespace(
+            fps=30,
+            tasks={0: "Pick the tomato."},
+            features=info["features"],
+            camera_keys=build().policy_metadata["camera_keys"],
+        )
+
+    class Source:
+        def __init__(self, repo_id, *, root, delta_timestamps, **kwargs):
+            self.root = Path(root)
+            self.meta = metadata(repo_id, root=root)
+            self.horizon = len(delta_timestamps["action"])
+            self.tables = [pq.read_table(path).to_pydict() for path in sorted((self.root / "data").glob("*.parquet"))]
+            self.ids = [(ep, frame) for ep, table in enumerate(self.tables) for frame in table["frame_index"]]
+            self.hf_dataset = datasets.Dataset.from_dict(
+                {"episode_index": [i[0] for i in self.ids], "frame_index": [i[1] for i in self.ids]}
+            )
+
+        def __len__(self):
+            return len(self.ids)
+
+        def __getitem__(self, index):
+            ep, frame = self.ids[index]
+            table = self.tables[ep]
+            return {
+                "observation.state": np.asarray(table["observation.state"][frame], np.float32),
+                "action": np.asarray(table["action"][frame : frame + self.horizon], np.float32),
+                "episode_index": ep,
+                "frame_index": frame,
+                "task_index": 0,
+                **{key: np.zeros((1, 1, 3), np.uint8) for key in self.meta.camera_keys},
+            }
+
+    monkeypatch.setattr(data_loader.lerobot_dataset, "LeRobotDatasetMetadata", metadata)
+    monkeypatch.setattr(data_loader.lerobot_dataset, "LeRobotDataset", Source)
+
+    def config():
+        dataset = build_no_block_one_dataset(owner="test", trial="collection", root=str(parent))
+        base = build_experiment(
+            owner="test", trial="collection", mode="timestamp_zscore_arms", beta=beta, dataset=dataset
+        )
+        return replace(
+            base, model=replace(base.model, action_horizon=horizon), fsdp_devices=1, batch_size=2, num_workers=0
+        )
+
+    before = config()
+    run_training.preflight(before, require_norm=False)
+    compute(before, batch_size=3)
+    current = config()
+    result = run_training.preflight(current)
+    directory = current.data.asset_directory(current.assets_dirs)
+    manifest, arrays = paper.load_bundle(
+        directory, mode="timestamp_zscore_arms", beta=beta, horizon=horizon, std_floor=1e-4
+    )
+    assert result["frames"] == 12 * horizon + 51
+    assert result["episodes"] == 12
+    assert manifest["training_windows"] == 63
+    assert [row["training_windows"] for row in manifest["datasets"]] == list(range(8, 14))
+    assert sum(row["training_windows"] for row in manifest["datasets"]) == 63
+    np.testing.assert_allclose(arrays["arm_mean"][:, 0], np.asarray(all_windows).mean(axis=0)[:, 0], atol=1e-7)
+    view = current.data.create(current.assets_dirs, current.model)
+    source = data_loader.create_torch_dataset(view, horizon, current.model, sampling_mode="epoch_shuffle")
+    assert len(source) == 63
+    assert len(np.unique(source.frame_ids[:, 0])) == 12
+    identity, ids = _source_identity(view, source)
+    assert len(identity["sources"]) == 6
+    assert ids.shape == (63, 2)
+    for row in range(len(source)):
+        # A future window stays within the same source episode, with no padding.
+        assert source[row]["action"].shape == (horizon, 58)
+        np.testing.assert_allclose(np.diff(source[row]["action"][:, 0]), 0.02, atol=3e-7)
+    loader = data_loader.create_data_loader(
+        current, framework="jax", skip_norm_stats=False, shuffle=True, num_batches=1
+    )
+    assert loader.prepare_reproducibility(current, resuming=False)
+    observation, actions = next(iter(loader))
+    assert observation.state.shape == (2, 58)
+    assert actions.shape == (2, horizon, 58)
+    for path, expected in fingerprints.items():
+        assert paper.sha256(path) == expected
+    # Altering one source invalidates the shared statistics.
+    changed = parent / NO_BLOCK_ONE_MEMBERS[-1] / "meta/tasks.jsonl"
+    changed.write_text('{"task_index": 0, "task": "Another task."}\n')
+    with pytest.raises(ValueError, match="differ"):
+        run_training.preflight(current)
+
+
+def test_no_block_one_generator_and_fixed_source_order(tmp_path, monkeypatch):
+    from openpi.training.delta_paper_experiment import NO_BLOCK_ONE_MEMBERS
+    from openpi.training.delta_paper_experiment import build_no_block_one_dataset
+    from scripts.create_delta_paper_experiments import create
+
+    monkeypatch.setattr(common, "repository_root", lambda: tmp_path)
+    generated = create("mengxiang", dataset="no-block-one")
+    assert (generated / "delta_paper_no_block_one_t3.py").is_file()
+    assert "build_no_block_one_dataset" in (generated / "delta_paper_no_block_one_t3.py").read_text()
+    dataset = build_no_block_one_dataset(owner="mengxiang", trial="t3")
+    assert len(dataset.members) == 6
+    assert [str(Path(member.root).relative_to(dataset.root)) for member in dataset.members] == list(
+        NO_BLOCK_ONE_MEMBERS
+    )
+    assert "no_block_one" in dataset.asset_id
+    assert "1016_2" not in dataset.asset_id
+    config = build_experiment(owner="mengxiang", trial="t3", mode="timestamp_zscore_arms", beta=0.5, dataset=dataset)
+    assert len(config.data.lerobot_datasets) == 6
+    assert config.policy_metadata["source_datasets"] == list(dataset.sources)
+    assert config.model.paper_asset_dir == str(Path(dataset.assets_dir) / dataset.asset_id)
+    with pytest.raises(ValueError, match="uniform"):
+        replace(config.data, lerobot_datasets=(replace(config.data.lerobot_datasets[0], weight=2),))

@@ -101,7 +101,7 @@ bash scripts/python.sh -m scripts.create_delta_paper_experiments --owner ma39non
 
 所有组**统一只训练完整50步窗口**，不足50步的episode尾部起点不参与训练或统计。这是为保证统计与标签完全一致而建立的新对照，T0不是旧模型原样重训；与旧baseline相比还包含窗口覆盖变化，不能把差异都归因于噪声或归一化。T1对T0同时包含quantile改z-score的变化，若要单独判断逐时间位置的贡献，应比较T1与TG。
 
-相关矩阵从同一训练集的归一化动作窗口按 `[time,dimension]` 展平估计，大小2900×2900；按特征中心化并标准化为相关矩阵，常量维度独立，使用 `beta*Sigma+(1-beta)*I` 做Cholesky。训练和推理初始化使用同一噪声定义；beta=0保持原随机流与计算路径。默认均匀无放回抽取最多20000个完整窗口拟合相关性，seed=42；逐时间统计及global统计使用全部训练窗口。计算可能占用约GB级RAM及较长CPU时间，可在个人配置调整 `correlation_max_windows`，需新统计身份。当前实验只支持单个30Hz数据集、epoch_shuffle、JAX全参入口；不支持TaskView、联合数据集或PyTorch。
+相关矩阵从同一训练集的归一化动作窗口按 `[time,dimension]` 展平估计，大小2900×2900；按特征中心化并标准化为相关矩阵，常量维度独立，使用 `beta*Sigma+(1-beta)*I` 做Cholesky。训练和推理初始化使用同一噪声定义；beta=0保持原随机流与计算路径。默认均匀无放回抽取最多20000个完整窗口拟合相关性，seed=42；逐时间统计及global统计使用全部训练窗口。计算可能占用约GB级RAM及较长CPU时间，可在个人配置调整 `correlation_max_windows`，需新统计身份。当前实验支持单个或显式列出的多个30Hz数据集，采用epoch_shuffle和JAX全参入口；不支持TaskView、加权重复采样或PyTorch。多源按完整窗口统一打乱，每个有效起点同权，不按源等概率重复采样。
 
 修改数据来源/版本、root、repo_id、asset_id和统计父目录：在**个人文件的 `build_dataset()`** 返回值上用 `dataclasses.replace` 调整；只搬迁相同数据可用 `PI05_SHARPA_MULTIMODAL_DATASET_ROOT`，论文统计父目录可用 `PI05_PAPER_ASSETS_DIR`。换批次须记录新的来源、版本与asset_id。算法开关在个人 `build_config()` 的 `mode/beta`；batch、FSDP、预算等也用replace覆盖。不要修改公共baseline。UI可以选择个人模块，但本轮不增加算法按钮；数据/统计路径应先在个人文件或上述环境变量中确定，不要只改UI统计路径而保留旧模型资产路径，预检查会拒绝这种不匹配。
 
@@ -126,3 +126,39 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 bash scripts/python.sh -u -m scripts.run_tr
 **新训练权重不能直接交给现有部署profile。** 本轮只改训练仓库，未改任何串行、RTC或Soft部署。现有部署会拒绝新的统计形状，后续需单独接入新模型类型、匹配统计及相关噪声采样，不得只换checkpoint路径。
 
 本轮状态为代码与离线验证准备完成：已验证合成parquet的真实转换、完整50×58统计/2900×2900因子、实际loader及采样审计、缩小Gemma/SigLIP的梯度与优化器更新、checkpoint保存/恢复和beta=0等价性。没有计算服务器真实训练集的新统计，没有启动真实数据完整训练或实机测试。此前 `template/timestamp_norm_trial.py` 及其已有结果保留原样。
+
+
+### no-block-one 六份摘番茄数据联合实验
+
+数据保持在 `/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one`，不搬迁、复制、合并、建软链接或修改原始meta/parquet/video。共享helper `build_no_block_one_dataset` 显式列出以下顺序；不自动扫描新加入的目录：
+
+| 相对原目录 | episode | 原帧数 | 完整50步窗口 |
+| --- | ---: | ---: | ---: |
+| A/1022_121_430_normal_lerobot | 168 | 157442 | 149210 |
+| A/1022_54_120_normal_lerobot | 41 | 37145 | 35136 |
+| A/1026_444_513_normal_lerobot | 47 | 37240 | 34937 |
+| B/1022_130_423_normal_lerobot | 34 | 40221 | 38555 |
+| B/1022_56_106_normal_lerobot | 8 | 10607 | 10215 |
+| B/1026_446_510_normal_lerobot | 13 | 11551 | 10914 |
+| 合计 | 311 | 294206 | 278967 |
+
+以上是2026-10-29读取实际元数据得到的数量，不能代替完整读取与训练验证。六份数据的帧率、维度、关节名字顺序和相机角色已做只读检查，均一致；来源的任务文本均为本页相同英文摘番茄指令。
+
+每个源先独立取完整窗口，再在内存联合；episode编号只在采样审计里映射，不写回数据。训练对全部278967个完整起点做epoch_shuffle，统计也按同样起点权重覆盖全部六份；相关性从全部完整窗口均匀无放回抽最多20000个。大批次自然贡献更多窗口，不把小批次放大为相同权重。手部Absolute、双臂Delta及逐时间统计规则不变，不加入Multi-Sample Flow Matching。
+
+统计使用独立 `tomato_sharpa_no_block_one_<owner>_delta_paper_t3_v1_30hz` 身份，记录六个原始目录、逐源帧数/episode/有效窗口数和文件摘要；任一源内容、顺序或算法改变都会导致检查拒绝复用。原10.16_2实验仍保留，不能复用它的统计或实验名称。
+
+服务器同步共享代码后，第一次可生成个人配置；若负责人目录已存在，生成器会拒绝覆盖。本机已额外创建被Git忽略的 `template/ma39nong/delta_paper_no_block_one_t3.py`，未覆盖原五份个人配置。服务器例子：
+
+```bash
+bash scripts/python.sh -m scripts.create_delta_paper_experiments --owner mengxiang --dataset no-block-one
+export MODULE=training_configs.experiments.tomato_sharpa.template.mengxiang.delta_paper_no_block_one_t3
+bash scripts/python.sh -m scripts.run_training "$MODULE" --dry-run
+bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE" --stats-batch-size 128
+bash scripts/python.sh -m scripts.run_training "$MODULE" --check
+# 下列命令才开始真实训练；保持原全参配方、8卡、batch32和30000步。
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 bash scripts/python.sh -u -m scripts.run_training \
+  "$MODULE" --exp-name mengxiang_sharpa_no_block_one_delta_paper_t3_s42_run01 --wandb-mode online
+```
+
+无法联网时显式采用 `--wandb-mode offline`，日志仍写本地，之后sync。此处不修改baseline、main、共享环境或数据权限。当前仅完成多源代码与合成数据离线验证、服务器六源元数据只读预检查，尚未同步服务器代码、计算真实联合统计或启动训练。新训练权重依旧需要单独的论文部署profile适配。

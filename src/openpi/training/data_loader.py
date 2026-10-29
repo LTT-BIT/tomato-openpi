@@ -369,6 +369,10 @@ def create_torch_dataset(
         ),
     )
     if sampling_mode in _sampling.PLAN_MODES:
+        if getattr(data_config, "paper_complete_windows", False):
+            from openpi.training.delta_paper import PaperCollectionDataset
+
+            return PaperCollectionDataset(datasets, data_config.lerobot_datasets)
         return CollectionDataset(datasets, data_config.lerobot_datasets)
     return WeightedConcatDataset(datasets, [spec.weight for spec in data_config.lerobot_datasets])
 

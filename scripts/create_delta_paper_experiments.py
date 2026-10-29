@@ -15,25 +15,31 @@ TRIALS = (
 )
 
 
-def source(owner, trial, mode, beta):
+def source(owner, trial, mode, beta, dataset="single"):
+    if dataset not in ("single", "no-block-one"):
+        raise ValueError("Unknown paper dataset preset")
+    builder = "build_no_block_one_dataset" if dataset == "no-block-one" else "build_default_dataset"
     return (
         f'"""Local Sharpa fullft {trial}: {mode}, noise beta={beta}; not a public baseline."""\n\n'
-        "from openpi.training.delta_paper_experiment import build_default_dataset\n"
+        f"from openpi.training.delta_paper_experiment import {builder}\n"
         "from openpi.training.delta_paper_experiment import build_experiment\n\n\n"
         "def build_dataset():\n"
-        f'    return build_default_dataset(owner="{owner}", trial="{trial}")\n\n\n'
+        f'    return {builder}(owner="{owner}", trial="{trial}")\n\n\n'
         "def build_config():\n"
         f'    return build_experiment(owner="{owner}", trial="{trial}", mode="{mode}", beta={beta}, dataset=build_dataset())\n'
     )
 
 
-def create(owner):
+def create(owner, dataset="single"):
     if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", owner) is None:
         raise ValueError("Owner must be an English directory-safe identifier")
+    if dataset not in ("single", "no-block-one"):
+        raise ValueError("Unknown paper dataset preset")
+    prefix = "no_block_one_" if dataset == "no-block-one" else ""
     directory = common.repository_root() / "training_configs/experiments/tomato_sharpa/template" / owner
     with new_artifact_directory(directory) as staging:
         for trial, mode, beta in TRIALS:
-            (staging / f"delta_paper_{trial}.py").write_text(source(owner, trial, mode, beta))
+            (staging / f"delta_paper_{prefix}{trial}.py").write_text(source(owner, trial, mode, beta, dataset))
 
     return directory
 
@@ -41,9 +47,10 @@ def create(owner):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--owner", required=True)
+    parser.add_argument("--dataset", choices=("single", "no-block-one"), default="single")
     args = parser.parse_args()
     print(
-        f"Created 5 local configs in {create(args.owner)}; Git ignores them. Existing directories are never overwritten."
+        f"Created 5 local configs in {create(args.owner, args.dataset)}; Git ignores them. Existing directories are never overwritten."
     )
 
 

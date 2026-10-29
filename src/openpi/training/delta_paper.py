@@ -45,6 +45,47 @@ class CompleteWindows:
         return self.dataset[int(self.indices[index])]
 
 
+class PaperCollectionDataset:
+    """Complete windows per source; local episode IDs map only in memory."""
+
+    def __init__(self, datasets, specs):
+        from torch.utils.data import ConcatDataset
+
+        from openpi.training.data_loader import TransformedDataset
+        from openpi.training.dataset_collection import collection_layout
+        from openpi.training.dataset_collection import validate_collection_features
+
+        self.dataset = ConcatDataset(datasets)
+        self.sources = []
+        self.layout = collection_layout([spec.root for spec in specs])
+        validate_collection_features([item["info"] for item in self.layout])
+        ids = []
+        for dataset, layout in zip(datasets, self.layout, strict=True):
+            source = dataset
+            while isinstance(source, TransformedDataset):
+                source = source._dataset  # noqa: SLF001
+            if not isinstance(source, CompleteWindows):
+                raise ValueError("Paper collection requires complete-window sources")
+            self.sources.append(source)
+            columns = source.hf_dataset.select_columns(["episode_index", "frame_index"]).with_format("numpy")[:]
+            episodes = np.asarray(columns["episode_index"], np.int64)
+            horizon = source.view_identity["complete_horizon"]
+            for row in layout["episodes"]:
+                frames = np.asarray(columns["frame_index"])[episodes == row["episode_index"]]
+                if not np.array_equal(frames, np.arange(max(0, row["length"] - horizon + 1))):
+                    raise ValueError("Paper collection windows differ from episode metadata")
+            if source.source_total_frames != layout["info"]["total_frames"]:
+                raise ValueError("Paper source frame count differs from metadata")
+            ids.append(np.column_stack(([layout["mapping"][int(e)] for e in episodes], columns["frame_index"])))
+        self.frame_ids = np.concatenate(ids).astype(np.int64)
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, index):
+        return self.dataset[index]
+
+
 @dataclass(frozen=True)
 class PaperDataView(cfg.DataConfig):
     paper_complete_windows: bool = True
@@ -84,12 +125,15 @@ class PaperSharpaData(cfg.LeRobotFr3SharpaMultimodalDataConfig):
             or not np.isfinite(self.paper_std_floor)
             or self.paper_std_floor <= 0
             or self.correlation_max_windows < 2
-            or len(self.lerobot_datasets) != 1
+            or not self.lerobot_datasets
+            or any(spec.weight != 1.0 for spec in self.lerobot_datasets)
             or not self.extra_delta_transform
             or self.action_hz != 30
             or getattr(self.base_config, "task_view", None) is not None
         ):
-            raise ValueError("Paper experiment requires one 30Hz Sharpa Delta dataset and valid independent options")
+            raise ValueError(
+                "Paper experiment requires 30Hz Sharpa Delta datasets with uniform complete-window sampling"
+            )
 
     def paper_contract(self):
         return {
@@ -98,6 +142,7 @@ class PaperSharpaData(cfg.LeRobotFr3SharpaMultimodalDataConfig):
             "beta": self.paper_beta,
             "std_floor": self.paper_std_floor,
             "windows": "complete_only",
+            "dataset_sampling": "uniform_complete_windows",
             "correlation_max_windows": self.correlation_max_windows,
             "correlation_seed": self.correlation_seed,
         }

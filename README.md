@@ -256,3 +256,5 @@ GitLab 自动验证目前暂停。本地代码检查命令为 `bash scripts/chec
 ## 显式选择的 Delta 论文训练实验
 
 Sharpa可在本地 `template/<负责人>/` 选择双臂Delta、逐未来时间位置归一化和Correlated Noise的新实验；八份baseline及recipe默认值不变。共享代码与个人配置分开，个人文件不提交、不上传；首次可用 `scripts.create_delta_paper_experiments --owner <负责人>` 在固定任务目录创建。对照设计、独立统计、训练命令和新权重部署限制见 [Sharpa论文算法实验](training_configs/experiments/tomato_sharpa/README.md#本地-delta-论文算法实验不修改-baseline)。目前仅完成离线代码验证，未执行真实数据完整训练。
+
+论文训练实验现支持原目录中的no-block-one六份摘番茄数据联合加载，逐源完整窗口、统一统计及独立个人配置；使用方法见[任务说明](training_configs/experiments/tomato_sharpa/README.md#no-block-one-六份摘番茄数据联合实验)。原baseline保持原样。
