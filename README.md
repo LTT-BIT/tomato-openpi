@@ -96,6 +96,8 @@ UI 流程日志和状态在 `logs/training_ui/<任务ID>/`；正式训练仍按�
 
 UI 只管理本仓库训练，不安装驱动或环境、不转换数据、不修改 W&B 登录凭据。除首次准备环境、登录 W&B 和启动 UI 外，日常数据准备检查、统计计算、参数选择及训练操作都可在页面完成。下面的命令行流程仍可使用。
 
+UI 启动 GPU 训练时默认传入 `XLA_PYTHON_CLIENT_PREALLOCATE=true` 和 `XLA_PYTHON_CLIENT_MEM_FRACTION=0.90`，无需每次手动 export；实际值记录在任务状态的 `training_environment` 和流程日志中。若启动 UI 的环境已显式设置这两个变量，则保留其值。此默认值仅作用于 UI 后续启动的 GPU 训练，不改变命令行入口、已有任务或 baseline 配置。预分配不能保证更大的 batch 能运行，仍须根据实际训练验证显存需求。
+
 ## 自己的电脑：安装本地环境
 
 

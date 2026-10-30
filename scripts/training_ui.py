@@ -453,6 +453,14 @@ def worker(job_id):
         env.pop("JAX_PLATFORM_NAME", None)
         # Fail if CUDA cannot initialize rather than accidentally training on CPU.
         env["JAX_PLATFORMS"] = "cuda"
+        # Apply before the training child imports JAX; explicit launcher values win.
+        env.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "true")
+        env.setdefault("XLA_PYTHON_CLIENT_MEM_FRACTION", "0.90")
+        state["training_environment"] = {
+            key: env[key]
+            for key in ("XLA_PYTHON_CLIENT_PREALLOCATE", "XLA_PYTHON_CLIENT_MEM_FRACTION")
+        }
+        print(f"JAX training environment: {state['training_environment']}", flush=True)
         if hashlib.sha256(path.read_bytes()).hexdigest() != state["config_sha256"]:
             raise ValueError("准备过程中配置被修改，请新建实验")
         command = [*python, "scripts.run_training", state["module"], *overrides, "--wandb-mode", state["wandb_mode"]]
