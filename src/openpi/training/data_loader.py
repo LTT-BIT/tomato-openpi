@@ -324,6 +324,10 @@ def create_torch_dataset(
             delta_timestamps=dict.fromkeys(data_config.action_sequence_keys, action_delta_timestamps),
             video_backend=data_config.video_backend,
         )
+        if getattr(data_config, "paper_complete_windows", False):
+            from openpi.training.delta_paper import CompleteWindows
+
+            dataset = CompleteWindows(dataset, action_horizon)
         view = getattr(data_config, "task_view", None)
         if view is not None:
             from openpi.training.task_view import TaskViewDataset
@@ -365,6 +369,10 @@ def create_torch_dataset(
         ),
     )
     if sampling_mode in _sampling.PLAN_MODES:
+        if getattr(data_config, "paper_complete_windows", False):
+            from openpi.training.delta_paper import PaperCollectionDataset
+
+            return PaperCollectionDataset(datasets, data_config.lerobot_datasets)
         return CollectionDataset(datasets, data_config.lerobot_datasets)
     return WeightedConcatDataset(datasets, [spec.weight for spec in data_config.lerobot_datasets])
 

@@ -13,6 +13,10 @@ def main():
     args, overrides = parser.parse_known_args()
     config = resolve_experiment(args.experiment, overrides)
     preflight(config, require_norm=False)
+    custom_compute = getattr(config.data, "compute_normalization", None)
+    if custom_compute is not None:
+        custom_compute(config, batch_size=args.stats_batch_size)
+        return
     from examples.fr3_wuji.compute_norm_stats import compute
 
     compute(config, batch_size=args.stats_batch_size)

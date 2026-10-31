@@ -78,6 +78,7 @@ def test_independent_augmentation_preserves_flow_randomness(monkeypatch):
 
     class StopBeforeNetwork:
         rtc_max_delay = 0
+        noise = pi0.Pi0.noise
 
         def embed_prefix(self, observation):
             del observation

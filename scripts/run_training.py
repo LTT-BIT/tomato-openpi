@@ -123,7 +123,10 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     if features["observation.state"]["shape"] not in [[dim] for dim in metadata["raw_state_dims"]]:
         raise ValueError("Dataset raw state shape is not supported by the embodiment")
     joint_names = metadata.get("joint_names")
-    for key, source_names in (("observation.state", "source_state_joint_names"), ("action", "source_action_joint_names")):
+    for key, source_names in (
+        ("observation.state", "source_state_joint_names"),
+        ("action", "source_action_joint_names"),
+    ):
         expected_names = metadata.get(source_names, joint_names)
         if expected_names is not None and features[key].get("names") != expected_names:
             raise ValueError(f"Dataset {key} joint names/order differ from the embodiment protocol")
@@ -225,6 +228,10 @@ def preflight_collection(config, *, require_norm=True):
 
 
 def check_norm(config, result):
+    custom_validate = getattr(config.data, "validate_normalization", None)
+    if custom_validate is not None:
+        custom_validate(config, result)
+        return
     metadata = config.policy_metadata
     norm_dir = Path(config.data.assets.assets_dir or config.assets_dirs) / config.data.assets.asset_id
     result["norm_stats_path"] = str(norm_dir / "norm_stats.json")

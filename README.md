@@ -96,6 +96,8 @@ UI 流程日志和状态在 `logs/training_ui/<任务ID>/`；正式训练仍按�
 
 UI 只管理本仓库训练，不安装驱动或环境、不转换数据、不修改 W&B 登录凭据。除首次准备环境、登录 W&B 和启动 UI 外，日常数据准备检查、统计计算、参数选择及训练操作都可在页面完成。下面的命令行流程仍可使用。
 
+UI 启动 GPU 训练时默认传入 `XLA_PYTHON_CLIENT_PREALLOCATE=true` 和 `XLA_PYTHON_CLIENT_MEM_FRACTION=0.90`，无需每次手动 export；实际值记录在任务状态的 `training_environment` 和流程日志中。若启动 UI 的环境已显式设置这两个变量，则保留其值。此默认值仅作用于 UI 后续启动的 GPU 训练，不改变命令行入口、已有任务或 baseline 配置。预分配不能保证更大的 batch 能运行，仍须根据实际训练验证显存需求。
+
 ## 自己的电脑：安装本地环境
 
 
@@ -296,3 +298,24 @@ CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training \
 历史训练参数、checkpoint 与指标见 [历史实验记录](docs/records/历史实验记录.md)。本仓库不包含这些历史运行产物。
 
 GitLab 自动验证目前暂停。本地代码检查命令为 `bash scripts/check_training.sh`，协作与验证规则见 [多人开发 README](多人开发README.md)。本项目遵循 [LICENSE](LICENSE) 和 [Gemma 许可](LICENSE_GEMMA.txt)。
+
+## 显式选择的 Delta 论文训练实验
+
+Sharpa可在本地 `template/<负责人>/` 选择双臂Delta、逐未来时间位置归一化和Correlated Noise的新实验；八份baseline及recipe默认值不变。共享代码与个人配置分开，个人文件不提交、不上传；首次可用 `scripts.create_delta_paper_experiments --owner <负责人>` 在固定任务目录创建。对照设计、独立统计、训练命令和新权重部署限制见 [Sharpa论文算法实验](training_configs/experiments/tomato_sharpa/README.md#本地-delta-论文算法实验不修改-baseline)。目前仅完成离线代码验证，未执行真实数据完整训练。
+
+论文训练实验现支持原目录中的no-block-one六份摘番茄数据联合加载，逐源完整窗口、统一统计及独立个人配置；使用方法见[任务说明](training_configs/experiments/tomato_sharpa/README.md#no-block-one-六份摘番茄数据联合实验)。原baseline保持原样。
+
+## 同一 UI 中的普通训练、原始 trainRTC、T3 与 T3+RTC
+
+| 选择的配置 | `rtc_max_delay` | 实际训练路径 |
+| --- | ---: | --- |
+| 正式 Sharpa 全参 baseline / 非 Paper 个人配置 | 0 | 原生 Pi0、标准高斯、原始数据与统计路径 |
+| 同一非 Paper 配置 | 10 | 原生 trainRTC；不需要 Paper 统计或相关噪声 |
+| Paper T3 个人配置 | 0 | `timestamp_zscore_arms` + `paper_beta=0.5`，无 RTC |
+| 同一 Paper T3 配置、同一统计身份 | 10 | T3 相关高斯与主线 trainRTC 同时生效 |
+
+普通训练在配置列表选择正式全参 baseline，直接编辑原有“Train RTC 最大延迟”；T3 则先用个人配置生成器创建并选择 `delta_paper_t3`（六源版本为 `delta_paper_no_block_one_t3`），仍用同一字段切换 0/10，不新增全局 Paper 开关。配置摘要显示模型类型、有效 RTC、Paper mode/beta（仅 Paper）、动作监督、统计路径及 bundle 摘要。`paper_beta=0` 仅关闭相关噪声，仍是 Paper 数据/归一化路径，不能代替非 Paper 的原始 trainRTC。
+
+`10` 表示每条训练样本均匀采样 0～10 步干净前缀，含两端，并非固定10步。T3 噪声先生成完整相关块，再用真值覆盖前缀；仅监督后缀，按有效 token 总数归一化。模型只保留一份 `Pi0.compute_loss/sample_actions`，Paper 子类只改变噪声。**不实现论文第9页的 correlation-aware correction、条件协方差修正或 soft inpainting。** PyTorch 不支持此组合。
+
+仅改 RTC、实验名、batch 等可在合同一致时复用原 T3 的四个资产文件；改变 mode/beta/horizon/数据必须使用匹配的独立资产，不能覆盖或跳过摘要检查。新 RTC 实验必须使用新实验名，已有 T3 权重可作为新 run 的初始化，不能以 `resume` 强行切换算法。生成命令、资产校验、跨 chunk 物理前缀接口和验证边界见 [Sharpa T3+RTC 说明](training_configs/experiments/tomato_sharpa/README.md#t3--trainrtc-集成)。

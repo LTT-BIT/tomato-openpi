@@ -40,6 +40,7 @@ function addField(container, definition, value, original) {
   const input=document.createElement(['lines','paths'].includes(type)?'textarea':type==='action-semantics'?'select':'input');input.id='field-'+key;input.name=key;
   if(type==='action-semantics'){
     for(const [mode,text] of [['absolute','absolute · 原始绝对目标'],['delta','delta · 关节目标减当前状态']]){const option=node('option',text);option.value=mode;input.append(option);}
+    if(protocol.paper_algorithm){input.querySelector('[value=absolute]').disabled=true;wrapper.append(node('small','论文配置固定为双臂 delta、双手 absolute；算法与来源由所选个人配置定义。','default'));}
     if(!protocol.delta_available){input.querySelector('[value=delta]').disabled=true;wrapper.append(node('small','当前仅番茄 Wuji / Sharpa 支持 delta。','default'));}
   }
   if(['int','float','optional-int'].includes(type)){input.type='number';input.step=type==='float'?'any':'1';}
@@ -60,6 +61,7 @@ function addField(container, definition, value, original) {
     else if(name.value.endsWith('_'+old))name.value=name.value.slice(0,-old.length)+input.value;
     name.dispatchEvent(new Event('input'));input.dataset.previous=input.value;input.dispatchEvent(new Event('input'));independentStats();
   });
+  if(['rtc_max_delay','action_semantics','assets_dir','asset_id'].includes(key))input.addEventListener('input',renderProtocol);
   fields.set(key,{input,type});container.append(wrapper);
 }
 function fillForm(result) {
@@ -70,12 +72,17 @@ function fillForm(result) {
     const container=$(section+'-fields');container.replaceChildren();
     for(const definition of defs){const key=definition[0];if(section==='advanced'&&!(key in initial))continue;let value=initial[key];if(key==='dataset_root')value=(initial.dataset_roots||[initial.dataset_root]).join('\n');if(key==='owner')value=result.owner;if(key==='exp_name')value=result.suggested_exp_name;if(key==='stats_batch_size')value=512;addField(container,definition,value,initial[key]);}
   }
-  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
-  if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
+  renderProtocol();
   if(result.shared_weights){const button=node('button','使用服务器公共权重','text-button');button.addEventListener('click',()=>{fields.get('weight_path').input.value=result.shared_weights;fields.get('weight_path').input.dispatchEvent(new Event('input'));});$('runtime-fields').append(button);}
   $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);
   $('groups-panel').classList.toggle('hidden',initial.sampling_mode!=='weighted_replacement');
   fields.get('exp_name').input.dispatchEvent(new Event('input'));updatePath();
+}
+function renderProtocol(){
+  const current=key=>fields.get(key)?.input.value??initial[key];
+  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · ${protocol.model_family==='Paper'?'Paper 专用配置':'普通 π0.5'} · RTC 最大延迟 ${current('rtc_max_delay')} 步 · 动作监督 ${current('action_semantics')}`),node('div','统计资产：'+current('assets_dir')+'/'+current('asset_id')),node('div','英文 prompt 示例：'+protocol.prompt));
+  if(protocol.paper_algorithm){const p=protocol.paper_algorithm;$('protocol').append(node('div',`Paper mode=${p.mode} · beta=${p.beta} · bundle SHA256=${p.asset_sha256||'待计算'}`));}
+  if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
 }
 async function chooseBaseline(module){
   const version=++loadingVersion;$('start').disabled=true;

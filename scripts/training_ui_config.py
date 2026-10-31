@@ -83,7 +83,7 @@ def baseline_config(module: str):
 def personal_catalog() -> list[dict]:
     root = common.repository_root().resolve()
     entries = []
-    for path in sorted((root / "training_configs/experiments").glob("*/template/*/*.py")):
+    for path in sorted((root / "training_configs/experiments").glob("*/template/*/**/*.py")):
         if path.name.startswith("_") or not path.resolve().is_relative_to(root):
             continue
         try:
@@ -194,6 +194,14 @@ def defaults(module: str) -> dict:
             "task_view": asdict(config.data.base_config.task_view)
             if getattr(config.data.base_config, "task_view", None)
             else None,
+            "model_family": "Paper" if getattr(config.data, "paper_contract", None) else "pi05",
+            "rtc_max_delay": config.model.rtc_max_delay,
+            "norm_asset": str(Path(config.data.assets.assets_dir) / config.data.assets.asset_id),
+            **(
+                {"paper_algorithm": {**config.data.paper_contract(), "asset_sha256": config.model.paper_asset_sha256}}
+                if getattr(config.data, "paper_contract", None)
+                else {}
+            ),
             "actions": values["action_semantics"],
             "delta_available": delta_supported(config),
         },
@@ -232,6 +240,12 @@ def apply_overrides(config, values: dict):
     action_semantics = values.get("action_semantics", source_semantics)
     if action_semantics not in ("absolute", "delta"):
         raise ValueError("动作监督只能选择 absolute 或 delta")
+    if getattr(config.data, "paper_contract", None) and (
+        values["sampling_mode"] != "epoch_shuffle" or values["sampling_groups"]
+    ):
+        raise ValueError("论文实验仅支持epoch_shuffle,不支持UI加权重复采样")
+    if getattr(config.data, "paper_contract", None) and action_semantics != "delta":
+        raise ValueError("论文实验固定为双臂 delta、双手 absolute，不能在 UI 切换为 absolute")
     delta_available = delta_supported(config)
     if action_semantics == "delta" and not delta_available:
         raise ValueError("当前仅番茄 Wuji / Sharpa 支持 delta 动作监督")
@@ -390,6 +404,10 @@ def apply_overrides(config, values: dict):
             "source_datasets": values["sources"],
         },
     )
+    if getattr(config.data, "paper_contract", None) is not None:
+        from openpi.training.delta_paper_ui import adapt_ui_config
+
+        result = adapt_ui_config(config, result)
     validate_config(result)
     return result
 

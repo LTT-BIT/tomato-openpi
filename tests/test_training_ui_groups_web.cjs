@@ -11,6 +11,7 @@ class Element {
   replaceChildren(...children) { this.children=children; }
   addEventListener() {}
   dispatchEvent() {}
+  querySelector(selector) { const value=selector.match(/^\[value=(.*)\]$/)?.[1]; return this.children.find(el=>el.value===value); }
   querySelectorAll(tag) { return this.children.flatMap(el=>[...((el.tag===tag||(tag==='input:checked'&&el.tag==='input'&&el.checked))?[el]:[]),...el.querySelectorAll(tag)]); }
 }
 function setup() {
@@ -122,4 +123,30 @@ test('launch request carries every selected root in order while one root keeps l
   assert.equal(run('request().values.dataset_root'),'/a');
   run("fields.get('dataset_root').input.value='/a'");
   assert.equal(run('request().values.dataset_roots'),undefined);
+});
+
+test('four-mode summary shows effective RTC and Paper details only for Paper',()=>{
+  const {run,elements}=setup();
+  elements.set('protocol',new Element('div'));
+  run(`initial={rtc_max_delay:0,action_semantics:'absolute',assets_dir:'/assets',asset_id:'ordinary'};
+    protocol={action_dim:58,model_action_dim:58,action_hz:30,model_family:'pi05',prompt:'Pick tomato.'};
+    fields.set('rtc_max_delay',{input:{value:10}});renderProtocol();`);
+  let text=elements.get('protocol').children.map(el=>el.textContent).join('\n');
+  assert.match(text,/普通 π0.5.*RTC 最大延迟 10/);
+  assert.doesNotMatch(text,/beta=/);
+  assert.match(text,/\/assets\/ordinary/);
+  run(`protocol.model_family='Paper';protocol.paper_algorithm={mode:'timestamp_zscore_arms',beta:.5,asset_sha256:'fixture-hash'};renderProtocol();`);
+  text=elements.get('protocol').children.map(el=>el.textContent).join('\n');
+  assert.match(text,/Paper 专用配置.*RTC 最大延迟 10/);
+  assert.match(text,/timestamp_zscore_arms.*beta=0.5.*fixture-hash/);
+});
+
+test('Paper action selector disables absolute without affecting ordinary baseline',()=>{
+  const {run,context}=setup();
+  context.container=new Element('div');
+  run(`initial={action_semantics:'delta'};protocol={delta_available:true,paper_algorithm:{mode:'timestamp_zscore_arms'}};
+    addField(container,['action_semantics','监督','action-semantics'],'delta','delta');`);
+  assert.equal(run("fields.get('action_semantics').input.querySelector('[value=absolute]').disabled"),true);
+  run(`protocol={delta_available:true};addField(container,['action_semantics','监督','action-semantics'],'absolute','absolute');`);
+  assert.notEqual(run("fields.get('action_semantics').input.querySelector('[value=absolute]').disabled"),true);
 });
