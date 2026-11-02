@@ -103,7 +103,7 @@ bash scripts/python.sh -m scripts.create_delta_paper_experiments --owner ma39non
 
 相关矩阵从同一训练集的归一化动作窗口按 `[time,dimension]` 展平估计，大小2900×2900；按特征中心化并标准化为相关矩阵，常量维度独立，使用 `beta*Sigma+(1-beta)*I` 做Cholesky。训练和推理初始化使用同一噪声定义；beta=0保持原随机流与计算路径。默认均匀无放回抽取最多20000个完整窗口拟合相关性，seed=42；逐时间统计及global统计使用全部训练窗口。计算可能占用约GB级RAM及较长CPU时间，可在个人配置调整 `correlation_max_windows`，需新统计身份。当前实验支持单个或显式列出的多个30Hz数据集，采用epoch_shuffle和JAX全参入口；不支持TaskView、加权重复采样或PyTorch。多源按完整窗口统一打乱，每个有效起点同权，不按源等概率重复采样。
 
-修改数据来源/版本、root、repo_id、asset_id和统计父目录：在**个人文件的 `build_dataset()`** 返回值上用 `dataclasses.replace` 调整；只搬迁相同数据可用 `PI05_SHARPA_MULTIMODAL_DATASET_ROOT`，论文统计父目录可用 `PI05_PAPER_ASSETS_DIR`。换批次须记录新的来源、版本与asset_id。算法开关在个人 `build_config()` 的 `mode/beta`；batch、FSDP、预算等也用replace覆盖。不要修改公共baseline。UI可以选择个人模块，无需另加算法按钮；论文UI适配保留个人配置中的数据源身份和顺序，修改统计存储位置时同步更新模型资产路径和摘要。更换数据须在个人文件定义新数据版本，UI不能直接改论文数据目录、顺序、repo_id或切换加权采样。
+修改数据来源/版本、root、repo_id、asset_id和统计父目录：在**个人文件的 `build_dataset()`** 返回值上用 `dataclasses.replace` 调整；只搬迁相同数据可用 `PI05_SHARPA_MULTIMODAL_DATASET_ROOT`，论文统计父目录可用 `PI05_PAPER_ASSETS_DIR`。换批次须记录新的来源、版本与asset_id。算法既可在 UI 的论文功能复选框选择，也可在个人 `build_config()` 的 `mode/beta` 设置；batch、FSDP、预算等也用replace覆盖。不要修改公共baseline。UI可以从 Sharpa multimodal 全参 baseline 直接勾选论文功能，也可选择已有个人模块；论文UI适配保留个人配置中的数据源身份和顺序，修改统计存储位置时同步更新模型资产路径和摘要。更换数据须在个人文件定义新数据版本，UI不能直接改论文数据目录、顺序、repo_id或切换加权采样。
 
 ### 统计、检查和训练
 
@@ -182,6 +182,19 @@ UI专用适配位于 `src/openpi/training/delta_paper_ui.py`；默认baseline UI
 | 仅原始 trainRTC | 与上一行相同 | 10 | 仍是原生 Pi0Config / 原数据工厂；标准高斯 |
 | 仅 T3 | 个人 `delta_paper_t3` 或六源对应文件 | 0 | PaperPi0Config / PaperSharpaData；逐时间双臂 z-score + beta=.5 |
 | T3+RTC | 与上一行相同的 T3 配置与统计身份 | 10 | 相同 T3 资产；同一 forward 叠加 clean-prefix / suffix-only loss |
+
+现在无需先在终端运行配置生成器：选择「番茄 · Sharpa / 全参」，设置数据目录、来源、版本与英文 prompt 对应数据后，在「03 训练参数 → 论文功能」直接勾选：
+
+| 逐时间步归一化 | 相关噪声 | GUI 训练方案 |
+| --- | --- | --- |
+| 关闭 | 关闭 | 普通 Pi0.5，原归一化/采样规则 |
+| 开启 | 关闭 | T1，双臂逐时间步 mean/std，独立高斯 |
+| 关闭 | 开启 | T2，全局 quantile，相关噪声 beta=.5 |
+| 开启 | 开启 | T3，双臂逐时间步 mean/std，相关噪声 beta=.5 |
+
+RTC 使用原有最大延迟字段，0关闭、10开启，两类功能独立组合。论文勾选仅开放给30Hz Sharpa multimodal π0.5全参；Wuji、LoRA等配置禁用并由后端拒绝。勾选会自动固定双臂 delta/双手 absolute、epoch_shuffle 并清空旧加权分组，切换功能自动分配独立asset_id。预览/检查只验证，启动时沿用现有流程保存独立个人配置、数据来源/版本、英文prompt、算法合同、统计和实验身份；不修改公共baseline或旧统计。同一算法只修改RTC可复用匹配统计。已有Paper个人配置恢复原算法，既有数据来源封存规则继续有效；新建GUI方案可直接采用当前选择的单源或多源。T0/TG仍可通过已有个人配置或可选CLI生成器使用。相关噪声固定beta=.5，其他beta仍由个人配置定义。
+
+本轮状态为GUI功能及软件验证完成；未启动真实数据训练，未做实机验证。服务器需要同步代码并重启本工程UI进程，然后刷新页面。
 
 先选择配置，再修改现有 RTC 字段，查看最终配置、数据预检查，通过后使用新的实验名启动。Paper 配置的双臂 delta/双手 absolute、源目录顺序、repo_id、数据版本和 epoch_shuffle 固定；UI 会拒绝 absolute 或加权重复采样。配置摘要显示有效 RTC、Paper mode/beta/摘要与统计路径。`beta=0` 不等于退出 Paper：时间归一化和完整窗口仍可能存在。切换 Paper / 非 Paper 时不得混用统计和 checkpoint。
 

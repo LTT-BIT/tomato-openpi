@@ -1,9 +1,95 @@
 """UI-only adapter: preserve data identity without changing normalization code."""
 
+from dataclasses import fields
 from dataclasses import replace
 from pathlib import Path
 
 from openpi.shared import delta_paper as paper
+
+TRIALS = {
+    "t0": ("global_quantile", 0.0),
+    "t1": ("timestamp_zscore_arms", 0.0),
+    "t2": ("global_quantile", 0.5),
+    "t3": ("timestamp_zscore_arms", 0.5),
+    "tg": ("global_zscore_arms", 0.0),
+}
+
+
+def selected_trial(config):
+    if not getattr(config.data, "paper_contract", None):
+        return "none"
+    return next(
+        (trial for trial, pair in TRIALS.items() if pair == (config.data.paper_mode, config.data.paper_beta)),
+        "custom",
+    )
+
+
+def paper_available(config):
+    from openpi.training.config import LeRobotFr3SharpaMultimodalDataConfig
+
+    return (
+        isinstance(config.data, LeRobotFr3SharpaMultimodalDataConfig)
+        and config.model.pi05
+        and config.model.action_dim == 58
+        and "lora" not in config.model.paligemma_variant
+        and "lora" not in config.model.action_expert_variant
+        and config.data.action_hz == 30
+        and not getattr(config.data.base_config, "task_view", None)
+    )
+
+
+def select_trial(config, trial, asset_id):
+    """Convert UI recipes without changing public baselines or existing assets."""
+    if trial == selected_trial(config):
+        return config
+    if trial not in ("none", *TRIALS):
+        raise ValueError("未知论文功能组合")
+    if not paper_available(config):
+        raise ValueError("论文功能仅支持30Hz Sharpa multimodal π0.5全参训练")
+    if asset_id == config.data.assets.asset_id:
+        raise ValueError("切换论文功能必须使用新的 asset_id,不能混用归一化统计")
+    from openpi.models.pi0_config import Pi0Config
+    from openpi.models.pi0_delta_paper import PaperPi0Config
+    from openpi.models.pi0_delta_paper import PaperWeightLoader
+    from openpi.training.config import LeRobotFr3SharpaMultimodalDataConfig
+    from openpi.training.delta_paper import PaperSharpaData
+    from openpi.training.weight_loaders import PartialCheckpointWeightLoader
+
+    def inherited(cls, obj):
+        return {field.name: getattr(obj, field.name) for field in fields(cls)}
+
+    model_args = inherited(Pi0Config, config.model)
+    data_args = inherited(LeRobotFr3SharpaMultimodalDataConfig, config.data)
+    loader_args = inherited(PartialCheckpointWeightLoader, config.weight_loader)
+    metadata = {
+        key: value
+        for key, value in config.policy_metadata.items()
+        if key not in ("paper_trial", "paper_algorithm", "statistics_shape", "deployment_compatibility")
+    }
+    if trial == "none":
+        model = Pi0Config(**model_args)
+        data = LeRobotFr3SharpaMultimodalDataConfig(**data_args)
+        loader = PartialCheckpointWeightLoader(**loader_args)
+    else:
+        mode, beta = TRIALS[trial]
+        data_args["extra_delta_transform"] = True
+        data = PaperSharpaData(**data_args, paper_mode=mode, paper_beta=beta)
+        model = PaperPi0Config(**model_args, paper_mode=mode, paper_beta=beta)
+        loader = PaperWeightLoader(**loader_args)
+        metadata.update(
+            paper_trial=trial,
+            paper_algorithm=data.paper_contract(),
+            statistics_shape={"state": [58], "actions": [model.action_horizon, 58]},
+            deployment_compatibility="requires_new_paper_profile; existing_profiles_reject_Hx58_stats",
+        )
+    return replace(
+        config,
+        name=f"{config.name}_ui_{trial}",
+        model=model,
+        data=data,
+        weight_loader=loader,
+        policy_metadata=metadata,
+    )
 
 
 def adapt_ui_config(source, result):

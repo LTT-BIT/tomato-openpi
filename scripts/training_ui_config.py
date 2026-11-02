@@ -14,6 +14,9 @@ import re
 from zoneinfo import ZoneInfo
 
 from openpi.training import config as train_config
+from openpi.training.delta_paper_ui import paper_available
+from openpi.training.delta_paper_ui import select_trial
+from openpi.training.delta_paper_ui import selected_trial
 from openpi.training.sampling import SamplingGroup
 from scripts.run_training import load_experiment
 from scripts.run_training import validate_config
@@ -166,6 +169,7 @@ def config_values(config) -> dict:
         action_semantics="delta" if getattr(config.data, "extra_delta_transform", False) else "absolute",
         sampling_mode=config.sampling_mode,
         sampling_groups=[asdict(group) for group in config.sampling_groups],
+        paper_trial=selected_trial(config),
     )
     if len(config.data.lerobot_datasets) > 1:
         values["dataset_roots"] = [spec.root for spec in config.data.lerobot_datasets]
@@ -204,6 +208,7 @@ def defaults(module: str) -> dict:
             ),
             "actions": values["action_semantics"],
             "delta_available": delta_supported(config),
+            "paper_available": paper_available(config),
         },
     }
 
@@ -224,6 +229,7 @@ def apply_overrides(config, values: dict):
         "sampling_mode",
         "sampling_groups",
         "dataset_roots",
+        "paper_trial",
     }
     if unknown := set(values) - allowed:
         raise ValueError(f"不支持的参数: {sorted(unknown)}")
@@ -236,7 +242,9 @@ def apply_overrides(config, values: dict):
     }
     if missing := required - set(values):
         raise ValueError(f"缺少参数: {sorted(missing)}")
+    source_was_paper = bool(getattr(config.data, "paper_contract", None))
     source_semantics = "delta" if getattr(config.data, "extra_delta_transform", False) else "absolute"
+    config = select_trial(config, values.get("paper_trial", selected_trial(config)), values["asset_id"])
     action_semantics = values.get("action_semantics", source_semantics)
     if action_semantics not in ("absolute", "delta"):
         raise ValueError("动作监督只能选择 absolute 或 delta")
@@ -407,7 +415,15 @@ def apply_overrides(config, values: dict):
     if getattr(config.data, "paper_contract", None) is not None:
         from openpi.training.delta_paper_ui import adapt_ui_config
 
-        result = adapt_ui_config(config, result)
+        result = adapt_ui_config(config if source_was_paper else result, result)
+        result = replace(
+            result,
+            policy_metadata={
+                **result.policy_metadata,
+                "paper_algorithm": result.data.paper_contract(),
+                "statistics_shape": {"state": [58], "actions": [result.model.action_horizon, 58]},
+            },
+        )
     validate_config(result)
     return result
 

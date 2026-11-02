@@ -577,3 +577,70 @@ def test_personal_catalog_skips_broken_and_external_files(workspace, tmp_path):
     (directory / "helper.py").write_text("VALUE = 1")
     (directory / "external.py").symlink_to(Path(__file__).resolve())
     assert editor.personal_catalog() == []
+
+
+@pytest.mark.parametrize("trial", ["none", "t1", "t2", "t3"])
+@pytest.mark.parametrize("delay", [0, 10])
+def test_gui_paper_features_save_reload_without_generator(tmp_path, trial, delay):
+    from openpi.models.pi0_config import Pi0Config
+    from openpi.models.pi0_delta_paper import PaperPi0Config
+    from openpi.training.delta_paper import PaperSharpaData
+
+    module = next(e["id"] for e in editor.baseline_catalog() if e["task"] == "tomato_sharpa" and "fullft" in e["id"])
+    original = editor.source_config(module)
+    values = {
+        **editor.defaults(module)["values"],
+        "paper_trial": trial,
+        "rtc_max_delay": delay,
+        "action_semantics": "delta",
+        "asset_id": f"gui_{trial}",
+        "assets_dir": str(tmp_path),
+        "exp_name": f"gui_{trial}_rtc_{delay}",
+        "dataset_root": "/data/source_a",
+        "dataset_roots": ["/data/source_a", "/data/source_b"],
+        "sources": ["/data/source_a", "/data/source_b"],
+        "dataset_version": "gui_two_sources_v1",
+    }
+    config = editor.apply_overrides(original, values)
+    is_paper = trial != "none"
+    assert type(config.model) is (PaperPi0Config if is_paper else Pi0Config)
+    assert isinstance(config.data, PaperSharpaData) == is_paper
+    assert config.model.rtc_max_delay == delay
+    assert [spec.root for spec in config.data.lerobot_datasets] == values["dataset_roots"]
+    assert config.policy_metadata["dataset_version"] == "gui_two_sources_v1"
+    assert config.policy_metadata["source_datasets"] == values["sources"]
+    assert config.policy_metadata["prompt_example"] == original.policy_metadata["prompt_example"]
+    scope = {}
+    exec(editor.personal_source(module, "alice", values), scope)
+    restored = scope["build_config"]()
+    assert restored.model == config.model
+    assert restored.data == config.data
+    assert editor.config_values(restored)["paper_trial"] == trial
+    if is_paper:
+        assert config.model.paper_mode == ("timestamp_zscore_arms" if trial in ("t1", "t3") else "global_quantile")
+        assert config.model.paper_beta == (0.5 if trial in ("t2", "t3") else 0.0)
+        assert config.model.paper_asset_dir == str(tmp_path / values["asset_id"])
+        assert config.policy_metadata["paper_algorithm"] == config.data.paper_contract()
+        assert "paper_trial" in editor.changed_parameters(module, values)
+        for forbidden in ({"sampling_mode": "weighted_replacement"}, {"action_semantics": "absolute"}):
+            with pytest.raises(ValueError, match="论文实验"):
+                editor.apply_overrides(original, {**values, **forbidden})
+        with pytest.raises(ValueError, match="asset_id"):
+            editor.apply_overrides(original, {**values, "asset_id": original.data.assets.asset_id})
+        # Disabling Paper creates an ordinary recipe with independent statistics.
+        off = editor.apply_overrides(config, {**editor.config_values(config), "paper_trial": "none", "asset_id": "off"})
+        assert type(off.model) is Pi0Config
+        assert not isinstance(off.data, PaperSharpaData)
+        assert "paper_algorithm" not in off.policy_metadata
+    assert editor.source_config(module) == original
+
+
+@pytest.mark.parametrize(("task", "method"), [("tomato_wuji", "fullft"), ("tomato_sharpa", "lora")])
+def test_gui_rejects_unsupported_paper_recipes(task, method):
+    module = next(e["id"] for e in editor.baseline_catalog() if e["task"] == task and method in e["id"])
+    assert not editor.defaults(module)["protocol"]["paper_available"]
+    with pytest.raises(ValueError, match="Sharpa"):
+        editor.apply_overrides(
+            editor.source_config(module),
+            {**editor.defaults(module)["values"], "paper_trial": "t3", "asset_id": "new_paper"},
+        )
