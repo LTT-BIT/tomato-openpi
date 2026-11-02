@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-02 Asia/Shanghai",
+  "worktree": "/home/user/tomato-openpi-paper-flash",
+  "branch": "paper-flash-test",
+  "initial_commit": "897cb917097c1d56a3fa7a517bf561b9e878036e",
+  "origin_main": "897cb917097c1d56a3fa7a517bf561b9e878036e",
+  "origin_url": "ssh://git@gitlab.litchibot.top:2222/fruit-train/tomato-openpi.git",
+  "original_head": "2ab68c8b8090284fca6d258f86bf5098d2f1302b",
+  "original_worktree_clean": true,
+  "delta_branch_is_not_ancestor": true,
+  "production_model_and_training_config_diff_empty": true,
+  "reference_commit": "f47e490f2b820f835d1b9145da3cdb3df69f50a0",
+  "python": "3.11.16",
+  "packages": {
+    "numpy": "1.26.4",
+    "pyarrow": "20.0.0",
+    "matplotlib": "3.10.3",
+    "torch": "2.7.1+cu128",
+    "jax": "0.5.3",
+    "flax": "0.10.2",
+    "pytest": "8.3.5"
+  },
+  "tests": {
+    "status": "passed",
+    "count": 8,
+    "skipped": 0,
+    "output": "test_absolute_and_delta_are_distinct (test_polynomial.PolynomialTest.test_absolute_and_delta_are_distinct) ... ok\ntest_c1_shared_boundary_and_velocity_seconds (test_polynomial.PolynomialTest.test_c1_shared_boundary_and_velocity_seconds) ... ok\ntest_derivative_finite_difference (test_polynomial.PolynomialTest.test_derivative_finite_difference) ... ok\ntest_exact_polynomial_recovery_and_scaling (test_polynomial.PolynomialTest.test_exact_polynomial_recovery_and_scaling) ... ok\ntest_invalid_fits_fail (test_polynomial.PolynomialTest.test_invalid_fits_fail) ... ok\ntest_official_basis_parity (test_polynomial.PolynomialTest.test_official_basis_parity) ... ok\ntest_sparse_grid_has_same_physical_span (test_polynomial.PolynomialTest.test_sparse_grid_has_same_physical_span) ... ok\ntest_canonical_mapping_matches_main_on_every_real_episode (test_real_data.RealDataTest.test_canonical_mapping_matches_main_on_every_real_episode) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 7.096s\n\nOK\n"
+  },
+  "training_started": false,
+  "expert_implemented": false,
+  "push_performed": false,
+  "experimental_quality_gate": "not cleared: sharp hand commands and sparse high-degree oscillation; no task tolerance specified"
+}
