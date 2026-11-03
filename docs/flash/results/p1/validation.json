@@ -1,0 +1,41 @@
+{
+  "cpu_suite": {
+    "passed": 23,
+    "skipped": 0,
+    "warnings": 8,
+    "seconds": 9.22,
+    "output": ".......................                                                  [100%]\n=============================== warnings summary ===============================\nscripts/flash/test_flash_model.py::FlashModelTest::test_full_parameter_shape_and_freeze_partition\nscripts/flash/test_flash_model.py::FlashModelTest::test_full_parameter_shape_and_freeze_partition\nscripts/flash/test_flash_model.py::FlashModelTest::test_future_labels_cannot_enter_sampling\nscripts/flash/test_flash_model.py::FlashModelTest::test_future_labels_cannot_enter_sampling\n  /home/user/sharpa-pi05/.venv/lib/python3.11/site-packages/jax/extend/linear_util.py:38: DeprecationWarning: linear_util.wrap_init is missing a DebugInfo object. This behavior is deprecated, use api_util.debug_info() to construct a proper DebugInfo object and propagate it to this function. See https://github.com/jax-ml/jax/issues/26480 for more details.\n    debug_info = debug_info or _missing_debug_info(\"linear_util.wrap_init\")\n\nscripts/flash/test_flash_model.py::FlashModelTest::test_full_parameter_shape_and_freeze_partition\nscripts/flash/test_flash_model.py::FlashModelTest::test_full_parameter_shape_and_freeze_partition\nscripts/flash/test_flash_model.py::FlashModelTest::test_future_labels_cannot_enter_sampling\nscripts/flash/test_flash_model.py::FlashModelTest::test_future_labels_cannot_enter_sampling\n  /home/user/sharpa-pi05/.venv/lib/python3.11/site-packages/flax/core/scope.py:959: DeprecationWarning: shape requires ndarray or scalar arguments, got <class 'jax._src.api.ShapeDtypeStruct'> at position 0. In a future JAX release this will be an error.\n    if jnp.shape(val) != jnp.shape(abs_val):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n23 passed, 8 warnings in 9.22s\n"
+  },
+  "gpu_polynomial_tests": {
+    "passed": 3,
+    "output": "...                                                                      [100%]\n3 passed in 2.62s\n"
+  },
+  "ruff": "All checks passed; 17 files already formatted",
+  "initial_issue": "non-donated NNX JIT duplicated full parameter state and exhausted GPU allocation; corrected with state donation",
+  "precision_issue": "GPU default float32 matmul caused ~1e-4 rad boundary target residual; polynomial contractions now explicitly HIGHEST",
+  "checkpoint_interruption": "first interrupted run left its new checkpoint intact; final acceptance uses distinct _r3 path without overwrite",
+  "wandb_mode": "offline",
+  "wandb_run": "q4omb2pj",
+  "checkpoint_uploaded": false,
+  "dataset_uploaded": false,
+  "source_time_diagnostics": {
+    "source_timestamp_episodes": 69,
+    "exact_matched_pairs": 42,
+    "raw_normal_identical_pairs": 15,
+    "speedup_normal_pairs": 27,
+    "same_source_time_action_max_difference_rad": 0.5780458822846413
+  },
+  "git_isolation": {
+    "original_worktree_clean": true,
+    "original_delta_head": "2ab68c8b8090284fca6d258f86bf5098d2f1302b",
+    "protected_main_files_unchanged": [
+      "src/openpi/models/pi0.py",
+      "src/openpi/models/pi0_config.py",
+      "src/openpi/models/gemma.py",
+      "src/openpi/training/data_loader.py",
+      "scripts/train.py"
+    ],
+    "worktree": "/home/user/tomato-openpi-paper-flash",
+    "branch": "paper-flash-test"
+  }
+}

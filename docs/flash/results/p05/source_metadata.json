@@ -1,0 +1,876 @@
+{
+  "/data/data-fruits/real/harvest-tomato/data/data-lerobot/sharpa/10.16before": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 635,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16之前数据/episode68",
+      "source_start_ns": 1790921790737387415,
+      "source_end_ns": 1790921811870720748
+    },
+    {
+      "episode_index": 84,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 770,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16之前数据/episode232",
+      "source_start_ns": 1791013348806602924,
+      "source_end_ns": 1791013374439936257
+    },
+    {
+      "episode_index": 168,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1063,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16之前数据/episode290",
+      "source_start_ns": 1791432043750770798,
+      "source_end_ns": 1791432079150770798
+    }
+  ],
+  "/data/data-fruits/real/harvest-tomato/data/data-lerobot/sharpa/A/121_430_data_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1674,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "51efbc8499074ef48af0bfdcfdc5c3d7",
+      "source_start_ns": 1792389933485359990,
+      "source_end_ns": 1792389989252026656
+    },
+    {
+      "episode_index": 84,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 927,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "b7965832072649a4b449e0775cbe7d57",
+      "source_start_ns": 1792561914443993873,
+      "source_end_ns": 1792561945310660539
+    },
+    {
+      "episode_index": 167,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 854,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "2b182253ad9c49eca8616528d44d5e40",
+      "source_start_ns": 1792654877988741395,
+      "source_end_ns": 1792654906422074728
+    }
+  ],
+  "/data/data-fruits/real/harvest-tomato/data/data-lerobot/sharpa/A/444_513_data_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 726,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "ebd8e1cd8ae14c35835031256e922434",
+      "source_start_ns": 1792661858077350240,
+      "source_end_ns": 1792661882244016906
+    },
+    {
+      "episode_index": 23,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 736,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "3ca154c604bc4116a20b7c9f0ef004f0",
+      "source_start_ns": 1792724624111966252,
+      "source_end_ns": 1792724648611966252
+    },
+    {
+      "episode_index": 46,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 800,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "4d13bc84ed4f4de68b31dc8ba9c7726f",
+      "source_start_ns": 1792740849819219747,
+      "source_end_ns": 1792740876452553080
+    }
+  ],
+  "/data/data-fruits/real/harvest-tomato/data/data-lerobot/sharpa/B/130_423_data_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1547,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "4fc2939659b046839965a9c73d3fd9e1",
+      "source_start_ns": 1792391440215063230,
+      "source_end_ns": 1792391491748396563
+    },
+    {
+      "episode_index": 17,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1109,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "008bf81378634b96aa2ea2b12d02cfe7",
+      "source_start_ns": 1792560021844081913,
+      "source_end_ns": 1792560058777415246
+    },
+    {
+      "episode_index": 33,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1151,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "d731d83afa1c499c817911ac59a54476",
+      "source_start_ns": 1792652676776153088,
+      "source_end_ns": 1792652715109486421
+    }
+  ],
+  "/data/data-fruits/real/harvest-tomato/data/data-lerobot/sharpa/B/446_510_data_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 845,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "000d36472f60463495e562bdd4a10670",
+      "source_start_ns": 1792661981260534859,
+      "source_end_ns": 1792662009393868192
+    },
+    {
+      "episode_index": 6,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 843,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "dfe3af863a854466ae5956ed1f46e162",
+      "source_start_ns": 1792722849050866451,
+      "source_end_ns": 1792722877117533117
+    },
+    {
+      "episode_index": 12,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1012,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "3c4a1ba08981484aae990c20f40eb2c0",
+      "source_start_ns": 1792740613468943825,
+      "source_end_ns": 1792740647168943825
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 7658,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "5c83746e032f4c70af823437b698f84c",
+      "source_start_ns": 1793516920853701593,
+      "source_end_ns": 1793517176087034926
+    },
+    {
+      "episode_index": 1,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 7654,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "e4bdeafd7d834062bfba2ad01049a5b8",
+      "source_start_ns": 1793597090600296960,
+      "source_end_ns": 1793597345700296960
+    },
+    {
+      "episode_index": 2,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 4542,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "435fc6da99284d7ba15cf09193352c06",
+      "source_start_ns": 1793603300497444245,
+      "source_end_ns": 1793603451864110911
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/B/1101_572_601_normal_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 6569,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "282b5b5cad9f4aa8bd40e0cbac21695d",
+      "source_start_ns": 1793500935115573438,
+      "source_end_ns": 1793501154048906771
+    },
+    {
+      "episode_index": 3,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 6376,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "34d3f5750f7049e0a0e73024589b7863",
+      "source_start_ns": 1793524924648017354,
+      "source_end_ns": 1793525137148017354
+    },
+    {
+      "episode_index": 6,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1609,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "d0b08ded7f5a450c9c07e7133891848c",
+      "source_start_ns": 1793526888537789302,
+      "source_end_ns": 1793526942137789302
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 635,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16之前数据/episode68",
+      "source_start_ns": 1790921790737387415,
+      "source_end_ns": 1790921811870720748
+    },
+    {
+      "episode_index": 84,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 770,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16之前数据/episode232",
+      "source_start_ns": 1791013348806602924,
+      "source_end_ns": 1791013374439936257
+    },
+    {
+      "episode_index": 168,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1063,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16之前数据/episode290",
+      "source_start_ns": 1791432043750770798,
+      "source_end_ns": 1791432079150770798
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1674,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "51efbc8499074ef48af0bfdcfdc5c3d7",
+      "source_start_ns": 1792389933485359990,
+      "source_end_ns": 1792389989252026656
+    },
+    {
+      "episode_index": 84,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 927,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "b7965832072649a4b449e0775cbe7d57",
+      "source_start_ns": 1792561914443993873,
+      "source_end_ns": 1792561945310660539
+    },
+    {
+      "episode_index": 167,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 854,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "2b182253ad9c49eca8616528d44d5e40",
+      "source_start_ns": 1792654877988741395,
+      "source_end_ns": 1792654906422074728
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1866,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "6fc2686e176d4677ade795e71fbdafc2",
+      "source_start_ns": 1792146018874280659,
+      "source_end_ns": 1792146081040947325
+    },
+    {
+      "episode_index": 20,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 931,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "9ff196137eaf4edaa5ab6ddbd39db55d",
+      "source_start_ns": 1792232044522704847,
+      "source_end_ns": 1792232075522704847
+    },
+    {
+      "episode_index": 40,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 952,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "949561b0b2814bf9b314af305c3f968c",
+      "source_start_ns": 1792233045358458922,
+      "source_end_ns": 1792233077058458922
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 726,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "ebd8e1cd8ae14c35835031256e922434",
+      "source_start_ns": 1792661858077350240,
+      "source_end_ns": 1792661882244016906
+    },
+    {
+      "episode_index": 23,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 736,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "3ca154c604bc4116a20b7c9f0ef004f0",
+      "source_start_ns": 1792724624111966252,
+      "source_end_ns": 1792724648611966252
+    },
+    {
+      "episode_index": 46,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 800,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "4d13bc84ed4f4de68b31dc8ba9c7726f",
+      "source_start_ns": 1792740849819219747,
+      "source_end_ns": 1792740876452553080
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1547,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "4fc2939659b046839965a9c73d3fd9e1",
+      "source_start_ns": 1792391440215063230,
+      "source_end_ns": 1792391491748396563
+    },
+    {
+      "episode_index": 17,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1109,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "008bf81378634b96aa2ea2b12d02cfe7",
+      "source_start_ns": 1792560021844081913,
+      "source_end_ns": 1792560058777415246
+    },
+    {
+      "episode_index": 33,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1151,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "d731d83afa1c499c817911ac59a54476",
+      "source_start_ns": 1792652676776153088,
+      "source_end_ns": 1792652715109486421
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_56_106_normal_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1243,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "f0e62cb87c014009a28a02e5e97c0b89",
+      "source_start_ns": 1792152019952024082,
+      "source_end_ns": 1792152061352024082
+    },
+    {
+      "episode_index": 4,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1364,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "728591e9e93640bd83dd0e23acc4c82c",
+      "source_start_ns": 1792231181409675008,
+      "source_end_ns": 1792231226843008341
+    },
+    {
+      "episode_index": 7,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1329,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "1758eaac8ab34016bca5305c4823d12f",
+      "source_start_ns": 1792233567625181576,
+      "source_end_ns": 1792233611891848242
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1026_446_510_normal_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 845,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "000d36472f60463495e562bdd4a10670",
+      "source_start_ns": 1792661981260534859,
+      "source_end_ns": 1792662009393868192
+    },
+    {
+      "episode_index": 6,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 843,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "dfe3af863a854466ae5956ed1f46e162",
+      "source_start_ns": 1792722849050866451,
+      "source_end_ns": 1792722877117533117
+    },
+    {
+      "episode_index": 12,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1012,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "3c4a1ba08981484aae990c20f40eb2c0",
+      "source_start_ns": 1792740613468943825,
+      "source_end_ns": 1792740647168943825
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/no-block-more/A/1102_588_616_speedup_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 5321,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "5c83746e032f4c70af823437b698f84c",
+      "source_start_ns": 1793516920853701593,
+      "source_end_ns": 1793517176087034926
+    },
+    {
+      "episode_index": 1,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 5287,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "e4bdeafd7d834062bfba2ad01049a5b8",
+      "source_start_ns": 1793597090600296960,
+      "source_end_ns": 1793597345700296960
+    },
+    {
+      "episode_index": 2,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 3197,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "435fc6da99284d7ba15cf09193352c06",
+      "source_start_ns": 1793603300497444245,
+      "source_end_ns": 1793603451864110911
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/no-block-more/B/1101_572_601_speedup_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 4632,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "282b5b5cad9f4aa8bd40e0cbac21695d",
+      "source_start_ns": 1793500935115573438,
+      "source_end_ns": 1793501154048906771
+    },
+    {
+      "episode_index": 3,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 4803,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "34d3f5750f7049e0a0e73024589b7863",
+      "source_start_ns": 1793524924648017354,
+      "source_end_ns": 1793525137148017354
+    },
+    {
+      "episode_index": 6,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1209,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "d0b08ded7f5a450c9c07e7133891848c",
+      "source_start_ns": 1793526888537789302,
+      "source_end_ns": 1793526942137789302
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/no-block-one/10.16before": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 450,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16之前数据/episode68",
+      "source_start_ns": 1790921790737387415,
+      "source_end_ns": 1790921811870720748
+    },
+    {
+      "episode_index": 84,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 536,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16之前数据/episode232",
+      "source_start_ns": 1791013348806602924,
+      "source_end_ns": 1791013374439936257
+    },
+    {
+      "episode_index": 168,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 675,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16之前数据/episode290",
+      "source_start_ns": 1791432043750770798,
+      "source_end_ns": 1791432079150770798
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/no-block-one/A/1022_121_430_speedup_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1219,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "51efbc8499074ef48af0bfdcfdc5c3d7",
+      "source_start_ns": 1792389933485359990,
+      "source_end_ns": 1792389989252026656
+    },
+    {
+      "episode_index": 84,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 695,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "b7965832072649a4b449e0775cbe7d57",
+      "source_start_ns": 1792561914443993873,
+      "source_end_ns": 1792561945310660539
+    },
+    {
+      "episode_index": 167,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 638,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "2b182253ad9c49eca8616528d44d5e40",
+      "source_start_ns": 1792654877988741395,
+      "source_end_ns": 1792654906422074728
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/no-block-one/A/1022_54_120_speedup_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1316,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "6fc2686e176d4677ade795e71fbdafc2",
+      "source_start_ns": 1792146018874280659,
+      "source_end_ns": 1792146081040947325
+    },
+    {
+      "episode_index": 20,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 680,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "9ff196137eaf4edaa5ab6ddbd39db55d",
+      "source_start_ns": 1792232044522704847,
+      "source_end_ns": 1792232075522704847
+    },
+    {
+      "episode_index": 40,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 713,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "949561b0b2814bf9b314af305c3f968c",
+      "source_start_ns": 1792233045358458922,
+      "source_end_ns": 1792233077058458922
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/no-block-one/A/1026_444_513_speedup_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 535,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "ebd8e1cd8ae14c35835031256e922434",
+      "source_start_ns": 1792661858077350240,
+      "source_end_ns": 1792661882244016906
+    },
+    {
+      "episode_index": 23,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 538,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "3ca154c604bc4116a20b7c9f0ef004f0",
+      "source_start_ns": 1792724624111966252,
+      "source_end_ns": 1792724648611966252
+    },
+    {
+      "episode_index": 46,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 579,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "4d13bc84ed4f4de68b31dc8ba9c7726f",
+      "source_start_ns": 1792740849819219747,
+      "source_end_ns": 1792740876452553080
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/no-block-one/B/1022_130_423_speedup_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 1100,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "4fc2939659b046839965a9c73d3fd9e1",
+      "source_start_ns": 1792391440215063230,
+      "source_end_ns": 1792391491748396563
+    },
+    {
+      "episode_index": 17,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 800,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "008bf81378634b96aa2ea2b12d02cfe7",
+      "source_start_ns": 1792560021844081913,
+      "source_end_ns": 1792560058777415246
+    },
+    {
+      "episode_index": 33,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 848,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "d731d83afa1c499c817911ac59a54476",
+      "source_start_ns": 1792652676776153088,
+      "source_end_ns": 1792652715109486421
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/no-block-one/B/1022_56_106_speedup_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 877,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "f0e62cb87c014009a28a02e5e97c0b89",
+      "source_start_ns": 1792152019952024082,
+      "source_end_ns": 1792152061352024082
+    },
+    {
+      "episode_index": 4,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 960,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "728591e9e93640bd83dd0e23acc4c82c",
+      "source_start_ns": 1792231181409675008,
+      "source_end_ns": 1792231226843008341
+    },
+    {
+      "episode_index": 7,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 934,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "1758eaac8ab34016bca5305c4823d12f",
+      "source_start_ns": 1792233567625181576,
+      "source_end_ns": 1792233611891848242
+    }
+  ],
+  "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/no-block-one/B/1026_446_510_speedup_lerobot": [
+    {
+      "episode_index": 0,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 627,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "000d36472f60463495e562bdd4a10670",
+      "source_start_ns": 1792661981260534859,
+      "source_end_ns": 1792662009393868192
+    },
+    {
+      "episode_index": 6,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 604,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "dfe3af863a854466ae5956ed1f46e162",
+      "source_start_ns": 1792722849050866451,
+      "source_end_ns": 1792722877117533117
+    },
+    {
+      "episode_index": 12,
+      "tasks": [
+        "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+      ],
+      "length": 730,
+      "task_index": 0,
+      "segment_id": "full_all",
+      "source_recording_id": "3c4a1ba08981484aae990c20f40eb2c0",
+      "source_start_ns": 1792740613468943825,
+      "source_end_ns": 1792740647168943825
+    }
+  ]
+}

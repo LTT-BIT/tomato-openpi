@@ -1,5 +1,7 @@
 # 真实 LeRobot Polynomial Reconstruction（P0）
 
+此文记录2026-11-02的P0阶段。2026-11-03已按新授权并行完成P0.5与标准P1最小实现，最新状态见[04](04_action_expert_design.md)、[05](05_training_results.md)、[06](06_local_diagnosis.md)。
+
 状态：数值和语义测试通过；表示质量尚未判定通过。平均重建误差较小，但手部急变、局部极值和相邻 Chunk 边界问题仍明显；未启动 Expert 开发/训练。用户尚未给出任务误差容限，本轮不虚构通过阈值。
 
 ## 数据与方法

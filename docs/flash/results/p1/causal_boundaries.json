@@ -1,0 +1,182 @@
+{
+  "checkpoint": ".cache/flash_p1_checkpoint_20261103_r3",
+  "first_provenance": [
+    {
+      "sample_id": "8fc6041fb6830400",
+      "source_path": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot/data/chunk-000/episode_000000.parquet",
+      "episode_index": 0,
+      "current_row": 302,
+      "current_frame": 302,
+      "history_rows": [
+        295,
+        302
+      ],
+      "target_rows": [
+        300,
+        353
+      ],
+      "cache_sha256": "aa1963413466d24bf4d56b7872b070c0e80ed7d92db9b5931b09480af611130c"
+    }
+  ],
+  "next_provenance": [
+    {
+      "sample_id": "8fc6041fb6830400",
+      "source_path": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot/data/chunk-000/episode_000000.parquet",
+      "episode_index": 0,
+      "current_row": 352,
+      "current_frame": 352,
+      "history_rows": [
+        345,
+        352
+      ],
+      "target_rows": [
+        350,
+        403
+      ],
+      "cache_sha256": "aa1963413466d24bf4d56b7872b070c0e80ed7d92db9b5931b09480af611130c"
+    }
+  ],
+  "prediction_metrics": {
+    "arms": {
+      "predicted_position_gap_rad": {
+        "mae": 0.2755678594112396,
+        "rmse": 0.39218440651893616,
+        "max": 1.0089248418807983
+      },
+      "predicted_velocity_gap_rad_per_second": {
+        "mae": 3.055177927017212,
+        "rmse": 4.179581642150879,
+        "max": 10.51630973815918
+      },
+      "first_boundary_position_error_rad": {
+        "mae": 0.28442904353141785,
+        "rmse": 0.3880009949207306,
+        "max": 0.8686696290969849
+      },
+      "next_boundary_position_error_rad": {
+        "mae": 0.05427626892924309,
+        "rmse": 0.07326766848564148,
+        "max": 0.17590796947479248
+      }
+    },
+    "hands": {
+      "predicted_position_gap_rad": {
+        "mae": 0.21010111272335052,
+        "rmse": 0.3326088786125183,
+        "max": 1.1419250965118408
+      },
+      "predicted_velocity_gap_rad_per_second": {
+        "mae": 2.9778144359588623,
+        "rmse": 5.070343494415283,
+        "max": 17.14430046081543
+      },
+      "first_boundary_position_error_rad": {
+        "mae": 0.20022425055503845,
+        "rmse": 0.33029472827911377,
+        "max": 1.209524393081665
+      },
+      "next_boundary_position_error_rad": {
+        "mae": 0.06754177808761597,
+        "rmse": 0.10275029391050339,
+        "max": 0.3576377034187317
+      }
+    }
+  },
+  "target_constraint_effect": {
+    "False": {
+      "arms": {
+        "position_error_at_shared_tick_rad": {
+          "mae": 0.00016694569785613567,
+          "rmse": 0.00045622538891620934,
+          "max": 0.0015815496444702148
+        },
+        "velocity_error_at_shared_tick_rad_per_second": {
+          "mae": 0.009220669977366924,
+          "rmse": 0.028820518404245377,
+          "max": 0.10704970359802246
+        },
+        "position_gap_rad": {
+          "mae": 0.0003844728344120085,
+          "rmse": 0.0009895960101857781,
+          "max": 0.0034786462783813477
+        },
+        "velocity_gap_rad_per_second": {
+          "mae": 0.011107045225799084,
+          "rmse": 0.027593757957220078,
+          "max": 0.09725767374038696
+        }
+      },
+      "hands": {
+        "position_error_at_shared_tick_rad": {
+          "mae": 0.00026863289531320333,
+          "rmse": 0.0004167895531281829,
+          "max": 0.001247406005859375
+        },
+        "velocity_error_at_shared_tick_rad_per_second": {
+          "mae": 0.021552102640271187,
+          "rmse": 0.03937273100018501,
+          "max": 0.10934606194496155
+        },
+        "position_gap_rad": {
+          "mae": 0.0002159421273972839,
+          "rmse": 0.0003991297271568328,
+          "max": 0.0012888908386230469
+        },
+        "velocity_gap_rad_per_second": {
+          "mae": 0.02192659117281437,
+          "rmse": 0.04018097370862961,
+          "max": 0.12345228344202042
+        }
+      }
+    },
+    "True": {
+      "arms": {
+        "position_error_at_shared_tick_rad": {
+          "mae": 4.789658891724002e-09,
+          "rmse": 1.605398125548163e-08,
+          "max": 5.960464477539063e-08
+        },
+        "velocity_error_at_shared_tick_rad_per_second": {
+          "mae": 1.7374658156654732e-08,
+          "rmse": 5.3620201612147866e-08,
+          "max": 1.955777406692505e-07
+        },
+        "position_gap_rad": {
+          "mae": 8.514949634275126e-09,
+          "rmse": 2.2528437781943467e-08,
+          "max": 5.960464477539063e-08
+        },
+        "velocity_gap_rad_per_second": {
+          "mae": 2.332065429655472e-09,
+          "rmse": 4.704018063961257e-09,
+          "max": 1.4901161193847656e-08
+        }
+      },
+      "hands": {
+        "position_error_at_shared_tick_rad": {
+          "mae": 9.059228922581042e-09,
+          "rmse": 2.1888332923936105e-08,
+          "max": 1.1920928955078125e-07
+        },
+        "velocity_error_at_shared_tick_rad_per_second": {
+          "mae": 9.854068849790565e-08,
+          "rmse": 1.5499711025768192e-07,
+          "max": 4.594076017383486e-07
+        },
+        "position_gap_rad": {
+          "mae": 8.889897706865213e-09,
+          "rmse": 2.0006199363820087e-08,
+          "max": 5.960464477539063e-08
+        },
+        "velocity_gap_rad_per_second": {
+          "mae": 3.3239551111563514e-09,
+          "rmse": 6.045917100294673e-09,
+          "max": 2.1187588572502136e-08
+        }
+      }
+    }
+  },
+  "interpretation": "one SGD step, real causal RGB and measured history at each chunk; target constraints do not guarantee predicted C1",
+  "finite": true,
+  "leakage_guard": "predict function takes only obs/history; reference target used only after both predictions"
+}

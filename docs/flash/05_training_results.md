@@ -1,58 +1,86 @@
-# 训练验证状态与后续对照协议
+# 标准 FLASH P1 离线验证结果
 
-**本轮没有启动 E0/E1/E2 训练，没有新 Expert forward/backward 或训练 smoke test 结果。** P0 数学与实现检查通过，但真实数据的局部急变重建和稀疏振荡问题尚未解决，因此没有把 P0 宣称为质量通过，也没有绕过用户要求的前置验证进入第二阶段。
+2026-11-03，实验名 `flash_p1_standard_k6_offline_smoke`。当前完成固定 K=6 标准 Expert 的机械验收：**合成/真实三路RGB＋LeRobot动作与实测历史 Forward/Backward、一次SGD、完整权重保存恢复、离线采样均通过**。没有启动完整训练，没有实机执行。P0阶段结果保留在03，P0.5局部误差见06。
 
-| 实验 | 实现/训练状态 | Flow loss / validation error | latency / GPU memory / 参数 |
-| --- | --- | --- | --- |
-| E0 main π₀.₅ | main 审计完成，本轮未训练 | 未测 | 未测 |
-| E1 Polynomial | P0 工具完成，Expert 尚未实现 | 未测 | 未测 |
-| E2 Polynomial + History-Anchored Flow | 已核对官方目标，尚未实现 | 未测 | 未测 |
+## 数据、配置与权重
 
-P0 重建误差是**真实动作投影的表示误差**，不是模型 validation action error。已离线记录的幅度/速度误差也仅属于重建，不代表学习性能、控制性能或实机安全性。
+- 基线 `origin/main=897cb917097c1d56a3fa7a517bf561b9e878036e`；本轮在既有 `paper-flash-test` 上开发，不合并Delta分支。
+- 模型 `Pi0FlashConfig`：π₀.₅、Absolute `(50,58)`、7个系数token、history8、ridge0.1、history噪声0.5（仅训练）、consistency权重1、NFE1、无RTC/LoRA。
+- 实际加载 `/home/user/checkpoints/pi05_base/params` 完整原生 Orbax；48个leaf加载、3个32D→58D投影leaf重新初始化；所有VLM参数完整覆盖。缺失、额外、非白名单shape mismatch均拒绝。
+- 冻结VLM `2,923,335,408` 参数；可训练Expert/时间MLP/投影 `430,151,738` 参数。权重保存float32，Transformer算术bfloat16。
+- 训练统计只使用 normal `A/1022_54_120_normal_lerobot` 首/中/末3个抽样Episode，共 `3749` 行；held-out根为normal `B/1022_56_106_normal_lerobot`。不混用raw/normal/speedup。这里只检查机械split，不是正式benchmark划分，也没有跑held-out validation loss。
+- 真实batch sample `8fc6041fb6830400`，发布ep0，current frame302，history rows295..302，target context rows300..353。第二次因果采样 current frame352，history345..352。各自三路当前RGB来自视频帧，核查timestamp，未来RGB不输入模型。
+- action与state分别fit q01/q99，系数拟合/history共用action统计，不clip。统计 SHA256 `6c97c5918c6dc657d94d4c2d06fd8fdbd2f855c6b00273164b81309fb133aca3`；完整统计、样本fingerprint、源路径及视频PTS见机读结果。
 
-## 可复核的验证
+英文任务prompt来自真实 `meta/tasks.jsonl`：
 
-使用已有解释器 `/home/user/sharpa-pi05/.venv/bin/python`，没有向该环境安装/更新包，也没有系统安装。该环境包含 numpy、pyarrow、matplotlib、torch、jax、flax。P0 不用 GPU。
+> Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket.
+
+## Forward / Backward 与损失
+
+| Batch | FM Loss | Consistency Loss | Total Loss | 梯度 |
+| --- | ---:| ---:| ---:| --- |
+| 合成batch | 0.42880195 | 1.38876140 | 1.81756330 | 有限 |
+| 真实RGB/LeRobot batch | 2.74194098 | 3.62039518 | 6.36233616 | 有限 |
+
+这是**归一化系数空间**的MSE，不能直接与main离散动作FM loss比较。真实梯度范数 `19.35956383`；仅执行 **1步** clipped SGD（学习率1e-5、global norm clip1），用于确认可更新Expert且不动VLM。没有训练曲线、收敛或任务成功率结论。prefix不做随机增强，这次验证不评价增强策略。
+
+VLM加载及更新前后SHA256完全相同：`de5ce5077e3f8e7f6dc08bec28893027c9a3aa486ff4dc4d43218a24f7f33324`。可训练参数摘要变化；两组梯度及采样均未发现NaN/Inf。数据准备拒绝非有限输入。未来action/state扰动测试在CPU数学套件覆盖；cached-vs-full-prefix测试是独立的缓存一致性检查，不能混称。
+
+## 采样、显存与耗时
+
+- 输出 `(1, 50, 58)`，物理absolute radians，有限；最大绝对值 `3.495307` rad。只做接口和数值验收，不表示动作已学好。
+- 同一真实观察缓存KV推理与完整prefix推理最大差 `0.0`。
+- RTX5090 32GB、B=1、三路224×224、256 prompt slots、NFE=1，warm-up后5次同步计时：缓存Expert中位数 **2.523ms**；包含SigLIP/VLM prefix的模型侧端到端 **43.417ms**。不含视频解码、文件读取和tokenizer；没有跑E0延迟，因此不声称相比baseline加速多少。
+- JAX peak bytes-in-use `16,962,903,296` bytes（**15.798GiB**）；同次nvidia-smi总占用约18.1GB，包括桌面与allocator池，口径不同。
+
+首次不donate的NNX JIT在prefix阶段GPU OOM；修正为模型state缓冲区donation，避免同一大权重输入/输出重复驻留。Checkpoint恢复先释放旧GPU参数再上传，避免两份完整VLM峰值。不修改模型数学算法来绕开显存问题。
+
+## Checkpoint 往返
+
+最终新目录 `/home/user/tomato-openpi-paper-flash/.cache/flash_p1_checkpoint_20261103_r3`；此前中断产生的目录原样保留，未覆盖历史checkpoint。约12GB完整参数以标准Orbax保存；sidecar含config、normalization、step1、无momentum SGD身份、prompt及batch来源。该机械optimizer没有momentum状态；正式训练应使用现有训练checkpoint机制保存优化器/数据采样状态。
+
+完整参数保存/恢复SHA256一致：`2cc9a3f149d1620089fe656bd490dc4ccfc8393b6235782ea903ba8a241665c3`。恢复后重新构建模型并实际采样，最大差 **0.0**；不是仅检查文件存在。
+
+## C¹ 实际效果与预测限制
+
+使用同一真实Episode的frame302与352，分别输入各自当前真实RGB、实测历史，比较前一多项式tick50与下一块tick0（同一物理时刻）。未来真值仅在两次预测完成之后用于指标。
+
+- 训练target双端KKT校正的GPU实际position/velocity与GT及相邻gap已测；float64预计算后float32矩阵收缩必须指定 `Precision.HIGHEST`，否则默认GPU低精度float32乘法可产生约1e-4rad锚点残差。
+- 最终高精度路径下手部target共享边界position最大误差 `1.192e-07` rad，velocity最大误差 `4.594e-07` rad/s。
+- 一步SGD后的**预测**手部position gap最大仍为 `1.141925` rad，velocity gap最大 `17.144300` rad/s。这暴露了未训练模型的真实限制；target C1机制通过，不等于采样已连续。
+
+完整开/关target约束、双臂/双手、真实误差/gap见 `results/p1/causal_boundaries.json`。P0.5全样本已进一步证明oracle C1能改善端点但恶化附近个别手指极值。
+
+## 测试与复现
+
+已有 `/home/user/sharpa-pi05/.venv`，没有安装/升级包。最终CPU套件 **23 passed**（8条现有JAX/Flax deprecation warnings），GPU polynomial套件 **3 passed**；Ruff check/format及git diff --check通过。测试涵盖官方parity、真实action/state映射、因果历史、统计隔离、KKT实际重建、完整冻结分区、严格loader及非覆盖checkpoint。
 
 ```bash
 cd /home/user/tomato-openpi-paper-flash
 PY=/home/user/sharpa-pi05/.venv/bin/python
-# 只读抽取；已有 manifest 时拒绝覆盖，重做须使用新的 --output。
-$PY scripts/flash/collect_samples.py --output .cache/flash_samples
-OPENBLAS_NUM_THREADS=1 $PY scripts/flash/reconstruct.py \
-  --samples .cache/flash_samples --output docs/flash/results
-PYTHONPATH=src:packages/openpi-client/src:. $PY -m unittest discover -s scripts/flash -p 'test_*.py' -v
-/home/user/sharpa-pi05/.venv/bin/ruff check scripts/flash
-/home/user/sharpa-pi05/.venv/bin/ruff format --check scripts/flash
+export PYTHONPATH=src:packages/openpi-client/src:.
+export XLA_PYTHON_CLIENT_PREALLOCATE=false
+export XLA_PYTHON_CLIENT_MEM_FRACTION=0.90
+# 输出目录必须新建；复跑时更换后缀，禁止覆盖已有checkpoint。
+$PY scripts/flash/prepare_smoke_batch.py --frame 302 --output .cache/flash_p1_inputs_REPRO
+$PY scripts/flash/prepare_smoke_batch.py --frame 352 --output .cache/flash_p1_inputs_next_REPRO
+$PY scripts/flash/smoke_expert.py --inputs .cache/flash_p1_inputs_REPRO \
+  --checkpoint .cache/flash_p1_checkpoint_REPRO --output .cache/flash_p1_run_REPRO
+$PY scripts/flash/sample_boundaries.py --checkpoint .cache/flash_p1_checkpoint_REPRO \
+  --first .cache/flash_p1_inputs_REPRO --next .cache/flash_p1_inputs_next_REPRO \
+  --output .cache/flash_p1_run_REPRO/causal_boundaries.json
+JAX_PLATFORMS=cpu OPENBLAS_NUM_THREADS=1 $PY -m pytest -q scripts/flash
+$PY -m pytest -q scripts/flash/test_flash_math.py
+/home/user/sharpa-pi05/.venv/bin/ruff check scripts/flash src/openpi/models/pi0_flash.py \
+  src/openpi/shared/flash_polynomial.py src/openpi/training/flash_data.py src/openpi/training/flash_checkpoint.py
 git diff --check
 ```
 
-结果：69 个 Episode / 23 个 dataset roots，2,195 个完整窗口；72 个组合（3 类型 × 4 degree × 3 stride × 2 fitting mode）完成。8 项测试通过（7 项数学/语义检查和 1 项覆盖全部 69 个真实 Episode 的 main adapter 对照），包括官方 basis/一阶二阶导数数值对照。详细结果见 `results/reconstruction.json`，每关节极值见 `results/per_joint_max.csv`。
+W&B显式offline run `q4omb2pj`，本地保存于 `.cache/flash_p1_run_r3/wandb/`，没有宣称已云同步；后续可 `wandb sync` 对应offline-run目录。本地完整日志、真实batch、图片和约12GB checkpoint留在Git忽略的 `.cache/`；Git只提交代码、统计/索引结果及诊断图，不上传数据集和权重。
 
-真实数据对照确认独立名称映射与 main 的 Fr3SharpaMultimodalInputs 在全部抽取 Episode 的 state/action 上一致。数学测试为精确 polynomial recovery/scale round-trip、物理速度单位、C1 约束、固定物理范围的稀疏网格、absolute/state-relative/temporal-delta 区分、无效输入、官方 pure function parity。官方 parity 默认读取参考仓库；其他机器需设置 `FLASH_REFERENCE`，参考仓库缺失时该测试会 skip，不能声称完成官方对照。
+## 是否具备小规模训练条件
 
-Baseline 配置实例化验证命令（未加载权重、未训练）：
+**模型层面具备受控小规模离线训练条件**：真实prefix/历史、loss/gradient、可训练更新、冻结、恢复、采样链路都已验证。下一步接专用历史batch训练入口并封存原始Episode分组train/validation划分，可先20–100步；不得直接套用只传 `(obs,actions)` 的原loader，模型会明确拒绝缺history的调用。
 
-```bash
-PYTHONPATH=src:packages/openpi-client/src:. $PY - <<'PYCODE'
-from pathlib import Path
-from training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1 import build_config
-c = build_config()
-d = c.data.create(Path(c.assets_base_dir), c.model)
-assert (c.model.action_horizon, c.model.action_dim) == (50, 58)
-assert c.model.pi05 and d.use_quantile_norm and not c.data.extra_delta_transform
-print(c.name, c.model, c.weight_loader, d.norm_stats is not None)
-PYCODE
-```
-
-## 下一次小规模训练的固定协议
-
-- 先完成 `04_action_expert_design.md` 的前置条件；config、实验名称、source parent IDs/split、seed、prompt、norm hash、checkpoint hash 一并保存。
-- 按原始 parent episode 划分 train/validation；同源 raw/normal/speedup 不能跨 split；不在 validation 上挑 degree 或归一化统计。
-- E0/E1/E2 共享 batch、数据抽样顺序、优化步数、学习率、冻结策略。另报告 GPU 时间与额外 consistency forward 成本，不能把相同步数等同相同计算量。
-- 第一轮建议仅 20–100 optimizer steps 的离线诊断，不进行全量训练；先验证实际真实样本 loss 有限、梯度有限且更新新 Expert，固定 VLM 权重确实不变，保存与恢复可用。
-- 汇总各自 FM/consistency loss、共同物理 validation action error、幅度/速度误差、实际预测 Chunk 连续性；latency 做 warm-up 后设备同步并报告 NFE、batch、prefix cache 范围；记录 peak GPU memory、总/可训练参数量。
-- 训练日志本地保存并启用 W&B；无法联网时显式 `WANDB_MODE=offline`，日后 sync。本轮无训练，所以没有 W&B run。
-- 使用全新输出目录，不覆盖历史 Checkpoint。不接入实体机器人或生产 RTC/ROS2。
-
-本轮修改清单：`scripts/flash/{collect_samples,polynomial,reconstruct,test_polynomial,test_real_data}.py`，`docs/flash/01..05` 五份报告、`docs/flash/results/` 真实数值/图表，以及根 README 的实验入口。真实抽取数据仅留在 Git 忽略的 `.cache/flash_samples/`，不提交数据集或权重。
+尚未完成正式E0/E1/E2训练对比、validation action error或收敛评估。P0.5补读源时间戳后确认：speedup与normal在同源时戳下动作标签最大差0.578046rad，且native50步覆盖的原始源时间范围不同；本轮P1只用固定normal版本，不混合这些标签。正式对比前需核对converter取样契约，并按原始Episode分组封存数据。固定K6的手部急变表示误差仍存在。本轮没有全量训练、没有生产RTC/ROS2修改、没有发布机器人动作。标准最小实现完成后才另行设计表示改进消融。
