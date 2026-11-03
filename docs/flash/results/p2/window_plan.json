@@ -1,0 +1,556 @@
+{
+  "train": [
+    {
+      "id": "b7dd683753d91a8f",
+      "start": 162
+    },
+    {
+      "id": "7d9f2a3d3d157957",
+      "start": 615
+    },
+    {
+      "id": "acbd8789e0227f42",
+      "start": 1450
+    },
+    {
+      "id": "2d161917fd76b5ff",
+      "start": 567
+    },
+    {
+      "id": "3724c39742e2ff0f",
+      "start": 91
+    },
+    {
+      "id": "f042ad0e2896136b",
+      "start": 275
+    },
+    {
+      "id": "6c0c3dff3325773c",
+      "start": 380
+    },
+    {
+      "id": "1de2c764fd27aec6",
+      "start": 119
+    },
+    {
+      "id": "d59517d5a79826d5",
+      "start": 275
+    },
+    {
+      "id": "9b6796b7e4b32c0a",
+      "start": 1478
+    },
+    {
+      "id": "2552a3173422b07c",
+      "start": 563
+    },
+    {
+      "id": "2f0a2cf11745ad70",
+      "start": 1155
+    },
+    {
+      "id": "297188f804cb5f4a",
+      "start": 252
+    },
+    {
+      "id": "cea23e6fa43f8b29",
+      "start": 523
+    },
+    {
+      "id": "aac4f5c2a912098e",
+      "start": 21
+    },
+    {
+      "id": "81f8ab311305f9a8",
+      "start": 1363
+    },
+    {
+      "id": "88aa55db85d3156d",
+      "start": 3766
+    },
+    {
+      "id": "ea14de7cc5f6f3dd",
+      "start": 142
+    },
+    {
+      "id": "83c1887fc182d1ec",
+      "start": 760
+    },
+    {
+      "id": "3dd3354f38b40493",
+      "start": 485
+    },
+    {
+      "id": "eea7815a2d0438a2",
+      "start": 4649
+    },
+    {
+      "id": "43a86fb3b0192e50",
+      "start": 641
+    },
+    {
+      "id": "dc02025341b31675",
+      "start": 20
+    },
+    {
+      "id": "9b6796b7e4b32c0a",
+      "start": 360
+    },
+    {
+      "id": "3415d26799b2a622",
+      "start": 122
+    },
+    {
+      "id": "742f3d8fccb04c98",
+      "start": 25
+    },
+    {
+      "id": "8fc6041fb6830400",
+      "start": 561
+    },
+    {
+      "id": "b7dd683753d91a8f",
+      "start": 554
+    },
+    {
+      "id": "9273125506919164",
+      "start": 631
+    },
+    {
+      "id": "949e57a6cbf31de9",
+      "start": 33
+    },
+    {
+      "id": "cc1cb573033ecdc3",
+      "start": 240
+    },
+    {
+      "id": "c417028de2207fb1",
+      "start": 542
+    },
+    {
+      "id": "c4e95dc11ade0b68",
+      "start": 398
+    },
+    {
+      "id": "baf47fa46418abd2",
+      "start": 1193
+    },
+    {
+      "id": "703b0148fc7f4417",
+      "start": 5780
+    },
+    {
+      "id": "25bbbcf700fc4997",
+      "start": 270
+    },
+    {
+      "id": "a6a8f7b583ccdbb3",
+      "start": 259
+    },
+    {
+      "id": "b4ac79dcc0ea4db8",
+      "start": 80
+    },
+    {
+      "id": "85e7ed6acc246440",
+      "start": 610
+    },
+    {
+      "id": "9890c0aa88b0b156",
+      "start": 65
+    },
+    {
+      "id": "297188f804cb5f4a",
+      "start": 720
+    },
+    {
+      "id": "64256abf6dd78e93",
+      "start": 65
+    },
+    {
+      "id": "3a54be211c04d1b6",
+      "start": 337
+    },
+    {
+      "id": "73d4e713c9eb2c45",
+      "start": 125
+    },
+    {
+      "id": "9b6796b7e4b32c0a",
+      "start": 917
+    },
+    {
+      "id": "ad4d74ddf18e85b3",
+      "start": 842
+    },
+    {
+      "id": "a66b7f3334178251",
+      "start": 572
+    },
+    {
+      "id": "9dede45dbcac7289",
+      "start": 142
+    },
+    {
+      "id": "81398794099d3804",
+      "start": 460
+    },
+    {
+      "id": "519b47c25368f69c",
+      "start": 1291
+    },
+    {
+      "id": "99c8b9a9560f279a",
+      "start": 630
+    },
+    {
+      "id": "8a8da2e8d7b22f46",
+      "start": 753
+    },
+    {
+      "id": "c7167c3f1c5229de",
+      "start": 513
+    },
+    {
+      "id": "d1544030c1543dc8",
+      "start": 907
+    },
+    {
+      "id": "26259bcb3aa22071",
+      "start": 313
+    },
+    {
+      "id": "fdfdc63d33526b59",
+      "start": 310
+    },
+    {
+      "id": "aeabf80db70244b8",
+      "start": 411
+    },
+    {
+      "id": "ff734cc3d6a4648b",
+      "start": 441
+    },
+    {
+      "id": "d6a77f06fda2c545",
+      "start": 1156
+    },
+    {
+      "id": "1e43f0f8636c06a4",
+      "start": 212
+    },
+    {
+      "id": "ebb944849c89b56d",
+      "start": 733
+    },
+    {
+      "id": "39f5b41ecb025516",
+      "start": 390
+    },
+    {
+      "id": "547004d44ce49a64",
+      "start": 5690
+    },
+    {
+      "id": "01d8ca61a46cd90e",
+      "start": 941
+    },
+    {
+      "id": "ebb944849c89b56d",
+      "start": 626
+    },
+    {
+      "id": "3e340aa171573e1f",
+      "start": 680
+    },
+    {
+      "id": "eea7815a2d0438a2",
+      "start": 1480
+    },
+    {
+      "id": "ada059d38cc74c8a",
+      "start": 3917
+    },
+    {
+      "id": "949e57a6cbf31de9",
+      "start": 614
+    },
+    {
+      "id": "dbc3fd20d742c363",
+      "start": 617
+    },
+    {
+      "id": "86fbcd0936ec4492",
+      "start": 239
+    },
+    {
+      "id": "b8d1347d72e66b7c",
+      "start": 363
+    },
+    {
+      "id": "20e45d15300bfe80",
+      "start": 759
+    },
+    {
+      "id": "008d9a1f6b58b848",
+      "start": 516
+    },
+    {
+      "id": "7d9f2a3d3d157957",
+      "start": 558
+    },
+    {
+      "id": "471eaf6c3c46db9f",
+      "start": 1125
+    },
+    {
+      "id": "519b47c25368f69c",
+      "start": 1447
+    },
+    {
+      "id": "547004d44ce49a64",
+      "start": 3935
+    },
+    {
+      "id": "eea7815a2d0438a2",
+      "start": 4888
+    },
+    {
+      "id": "6c0c3dff3325773c",
+      "start": 294
+    },
+    {
+      "id": "4b5129c54ccde2a5",
+      "start": 797
+    },
+    {
+      "id": "297188f804cb5f4a",
+      "start": 301
+    },
+    {
+      "id": "8a8da2e8d7b22f46",
+      "start": 505
+    },
+    {
+      "id": "ada059d38cc74c8a",
+      "start": 3020
+    },
+    {
+      "id": "547004d44ce49a64",
+      "start": 1115
+    },
+    {
+      "id": "1f791e7dc8696ecc",
+      "start": 34
+    },
+    {
+      "id": "eea7815a2d0438a2",
+      "start": 337
+    },
+    {
+      "id": "9f62f5eaaf0ebc9d",
+      "start": 628
+    },
+    {
+      "id": "a1475f73df6d3aff",
+      "start": 32
+    },
+    {
+      "id": "f5d20f518535a32d",
+      "start": 626
+    },
+    {
+      "id": "b010693c267ba337",
+      "start": 735
+    },
+    {
+      "id": "88aa55db85d3156d",
+      "start": 4630
+    },
+    {
+      "id": "e4f6b7cad4e0a45c",
+      "start": 849
+    },
+    {
+      "id": "0c4ad382d14873a8",
+      "start": 789
+    },
+    {
+      "id": "cc6c12b76662bb44",
+      "start": 572
+    },
+    {
+      "id": "83c1887fc182d1ec",
+      "start": 785
+    },
+    {
+      "id": "fc1f795b6a0a341a",
+      "start": 287
+    },
+    {
+      "id": "a3db4680a223e005",
+      "start": 829
+    },
+    {
+      "id": "a40fa05b049bdd07",
+      "start": 540
+    },
+    {
+      "id": "edcef5d686d3bb91",
+      "start": 777
+    }
+  ],
+  "validation": [
+    {
+      "id": "7f7e5279898aa902",
+      "start": 7,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 57,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 107,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 157,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 207,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 257,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 307,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 357,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 407,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 457,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 507,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 557,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 607,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 657,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 707,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 757,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 807,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 857,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 907,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 957,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 1007,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 1057,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 1107,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 1157,
+      "role": "complete_held_out_episode"
+    },
+    {
+      "id": "d8f720863e569786",
+      "start": 5952,
+      "role": "predeclared_sharpa_transient"
+    },
+    {
+      "id": "d8f720863e569786",
+      "start": 6002,
+      "role": "predeclared_sharpa_transient"
+    },
+    {
+      "id": "606140b9fb30c1e5",
+      "start": 352,
+      "role": "predeclared_sharpa_transient"
+    },
+    {
+      "id": "606140b9fb30c1e5",
+      "start": 402,
+      "role": "predeclared_sharpa_transient"
+    }
+  ],
+  "fixed": {
+    "id": "8fc6041fb6830400",
+    "start": 302
+  },
+  "seed": 42001,
+  "microbatch_size": 1,
+  "effective_batch_size": 1,
+  "split_sha256": "0dbf81403fa65edceeef021d8ebf19f61ef85a498300ec33b14feafcf6548a84",
+  "normalization_sha256": "effbcaf2e7d79cf061385ed0983a57052778dcecbdcbff7e06b9dac517bc9e76",
+  "sha256": "841f7b2ac8412e8a55d3bcaa90308fdf6bb59931f3602e18abc11a727105ad4c"
+}

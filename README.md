@@ -299,7 +299,9 @@ GitLab 自动验证目前暂停。本地代码检查命令为 `bash scripts/chec
 
 ### FLASH 独立实验（paper-flash-test）
 
-从 `origin/main` 独立建立；已完成真实数据 P0/P0.5 诊断，并实现固定 K=6 的标准 FLASH Expert。完整预训练 VLM 冻结复用，离线验证合成/真实 RGB+LeRobot batch 梯度、一次 SGD、采样和 Checkpoint 恢复；没有全量训练或实机验证。手部急变仍有局部表示误差，正式训练入口及统一数据划分尚待封存。
+从 `origin/main` 独立建立；已完成真实数据 P0/P0.5 诊断，并实现固定 K=6 的标准 FLASH Expert。完整预训练 VLM 冻结复用；P2 已接通 normal 数据加载、原始录制级 Split 与训练集归一化，完成固定真实 Batch 20 步和独立初始化的 100 步 AdamW 离线训练。固定验证集 MAE 从 0.1682 降至 0.0739 rad，完整模型与优化器恢复通过。手部急变和跨 Chunk 连续性仍有明显误差；当前为 K=6、stride=1 的受控学习验证，尚无完整对照训练或实机验证。
 
 - [Baseline 审计](docs/flash/01_baseline_audit.md) · [论文与官方源码](docs/flash/02_paper_analysis.md)
 - [真实重建结果与图表](docs/flash/03_polynomial_tests.md) · [Expert 设计](docs/flash/04_action_expert_design.md) · [验证命令与训练状态](docs/flash/05_training_results.md) · [P0.5 局部误差诊断](docs/flash/06_local_diagnosis.md)
+
+- [P2 受控训练与验证报告](docs/flash/07_p2_training.md) · [P2 曲线与逐关节结果](docs/flash/results/p2/)

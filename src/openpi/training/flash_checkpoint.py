@@ -150,6 +150,15 @@ def restore_offline_checkpoint(directory):
     metadata = json.loads((directory / "metadata.json").read_text())
     optimizer = None
     if (directory / "optimizer").exists():
+        import jax
+
         with ocp.PyTreeCheckpointer() as checkpointer:
-            optimizer = checkpointer.restore(directory / "optimizer")["optimizer"]
+            item = {"optimizer": checkpointer.metadata(directory / "optimizer")["optimizer"]}
+            optimizer = checkpointer.restore(
+                directory / "optimizer",
+                ocp.args.PyTreeRestore(
+                    item=item,
+                    restore_args=jax.tree.map(lambda _: ocp.ArrayRestoreArgs(restore_type=np.ndarray), item),
+                ),
+            )["optimizer"]
     return params, metadata, optimizer

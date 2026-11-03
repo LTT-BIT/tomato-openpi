@@ -1,0 +1,7 @@
+{
+  "episodes": 496,
+  "cross_split_identical_action_state_trajectories": [],
+  "cross_split_source_recording_ids": [],
+  "normalization_snapshot_sha256": "f57f5a99304c45d44e1f614d7604a758253730c79f6c9a3054a8ce02297ca4fb",
+  "scope": "Exact full-episode action+state byte hashes; not proof against nonidentical duplicate demonstrations"
+}
