@@ -1,0 +1,86 @@
+[
+  {
+    "joint": "left_ring_MCP_FE",
+    "window_index": 59,
+    "id": "2248e5b803ef8c02",
+    "start": 1011,
+    "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode361",
+    "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+    "episode_index": 152,
+    "strata": [
+      "uniform_within_source"
+    ],
+    "step100_max": 0.9747301340103149,
+    "step250_max": 0.9574453830718994
+  },
+  {
+    "joint": "left_pinky_MCP_FE",
+    "window_index": 102,
+    "id": "41b0ec215ed0d051",
+    "start": 512,
+    "source_recording_id": "9b3e4af4c58a41aab6cca85bc90d0e39",
+    "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+    "episode_index": 9,
+    "strata": [
+      "uniform_within_source"
+    ],
+    "step100_max": 0.6800639629364014,
+    "step250_max": 0.6374654769897461
+  },
+  {
+    "joint": "left_middle_MCP_FE",
+    "window_index": 59,
+    "id": "2248e5b803ef8c02",
+    "start": 1011,
+    "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode361",
+    "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+    "episode_index": 152,
+    "strata": [
+      "uniform_within_source"
+    ],
+    "step100_max": 0.7210389375686646,
+    "step250_max": 0.8406184315681458
+  },
+  {
+    "joint": "left_index_MCP_FE",
+    "window_index": 59,
+    "id": "2248e5b803ef8c02",
+    "start": 1011,
+    "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode361",
+    "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+    "episode_index": 152,
+    "strata": [
+      "uniform_within_source"
+    ],
+    "step100_max": 0.6194460988044739,
+    "step250_max": 0.6335483193397522
+  },
+  {
+    "joint": "right_index_MCP_FE",
+    "window_index": 330,
+    "id": "afcb028a488a46cc",
+    "start": 23,
+    "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode318",
+    "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+    "episode_index": 128,
+    "strata": [
+      "uniform_within_source"
+    ],
+    "step100_max": 0.8614097833633423,
+    "step250_max": 0.6632644534111023
+  },
+  {
+    "joint": "left_index_DIP",
+    "window_index": 429,
+    "id": "d8f720863e569786",
+    "start": 6589,
+    "source_recording_id": "e4bdeafd7d834062bfba2ad01049a5b8",
+    "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot",
+    "episode_index": 1,
+    "strata": [
+      "uniform_within_source"
+    ],
+    "step100_max": 0.6136303544044495,
+    "step250_max": 0.5644486546516418
+  }
+]

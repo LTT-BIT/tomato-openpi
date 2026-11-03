@@ -36,7 +36,7 @@ def file_inventory(directory):
     }
 
 
-def restore_model(checkpoint, reference):
+def restore_model(checkpoint, reference, expected_step=100):
     inventory = file_inventory(checkpoint)
     params, metadata, moments = restore_offline_checkpoint(checkpoint)
     expected = reference["checkpoint_pre_save_hashes"]
@@ -56,14 +56,22 @@ def restore_model(checkpoint, reference):
     state.replace_by_pure_dict({"model": params, **moments})
     host_optimizer = nnx.merge(graph, state)
     assert content_digest(optimizer_only(host_optimizer).to_pure_dict()) == expected["optimizer"]
-    assert int(host_optimizer.step.value) == metadata["step"] == 100
+    assert int(host_optimizer.step.value) == metadata["step"] == expected_step
+    counts = {
+        str(path): int(value)
+        for path, value in jax.tree_util.tree_flatten_with_path(optimizer_only(host_optimizer).to_pure_dict())[0]
+        if np.asarray(value).shape == () and np.issubdtype(np.asarray(value).dtype, np.integer)
+    }
+    assert counts
+    assert all(value == expected_step for value in counts.values())
     model_graph, model_state = nnx.split(host_optimizer.model)
     model_state.replace_by_pure_dict(jax.device_put(params))
     model = nnx.merge(model_graph, model_state)
     audit = {
         "parameter_sha256": expected["parameters"],
         "optimizer_sha256": expected["optimizer"],
-        "optimizer_step": 100,
+        "optimizer_step": expected_step,
+        "optimizer_scalar_counts": counts,
         "parameter_roundtrip": True,
         "adam_state_roundtrip": True,
         "checkpoint_inventory_sha256": digest(inventory),
@@ -80,7 +88,7 @@ def main():
     p.add_argument("--images", type=Path, required=True)
     p.add_argument("--plan", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
-    p.add_argument("--method", choices=["step100", "initial"], required=True)
+    p.add_argument("--method", choices=["step100", "step250", "initial"], required=True)
     p.add_argument("--checkpoint", type=Path, default=Path(".cache/flash_p2_checkpoint_100_recovered"))
     p.add_argument("--reference", type=Path, default=Path(".cache/flash_p2_recovery_02/result.json"))
     p.add_argument("--pretrained", type=Path, default=Path("/home/user/checkpoints/pi05_base/params"))
@@ -96,8 +104,10 @@ def main():
     assert plan["dataset_sha256"] == d.manifest["sha256"]
     assert plan["normalization_snapshot_sha256"] == d.normalization_snapshot_sha256
     reference = json.loads(args.reference.read_text())
-    if args.method == "step100":
-        model, audit, inventory = restore_model(args.checkpoint, reference)
+    if args.method in ("step100", "step250"):
+        model, audit, inventory = restore_model(
+            args.checkpoint, reference, expected_step=250 if args.method == "step250" else 100
+        )
         assert tuple(model.action_q01) == tuple(d.normalization["q01"])
         assert tuple(model.action_q99) == tuple(d.normalization["q99"])
     else:
@@ -227,7 +237,7 @@ def main():
         peak_bytes_in_use=int(jax.devices()[0].memory_stats()["peak_bytes_in_use"]),
         prediction_file_sha256=hashlib.sha256((args.output / "predictions.npz").read_bytes()).hexdigest(),
     )
-    if args.method == "step100":
+    if args.method in ("step100", "step250"):
         assert file_inventory(args.checkpoint) == inventory
         audit["checkpoint_files_unchanged"] = True
     (args.output / "audit.json").write_text(json.dumps(audit, indent=2))

@@ -1,0 +1,5066 @@
+{
+  "dataset_sha256": "1f34247c7461a4a8d18809798e75b1b1226a8e877fd3d524852a0d8e059dddbc",
+  "split_sha256": "0dbf81403fa65edceeef021d8ebf19f61ef85a498300ec33b14feafcf6548a84",
+  "normalization_sha256": "effbcaf2e7d79cf061385ed0983a57052778dcecbdcbff7e06b9dac517bc9e76",
+  "normalization_snapshot_sha256": "f57f5a99304c45d44e1f614d7604a758253730c79f6c9a3054a8ce02297ca4fb",
+  "K": 6,
+  "stride": 1,
+  "windows": [
+    {
+      "id": "0200e91a0eba4847",
+      "start": 187,
+      "source_recording_id": "8dd7756d0d9848ea92ea966a0bc86190",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 121,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0200e91a0eba4847",
+      "start": 449,
+      "source_recording_id": "8dd7756d0d9848ea92ea966a0bc86190",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 121,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0200e91a0eba4847",
+      "start": 484,
+      "source_recording_id": "8dd7756d0d9848ea92ea966a0bc86190",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 121,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0200e91a0eba4847",
+      "start": 564,
+      "source_recording_id": "8dd7756d0d9848ea92ea966a0bc86190",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 121,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0200e91a0eba4847",
+      "start": 612,
+      "source_recording_id": "8dd7756d0d9848ea92ea966a0bc86190",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 121,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0301d1306e68ff92",
+      "start": 78,
+      "source_recording_id": "065010ecd2a4443ea84bf71c630df90c",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 6,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0301d1306e68ff92",
+      "start": 82,
+      "source_recording_id": "065010ecd2a4443ea84bf71c630df90c",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 6,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0301d1306e68ff92",
+      "start": 301,
+      "source_recording_id": "065010ecd2a4443ea84bf71c630df90c",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 6,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0301d1306e68ff92",
+      "start": 642,
+      "source_recording_id": "065010ecd2a4443ea84bf71c630df90c",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 6,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0301d1306e68ff92",
+      "start": 694,
+      "source_recording_id": "065010ecd2a4443ea84bf71c630df90c",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 6,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "057faef6f80c620e",
+      "start": 7,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode373",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 159,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "057faef6f80c620e",
+      "start": 463,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode373",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 159,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "057faef6f80c620e",
+      "start": 626,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode373",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 159,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "057faef6f80c620e",
+      "start": 800,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode373",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 159,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "057faef6f80c620e",
+      "start": 951,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode373",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 159,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0757598f27ad6daf",
+      "start": 7,
+      "source_recording_id": "7e089b86a14a4883970828d4476c26ac",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 23,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0757598f27ad6daf",
+      "start": 169,
+      "source_recording_id": "7e089b86a14a4883970828d4476c26ac",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 23,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0757598f27ad6daf",
+      "start": 307,
+      "source_recording_id": "7e089b86a14a4883970828d4476c26ac",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 23,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0757598f27ad6daf",
+      "start": 517,
+      "source_recording_id": "7e089b86a14a4883970828d4476c26ac",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 23,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0757598f27ad6daf",
+      "start": 719,
+      "source_recording_id": "7e089b86a14a4883970828d4476c26ac",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 23,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0a69efc058b71a35",
+      "start": 112,
+      "source_recording_id": "a43e001074564dc48b6914f4ebbcb317",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_56_106_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0a69efc058b71a35",
+      "start": 678,
+      "source_recording_id": "a43e001074564dc48b6914f4ebbcb317",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_56_106_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0a69efc058b71a35",
+      "start": 798,
+      "source_recording_id": "a43e001074564dc48b6914f4ebbcb317",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_56_106_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0a69efc058b71a35",
+      "start": 942,
+      "source_recording_id": "a43e001074564dc48b6914f4ebbcb317",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_56_106_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "0a69efc058b71a35",
+      "start": 1151,
+      "source_recording_id": "a43e001074564dc48b6914f4ebbcb317",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_56_106_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "130d1d4682efe831",
+      "start": 63,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode205",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 67,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "130d1d4682efe831",
+      "start": 283,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode205",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 67,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "130d1d4682efe831",
+      "start": 412,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode205",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 67,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "130d1d4682efe831",
+      "start": 436,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode205",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 67,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "130d1d4682efe831",
+      "start": 552,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode205",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 67,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "15550ba5d22a6d40",
+      "start": 144,
+      "source_recording_id": "31c06df2cb3c4ecaaec03a241faa803d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 117,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "15550ba5d22a6d40",
+      "start": 280,
+      "source_recording_id": "31c06df2cb3c4ecaaec03a241faa803d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 117,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "15550ba5d22a6d40",
+      "start": 302,
+      "source_recording_id": "31c06df2cb3c4ecaaec03a241faa803d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 117,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "15550ba5d22a6d40",
+      "start": 394,
+      "source_recording_id": "31c06df2cb3c4ecaaec03a241faa803d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 117,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "15550ba5d22a6d40",
+      "start": 514,
+      "source_recording_id": "31c06df2cb3c4ecaaec03a241faa803d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 117,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1946714033a21be3",
+      "start": 25,
+      "source_recording_id": "294050f1774945e493abaf9c3034ea61",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 134,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1946714033a21be3",
+      "start": 206,
+      "source_recording_id": "294050f1774945e493abaf9c3034ea61",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 134,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1946714033a21be3",
+      "start": 455,
+      "source_recording_id": "294050f1774945e493abaf9c3034ea61",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 134,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1946714033a21be3",
+      "start": 871,
+      "source_recording_id": "294050f1774945e493abaf9c3034ea61",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 134,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1946714033a21be3",
+      "start": 877,
+      "source_recording_id": "294050f1774945e493abaf9c3034ea61",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 134,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1968f69992b6620f",
+      "start": 40,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode352",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 145,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1968f69992b6620f",
+      "start": 59,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode352",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 145,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1968f69992b6620f",
+      "start": 307,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode352",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 145,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1968f69992b6620f",
+      "start": 420,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode352",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 145,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1968f69992b6620f",
+      "start": 463,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode352",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 145,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1a634062e21a75b0",
+      "start": 344,
+      "source_recording_id": "0810bb6231884e3eab296ca8871970e7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 73,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1a634062e21a75b0",
+      "start": 425,
+      "source_recording_id": "0810bb6231884e3eab296ca8871970e7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 73,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1a634062e21a75b0",
+      "start": 520,
+      "source_recording_id": "0810bb6231884e3eab296ca8871970e7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 73,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1a634062e21a75b0",
+      "start": 669,
+      "source_recording_id": "0810bb6231884e3eab296ca8871970e7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 73,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1a634062e21a75b0",
+      "start": 816,
+      "source_recording_id": "0810bb6231884e3eab296ca8871970e7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 73,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1f6952ab502d9d84",
+      "start": 206,
+      "source_recording_id": "0a3962be7a7a49fd98836386c295f6d9",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 26,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1f6952ab502d9d84",
+      "start": 324,
+      "source_recording_id": "0a3962be7a7a49fd98836386c295f6d9",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 26,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1f6952ab502d9d84",
+      "start": 462,
+      "source_recording_id": "0a3962be7a7a49fd98836386c295f6d9",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 26,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1f6952ab502d9d84",
+      "start": 522,
+      "source_recording_id": "0a3962be7a7a49fd98836386c295f6d9",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 26,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "1f6952ab502d9d84",
+      "start": 711,
+      "source_recording_id": "0a3962be7a7a49fd98836386c295f6d9",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 26,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2248e5b803ef8c02",
+      "start": 30,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode361",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 152,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2248e5b803ef8c02",
+      "start": 181,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode361",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 152,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2248e5b803ef8c02",
+      "start": 908,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode361",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 152,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2248e5b803ef8c02",
+      "start": 947,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode361",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 152,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2248e5b803ef8c02",
+      "start": 1011,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode361",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 152,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "25eb8f9017ecf590",
+      "start": 88,
+      "source_recording_id": "be79493d531944aba5bc9e85eeaa7af2",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 25,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "25eb8f9017ecf590",
+      "start": 602,
+      "source_recording_id": "be79493d531944aba5bc9e85eeaa7af2",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 25,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "25eb8f9017ecf590",
+      "start": 848,
+      "source_recording_id": "be79493d531944aba5bc9e85eeaa7af2",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 25,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "25eb8f9017ecf590",
+      "start": 895,
+      "source_recording_id": "be79493d531944aba5bc9e85eeaa7af2",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 25,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "25eb8f9017ecf590",
+      "start": 954,
+      "source_recording_id": "be79493d531944aba5bc9e85eeaa7af2",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 25,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2d8c96473dbead85",
+      "start": 396,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode300",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 121,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2d8c96473dbead85",
+      "start": 451,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode300",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 121,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2d8c96473dbead85",
+      "start": 583,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode300",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 121,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2d8c96473dbead85",
+      "start": 598,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode300",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 121,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2d8c96473dbead85",
+      "start": 787,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode300",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 121,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2dbedebe36ab3464",
+      "start": 280,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode170",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 55,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2dbedebe36ab3464",
+      "start": 394,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode170",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 55,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2dbedebe36ab3464",
+      "start": 811,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode170",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 55,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2dbedebe36ab3464",
+      "start": 1150,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode170",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 55,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2dbedebe36ab3464",
+      "start": 1152,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode170",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 55,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2e3c7e02d05f22eb",
+      "start": 16,
+      "source_recording_id": "909ea7a6e8b24913a068710540896c41",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2e3c7e02d05f22eb",
+      "start": 379,
+      "source_recording_id": "909ea7a6e8b24913a068710540896c41",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2e3c7e02d05f22eb",
+      "start": 391,
+      "source_recording_id": "909ea7a6e8b24913a068710540896c41",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2e3c7e02d05f22eb",
+      "start": 556,
+      "source_recording_id": "909ea7a6e8b24913a068710540896c41",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "2e3c7e02d05f22eb",
+      "start": 876,
+      "source_recording_id": "909ea7a6e8b24913a068710540896c41",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "3643198c48f3d329",
+      "start": 228,
+      "source_recording_id": "4bd71ef59aa94b63aee74ae5f3352abc",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 5,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "3643198c48f3d329",
+      "start": 298,
+      "source_recording_id": "4bd71ef59aa94b63aee74ae5f3352abc",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 5,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "3643198c48f3d329",
+      "start": 450,
+      "source_recording_id": "4bd71ef59aa94b63aee74ae5f3352abc",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 5,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "3643198c48f3d329",
+      "start": 832,
+      "source_recording_id": "4bd71ef59aa94b63aee74ae5f3352abc",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 5,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "3643198c48f3d329",
+      "start": 1058,
+      "source_recording_id": "4bd71ef59aa94b63aee74ae5f3352abc",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 5,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "376dd3e378b0a855",
+      "start": 163,
+      "source_recording_id": "f6d4dc2de7e848ae8e99040c6a2ad36e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 141,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "376dd3e378b0a855",
+      "start": 337,
+      "source_recording_id": "f6d4dc2de7e848ae8e99040c6a2ad36e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 141,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "376dd3e378b0a855",
+      "start": 480,
+      "source_recording_id": "f6d4dc2de7e848ae8e99040c6a2ad36e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 141,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "376dd3e378b0a855",
+      "start": 547,
+      "source_recording_id": "f6d4dc2de7e848ae8e99040c6a2ad36e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 141,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "376dd3e378b0a855",
+      "start": 788,
+      "source_recording_id": "f6d4dc2de7e848ae8e99040c6a2ad36e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 141,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "37c17e03293bad20",
+      "start": 157,
+      "source_recording_id": "45770e64822f4838a4e747f0b5b58adb",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 28,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "37c17e03293bad20",
+      "start": 271,
+      "source_recording_id": "45770e64822f4838a4e747f0b5b58adb",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 28,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "37c17e03293bad20",
+      "start": 314,
+      "source_recording_id": "45770e64822f4838a4e747f0b5b58adb",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 28,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "37c17e03293bad20",
+      "start": 555,
+      "source_recording_id": "45770e64822f4838a4e747f0b5b58adb",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 28,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "37c17e03293bad20",
+      "start": 564,
+      "source_recording_id": "45770e64822f4838a4e747f0b5b58adb",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 28,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "3d109a0d23da78c2",
+      "start": 15,
+      "source_recording_id": "97d0ebf7e2034010a9afdbdc2ba2ec75",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 31,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "3d109a0d23da78c2",
+      "start": 48,
+      "source_recording_id": "97d0ebf7e2034010a9afdbdc2ba2ec75",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 31,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "3d109a0d23da78c2",
+      "start": 172,
+      "source_recording_id": "97d0ebf7e2034010a9afdbdc2ba2ec75",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 31,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "3d109a0d23da78c2",
+      "start": 506,
+      "source_recording_id": "97d0ebf7e2034010a9afdbdc2ba2ec75",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 31,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "3d109a0d23da78c2",
+      "start": 557,
+      "source_recording_id": "97d0ebf7e2034010a9afdbdc2ba2ec75",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 31,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "41b0ec215ed0d051",
+      "start": 97,
+      "source_recording_id": "9b3e4af4c58a41aab6cca85bc90d0e39",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "41b0ec215ed0d051",
+      "start": 417,
+      "source_recording_id": "9b3e4af4c58a41aab6cca85bc90d0e39",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "41b0ec215ed0d051",
+      "start": 512,
+      "source_recording_id": "9b3e4af4c58a41aab6cca85bc90d0e39",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "41b0ec215ed0d051",
+      "start": 621,
+      "source_recording_id": "9b3e4af4c58a41aab6cca85bc90d0e39",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "41b0ec215ed0d051",
+      "start": 868,
+      "source_recording_id": "9b3e4af4c58a41aab6cca85bc90d0e39",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4364193700493d4c",
+      "start": 12,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode95",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 19,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4364193700493d4c",
+      "start": 174,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode95",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 19,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4364193700493d4c",
+      "start": 958,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode95",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 19,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4364193700493d4c",
+      "start": 1089,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode95",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 19,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4364193700493d4c",
+      "start": 1091,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode95",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 19,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "44d5ceb0fa561e59",
+      "start": 110,
+      "source_recording_id": "ec860ce05d4244cf96adafaabb1d6ed2",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 45,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "44d5ceb0fa561e59",
+      "start": 486,
+      "source_recording_id": "ec860ce05d4244cf96adafaabb1d6ed2",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 45,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "44d5ceb0fa561e59",
+      "start": 870,
+      "source_recording_id": "ec860ce05d4244cf96adafaabb1d6ed2",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 45,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "44d5ceb0fa561e59",
+      "start": 897,
+      "source_recording_id": "ec860ce05d4244cf96adafaabb1d6ed2",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 45,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "44d5ceb0fa561e59",
+      "start": 949,
+      "source_recording_id": "ec860ce05d4244cf96adafaabb1d6ed2",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 45,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "44e572ef4694ae3d",
+      "start": 30,
+      "source_recording_id": "6de4ba50f59842899a743153681c68a9",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "44e572ef4694ae3d",
+      "start": 422,
+      "source_recording_id": "6de4ba50f59842899a743153681c68a9",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "44e572ef4694ae3d",
+      "start": 799,
+      "source_recording_id": "6de4ba50f59842899a743153681c68a9",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "44e572ef4694ae3d",
+      "start": 1038,
+      "source_recording_id": "6de4ba50f59842899a743153681c68a9",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "44e572ef4694ae3d",
+      "start": 1426,
+      "source_recording_id": "6de4ba50f59842899a743153681c68a9",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "46b8b5a8c3e5c4db",
+      "start": 410,
+      "source_recording_id": "008bf81378634b96aa2ea2b12d02cfe7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 17,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "46b8b5a8c3e5c4db",
+      "start": 498,
+      "source_recording_id": "008bf81378634b96aa2ea2b12d02cfe7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 17,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "46b8b5a8c3e5c4db",
+      "start": 725,
+      "source_recording_id": "008bf81378634b96aa2ea2b12d02cfe7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 17,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "46b8b5a8c3e5c4db",
+      "start": 882,
+      "source_recording_id": "008bf81378634b96aa2ea2b12d02cfe7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 17,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "46b8b5a8c3e5c4db",
+      "start": 1008,
+      "source_recording_id": "008bf81378634b96aa2ea2b12d02cfe7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 17,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "46d69fa577ef62a6",
+      "start": 422,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode364",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 153,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "46d69fa577ef62a6",
+      "start": 905,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode364",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 153,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "46d69fa577ef62a6",
+      "start": 961,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode364",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 153,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "46d69fa577ef62a6",
+      "start": 1017,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode364",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 153,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "46d69fa577ef62a6",
+      "start": 1068,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode364",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 153,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "471dc1b3908e2d33",
+      "start": 216,
+      "source_recording_id": "1ae0506b498343ecb728a6220bf3550d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 27,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "471dc1b3908e2d33",
+      "start": 384,
+      "source_recording_id": "1ae0506b498343ecb728a6220bf3550d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 27,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "471dc1b3908e2d33",
+      "start": 486,
+      "source_recording_id": "1ae0506b498343ecb728a6220bf3550d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 27,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "471dc1b3908e2d33",
+      "start": 972,
+      "source_recording_id": "1ae0506b498343ecb728a6220bf3550d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 27,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "471dc1b3908e2d33",
+      "start": 997,
+      "source_recording_id": "1ae0506b498343ecb728a6220bf3550d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 27,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4780f4868b5b4ca1",
+      "start": 189,
+      "source_recording_id": "0d662d06fae04c93a8320230ef548d71",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 15,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4780f4868b5b4ca1",
+      "start": 270,
+      "source_recording_id": "0d662d06fae04c93a8320230ef548d71",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 15,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4780f4868b5b4ca1",
+      "start": 325,
+      "source_recording_id": "0d662d06fae04c93a8320230ef548d71",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 15,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4780f4868b5b4ca1",
+      "start": 361,
+      "source_recording_id": "0d662d06fae04c93a8320230ef548d71",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 15,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4780f4868b5b4ca1",
+      "start": 435,
+      "source_recording_id": "0d662d06fae04c93a8320230ef548d71",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 15,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4ba3e402cdbbe394",
+      "start": 81,
+      "source_recording_id": "ff841ab2dc1842cfa7dda1d818182489",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4ba3e402cdbbe394",
+      "start": 263,
+      "source_recording_id": "ff841ab2dc1842cfa7dda1d818182489",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4ba3e402cdbbe394",
+      "start": 1160,
+      "source_recording_id": "ff841ab2dc1842cfa7dda1d818182489",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4ba3e402cdbbe394",
+      "start": 1206,
+      "source_recording_id": "ff841ab2dc1842cfa7dda1d818182489",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "4ba3e402cdbbe394",
+      "start": 1358,
+      "source_recording_id": "ff841ab2dc1842cfa7dda1d818182489",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5d5ac03aed5aa52d",
+      "start": 122,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode382",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 165,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5d5ac03aed5aa52d",
+      "start": 346,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode382",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 165,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5d5ac03aed5aa52d",
+      "start": 520,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode382",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 165,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5d5ac03aed5aa52d",
+      "start": 596,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode382",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 165,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5d5ac03aed5aa52d",
+      "start": 827,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode382",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 165,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f35c40b89bc7293",
+      "start": 278,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode329",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 136,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f35c40b89bc7293",
+      "start": 564,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode329",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 136,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f35c40b89bc7293",
+      "start": 565,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode329",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 136,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f35c40b89bc7293",
+      "start": 596,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode329",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 136,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f35c40b89bc7293",
+      "start": 649,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode329",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 136,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f4bc15e680a134e",
+      "start": 39,
+      "source_recording_id": "f659adea6cc34ed5b87f7013e8270f37",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 157,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f4bc15e680a134e",
+      "start": 94,
+      "source_recording_id": "f659adea6cc34ed5b87f7013e8270f37",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 157,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f4bc15e680a134e",
+      "start": 236,
+      "source_recording_id": "f659adea6cc34ed5b87f7013e8270f37",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 157,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f4bc15e680a134e",
+      "start": 251,
+      "source_recording_id": "f659adea6cc34ed5b87f7013e8270f37",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 157,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f4bc15e680a134e",
+      "start": 503,
+      "source_recording_id": "f659adea6cc34ed5b87f7013e8270f37",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 157,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f50f82e6f027a83",
+      "start": 120,
+      "source_recording_id": "46b8ac192e7940c5af7d2790467be97e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 24,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f50f82e6f027a83",
+      "start": 179,
+      "source_recording_id": "46b8ac192e7940c5af7d2790467be97e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 24,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f50f82e6f027a83",
+      "start": 539,
+      "source_recording_id": "46b8ac192e7940c5af7d2790467be97e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 24,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f50f82e6f027a83",
+      "start": 647,
+      "source_recording_id": "46b8ac192e7940c5af7d2790467be97e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 24,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f50f82e6f027a83",
+      "start": 654,
+      "source_recording_id": "46b8ac192e7940c5af7d2790467be97e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 24,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f871440261d05aa",
+      "start": 105,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode193",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 62,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f871440261d05aa",
+      "start": 468,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode193",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 62,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f871440261d05aa",
+      "start": 729,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode193",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 62,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f871440261d05aa",
+      "start": 883,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode193",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 62,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "5f871440261d05aa",
+      "start": 947,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode193",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 62,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "606140b9fb30c1e5",
+      "start": 1428,
+      "source_recording_id": "435fc6da99284d7ba15cf09193352c06",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "606140b9fb30c1e5",
+      "start": 1713,
+      "source_recording_id": "435fc6da99284d7ba15cf09193352c06",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "606140b9fb30c1e5",
+      "start": 3092,
+      "source_recording_id": "435fc6da99284d7ba15cf09193352c06",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "606140b9fb30c1e5",
+      "start": 3864,
+      "source_recording_id": "435fc6da99284d7ba15cf09193352c06",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "606140b9fb30c1e5",
+      "start": 4233,
+      "source_recording_id": "435fc6da99284d7ba15cf09193352c06",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "63874a4e963e58e0",
+      "start": 393,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode213",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 73,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "63874a4e963e58e0",
+      "start": 489,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode213",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 73,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "63874a4e963e58e0",
+      "start": 634,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode213",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 73,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "63874a4e963e58e0",
+      "start": 720,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode213",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 73,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "63874a4e963e58e0",
+      "start": 760,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode213",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 73,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "66a957698aa8aab0",
+      "start": 15,
+      "source_recording_id": "d5954048b21e477a8a788bbdd69a0b73",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 102,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "66a957698aa8aab0",
+      "start": 63,
+      "source_recording_id": "d5954048b21e477a8a788bbdd69a0b73",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 102,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "66a957698aa8aab0",
+      "start": 313,
+      "source_recording_id": "d5954048b21e477a8a788bbdd69a0b73",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 102,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "66a957698aa8aab0",
+      "start": 578,
+      "source_recording_id": "d5954048b21e477a8a788bbdd69a0b73",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 102,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "66a957698aa8aab0",
+      "start": 672,
+      "source_recording_id": "d5954048b21e477a8a788bbdd69a0b73",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 102,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "66d55ab112249854",
+      "start": 74,
+      "source_recording_id": "846be1d8e9744789a567cb8a4c3bd10a",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 166,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "66d55ab112249854",
+      "start": 114,
+      "source_recording_id": "846be1d8e9744789a567cb8a4c3bd10a",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 166,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "66d55ab112249854",
+      "start": 125,
+      "source_recording_id": "846be1d8e9744789a567cb8a4c3bd10a",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 166,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "66d55ab112249854",
+      "start": 177,
+      "source_recording_id": "846be1d8e9744789a567cb8a4c3bd10a",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 166,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "66d55ab112249854",
+      "start": 605,
+      "source_recording_id": "846be1d8e9744789a567cb8a4c3bd10a",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 166,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "6f96f985b2454f67",
+      "start": 299,
+      "source_recording_id": "8ca1fd44da2c486a881aab75e423c1c1",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 41,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "6f96f985b2454f67",
+      "start": 381,
+      "source_recording_id": "8ca1fd44da2c486a881aab75e423c1c1",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 41,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "6f96f985b2454f67",
+      "start": 474,
+      "source_recording_id": "8ca1fd44da2c486a881aab75e423c1c1",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 41,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "6f96f985b2454f67",
+      "start": 514,
+      "source_recording_id": "8ca1fd44da2c486a881aab75e423c1c1",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 41,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "6f96f985b2454f67",
+      "start": 681,
+      "source_recording_id": "8ca1fd44da2c486a881aab75e423c1c1",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 41,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "6faec95e8f4239b7",
+      "start": 268,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode368",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 156,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "6faec95e8f4239b7",
+      "start": 399,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode368",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 156,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "6faec95e8f4239b7",
+      "start": 755,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode368",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 156,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "6faec95e8f4239b7",
+      "start": 820,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode368",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 156,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "6faec95e8f4239b7",
+      "start": 1234,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode368",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 156,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7805879acb0081a3",
+      "start": 42,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode202",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 66,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7805879acb0081a3",
+      "start": 354,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode202",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 66,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7805879acb0081a3",
+      "start": 635,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode202",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 66,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7805879acb0081a3",
+      "start": 695,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode202",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 66,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7805879acb0081a3",
+      "start": 787,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode202",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 66,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7c9e27fc539f61a1",
+      "start": 36,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode91",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 17,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7c9e27fc539f61a1",
+      "start": 170,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode91",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 17,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7c9e27fc539f61a1",
+      "start": 212,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode91",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 17,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7c9e27fc539f61a1",
+      "start": 237,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode91",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 17,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7c9e27fc539f61a1",
+      "start": 283,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode91",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 17,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7d7f45b78418131e",
+      "start": 280,
+      "source_recording_id": "98fbac16a705402d8203f00a7fd1b191",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7d7f45b78418131e",
+      "start": 436,
+      "source_recording_id": "98fbac16a705402d8203f00a7fd1b191",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7d7f45b78418131e",
+      "start": 447,
+      "source_recording_id": "98fbac16a705402d8203f00a7fd1b191",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7d7f45b78418131e",
+      "start": 507,
+      "source_recording_id": "98fbac16a705402d8203f00a7fd1b191",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7d7f45b78418131e",
+      "start": 623,
+      "source_recording_id": "98fbac16a705402d8203f00a7fd1b191",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 103,
+      "source_recording_id": "f0e62cb87c014009a28a02e5e97c0b89",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_56_106_normal_lerobot",
+      "episode_index": 0,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 633,
+      "source_recording_id": "f0e62cb87c014009a28a02e5e97c0b89",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_56_106_normal_lerobot",
+      "episode_index": 0,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 965,
+      "source_recording_id": "f0e62cb87c014009a28a02e5e97c0b89",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_56_106_normal_lerobot",
+      "episode_index": 0,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 991,
+      "source_recording_id": "f0e62cb87c014009a28a02e5e97c0b89",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_56_106_normal_lerobot",
+      "episode_index": 0,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "7f7e5279898aa902",
+      "start": 1186,
+      "source_recording_id": "f0e62cb87c014009a28a02e5e97c0b89",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_56_106_normal_lerobot",
+      "episode_index": 0,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "81395d05449a12c1",
+      "start": 33,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode74",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "81395d05449a12c1",
+      "start": 94,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode74",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "81395d05449a12c1",
+      "start": 102,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode74",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "81395d05449a12c1",
+      "start": 504,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode74",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "81395d05449a12c1",
+      "start": 515,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode74",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "86584c3ac8141ab7",
+      "start": 33,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode79",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "86584c3ac8141ab7",
+      "start": 143,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode79",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "86584c3ac8141ab7",
+      "start": 463,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode79",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "86584c3ac8141ab7",
+      "start": 680,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode79",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "86584c3ac8141ab7",
+      "start": 707,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode79",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 9,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "86c83bfff1837061",
+      "start": 101,
+      "source_recording_id": "6c0458a448254ea8bccc92b158662e34",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 61,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "86c83bfff1837061",
+      "start": 134,
+      "source_recording_id": "6c0458a448254ea8bccc92b158662e34",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 61,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "86c83bfff1837061",
+      "start": 303,
+      "source_recording_id": "6c0458a448254ea8bccc92b158662e34",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 61,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "86c83bfff1837061",
+      "start": 427,
+      "source_recording_id": "6c0458a448254ea8bccc92b158662e34",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 61,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "86c83bfff1837061",
+      "start": 528,
+      "source_recording_id": "6c0458a448254ea8bccc92b158662e34",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 61,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "88357ccbd21c9903",
+      "start": 280,
+      "source_recording_id": "2d6000f8168b4f2ab8a596a9e0235fbd",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 15,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "88357ccbd21c9903",
+      "start": 704,
+      "source_recording_id": "2d6000f8168b4f2ab8a596a9e0235fbd",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 15,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "88357ccbd21c9903",
+      "start": 736,
+      "source_recording_id": "2d6000f8168b4f2ab8a596a9e0235fbd",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 15,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "88357ccbd21c9903",
+      "start": 890,
+      "source_recording_id": "2d6000f8168b4f2ab8a596a9e0235fbd",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 15,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "88357ccbd21c9903",
+      "start": 1004,
+      "source_recording_id": "2d6000f8168b4f2ab8a596a9e0235fbd",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 15,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8856c1a23cf97fc0",
+      "start": 186,
+      "source_recording_id": "4c5eb0a290b24c42aee442de499465ea",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1026_446_510_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8856c1a23cf97fc0",
+      "start": 345,
+      "source_recording_id": "4c5eb0a290b24c42aee442de499465ea",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1026_446_510_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8856c1a23cf97fc0",
+      "start": 422,
+      "source_recording_id": "4c5eb0a290b24c42aee442de499465ea",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1026_446_510_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8856c1a23cf97fc0",
+      "start": 486,
+      "source_recording_id": "4c5eb0a290b24c42aee442de499465ea",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1026_446_510_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8856c1a23cf97fc0",
+      "start": 745,
+      "source_recording_id": "4c5eb0a290b24c42aee442de499465ea",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1026_446_510_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "89fd3cc814c410bc",
+      "start": 243,
+      "source_recording_id": "d18c91afa4e242e98315610463413f28",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 83,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "89fd3cc814c410bc",
+      "start": 468,
+      "source_recording_id": "d18c91afa4e242e98315610463413f28",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 83,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "89fd3cc814c410bc",
+      "start": 594,
+      "source_recording_id": "d18c91afa4e242e98315610463413f28",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 83,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "89fd3cc814c410bc",
+      "start": 692,
+      "source_recording_id": "d18c91afa4e242e98315610463413f28",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 83,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "89fd3cc814c410bc",
+      "start": 741,
+      "source_recording_id": "d18c91afa4e242e98315610463413f28",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 83,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8a4803343cbfed6e",
+      "start": 288,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode142",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 42,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8a4803343cbfed6e",
+      "start": 315,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode142",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 42,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8a4803343cbfed6e",
+      "start": 366,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode142",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 42,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8a4803343cbfed6e",
+      "start": 403,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode142",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 42,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8a4803343cbfed6e",
+      "start": 622,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode142",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 42,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8adf15bbe15cf947",
+      "start": 194,
+      "source_recording_id": "ee0ba033bb4b4a5b917b13919b8889b7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 28,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8adf15bbe15cf947",
+      "start": 237,
+      "source_recording_id": "ee0ba033bb4b4a5b917b13919b8889b7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 28,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8adf15bbe15cf947",
+      "start": 376,
+      "source_recording_id": "ee0ba033bb4b4a5b917b13919b8889b7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 28,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8adf15bbe15cf947",
+      "start": 397,
+      "source_recording_id": "ee0ba033bb4b4a5b917b13919b8889b7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 28,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8adf15bbe15cf947",
+      "start": 528,
+      "source_recording_id": "ee0ba033bb4b4a5b917b13919b8889b7",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 28,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8b9fd65a0b27c902",
+      "start": 52,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode101",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 22,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8b9fd65a0b27c902",
+      "start": 75,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode101",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 22,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8b9fd65a0b27c902",
+      "start": 82,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode101",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 22,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8b9fd65a0b27c902",
+      "start": 290,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode101",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 22,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8b9fd65a0b27c902",
+      "start": 570,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode101",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 22,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8ce047ce002d814f",
+      "start": 143,
+      "source_recording_id": "dbcb1a8bca684f2f9d03e3a2691b7d5d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 72,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8ce047ce002d814f",
+      "start": 374,
+      "source_recording_id": "dbcb1a8bca684f2f9d03e3a2691b7d5d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 72,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8ce047ce002d814f",
+      "start": 595,
+      "source_recording_id": "dbcb1a8bca684f2f9d03e3a2691b7d5d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 72,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8ce047ce002d814f",
+      "start": 720,
+      "source_recording_id": "dbcb1a8bca684f2f9d03e3a2691b7d5d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 72,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "8ce047ce002d814f",
+      "start": 822,
+      "source_recording_id": "dbcb1a8bca684f2f9d03e3a2691b7d5d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 72,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9602185f37125652",
+      "start": 110,
+      "source_recording_id": "19d3212a1ccc45348d424dbac297754b",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 82,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9602185f37125652",
+      "start": 718,
+      "source_recording_id": "19d3212a1ccc45348d424dbac297754b",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 82,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9602185f37125652",
+      "start": 817,
+      "source_recording_id": "19d3212a1ccc45348d424dbac297754b",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 82,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9602185f37125652",
+      "start": 831,
+      "source_recording_id": "19d3212a1ccc45348d424dbac297754b",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 82,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9602185f37125652",
+      "start": 911,
+      "source_recording_id": "19d3212a1ccc45348d424dbac297754b",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 82,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "96e9ecb9fc22070b",
+      "start": 121,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode77",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 7,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "96e9ecb9fc22070b",
+      "start": 315,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode77",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 7,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "96e9ecb9fc22070b",
+      "start": 334,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode77",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 7,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "96e9ecb9fc22070b",
+      "start": 611,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode77",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 7,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "96e9ecb9fc22070b",
+      "start": 794,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode77",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 7,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9e8a79083fadc73c",
+      "start": 186,
+      "source_recording_id": "2a48ea6c85be4b3ba7df0098a7086ea0",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 3,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9e8a79083fadc73c",
+      "start": 851,
+      "source_recording_id": "2a48ea6c85be4b3ba7df0098a7086ea0",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 3,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9e8a79083fadc73c",
+      "start": 885,
+      "source_recording_id": "2a48ea6c85be4b3ba7df0098a7086ea0",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 3,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9e8a79083fadc73c",
+      "start": 1499,
+      "source_recording_id": "2a48ea6c85be4b3ba7df0098a7086ea0",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 3,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9e8a79083fadc73c",
+      "start": 1554,
+      "source_recording_id": "2a48ea6c85be4b3ba7df0098a7086ea0",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 3,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9ec6fe03a0d2853e",
+      "start": 36,
+      "source_recording_id": "4c0e9872d6a148ffb656ca43c75b2a46",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 22,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9ec6fe03a0d2853e",
+      "start": 318,
+      "source_recording_id": "4c0e9872d6a148ffb656ca43c75b2a46",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 22,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9ec6fe03a0d2853e",
+      "start": 494,
+      "source_recording_id": "4c0e9872d6a148ffb656ca43c75b2a46",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 22,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9ec6fe03a0d2853e",
+      "start": 767,
+      "source_recording_id": "4c0e9872d6a148ffb656ca43c75b2a46",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 22,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9ec6fe03a0d2853e",
+      "start": 768,
+      "source_recording_id": "4c0e9872d6a148ffb656ca43c75b2a46",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 22,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9f506def61046a27",
+      "start": 22,
+      "source_recording_id": "db08d685bb4d4a20b7cc871d9c1996b6",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 36,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9f506def61046a27",
+      "start": 80,
+      "source_recording_id": "db08d685bb4d4a20b7cc871d9c1996b6",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 36,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9f506def61046a27",
+      "start": 191,
+      "source_recording_id": "db08d685bb4d4a20b7cc871d9c1996b6",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 36,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9f506def61046a27",
+      "start": 343,
+      "source_recording_id": "db08d685bb4d4a20b7cc871d9c1996b6",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 36,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "9f506def61046a27",
+      "start": 426,
+      "source_recording_id": "db08d685bb4d4a20b7cc871d9c1996b6",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 36,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "a60db3bd6ec0dc2c",
+      "start": 121,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode337",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 141,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "a60db3bd6ec0dc2c",
+      "start": 152,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode337",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 141,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "a60db3bd6ec0dc2c",
+      "start": 227,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode337",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 141,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "a60db3bd6ec0dc2c",
+      "start": 313,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode337",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 141,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "a60db3bd6ec0dc2c",
+      "start": 702,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode337",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 141,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "a6bea39865581eea",
+      "start": 51,
+      "source_recording_id": "b170ec06dade45e1a62af3cfeb08ae69",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 20,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "a6bea39865581eea",
+      "start": 176,
+      "source_recording_id": "b170ec06dade45e1a62af3cfeb08ae69",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 20,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "a6bea39865581eea",
+      "start": 276,
+      "source_recording_id": "b170ec06dade45e1a62af3cfeb08ae69",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 20,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "a6bea39865581eea",
+      "start": 558,
+      "source_recording_id": "b170ec06dade45e1a62af3cfeb08ae69",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 20,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "a6bea39865581eea",
+      "start": 583,
+      "source_recording_id": "b170ec06dade45e1a62af3cfeb08ae69",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 20,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "aa829cea217adff5",
+      "start": 16,
+      "source_recording_id": "d0818f8853d8417e9e6b60a2c88ee141",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 63,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "aa829cea217adff5",
+      "start": 180,
+      "source_recording_id": "d0818f8853d8417e9e6b60a2c88ee141",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 63,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "aa829cea217adff5",
+      "start": 214,
+      "source_recording_id": "d0818f8853d8417e9e6b60a2c88ee141",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 63,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "aa829cea217adff5",
+      "start": 621,
+      "source_recording_id": "d0818f8853d8417e9e6b60a2c88ee141",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 63,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "aa829cea217adff5",
+      "start": 848,
+      "source_recording_id": "d0818f8853d8417e9e6b60a2c88ee141",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 63,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ab61dea33110cef1",
+      "start": 448,
+      "source_recording_id": "9e91837947df4f4c9119314aff63618d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 13,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ab61dea33110cef1",
+      "start": 515,
+      "source_recording_id": "9e91837947df4f4c9119314aff63618d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 13,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ab61dea33110cef1",
+      "start": 624,
+      "source_recording_id": "9e91837947df4f4c9119314aff63618d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 13,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ab61dea33110cef1",
+      "start": 693,
+      "source_recording_id": "9e91837947df4f4c9119314aff63618d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 13,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ab61dea33110cef1",
+      "start": 717,
+      "source_recording_id": "9e91837947df4f4c9119314aff63618d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 13,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ab8fd61412716933",
+      "start": 80,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode255",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 99,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ab8fd61412716933",
+      "start": 108,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode255",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 99,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ab8fd61412716933",
+      "start": 219,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode255",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 99,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ab8fd61412716933",
+      "start": 439,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode255",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 99,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ab8fd61412716933",
+      "start": 498,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode255",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 99,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ad013527667ee088",
+      "start": 133,
+      "source_recording_id": "72bfd9a8166645339fd1bd45af03baea",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 14,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ad013527667ee088",
+      "start": 380,
+      "source_recording_id": "72bfd9a8166645339fd1bd45af03baea",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 14,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ad013527667ee088",
+      "start": 800,
+      "source_recording_id": "72bfd9a8166645339fd1bd45af03baea",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 14,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ad013527667ee088",
+      "start": 1006,
+      "source_recording_id": "72bfd9a8166645339fd1bd45af03baea",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 14,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ad013527667ee088",
+      "start": 1019,
+      "source_recording_id": "72bfd9a8166645339fd1bd45af03baea",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 14,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "adb926817885aa45",
+      "start": 440,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode219",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 77,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "adb926817885aa45",
+      "start": 725,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode219",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 77,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "adb926817885aa45",
+      "start": 746,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode219",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 77,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "adb926817885aa45",
+      "start": 779,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode219",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 77,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "adb926817885aa45",
+      "start": 849,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode219",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 77,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "afcb028a488a46cc",
+      "start": 23,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode318",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 128,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "afcb028a488a46cc",
+      "start": 53,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode318",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 128,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "afcb028a488a46cc",
+      "start": 873,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode318",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 128,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "afcb028a488a46cc",
+      "start": 1025,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode318",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 128,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "afcb028a488a46cc",
+      "start": 1368,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode318",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 128,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b3545c90aacb086b",
+      "start": 247,
+      "source_recording_id": "6097c00c66964b7c90140791dadfc266",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 118,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b3545c90aacb086b",
+      "start": 256,
+      "source_recording_id": "6097c00c66964b7c90140791dadfc266",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 118,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b3545c90aacb086b",
+      "start": 292,
+      "source_recording_id": "6097c00c66964b7c90140791dadfc266",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 118,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b3545c90aacb086b",
+      "start": 324,
+      "source_recording_id": "6097c00c66964b7c90140791dadfc266",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 118,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b3545c90aacb086b",
+      "start": 583,
+      "source_recording_id": "6097c00c66964b7c90140791dadfc266",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 118,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b3616f9ebf2390df",
+      "start": 30,
+      "source_recording_id": "4d13bc84ed4f4de68b31dc8ba9c7726f",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 46,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b3616f9ebf2390df",
+      "start": 174,
+      "source_recording_id": "4d13bc84ed4f4de68b31dc8ba9c7726f",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 46,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b3616f9ebf2390df",
+      "start": 242,
+      "source_recording_id": "4d13bc84ed4f4de68b31dc8ba9c7726f",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 46,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b3616f9ebf2390df",
+      "start": 333,
+      "source_recording_id": "4d13bc84ed4f4de68b31dc8ba9c7726f",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 46,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b3616f9ebf2390df",
+      "start": 511,
+      "source_recording_id": "4d13bc84ed4f4de68b31dc8ba9c7726f",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 46,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b44e759438b47f18",
+      "start": 8,
+      "source_recording_id": "fe6d0bcb233e4d419e8ec8e49cf2b85d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 94,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b44e759438b47f18",
+      "start": 134,
+      "source_recording_id": "fe6d0bcb233e4d419e8ec8e49cf2b85d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 94,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b44e759438b47f18",
+      "start": 315,
+      "source_recording_id": "fe6d0bcb233e4d419e8ec8e49cf2b85d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 94,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b44e759438b47f18",
+      "start": 540,
+      "source_recording_id": "fe6d0bcb233e4d419e8ec8e49cf2b85d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 94,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b44e759438b47f18",
+      "start": 577,
+      "source_recording_id": "fe6d0bcb233e4d419e8ec8e49cf2b85d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 94,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b464272757a83475",
+      "start": 161,
+      "source_recording_id": "901cc2faeb964194a1f471fc0ceaea7e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 13,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b464272757a83475",
+      "start": 538,
+      "source_recording_id": "901cc2faeb964194a1f471fc0ceaea7e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 13,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b464272757a83475",
+      "start": 551,
+      "source_recording_id": "901cc2faeb964194a1f471fc0ceaea7e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 13,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b464272757a83475",
+      "start": 722,
+      "source_recording_id": "901cc2faeb964194a1f471fc0ceaea7e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 13,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b464272757a83475",
+      "start": 731,
+      "source_recording_id": "901cc2faeb964194a1f471fc0ceaea7e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 13,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b6529b1f8ed29fd2",
+      "start": 37,
+      "source_recording_id": "70d5f80b998c490cb6f07cb30c8cc922",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 91,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b6529b1f8ed29fd2",
+      "start": 62,
+      "source_recording_id": "70d5f80b998c490cb6f07cb30c8cc922",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 91,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b6529b1f8ed29fd2",
+      "start": 164,
+      "source_recording_id": "70d5f80b998c490cb6f07cb30c8cc922",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 91,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b6529b1f8ed29fd2",
+      "start": 190,
+      "source_recording_id": "70d5f80b998c490cb6f07cb30c8cc922",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 91,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "b6529b1f8ed29fd2",
+      "start": 542,
+      "source_recording_id": "70d5f80b998c490cb6f07cb30c8cc922",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 91,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "be13a9a12a842c6c",
+      "start": 301,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode207",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 68,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "be13a9a12a842c6c",
+      "start": 339,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode207",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 68,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "be13a9a12a842c6c",
+      "start": 483,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode207",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 68,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "be13a9a12a842c6c",
+      "start": 587,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode207",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 68,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "be13a9a12a842c6c",
+      "start": 639,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode207",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 68,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c03ac531c3ff282e",
+      "start": 51,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode231",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 83,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c03ac531c3ff282e",
+      "start": 125,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode231",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 83,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c03ac531c3ff282e",
+      "start": 140,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode231",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 83,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c03ac531c3ff282e",
+      "start": 175,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode231",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 83,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c03ac531c3ff282e",
+      "start": 496,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode231",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 83,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c15b75a05e6c3d15",
+      "start": 36,
+      "source_recording_id": "ebd8e1cd8ae14c35835031256e922434",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 0,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c15b75a05e6c3d15",
+      "start": 86,
+      "source_recording_id": "ebd8e1cd8ae14c35835031256e922434",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 0,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c15b75a05e6c3d15",
+      "start": 128,
+      "source_recording_id": "ebd8e1cd8ae14c35835031256e922434",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 0,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c15b75a05e6c3d15",
+      "start": 421,
+      "source_recording_id": "ebd8e1cd8ae14c35835031256e922434",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 0,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c15b75a05e6c3d15",
+      "start": 646,
+      "source_recording_id": "ebd8e1cd8ae14c35835031256e922434",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 0,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c5db170146c19705",
+      "start": 237,
+      "source_recording_id": "1aef7815bef64edaabf9f742c0dc4fb8",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 18,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c5db170146c19705",
+      "start": 460,
+      "source_recording_id": "1aef7815bef64edaabf9f742c0dc4fb8",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 18,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c5db170146c19705",
+      "start": 467,
+      "source_recording_id": "1aef7815bef64edaabf9f742c0dc4fb8",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 18,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c5db170146c19705",
+      "start": 489,
+      "source_recording_id": "1aef7815bef64edaabf9f742c0dc4fb8",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 18,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c5db170146c19705",
+      "start": 531,
+      "source_recording_id": "1aef7815bef64edaabf9f742c0dc4fb8",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 18,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c7605a49c9985b7c",
+      "start": 68,
+      "source_recording_id": "7332bb9c555649cc987b7b57e7edc9d1",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 68,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c7605a49c9985b7c",
+      "start": 254,
+      "source_recording_id": "7332bb9c555649cc987b7b57e7edc9d1",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 68,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c7605a49c9985b7c",
+      "start": 371,
+      "source_recording_id": "7332bb9c555649cc987b7b57e7edc9d1",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 68,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c7605a49c9985b7c",
+      "start": 386,
+      "source_recording_id": "7332bb9c555649cc987b7b57e7edc9d1",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 68,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c7605a49c9985b7c",
+      "start": 667,
+      "source_recording_id": "7332bb9c555649cc987b7b57e7edc9d1",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 68,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c7c53660f7f4ac53",
+      "start": 183,
+      "source_recording_id": "0da66b94229a4e31b5d63a022322e91d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 104,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c7c53660f7f4ac53",
+      "start": 317,
+      "source_recording_id": "0da66b94229a4e31b5d63a022322e91d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 104,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c7c53660f7f4ac53",
+      "start": 585,
+      "source_recording_id": "0da66b94229a4e31b5d63a022322e91d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 104,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c7c53660f7f4ac53",
+      "start": 606,
+      "source_recording_id": "0da66b94229a4e31b5d63a022322e91d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 104,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c7c53660f7f4ac53",
+      "start": 849,
+      "source_recording_id": "0da66b94229a4e31b5d63a022322e91d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 104,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c9680f3bb680520a",
+      "start": 86,
+      "source_recording_id": "50968ddcbecb45d5af52d7be1b584e9e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 16,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c9680f3bb680520a",
+      "start": 264,
+      "source_recording_id": "50968ddcbecb45d5af52d7be1b584e9e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 16,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c9680f3bb680520a",
+      "start": 563,
+      "source_recording_id": "50968ddcbecb45d5af52d7be1b584e9e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 16,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c9680f3bb680520a",
+      "start": 718,
+      "source_recording_id": "50968ddcbecb45d5af52d7be1b584e9e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 16,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "c9680f3bb680520a",
+      "start": 752,
+      "source_recording_id": "50968ddcbecb45d5af52d7be1b584e9e",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 16,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ccc026a73cf0fc9f",
+      "start": 52,
+      "source_recording_id": "c8693059336c42bf989ae8853ddbea33",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 12,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ccc026a73cf0fc9f",
+      "start": 112,
+      "source_recording_id": "c8693059336c42bf989ae8853ddbea33",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 12,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ccc026a73cf0fc9f",
+      "start": 128,
+      "source_recording_id": "c8693059336c42bf989ae8853ddbea33",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 12,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ccc026a73cf0fc9f",
+      "start": 759,
+      "source_recording_id": "c8693059336c42bf989ae8853ddbea33",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 12,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ccc026a73cf0fc9f",
+      "start": 959,
+      "source_recording_id": "c8693059336c42bf989ae8853ddbea33",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 12,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cd4859286159c159",
+      "start": 10,
+      "source_recording_id": "9cac40da668448ddb2ece53b210e439d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 105,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cd4859286159c159",
+      "start": 190,
+      "source_recording_id": "9cac40da668448ddb2ece53b210e439d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 105,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cd4859286159c159",
+      "start": 524,
+      "source_recording_id": "9cac40da668448ddb2ece53b210e439d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 105,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cd4859286159c159",
+      "start": 530,
+      "source_recording_id": "9cac40da668448ddb2ece53b210e439d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 105,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cd4859286159c159",
+      "start": 551,
+      "source_recording_id": "9cac40da668448ddb2ece53b210e439d",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 105,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cd9c12d634ba2d00",
+      "start": 36,
+      "source_recording_id": "82a65e98e520479c8649d1d4b5217022",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 110,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cd9c12d634ba2d00",
+      "start": 121,
+      "source_recording_id": "82a65e98e520479c8649d1d4b5217022",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 110,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cd9c12d634ba2d00",
+      "start": 441,
+      "source_recording_id": "82a65e98e520479c8649d1d4b5217022",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 110,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cd9c12d634ba2d00",
+      "start": 500,
+      "source_recording_id": "82a65e98e520479c8649d1d4b5217022",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 110,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cd9c12d634ba2d00",
+      "start": 705,
+      "source_recording_id": "82a65e98e520479c8649d1d4b5217022",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 110,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ce0e6048ce10c955",
+      "start": 88,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode261",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 102,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ce0e6048ce10c955",
+      "start": 207,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode261",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 102,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ce0e6048ce10c955",
+      "start": 298,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode261",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 102,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ce0e6048ce10c955",
+      "start": 444,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode261",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 102,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ce0e6048ce10c955",
+      "start": 593,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode261",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 102,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cea2612a6c7e5cc4",
+      "start": 43,
+      "source_recording_id": "05b80a2df1374fb8af649a1d0e210399",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cea2612a6c7e5cc4",
+      "start": 341,
+      "source_recording_id": "05b80a2df1374fb8af649a1d0e210399",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cea2612a6c7e5cc4",
+      "start": 428,
+      "source_recording_id": "05b80a2df1374fb8af649a1d0e210399",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cea2612a6c7e5cc4",
+      "start": 472,
+      "source_recording_id": "05b80a2df1374fb8af649a1d0e210399",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "cea2612a6c7e5cc4",
+      "start": 741,
+      "source_recording_id": "05b80a2df1374fb8af649a1d0e210399",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 29,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d532081808e2c096",
+      "start": 159,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode265",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 105,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d532081808e2c096",
+      "start": 312,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode265",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 105,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d532081808e2c096",
+      "start": 460,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode265",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 105,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d532081808e2c096",
+      "start": 522,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode265",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 105,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d532081808e2c096",
+      "start": 551,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode265",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 105,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d8f720863e569786",
+      "start": 2925,
+      "source_recording_id": "e4bdeafd7d834062bfba2ad01049a5b8",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot",
+      "episode_index": 1,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d8f720863e569786",
+      "start": 4579,
+      "source_recording_id": "e4bdeafd7d834062bfba2ad01049a5b8",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot",
+      "episode_index": 1,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d8f720863e569786",
+      "start": 4590,
+      "source_recording_id": "e4bdeafd7d834062bfba2ad01049a5b8",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot",
+      "episode_index": 1,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d8f720863e569786",
+      "start": 4886,
+      "source_recording_id": "e4bdeafd7d834062bfba2ad01049a5b8",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot",
+      "episode_index": 1,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d8f720863e569786",
+      "start": 6589,
+      "source_recording_id": "e4bdeafd7d834062bfba2ad01049a5b8",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/A/1102_588_616_normal_lerobot",
+      "episode_index": 1,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d9357e17263a02ea",
+      "start": 202,
+      "source_recording_id": "e267253a79dc4b35be63fa0a9019d654",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 19,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d9357e17263a02ea",
+      "start": 281,
+      "source_recording_id": "e267253a79dc4b35be63fa0a9019d654",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 19,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d9357e17263a02ea",
+      "start": 679,
+      "source_recording_id": "e267253a79dc4b35be63fa0a9019d654",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 19,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d9357e17263a02ea",
+      "start": 1056,
+      "source_recording_id": "e267253a79dc4b35be63fa0a9019d654",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 19,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d9357e17263a02ea",
+      "start": 1061,
+      "source_recording_id": "e267253a79dc4b35be63fa0a9019d654",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_54_120_normal_lerobot",
+      "episode_index": 19,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d958b0eb9313567f",
+      "start": 327,
+      "source_recording_id": "0340d869ea074774b09441f2339cec30",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/B/1103_604_632_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d958b0eb9313567f",
+      "start": 2733,
+      "source_recording_id": "0340d869ea074774b09441f2339cec30",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/B/1103_604_632_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d958b0eb9313567f",
+      "start": 3315,
+      "source_recording_id": "0340d869ea074774b09441f2339cec30",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/B/1103_604_632_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d958b0eb9313567f",
+      "start": 4780,
+      "source_recording_id": "0340d869ea074774b09441f2339cec30",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/B/1103_604_632_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "d958b0eb9313567f",
+      "start": 4985,
+      "source_recording_id": "0340d869ea074774b09441f2339cec30",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/B/1103_604_632_normal_lerobot",
+      "episode_index": 2,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "db26ed973729253d",
+      "start": 20,
+      "source_recording_id": "9f73c1818e7147f6b16df9efe8bb4eae",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "db26ed973729253d",
+      "start": 83,
+      "source_recording_id": "9f73c1818e7147f6b16df9efe8bb4eae",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "db26ed973729253d",
+      "start": 176,
+      "source_recording_id": "9f73c1818e7147f6b16df9efe8bb4eae",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "db26ed973729253d",
+      "start": 265,
+      "source_recording_id": "9f73c1818e7147f6b16df9efe8bb4eae",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "db26ed973729253d",
+      "start": 610,
+      "source_recording_id": "9f73c1818e7147f6b16df9efe8bb4eae",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1026_444_513_normal_lerobot",
+      "episode_index": 4,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "dc03a73fed3e9dee",
+      "start": 307,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode259",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 101,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "dc03a73fed3e9dee",
+      "start": 373,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode259",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 101,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "dc03a73fed3e9dee",
+      "start": 700,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode259",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 101,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "dc03a73fed3e9dee",
+      "start": 754,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode259",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 101,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "dc03a73fed3e9dee",
+      "start": 789,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode259",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 101,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "de3e00f97313ab24",
+      "start": 80,
+      "source_recording_id": "eb50bbcaa2f24176942f4507275fb522",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 112,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "de3e00f97313ab24",
+      "start": 149,
+      "source_recording_id": "eb50bbcaa2f24176942f4507275fb522",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 112,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "de3e00f97313ab24",
+      "start": 174,
+      "source_recording_id": "eb50bbcaa2f24176942f4507275fb522",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 112,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "de3e00f97313ab24",
+      "start": 461,
+      "source_recording_id": "eb50bbcaa2f24176942f4507275fb522",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 112,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "de3e00f97313ab24",
+      "start": 784,
+      "source_recording_id": "eb50bbcaa2f24176942f4507275fb522",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 112,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e1c02325e075bdc3",
+      "start": 121,
+      "source_recording_id": "43d943d269124d14952dd1083e16a968",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 24,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e1c02325e075bdc3",
+      "start": 319,
+      "source_recording_id": "43d943d269124d14952dd1083e16a968",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 24,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e1c02325e075bdc3",
+      "start": 595,
+      "source_recording_id": "43d943d269124d14952dd1083e16a968",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 24,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e1c02325e075bdc3",
+      "start": 673,
+      "source_recording_id": "43d943d269124d14952dd1083e16a968",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 24,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e1c02325e075bdc3",
+      "start": 716,
+      "source_recording_id": "43d943d269124d14952dd1083e16a968",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 24,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e389d9c2c0c82761",
+      "start": 21,
+      "source_recording_id": "a48024dc9af0417cb9f678c0bd5bbddf",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 93,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e389d9c2c0c82761",
+      "start": 106,
+      "source_recording_id": "a48024dc9af0417cb9f678c0bd5bbddf",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 93,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e389d9c2c0c82761",
+      "start": 108,
+      "source_recording_id": "a48024dc9af0417cb9f678c0bd5bbddf",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 93,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e389d9c2c0c82761",
+      "start": 184,
+      "source_recording_id": "a48024dc9af0417cb9f678c0bd5bbddf",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 93,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e389d9c2c0c82761",
+      "start": 605,
+      "source_recording_id": "a48024dc9af0417cb9f678c0bd5bbddf",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 93,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e8dc35983bfecc5b",
+      "start": 211,
+      "source_recording_id": "cd9d694d75614bdabcffe025a03f79c5",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 130,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e8dc35983bfecc5b",
+      "start": 263,
+      "source_recording_id": "cd9d694d75614bdabcffe025a03f79c5",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 130,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e8dc35983bfecc5b",
+      "start": 267,
+      "source_recording_id": "cd9d694d75614bdabcffe025a03f79c5",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 130,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e8dc35983bfecc5b",
+      "start": 530,
+      "source_recording_id": "cd9d694d75614bdabcffe025a03f79c5",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 130,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "e8dc35983bfecc5b",
+      "start": 572,
+      "source_recording_id": "cd9d694d75614bdabcffe025a03f79c5",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 130,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ee6e1d0c89056790",
+      "start": 22,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode276",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 113,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ee6e1d0c89056790",
+      "start": 173,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode276",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 113,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ee6e1d0c89056790",
+      "start": 219,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode276",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 113,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ee6e1d0c89056790",
+      "start": 398,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode276",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 113,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ee6e1d0c89056790",
+      "start": 667,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode276",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 113,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "eebd6f42308dd20a",
+      "start": 170,
+      "source_recording_id": "6a089b30f67d44d79b5638830d966f9b",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 52,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "eebd6f42308dd20a",
+      "start": 340,
+      "source_recording_id": "6a089b30f67d44d79b5638830d966f9b",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 52,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "eebd6f42308dd20a",
+      "start": 563,
+      "source_recording_id": "6a089b30f67d44d79b5638830d966f9b",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 52,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "eebd6f42308dd20a",
+      "start": 579,
+      "source_recording_id": "6a089b30f67d44d79b5638830d966f9b",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 52,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "eebd6f42308dd20a",
+      "start": 700,
+      "source_recording_id": "6a089b30f67d44d79b5638830d966f9b",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 52,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f01cfa90a1d5d93d",
+      "start": 25,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode215",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 75,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f01cfa90a1d5d93d",
+      "start": 62,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode215",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 75,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f01cfa90a1d5d93d",
+      "start": 64,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode215",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 75,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f01cfa90a1d5d93d",
+      "start": 579,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode215",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 75,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f01cfa90a1d5d93d",
+      "start": 698,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode215",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 75,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f36fd9d86dc0dec0",
+      "start": 261,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode289",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 118,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f36fd9d86dc0dec0",
+      "start": 366,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode289",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 118,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f36fd9d86dc0dec0",
+      "start": 665,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode289",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 118,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f36fd9d86dc0dec0",
+      "start": 877,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode289",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 118,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f36fd9d86dc0dec0",
+      "start": 965,
+      "source_recording_id": "/home/user/company-remote-2/real/harvest-tomato/origin-sharpa/10.16\u4e4b\u524d\u6570\u636e/episode289",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/10.16before",
+      "episode_index": 118,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f8327a460caac4e6",
+      "start": 336,
+      "source_recording_id": "b710689fe5084126b0ab3dedde821f29",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/B/1103_604_632_normal_lerobot",
+      "episode_index": 3,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f8327a460caac4e6",
+      "start": 1042,
+      "source_recording_id": "b710689fe5084126b0ab3dedde821f29",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/B/1103_604_632_normal_lerobot",
+      "episode_index": 3,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f8327a460caac4e6",
+      "start": 1281,
+      "source_recording_id": "b710689fe5084126b0ab3dedde821f29",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/B/1103_604_632_normal_lerobot",
+      "episode_index": 3,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f8327a460caac4e6",
+      "start": 1826,
+      "source_recording_id": "b710689fe5084126b0ab3dedde821f29",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/B/1103_604_632_normal_lerobot",
+      "episode_index": 3,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f8327a460caac4e6",
+      "start": 2592,
+      "source_recording_id": "b710689fe5084126b0ab3dedde821f29",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more/B/1103_604_632_normal_lerobot",
+      "episode_index": 3,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f8f0afdc8ac8f098",
+      "start": 7,
+      "source_recording_id": "1077759841dd46f4aacab39720402686",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 49,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f8f0afdc8ac8f098",
+      "start": 238,
+      "source_recording_id": "1077759841dd46f4aacab39720402686",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 49,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f8f0afdc8ac8f098",
+      "start": 578,
+      "source_recording_id": "1077759841dd46f4aacab39720402686",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 49,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f8f0afdc8ac8f098",
+      "start": 714,
+      "source_recording_id": "1077759841dd46f4aacab39720402686",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 49,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "f8f0afdc8ac8f098",
+      "start": 725,
+      "source_recording_id": "1077759841dd46f4aacab39720402686",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/A/1022_121_430_normal_lerobot",
+      "episode_index": 49,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ff2a2cd4ee0ead6e",
+      "start": 229,
+      "source_recording_id": "23eb45c9143d452aa2c5208433ab8f72",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 26,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ff2a2cd4ee0ead6e",
+      "start": 599,
+      "source_recording_id": "23eb45c9143d452aa2c5208433ab8f72",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 26,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ff2a2cd4ee0ead6e",
+      "start": 693,
+      "source_recording_id": "23eb45c9143d452aa2c5208433ab8f72",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 26,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ff2a2cd4ee0ead6e",
+      "start": 962,
+      "source_recording_id": "23eb45c9143d452aa2c5208433ab8f72",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 26,
+      "strata": [
+        "uniform_within_source"
+      ]
+    },
+    {
+      "id": "ff2a2cd4ee0ead6e",
+      "start": 1009,
+      "source_recording_id": "23eb45c9143d452aa2c5208433ab8f72",
+      "root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one/B/1022_130_423_normal_lerobot",
+      "episode_index": 26,
+      "strata": [
+        "uniform_within_source"
+      ]
+    }
+  ],
+  "anchors": [],
+  "seed": 20261104,
+  "source_count": 101,
+  "method": "5 uniformly random legal current frames per validation source, without replacement, excluding frozen P2.5 windows; same sources, not an independent test split",
+  "training_updates_at_freeze": 0,
+  "sha256": "d666f5a62e92e4ddc8df4a00c52df9eea984d33530ddd3cbb9b4c37fa4545fa4"
+}

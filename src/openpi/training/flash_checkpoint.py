@@ -148,6 +148,20 @@ def restore_offline_checkpoint(directory):
     directory = Path(directory).resolve()
     params = model.restore_params(directory / "params", restore_type=np.ndarray)
     metadata = json.loads((directory / "metadata.json").read_text())
+    if metadata.get("checkpoint_kind") == "flash_expert_increment":
+        # The frozen VLM is referenced, never silently replaced by random weights.
+        base = Path(metadata["vlm_reference_checkpoint"])
+        full = model.restore_params(base / "params", restore_type=np.ndarray)
+        if parameter_digest(full, vlm_only=True) != metadata["vlm_sha256"]:
+            raise ValueError("Referenced frozen VLM fingerprint differs")
+        old_flat = traverse_util.flatten_dict(full)
+        delta = traverse_util.flatten_dict(params)
+        expected = {p for p in old_flat if not is_vlm_parameter(p)}
+        if set(delta) != expected:
+            raise ValueError("Increment must contain every Expert leaf and no VLM leaves")
+        params = traverse_util.unflatten_dict({**old_flat, **delta})
+        if parameter_digest(params) != metadata["full_parameter_sha256"]:
+            raise ValueError("Reconstructed full parameter fingerprint differs")
     optimizer = None
     if (directory / "optimizer").exists():
         import jax

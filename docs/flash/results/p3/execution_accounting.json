@@ -1,0 +1,11 @@
+{
+  "original_p3_updates": 150,
+  "authorized_recovery_p3_updates": 150,
+  "total_p3_compute_updates": 300,
+  "effective_checkpoint_step": 250,
+  "updates_on_final_trajectory": 150,
+  "source_step": 100,
+  "step251_executed": false,
+  "recovery_explicitly_authorized_by_user": true,
+  "maximum_replay_loss_difference": 0.012851417064666748
+}

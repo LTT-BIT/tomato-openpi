@@ -307,3 +307,5 @@ GitLab 自动验证目前暂停。本地代码检查命令为 `bash scripts/chec
 - [P2 受控训练与验证报告](docs/flash/07_p2_training.md) · [P2 曲线与逐关节结果](docs/flash/results/p2/)
 
 - [P2.5 扩大离线验证与 P3 候选方案](docs/flash/08_p25_extended_validation.md)：全部101验证源、813窗；Step100 MAE 0.15935→0.05676 rad，101源平均误差均改善。新增10/15/50帧重规划、初始模型/Oracle对照及恢复审计；零训练更新，P3仅规划，手指局部误差与跨进程数值漂移仍需跟踪。
+
+- [P3 Step100→250 受控续训](docs/flash/09_p3_step250.md)：固定813窗MAE改善12.87%，预先冻结505均匀窗改善14.38%；增量Expert+Adam引用冻结VLM的实际恢复通过。关键手指尾误差及重规划速度Gap仍有退化；保留中断与获准恢复计算记录，未训练Step500或执行实机部署。

@@ -1,0 +1,30 @@
+{
+  "frozen_at_utc": "2026-11-03T09:45:59.150759+00:00",
+  "parent_commit": "534ed023542a20dad55e1827b0a5adad9b760d4d",
+  "planned_new_updates": 150,
+  "steps": [
+    101,
+    250
+  ],
+  "files_sha256": {
+    "scripts/flash/train_p3.py": "76e126b4b9b32b22007d8eb917f877a8092d74ccd6c92e16053bc0cd1199a921",
+    "scripts/flash/evaluate_p25.py": "ad59e1159b595c87299b5625ce4fc108940a02e533cc4c510683cb75af1afaed",
+    "src/openpi/models/pi0_flash.py": "34d171aea246cd94c843c42b0f9b7dcecbf76f15247b381f14e2481cab9bcae9",
+    "src/openpi/shared/flash_polynomial.py": "1ecf679545227406b84dfb5b1054cbdb7e4565b666fb32d49c985819368a772d",
+    "src/openpi/training/flash_data.py": "5175bfe4a766ce6599bb0465632cabcbc7eb2820c747c54dbf3a37e193e692b4",
+    "src/openpi/training/flash_dataset.py": "f5414737657c0cf263310bd77a532f4e81c16410abc8429d5554cc5a8c5c1462",
+    "src/openpi/training/optimizer.py": "cfb5d6f6aec61fbe961287b4015c652260628a0ed4682a0dbdc271b8e65431fa"
+  },
+  "uniform_plan_sha256": "d666f5a62e92e4ddc8df4a00c52df9eea984d33530ddd3cbb9b4c37fa4545fa4",
+  "recovery_authorized_by_user": true,
+  "recovery_reason": "Interrupted during first Step250 full checkpoint write; Adam not persisted; user explicitly authorized repeating150 compute updates",
+  "recovery_files_sha256": {
+    "scripts/flash/train_p3.py": "367e568c6fcca1bc26172039bafeb842ead1898b762ac0360ebdea7eeb9575d5",
+    "scripts/flash/evaluate_p25.py": "ad59e1159b595c87299b5625ce4fc108940a02e533cc4c510683cb75af1afaed",
+    "src/openpi/models/pi0_flash.py": "34d171aea246cd94c843c42b0f9b7dcecbf76f15247b381f14e2481cab9bcae9",
+    "src/openpi/shared/flash_polynomial.py": "1ecf679545227406b84dfb5b1054cbdb7e4565b666fb32d49c985819368a772d",
+    "src/openpi/training/flash_data.py": "5175bfe4a766ce6599bb0465632cabcbc7eb2820c747c54dbf3a37e193e692b4",
+    "src/openpi/training/flash_dataset.py": "f5414737657c0cf263310bd77a532f4e81c16410abc8429d5554cc5a8c5c1462",
+    "src/openpi/training/optimizer.py": "cfb5d6f6aec61fbe961287b4015c652260628a0ed4682a0dbdc271b8e65431fa"
+  }
+}
