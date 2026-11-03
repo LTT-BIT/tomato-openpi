@@ -1,0 +1,98 @@
+{
+  "parameter_sha256": "6b3d9f3ad26b3db2b123af86f56d45e21ec57c83c366e50ad69711d42e437a73",
+  "optimizer_sha256": "5d4b7f09e55210477f1c9085321771f9d1c9a5131a655400bf2c8979aa7d964f",
+  "optimizer_step": 100,
+  "parameter_roundtrip": true,
+  "adam_state_roundtrip": true,
+  "checkpoint_inventory_sha256": "ac7125baebcc0215f5f444dfc3489ff1fd89be307904995d74b33adba87f3b70",
+  "optimizer_updates": 0,
+  "vlm_sha256": "de5ce5077e3f8e7f6dc08bec28893027c9a3aa486ff4dc4d43218a24f7f33324",
+  "method": "step100",
+  "windows": 32,
+  "plan_sha256": "1c6d4685fd296f48722ec11072f067dd51537a595214751bda726da4678fbbb6",
+  "input_sequence_sha256": "89330ca3d7c53d7172a185a856facdf76516162ca2d02a3bc1e4040ac590c254",
+  "input_hashes": [
+    "9bb878c78f8a82ab06a0a17130ea70c63ca3c5a892a2a79866c305b2624581a4",
+    "37a03d1609eb30ce657f5c5124d749825dceedfbb809f6684bd215c636d7ed75",
+    "b84d3a935e9bc5cf496873c2c481bf50b1047a7935dc26aac415e82103d53721",
+    "1ee932f7f1ee41ef9d263944bd2aafa84609d3b8fce38d6ddba11416b1b422a2",
+    "a5da5a3efa45685db5c5e99ea335b4dfe05663c19d35423a194e8e21ec210cd0",
+    "cd40759569c6d52e51a522f2ad79aca7d786498e1c242ccf119ed27f30570668",
+    "17ed88523f456de3628d58929fdd2f60123306820ffd6a8b65fffa4ec53980d6",
+    "226c3e4275e82dc6729a6ca236860a3266155d4b8af7c2760869b723f97fdc12",
+    "76234ebe0b80c1e5fa364a6ab42f6e31a2ec3b09c4e4142864dacc6f3f77a28b",
+    "23a78467ba9f6fe8db13c686fe9510f2257214fa0c2a7ad6729aeb5441365d8a",
+    "ac1607a71186b8af6c5ace40319051193d445ce4f849ccc4d35753af283025a2",
+    "664942e70aec32b9b529353f5bf3dda01faadb93362d87a1e04a7b90bfa69a3d",
+    "95a2e46e9a5932907824f12217e16f6953b3068d4d0fe980993b56be5fd78383",
+    "bc64f634018e2aa18ea6d8251e65145e131143420ac3b16f51b46c9fbe1656e6",
+    "61d8b9692e29ffe87c80af0c48d362ec408d5c15b4513c5b3e227bb8582cdaf7",
+    "467230bf6bc3771313a04e57032583e40c8352ce424272dcf2a6fe7e592011b5",
+    "c1b709b66e80f2770d71ab1f9c71ce507bd774b6c9ad5a6ed9adb6c52a405c89",
+    "8de835a283e24d5fc1987b6b7e27a19cd5f1fd2a892b7f8732be7262df9014f2",
+    "c7f2bef2d74f3c4f2762268f4ca485535e4a161f1f93329f7e785836c8d75774",
+    "a8f7b037f8e3d966d2605353ada4fafeda3ca4193bb203c4994b60287641f2df",
+    "d42645118b5eb33d5cdf999af13f6edbeef17f73d932b11219a91b3e2a1509d5",
+    "fb5b2940d3fcd145835e833e32114b351551fc64fabeed7efd1d82828dd2e767",
+    "17fbd39bfdc1d0027ab1e50ebbd93b155148b38b9d32c940f639288e89c8c409",
+    "8ffd8cd7de4cf805e3eb288e41d55d0d515779e8840524fc5735fbdd4a83e821",
+    "ad5a7292d9fe3a87feb3a5fda4cc5cd7e1dc48666b37cb4b2211ca19aa7b2e77",
+    "daaaab1718b0183353247db4d49558fa64c0b05272a88300b8fd8cf2a63a0734",
+    "5e418d6088a78fcec520cec6aac2cc4fe9e69029f521a9a52e4fcd1e7dd92e83",
+    "3e043f7969b7fe9bbdb069d6ae9b2e2b3725fc417ca940e39e49c215fa91fdd8",
+    "d12a855493bcef202297df9d5d200a4e960b986a6a9cc2bb9fea4d46bc0f6e59",
+    "7d31ee2bbf91bfab46a63e25ea6cfe1161d4540addab7334a3ed8de1191c0f4b",
+    "a5e298fb7ed0b3a7e1288d3e70364966030ddb4fc9e6024774df3a2209581083",
+    "73f3b08d302bdeb2bc0a9a33d7d3fc0c0de2e1b2cbd69f37089623ca9f267d59"
+  ],
+  "prompts": [
+    "Pick up a tomato truss with the right hand, then pick a cherry tomato with the left hand and place it in the left basket."
+  ],
+  "repeats": [
+    {
+      "index": 0,
+      "same_cache_max": 0.0,
+      "fresh_prefix_max": 0.0
+    },
+    {
+      "index": 1,
+      "same_cache_max": 0.0,
+      "fresh_prefix_max": 0.0
+    },
+    {
+      "index": 2,
+      "same_cache_max": 0.0,
+      "fresh_prefix_max": 0.0
+    },
+    {
+      "index": 3,
+      "same_cache_max": 0.0,
+      "fresh_prefix_max": 0.0
+    },
+    {
+      "index": 4,
+      "same_cache_max": 0.0,
+      "fresh_prefix_max": 0.0
+    },
+    {
+      "index": 5,
+      "same_cache_max": 0.0,
+      "fresh_prefix_max": 0.0
+    },
+    {
+      "index": 6,
+      "same_cache_max": 0.0,
+      "fresh_prefix_max": 0.0
+    },
+    {
+      "index": 7,
+      "same_cache_max": 0.0,
+      "fresh_prefix_max": 0.0
+    }
+  ],
+  "median_forward_seconds": 0.07082824094686657,
+  "total_evaluation_seconds": 13.496846036985517,
+  "peak_bytes_in_use": 27520628736,
+  "prediction_file_sha256": "a35b19b2367d9547aa66f75d1d54c1c116a6c9110027763486f9bc647bfb2639",
+  "checkpoint_files_unchanged": true
+}

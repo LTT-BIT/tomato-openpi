@@ -1,0 +1,30 @@
+{
+  "checkpoint_path": "/home/user/tomato-openpi-paper-flash/.cache/flash_p2_checkpoint_100_recovered",
+  "step": 100,
+  "execution_accounting": {
+    "original_fixed_updates": 20,
+    "original_fresh_updates": 100,
+    "failed_strict_replay_updates": 1,
+    "final_fresh_replay_updates": 100,
+    "total_executed_optimizer_updates": 221,
+    "final_checkpoint_step": 100,
+    "note": "Recovery adds 101 repeated compute updates, no final model trajectory beyond step100; fixed20 reset before fresh100"
+  },
+  "checkpoint_metadata_file_sha256": "69613edf9ad2b804db17cbd624a05b8321e1db1757a46e81b0e5f7607e8ba97b",
+  "p2_model_seed": 42,
+  "p2_flow_seed": 42002,
+  "p2_sampler_seed": 42001,
+  "checkpoint_explicit_random_fields": [],
+  "random_recovery": "P2 uses stateless fold_in(key(42002), global_step), then splits noise/time. Next update is step101. Sampler exact100-prefix reconstructed from frozen plan, numpy seed42001 and unchanged manifest iteration. Standalone checkpoint lacks explicit flow seed; retain P2 result and this sidecar.",
+  "next_flow_key_data": [
+    837265607,
+    1489898847
+  ],
+  "candidate_plan_sha256": "8bb5395c9454991318f7af981cc784e3e93af2fe9f16e08ead312b6dc1f2a9c2",
+  "next_train_window": {
+    "id": "aed5208e09f5a250",
+    "start": 172
+  },
+  "training_updates": 0,
+  "strict_bitwise_reproducibility_claimed": false
+}
