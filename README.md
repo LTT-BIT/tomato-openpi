@@ -243,6 +243,8 @@ bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE" --stats-batc
 
 统计绑定数据文件、输入变换和 horizon。改变这些内容后重新计算；仅改学习率或 batch 可复用。常量关节允许 std=0，归一化使用 epsilon。番茄 Wuji / Sharpa 已切换为 absolute，四份 baseline 使用带 absolute 的新 asset_id 与默认实验名。必须重新计算统计，不能复用旧 delta 统计或对旧 checkpoint 直接 resume。
 
+任务仓库自定义输入变换若需使用快速向量统计，须在具体变换类上显式声明 `vector_statistics_image_independent = True`，并保证 state/actions 不依赖图像像素。统计程序仍逐 episode 抽样，将快速计算的向量与真实 LeRobot 样本的变换结果比较；未经声明的自定义变换会被拒绝。铲柠檬的 12 维 arm-only 任务变换已按此接口接入；统计准备通过不等于完成训练或实机验证。
+
 ## 本机检查与训练
 
 服务器启动命令见上方“500028 服务器”部分，包含公共基础权重路径。以下命令用于本机默认基础权重。
