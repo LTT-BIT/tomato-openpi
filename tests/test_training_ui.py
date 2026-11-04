@@ -586,3 +586,41 @@ def test_personal_catalog_skips_broken_and_external_files(workspace, tmp_path):
     (directory / "helper.py").write_text("VALUE = 1")
     (directory / "external.py").symlink_to(Path(__file__).resolve())
     assert editor.personal_catalog() == []
+
+
+@pytest.mark.parametrize(
+    ("mode", "beta", "name"),
+    [
+        ("global_quantile", 0.0, "T0"),
+        ("timestamp_zscore_arms", 0.0, "T1"),
+        ("global_quantile", 0.5, "T2"),
+        ("timestamp_zscore_arms", 0.5, "T3"),
+        ("global_zscore_arms", 0.0, "TG"),
+    ],
+)
+def test_personal_labels_explain_historical_methods_without_execution(tmp_path, mode, beta, name):
+    source = (
+        f"from openpi.training.delta_paper_experiment import build_experiment\n"
+        f"def build_config():\n    raise RuntimeError('must not execute')\n"
+        f"    return build_experiment(mode={mode!r}, beta={beta!r}, batch_size=512)\n"
+    )
+    description = editor.personal_presentation(source, "delta_paper_normal480_t3_b512", tmp_path)
+    assert name in description["label"]
+    assert "480 集" in description["label"]
+    assert "Batch 512" in description["label"]
+    assert not description["available"]
+    assert "train-rtc-paper-delta" in description["unavailable_reason"]
+
+
+def test_nested_ui_names_preserve_latest_batch_and_configuration_file(tmp_path):
+    original = "from openpi.training.delta_paper_experiment import build_experiment\ndef build_config():\n    return build_experiment(mode='timestamp_zscore_arms', beta=0.5)"
+    inner = f"_SOURCE = {original!r}\n_UI_VALUES = {{'batch_size': 256}}\ndef build_config(): pass"
+    source = f"_SOURCE = {inner!r}\n_UI_VALUES = {{'batch_size': 512}}\ndef build_config(): pass"
+    result = editor.personal_presentation(source, "long_no_block_one_run", tmp_path)
+    assert "Batch 512" in result["label"]
+    assert "311 集" in result["label"]
+    assert "已保存的运行配置" in result["description"]
+    dependency = tmp_path / "src/openpi/training/delta_paper_experiment.py"
+    dependency.parent.mkdir(parents=True)
+    dependency.touch()
+    assert editor.personal_presentation(source, "long_no_block_one_run", tmp_path)["available"]

@@ -223,10 +223,10 @@ $('browse-select').addEventListener('click',()=>{browseTarget.value=browseTarget
 async function refreshCatalog(){
   const info=await api('/api/baselines');
   $('runtime').textContent=info.repository+'\n'+(info.revision?.branch||'未知分支')+' @ '+(info.revision?.commit||'未知版本')+'\nPython: '+info.python;
-  for(const [id,entries] of [['baseline-list',info.baselines.filter(e=>e.kind!=='experiment')],['paper-list',info.baselines.filter(e=>e.kind==='experiment')],['personal-list',info.personal||[]]]){
+  for(const [id,entries] of [['baseline-list',info.baselines.filter(e=>e.kind!=='experiment')],['paper-list',info.baselines.filter(e=>e.kind==='experiment')],['personal-list',(info.personal||[]).filter(e=>e.available!==false)],['history-list',(info.personal||[]).filter(e=>e.available===false)]]){
     $(id).replaceChildren();
-    for(const entry of entries){const button=node('button',entry.label,'baseline');button.dataset.id=entry.id;button.classList.toggle('selected',baseline===entry.id);button.addEventListener('click',()=>perform(()=>chooseBaseline(entry.id)));$(id).append(button);}
-    if(!entries.length)$(id).textContent='暂无本地个人配置。';
+    for(const entry of entries){const button=node('button',entry.label,'baseline');button.dataset.id=entry.id;button.title=entry.file;button.disabled=entry.available===false;if(entry.description)button.append(node('small',entry.description,'config-description'));if(entry.owner)button.append(node('small','负责人：'+entry.owner,'config-description'));if(entry.unavailable_reason)button.append(node('small',entry.unavailable_reason,'config-description'));button.classList.toggle('selected',baseline===entry.id);button.addEventListener('click',()=>perform(()=>chooseBaseline(entry.id)));$(id).append(button);}
+    if(!entries.length)$(id).textContent=id==='personal-list'?'暂无当前分支的个人配置；请选择上方正式入口。':id==='history-list'?'暂无其他分支的历史配置。':'暂无配置。';
   }
   return info;
 }

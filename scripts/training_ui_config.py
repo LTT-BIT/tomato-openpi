@@ -2,6 +2,7 @@
 """Validated UI edits and portable personal Python configurations."""
 
 import ast
+from contextlib import suppress
 from dataclasses import asdict
 from dataclasses import replace
 from datetime import datetime
@@ -83,6 +84,78 @@ def baseline_config(module: str):
     return load_experiment(module)
 
 
+def personal_presentation(source: str, stem: str, root: Path) -> dict:
+    """Describe saved recipes without importing or executing historical code."""
+    values, keywords = {}, {}
+    generated = False
+    tree = ast.parse(source)
+    for _ in range(8):
+        embedded = None
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                for arg in node.keywords:
+                    if arg.arg in ("mode", "beta", "batch_size"):
+                        with suppress(ValueError, TypeError):
+                            keywords.setdefault(arg.arg, ast.literal_eval(arg.value))
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if not isinstance(target, ast.Name):
+                        continue
+                    if target.id == "_UI_VALUES":
+                        generated = True
+                        try:
+                            for key, value in ast.literal_eval(node.value).items():
+                                values.setdefault(key, value)
+                        except (ValueError, TypeError, AttributeError):
+                            pass
+                    elif target.id == "_SOURCE" and isinstance(node.value, ast.Constant):
+                        embedded = node.value.value
+        if not isinstance(embedded, str):
+            break
+        try:
+            tree = ast.parse(embedded)
+        except SyntaxError:
+            break
+    delta = "openpi.training.delta_paper_experiment" in source
+    available = not delta or (root / "src/openpi/training/delta_paper_experiment.py").is_file()
+    modes = {
+        "global_quantile": "全局分位数归一化",
+        "timestamp_zscore_arms": "双臂逐时间步归一化",
+        "global_zscore_arms": "双臂全局均值/标准差归一化",
+    }
+    if delta:
+        methods = {
+            ("global_quantile", 0.0): "Delta 基础对照（T0）",
+            ("timestamp_zscore_arms", 0.0): "Delta＋逐时间步归一化（T1）",
+            ("global_quantile", 0.5): "Delta＋相关噪声（T2）",
+            ("timestamp_zscore_arms", 0.5): "Delta 双改进（T3）",
+            ("global_zscore_arms", 0.0): "Delta＋全局均值归一化（TG）",
+        }
+        method = methods.get((keywords.get("mode"), keywords.get("beta")), "Delta 历史配置")
+        features = [modes.get(keywords.get("mode"), "历史论文配置")]
+        beta = keywords.get("beta")
+        features.append("独立噪声" if beta == 0 else f"相关噪声 β={beta}" if beta is not None else "噪声见原配置")
+        data = (
+            "480 集（新采摘 311＋历史 169）"
+            if "normal480" in stem
+            else "311 集新采摘"
+            if "no_block_one" in stem
+            else "数据见原配置"
+        )
+    else:
+        method, features, data = "个人配置", [], ""
+    batch = values.get("batch_size", keywords.get("batch_size"))
+    label = f"{method} · {data}" if delta else stem
+    if batch is not None:
+        label += f" · Batch {batch}"
+    return {
+        "label": label,
+        "description": "；".join([*features, "已保存的运行配置" if generated else "方案模板"]),
+        "available": available,
+        "unavailable_reason": "请在 train-rtc-paper-delta 分支使用" if not available else "",
+    }
+
+
 def personal_catalog() -> list[dict]:
     root = common.repository_root().resolve()
     entries = []
@@ -101,7 +174,8 @@ def personal_catalog() -> list[dict]:
         entries.append(
             {
                 "id": ".".join(parts),
-                "label": f"{TASK_LABELS.get(parts[2], parts[2])} / {parts[4]} / {path.stem}",
+                **personal_presentation(path.read_text(), path.stem, root),
+                "owner": parts[4],
                 "task": parts[2],
                 "file": str(path.relative_to(root)),
             }
