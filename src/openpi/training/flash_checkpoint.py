@@ -117,6 +117,18 @@ class FlashCheckpointWeightLoader:
         return merged
 
 
+def _validate_training_checkpoint(metadata, params):
+    config = metadata.get("config", {})
+    if isinstance(config, Mapping) and config.get("freeze_vlm") is False:
+        if metadata.get("checkpoint_kind") == "flash_expert_increment":
+            raise ValueError("FullFT cannot use an expert-only increment with a frozen VLM reference")
+        paths = traverse_util.flatten_dict(params)
+        if not any(_parts(p)[:2] == ("PaliGemma", "img") for p in paths) or not any(
+            _parts(p)[:2] == ("PaliGemma", "llm") and is_vlm_parameter(p) for p in paths
+        ):
+            raise ValueError("FullFT checkpoint must include updated vision and language parameters")
+
+
 def save_offline_checkpoint(directory, params, *, metadata: Mapping[str, Any], optimizer_state=None):
     """Save a *new* offline checkpoint, never overwrite an existing directory.
 
@@ -129,6 +141,7 @@ def save_offline_checkpoint(directory, params, *, metadata: Mapping[str, Any], o
     required = {"config", "normalization", "step", "optimizer"}
     if missing := required - metadata.keys():
         raise ValueError(f"Missing checkpoint metadata: {sorted(missing)}")
+    _validate_training_checkpoint(metadata, params)
     directory = Path(directory).resolve()
     directory.mkdir(parents=True, exist_ok=False)
     with ocp.PyTreeCheckpointer() as checkpointer:
@@ -148,6 +161,7 @@ def restore_offline_checkpoint(directory):
     directory = Path(directory).resolve()
     params = model.restore_params(directory / "params", restore_type=np.ndarray)
     metadata = json.loads((directory / "metadata.json").read_text())
+    _validate_training_checkpoint(metadata, params)
     if metadata.get("checkpoint_kind") == "flash_expert_increment":
         # The frozen VLM is referenced, never silently replaced by random weights.
         base = Path(metadata["vlm_reference_checkpoint"])

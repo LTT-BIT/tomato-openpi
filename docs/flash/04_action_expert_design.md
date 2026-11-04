@@ -45,7 +45,38 @@
 
 每个观察只编码一次prefix，FM与consistency使用同一cache；cache stop-gradient且冻结VLM。更新Expert后缓存仍有效。推理缓存/完整prefix结果相等的测试与数据层未来扰动测试分别记录，不能混称。
 
-## 当前训练接口边界
+## FullFT 可选训练模式
+
+`Pi0FlashConfig(freeze_vlm=False)` 支持与原 π₀.₅ FullFT 相同的可训练范围：视觉、语言、Expert、时间 MLP 与动作投影，共 3,353,487,146 参数、51 个参数叶。默认仍为 `True`，用于复现历史冻结实验（VLM 32 叶冻结、Expert 等19叶可训练）。上面的冻结说明记录 P1/P2/P3 的实验状态。
+
+`src/openpi/training/flash_train.py` 统一构造 AdamW 与梯度过滤器。每步在 `nnx.value_and_grad` 内调用 `loss_components`，当前 RGB/语言 prefix 与 KV 因而保留回传路径，FM 与 Consistency 共同向 VLM 回传。FullFT 不能沿用历史脚本预先编码的跨更新缓存，也不能只改 optimizer filter；旧 P2/P3 脚本继续显式使用冻结配置。训练条件仍只有当前 Observation 和八帧实测历史，54 帧扩展 Action 只进入监督目标，输出保持 `(B,50,58)`。
+
+每次更新前检查模型与配置模式、优化器参数覆盖、Loss/Gradient 是否有限；非有限值不会推进 Adam 或修改参数。FullFT checkpoint 必须包含更新后的视觉与语言参数，禁止复用 P3 的 Expert-only 增量格式；新的冒烟入口可按需保存一份完整模型与 Adam，默认不保存大型权重。
+
+`scripts/flash/train_fullft.py` 是 **fresh pi05_base、Step 0 的 1–20 步冒烟入口**，不从 Step 251 继续。复用 normal 清单、源级 Split 和训练集归一化，记录训练窗口、英文 prompt、种子与 `fold_in(key(42002), update_index)` 策略；augmentation/flow 在 loss 内拆分随机数。使用 baseline AdamW（β=.9/.95，eps=1e-8，wd=1e-10，clip=1）与 cosine schedule（warmup=1000，peak=2.5e-5，end=2.5e-6，30000步），未沿用 P2 的恒定学习率。初始 Batch=1，无梯度累积；这与正式 baseline 的 Batch=64 还不构成公平训练预算。日志写本地及 W&B offline，执行后需同步对应 W&B run。
+
+显式运行示例（本轮未执行真实数据 FullFT 更新；需先验证可用显存）：
+
+```bash
+PYTHONPATH=src:packages/openpi-client/src:. XLA_PYTHON_CLIENT_PREALLOCATE=false \
+  /home/user/sharpa-pi05/.venv/bin/python scripts/flash/train_fullft.py \
+  --data .cache/flash_p2_data --images .cache/flash_p2_images \
+  --pretrained /home/user/checkpoints/pi05_base/params \
+  --output .cache/flash_fullft_smoke_001 --steps 1
+```
+
+新增 `scripts/flash/test_fullft.py` 使用真实 dummy Gemma 注意力与小型替代视觉编码器验证：两步后视觉/语言/Expert/时间投影均实际更新；冻结模式 VLM 不变；保存全部参数及 Adam 后，以相同随机数恢复下一步结果一致；采样 `(1,50,58)` 有限；NaN 拒绝更新；误用 Expert-only optimizer 被拒绝。独立的正式尺寸抽象模型检查确认全部51叶参数纳入 FullFT。小模型一致性不能外推为完整模型跨进程或跨 GPU 的 bitwise 一致性；正式尺寸真实数据梯度、显存与学习曲线仍待28服务器验证。
+
+回归命令：
+
+```bash
+PYTHONPATH=src:packages/openpi-client/src:. JAX_PLATFORMS=cpu OPENBLAS_NUM_THREADS=1 \
+  /home/user/sharpa-pi05/.venv/bin/python -m pytest scripts/flash/test_*.py -q
+```
+
+验证结果：上述完整回归 **38 passed**，232 条 Flax/JAX 兼容性弃用警告；Ruff check、format check、`git diff --check` 和冒烟入口 `--help` 均通过。未执行正式尺寸真实数据 FullFT 更新，没有新增或覆盖 P2/P3 Checkpoint。
+
+## 历史 P1 训练接口边界
 
 这是可直接调用的离线模型与batch API，尚未把历史字段接到原 `scripts/train.py` 的 `(obs,actions)` 默认loader，也没有注册正式 E0/E1/E2 长训练配置。已具备受控小规模离线训练的模型条件；下一阶段应接专用历史batch训练入口、封存按原始Episode分组的数据划分和训练预算，再运行20–100步验证。
 

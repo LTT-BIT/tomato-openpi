@@ -77,3 +77,19 @@ def test_roundtrip_and_no_overwrite(tmp_path):
     assert optimizer["count"] == 1
     with pytest.raises(FileExistsError):
         checkpoint.save_offline_checkpoint(path, _params(), metadata=metadata)
+
+
+def test_fullft_checkpoint_requires_updated_vlm(tmp_path):
+    metadata = {
+        "config": {"freeze_vlm": False},
+        "normalization": {},
+        "step": 1,
+        "optimizer": "AdamW",
+        "checkpoint_kind": "flash_expert_increment",
+    }
+    with pytest.raises(ValueError, match="expert-only"):
+        checkpoint.save_offline_checkpoint(tmp_path / "bad", _params(), metadata=metadata)
+    assert not (tmp_path / "bad").exists()
+    metadata["checkpoint_kind"] = "flash_full_model"
+    with pytest.raises(ValueError, match="vision and language"):
+        checkpoint.save_offline_checkpoint(tmp_path / "bad", {"action_in_proj": {}}, metadata=metadata)

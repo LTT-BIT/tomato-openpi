@@ -1,7 +1,8 @@
 """Opt-in standard FLASH coefficient expert on the unchanged pi05 VLM.
 
 Absolute physical-radian history/targets in, absolute (B,50,58) actions out.
-The VLM prefix is cached once, frozen, and shared by FM/consistency calls.
+The VLM prefix is shared by FM/consistency calls within each loss evaluation.
+FullFT differentiates through the prefix; legacy frozen mode detaches it.
 Future labels exist only in the loss API; inference has no target argument.
 """
 
@@ -29,6 +30,7 @@ class Pi0FlashConfig(Pi0Config):
     action_dim: int = 58
     action_horizon: int = 50
     max_token_len: int = 256
+    freeze_vlm: bool = True  # Preserve P1/P2/P3 checkpoint and training semantics.
     poly_degree: int = 6
     history_steps: int = 8
     history_reg_lambda: float = 0.1
@@ -59,12 +61,16 @@ class Pi0FlashConfig(Pi0Config):
         return Pi0Flash(self, rngs=nnx.Rngs(rng))
 
     def get_freeze_filter(self):
-        return is_vlm_parameter
+        return is_vlm_parameter if self.freeze_vlm else nnx.Nothing
+
+    def get_trainable_filter(self):
+        return nnx.All(nnx.Param, nnx.Not(self.get_freeze_filter()))
 
 
 class Pi0Flash(Pi0):
     def __init__(self, config: Pi0FlashConfig, rngs: nnx.Rngs):
         super().__init__(config, rngs)
+        self.freeze_vlm = config.freeze_vlm
         self.polynomial = FlashPolynomial(history_reg_lambda=config.history_reg_lambda)
         self.coefficient_tokens = config.poly_degree + 1
         self.history_steps = config.history_steps
@@ -89,7 +95,9 @@ class Pi0Flash(Pi0):
             mask=make_attn_mask(mask, ar),
             positions=jnp.cumsum(mask, axis=1) - 1,
         )
-        return mask, jax.tree.map(jax.lax.stop_gradient, cache)
+        if self.freeze_vlm:
+            cache = jax.tree.map(jax.lax.stop_gradient, cache)
+        return mask, cache
 
     def coefficient_velocity(self, coeff, time, prefix_mask, kv_cache):
         if coeff.shape[1:] != (7, 58):

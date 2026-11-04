@@ -299,6 +299,10 @@ GitLab 自动验证目前暂停。本地代码检查命令为 `bash scripts/chec
 
 ### FLASH 独立实验（paper-flash-test）
 
+FLASH 已新增显式 **FullFT** 模式：`Pi0FlashConfig(freeze_vlm=False)` 训练视觉编码器、语言骨干、Action Expert、时间 MLP 和动作投影；默认 `freeze_vlm=True` 保留 P1/P2/P3 冻结实验。FullFT 的 prefix/KV 在每步求梯度内部重新编码。两种模式的更新、非有限梯度拦截与模型/Adam 恢复回归测试已通过；正式尺寸训练参数覆盖为 3,353,487,146。梯度回归使用缩小视觉编码器与 dummy Gemma，尚未验证正式尺寸 FullFT 的 GPU 容量或学习效果。
+
+新增 `scripts/flash/train_fullft.py` 为真实数据 **1–20 步显式冒烟入口**：从 `pi05_base` 与全新 Adam/Step 0 开始，复用冻结 normal 清单、Split、Normalization，采用 baseline AdamW/cosine warmup 配置，Batch=1。正式全量训练仍需完成 28 服务器真实 Batch 容量验证、多 GPU/有效 Batch 配置及公平的 baseline 对照；本轮没有启动该冒烟入口或全量训练。详见 [FullFT 训练接口与验证范围](docs/flash/04_action_expert_design.md#fullft-可选训练模式)。
+
 从 `origin/main` 独立建立；已完成真实数据 P0/P0.5 诊断，并实现固定 K=6 的标准 FLASH Expert。完整预训练 VLM 冻结复用；P2 已接通 normal 数据加载、原始录制级 Split 与训练集归一化，完成固定真实 Batch 20 步和独立初始化的 100 步 AdamW 离线训练。固定验证集 MAE 从 0.1682 降至 0.0739 rad，完整模型与优化器恢复通过。手部急变和跨 Chunk 连续性仍有明显误差；当前为 K=6、stride=1 的受控学习验证，尚无完整对照训练或实机验证。
 
 - [Baseline 审计](docs/flash/01_baseline_audit.md) · [论文与官方源码](docs/flash/02_paper_analysis.md)

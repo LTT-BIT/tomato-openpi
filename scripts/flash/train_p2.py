@@ -63,8 +63,10 @@ def optimizer_only(optimizer):
     return nnx.state(optimizer, lambda path, value: path[0] != "model")
 
 
-def load_model(normalization, pretrained):
-    config = Pi0FlashConfig(action_q01=tuple(normalization["q01"]), action_q99=tuple(normalization["q99"]))
+def load_model(normalization, pretrained, *, freeze_vlm=True):
+    config = Pi0FlashConfig(
+        freeze_vlm=freeze_vlm, action_q01=tuple(normalization["q01"]), action_q99=tuple(normalization["q99"])
+    )
     abstract = nnx.eval_shape(config.create, jax.random.key(42))
     graph, state = nnx.split(abstract)
     reference = state.to_pure_dict()
