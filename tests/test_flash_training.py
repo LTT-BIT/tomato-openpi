@@ -154,7 +154,8 @@ def test_fullft_update_checkpoint_and_rejected_nonfinite(prepared, monkeypatch, 
     try:
         checkpoints.save_state(manager, state, d, 2)
         manager.wait_until_finished()
-        restored = checkpoints.restore_state(manager, state, d)
+        template, _ = init_train_state(config, jax.random.key(42), mesh, resume=True)
+        restored = checkpoints.restore_state(manager, template, d)
         left, _ = update(state, batch)
         right, _ = update(restored, batch)
         for a, b in zip(jax.tree.leaves(left), jax.tree.leaves(right), strict=True):

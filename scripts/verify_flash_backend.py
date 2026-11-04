@@ -33,12 +33,14 @@ MODULE = "training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_fla
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--resume-verification", action="store_true")
     args = parser.parse_args()
     from training_configs import common
 
     common.configure_environment()
     args.output = args.output.resolve()
-    args.output.mkdir(parents=True, exist_ok=False)
+    if not args.resume_verification:
+        args.output.mkdir(parents=True, exist_ok=False)
     config = replace(load_experiment(MODULE), num_workers=4)
     report = {
         "purpose": "bounded_full_size_gpu_acceptance",
@@ -49,10 +51,18 @@ def main():
         "updates": [],
     }
     target = args.output / "result.json"
+    if args.resume_verification:
+        report = json.loads(target.read_text())
+        assert report["status"] == "failed"
+        assert report["data"] == preflight(config)
+        report.setdefault("failure_history", []).append(report.pop("error", "unknown"))
+        report["status"] = "running"
+        report["resumed_from_completed_step"] = 2
 
     def flush():
         target.write_text(json.dumps(report, indent=2))
 
+    flush()
     run = wandb.init(
         project="openpi-flash",
         name="flash_formal_backend_acceptance",
@@ -75,7 +85,14 @@ def main():
         report["training_windows"] = indices
         report["batch_shapes"] = {"history": list(batch[1].shape), "target": list(batch[2].shape)}
         print("Real causal batch loaded", report["batch_shapes"], flush=True)
-        state, layout = init_train_state(config, jax.random.key(config.model_seed), mesh, resume=False)
+        state, layout = init_train_state(
+            config, jax.random.key(config.model_seed), mesh, resume=args.resume_verification
+        )
+        if args.resume_verification:
+            manager, _ = checkpoints.initialize_checkpoint_dir(
+                args.output / "temporary_checkpoint", keep_period=None, overwrite=False, resume=True
+            )
+            state = checkpoints.restore_state(manager, state, dataset)
         jax.block_until_ready(state)
         report["parameter_count"] = sum(v.size for v in jax.tree.leaves(state.params))
         report["vlm_frozen"] = config.model.freeze_vlm
@@ -85,10 +102,10 @@ def main():
             out_shardings=(layout, replicated),
         )
 
-        def advance(current):
+        def advance(current, function=update):
             begin = time.perf_counter()
             with sharding.set_mesh(mesh):
-                new, metrics = update(jax.random.key(config.seed), current, batch)
+                new, metrics = function(jax.random.key(config.seed), current, batch)
             metrics = jax.device_get(metrics)
             assert bool(metrics["finite"])
             values = {k: float(v) for k, v in metrics.items() if k != "finite"}
@@ -100,8 +117,9 @@ def main():
             flush()
             return new
 
-        for _ in range(2):
-            state = advance(state)
+        if not args.resume_verification:
+            for _ in range(2):
+                state = advance(state)
         for name in ("vision_gradient_norm", "language_gradient_norm", "expert_gradient_norm"):
             assert report["updates"][-1][name] > 0, name
         evaluator = jax.jit(
@@ -115,15 +133,16 @@ def main():
         report["sampling_shape"] = list(result["prediction"].shape)
         report["validation_prediction_mae"] = float(np.abs(result["prediction"] - result["truth"]).mean())
         report["validation_oracle_mae"] = float(np.abs(result["oracle"] - result["truth"]).mean())
-        manager, _ = checkpoints.initialize_checkpoint_dir(
-            args.output / "temporary_checkpoint", keep_period=None, overwrite=False, resume=False
-        )
-        begin = time.perf_counter()
-        checkpoints.save_state(manager, state, dataset, 2)
-        manager.wait_until_finished()
-        report["checkpoint_seconds"] = time.perf_counter() - begin
-        print("Full parameter/Adam checkpoint saved", flush=True)
-        template, _ = init_train_state(config, jax.random.key(config.model_seed), mesh, resume=True)
+        if not args.resume_verification:
+            manager, _ = checkpoints.initialize_checkpoint_dir(
+                args.output / "temporary_checkpoint", keep_period=None, overwrite=False, resume=False
+            )
+            begin = time.perf_counter()
+            checkpoints.save_state(manager, state, dataset, 2)
+            manager.wait_until_finished()
+            report["checkpoint_seconds"] = time.perf_counter() - begin
+            print("Full parameter/Adam checkpoint saved", flush=True)
+        template, restored_layout = init_train_state(config, jax.random.key(config.model_seed), mesh, resume=True)
         restored = checkpoints.restore_state(manager, template, dataset)
         assert int(restored.step) == 2
         # Compare every parameter and optimizer leaf on devices, without giant host copies.
@@ -133,7 +152,12 @@ def main():
         report["restore_max_abs_difference"] = maximum
         assert maximum == 0
         expected = advance(state)
-        actual = advance(restored)
+        restored_update = jax.jit(
+            functools.partial(step, config),
+            in_shardings=(replicated, restored_layout, data_layout),
+            out_shardings=(restored_layout, replicated),
+        )
+        actual = advance(restored, restored_update)
         maximum = 0.0
         for a, b in zip(jax.tree.leaves(expected), jax.tree.leaves(actual), strict=True):
             maximum = max(maximum, float(jax.device_get(jnp.max(jnp.abs(a - b)))))
