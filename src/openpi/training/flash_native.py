@@ -12,9 +12,10 @@ from pathlib import Path
 
 import av
 import jax
-import jax.numpy as jnp
 import numpy as np
 import pyarrow.parquet as pq
+import torch
+import torch.nn.functional as F  # noqa: N812
 
 from openpi.models import model as model_lib
 from openpi.policies.fr3_sharpa_protocol import ORDER
@@ -238,6 +239,7 @@ def bind_stats(config):
 class NativeDataset:
     def __init__(self, config, *, tokenizer=None):
         preflight(config)
+        torch.set_num_threads(1)
         self.config = config
         self.directory = asset_directory(config)
         self.manifest = json.loads((self.directory / "flash_manifest.json").read_text())
@@ -296,25 +298,39 @@ class NativeDataset:
                 return frame.to_ndarray(format="rgb24")
         raise ValueError("Current video frame missing")
 
-    def observation(self, index):
-        # Dataset threads must not allocate unsharded camera batches on GPU 0.
-        with jax.default_device(jax.devices("cpu")[0]):
-            return self._observation(index)
+    @staticmethod
+    def resize_image(rgb):
+        # Match float linear resize-with-pad on CPU; no JAX CPU backend is needed
+        # when training explicitly requires JAX_PLATFORMS=cuda.
+        pixels = rgb.astype(np.float32) / 127.5 - 1
+        height, width = pixels.shape[:2]
+        ratio = max(width / 224, height / 224)
+        resized_h, resized_w = int(height / ratio), int(width / ratio)
+        tensor = torch.from_numpy(pixels).permute(2, 0, 1)[None]
+        value = (
+            F.interpolate(tensor, size=(resized_h, resized_w), mode="bilinear", align_corners=False, antialias=True)[0]
+            .permute(1, 2, 0)
+            .numpy()
+        )
+        top, left = (224 - resized_h) // 2, (224 - resized_w) // 2
+        return np.pad(
+            value, ((top, 224 - resized_h - top), (left, 224 - resized_w - left), (0, 0)), constant_values=-1
+        )[None]
 
-    def _observation(self, index):
+    def observation(self, index):
         history, target, state, prompt = self.window(index)
         stat = self.stats["state"]
         normalized = (state - stat.q01) / (stat.q99 - stat.q01 + 1e-6) * 2 - 1
         tokens, mask = self.tokenizer.tokenize(prompt, normalized)
-        images = {key: jnp.asarray(self.image(index, key)[None], jnp.float32) / 127.5 - 1 for key in CAMERAS}
+        images = {key: self.resize_image(self.image(index, key)) for key in CAMERAS}
         obs = model_lib.Observation(
             images=images,
-            image_masks={k: jnp.ones(1, bool) for k in images},
-            state=jnp.asarray(normalized[None], jnp.float32),
-            tokenized_prompt=jnp.asarray(tokens[None], jnp.int32),
-            tokenized_prompt_mask=jnp.asarray(mask[None]),
+            image_masks={k: np.ones(1, bool) for k in images},
+            state=np.asarray(normalized[None], np.float32),
+            tokenized_prompt=np.asarray(tokens[None], np.int32),
+            tokenized_prompt_mask=np.asarray(mask[None]),
         )
-        return model_lib.preprocess_observation(None, obs, train=False), history[None], target[None]
+        return obs, history[None], target[None]
 
     def batch(self, indices):
         with ThreadPoolExecutor(max_workers=min(max(self.config.num_workers, 1), len(indices))) as pool:

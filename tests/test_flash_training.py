@@ -14,6 +14,7 @@ from test_delta_paper_training import shrink_network
 
 from openpi.models.pi0_config import Pi0Config
 from openpi.policies.fr3_sharpa_protocol import ORDER
+from openpi.shared.image_tools import resize_with_pad
 from openpi.training import checkpoints
 from openpi.training import sharding
 from openpi.training import weight_loaders
@@ -186,3 +187,12 @@ def test_ui_flash_enforces_standard_method():
     for delta in ({"action_semantics": "delta"}, {"rtc_max_delay": 10}, {"paper_trial": "t3", "asset_id": "different"}):
         with pytest.raises(ValueError, match="Absolute|论文功能"):
             editor.apply_overrides(config, {**values, **delta})
+
+
+@pytest.mark.parametrize("shape", [(80, 160, 3), (480, 640, 3)])
+def test_numpy_camera_batch_matches_jax_reference_without_backend_allocations(shape):
+    rgb = np.random.default_rng(42).integers(0, 256, shape, dtype=np.uint8)
+    actual = NativeDataset.resize_image(rgb)
+    expected = np.asarray(resize_with_pad(rgb.astype(np.float32) / 127.5 - 1, 224, 224))[None]
+    assert isinstance(actual, np.ndarray)
+    np.testing.assert_allclose(actual, expected, atol=3e-5, rtol=1e-5)

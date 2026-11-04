@@ -94,7 +94,7 @@ function syncPaperControls(){
   $('paper-timestamp').checked=['t1','t3'].includes(paperChoice);
   $('paper-correlated').checked=['t2','t3'].includes(paperChoice);
   $('paper-timestamp').disabled=!available;$('paper-correlated').disabled=!available;
-  $('paper-help').textContent=available?'两项同时勾选为 T3；可与 Train RTC 组合。论文功能使用双臂 delta、双手 absolute、完整动作窗口及无放回采样。切换功能自动分配独立统计。':'论文勾选仅支持 30 Hz Sharpa multimodal π0.5 全参；已有自定义论文配置保留原算法。';
+  $('paper-help').textContent=protocol.flash?'此配置固定 Absolute，不叠加 T3 或 RTC；使用相同划分的 π05 对照评估 FLASH。':available?'两项同时勾选为 T3；可与 Train RTC 组合。论文功能使用双臂 delta、双手 absolute、完整动作窗口及无放回采样。切换功能自动分配独立统计。':'论文勾选仅支持 30 Hz Sharpa multimodal π0.5 全参；已有自定义论文配置保留原算法。';
   fields.get('action_semantics').input.querySelector('[value=absolute]').disabled=active;
   $('sampling-mode').querySelector('[value=weighted_replacement]').disabled=active||protocol.flash;
   if(active){
@@ -121,7 +121,7 @@ function renderProtocol(){
 }
 async function chooseBaseline(module){
   const version=++loadingVersion;$('start').disabled=true;
-  try{const result=await api('/api/baseline?id='+encodeURIComponent(module));if(version!==loadingVersion)return;baseline=module;fillForm(result);for(const el of document.querySelectorAll('#baseline-list button, #personal-list button'))el.classList.toggle('selected',el.dataset.id===module);}
+  try{const result=await api('/api/baseline?id='+encodeURIComponent(module));if(version!==loadingVersion)return;baseline=module;fillForm(result);for(const el of document.querySelectorAll('#baseline-list button, #paper-list button, #personal-list button'))el.classList.toggle('selected',el.dataset.id===module);}
   finally{if(version===loadingVersion)$('start').disabled=false;}
 }
 function parseIds(text){
@@ -266,7 +266,7 @@ $('browse-select').addEventListener('click',()=>{browseTarget.value=browseTarget
 async function refreshCatalog(){
   const info=await api('/api/baselines');
   $('runtime').textContent=info.repository+'\n'+(info.revision?.branch||'未知分支')+' @ '+(info.revision?.commit||'未知版本')+'\nPython: '+info.python;
-  for(const [id,entries] of [['baseline-list',info.baselines],['personal-list',info.personal||[]]]){
+  for(const [id,entries] of [['baseline-list',info.baselines.filter(e=>e.kind!=='experiment')],['paper-list',info.baselines.filter(e=>e.kind==='experiment')],['personal-list',info.personal||[]]]){
     $(id).replaceChildren();
     for(const entry of entries){const button=node('button',entry.label,'baseline');button.dataset.id=entry.id;button.classList.toggle('selected',baseline===entry.id);button.addEventListener('click',()=>perform(()=>chooseBaseline(entry.id)));$(id).append(button);}
     if(!entries.length)$(id).textContent='暂无本地个人配置。';
@@ -274,5 +274,5 @@ async function refreshCatalog(){
   return info;
 }
 $('refresh-configs').addEventListener('click',()=>perform(refreshCatalog,$('refresh-configs')));
-perform(async()=>{const info=await refreshCatalog();if(info.baselines.length)await chooseBaseline(info.baselines.find(e=>e.id.includes('tomato_wuji')&&e.id.includes('lora'))?.id||info.baselines[0].id);await Promise.all([refreshGPUs(),refreshJobs()]);});
+perform(async()=>{const info=await refreshCatalog();if(info.baselines.length)await chooseBaseline(info.baselines.find(e=>e.id.includes('tomato_sharpa')&&e.id.includes('flash_fullft'))?.id||info.baselines[0].id);await Promise.all([refreshGPUs(),refreshJobs()]);});
 let polling=false;setInterval(async()=>{if(polling||document.hidden)return;polling=true;try{if(currentJob)await showJob(currentJob);await refreshJobs();}catch(error){notice('连接中断：'+error.message,true);}finally{polling=false;}},5000);

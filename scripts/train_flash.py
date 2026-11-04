@@ -243,14 +243,15 @@ def main(config):
                     print(json.dumps(row), flush=True)
                 final = int(state.step) == config.num_train_steps
                 if int(state.step) % config.save_interval == 0 or final:
+                    # Persist the accepted update before evaluation can fail or exhaust memory.
+                    checkpoints.save_state(manager, state, dataset, int(state.step))
+                    manager.wait_until_finished()
                     report = validation(config, state, dataset, data_sharding, evaluator)
                     (output / f"validation_{int(state.step)}.json").write_text(json.dumps(report, indent=2))
                     wandb.log(
                         {"validation/" + k: v for k, v in report.items() if isinstance(v, int | float)},
                         step=int(state.step),
                     )
-                    checkpoints.save_state(manager, state, dataset, int(state.step))
-                    manager.wait_until_finished()
         manager.wait_until_finished()
     finally:
         manager.close()
