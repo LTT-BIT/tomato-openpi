@@ -53,10 +53,11 @@ def build_config():
             model=model,
             data=data,
             freeze_filter=model.get_freeze_filter(),
-            batch_size=8,
+            batch_size=512,
+            num_train_steps=8000,
             fsdp_devices=8,
-            save_interval=1000,
-            keep_period=None,
+            save_interval=2000,
+            keep_period=2000,
             weight_loader=replace(
                 config.weight_loader, params_path="/mnt/data/train_platform/weights/pi05/pi05_base/params"
             ),

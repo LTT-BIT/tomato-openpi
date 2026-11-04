@@ -34,6 +34,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--resume-verification", action="store_true")
+    parser.add_argument(
+        "--capacity-only", action="store_true", help="One real update at the formal batch, no checkpoint"
+    )
     args = parser.parse_args()
     from training_configs import common
 
@@ -41,7 +44,11 @@ def main():
     args.output = args.output.resolve()
     if not args.resume_verification:
         args.output.mkdir(parents=True, exist_ok=False)
-    config = replace(load_experiment(MODULE), num_workers=4)
+    if args.capacity_only and args.resume_verification:
+        parser.error("capacity-only cannot resume checkpoint verification")
+    config = replace(load_experiment(MODULE), num_workers=8)
+    if not args.capacity_only:
+        config = replace(config, batch_size=8)
     report = {
         "purpose": "bounded_full_size_gpu_acceptance",
         "status": "running",
@@ -49,6 +56,8 @@ def main():
         "update_computations": 0,
         "data": preflight(config),
         "updates": [],
+        "batch_size": config.batch_size,
+        "capacity_only": args.capacity_only,
     }
     target = args.output / "result.json"
     if args.resume_verification:
@@ -74,7 +83,7 @@ def main():
     try:
         assert jax.default_backend() == "gpu", "Real GPU backend required"
         assert jax.device_count() == 8
-        assert config.batch_size == 8
+        assert config.batch_size % 8 == 0
         assert config.fsdp_devices == 8
         dataset = NativeDataset(config, tokenizer=PaligemmaTokenizer(max_len=config.model.max_token_len))
         mesh = sharding.make_mesh(8)
@@ -117,6 +126,13 @@ def main():
             flush()
             return new
 
+        if args.capacity_only:
+            state = advance(state)
+            for name in ("vision_gradient_norm", "language_gradient_norm", "expert_gradient_norm"):
+                assert report["updates"][-1][name] > 0, name
+            report["device_memory"] = [d.memory_stats() for d in jax.devices()]
+            report["status"] = "passed"
+            return
         if not args.resume_verification:
             for _ in range(2):
                 state = advance(state)

@@ -17,3 +17,5 @@
 - 28 服务器沿用 `/home/mengxiang/workspace/code/tomato-openpi-sharpa`，数据父目录 `/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one`。不另开工程、不清理其他仓库的真实 checkpoint；本轮验收后启动 UI，不自动启动正式训练。
 
 - 用户最新要求：正式 FLASH 与 π05 对照沿用昨天 T3 的全数据方式，normal480 全部来源参与训练、完整合法窗口等权 epoch_shuffle，不强制沿用 P 系列的独立验证源。旧划分资产保留，新建 all_sources 统计资产；训练内监测不得称为独立验证或泛化结果。
+
+- 正式 FLASH 训练预算以 2026-11-03 normal480_t3_b512 实际配置为参照：8000 步、global batch 512、8 卡、每 2000 步保存，保留原学习率/随机种子；不得沿用通用 recipe 的 30000 训练步数。decay_steps=30000 属于昨天原调度参数，需与 num_train_steps=8000 区分。大 Batch 必须实际验收，不把 Batch8 的验收当作 Batch512 通过。
