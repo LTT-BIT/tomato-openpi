@@ -92,3 +92,15 @@ class MambaVlmInitLoader:
         if self.report_path is not None:
             Path(self.report_path).write_text(json.dumps(report, indent=2) + "\n")
         return result
+
+
+@dataclass(frozen=True)
+class PaperMambaVlmInitLoader(MambaVlmInitLoader):
+    """Keep the validated fixed prior state, initialize the VLM with the strict loader."""
+
+    def load(self, params):
+        base = {key: value for key, value in params.items() if key != "paper_noise_cholesky"}
+        result = super().load(base)
+        if "paper_noise_cholesky" in params:
+            result["paper_noise_cholesky"] = params["paper_noise_cholesky"]
+        return result

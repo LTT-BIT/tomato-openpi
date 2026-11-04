@@ -1,6 +1,7 @@
 """Shared finite smoke helpers. Training updates always call scripts.train.train_step."""
 
 from contextlib import nullcontext
+from dataclasses import asdict
 from dataclasses import replace
 import functools
 import hashlib
@@ -25,6 +26,7 @@ from openpi.training import sharding
 from openpi.training.mamba_training import MambaDataView
 from openpi.training.mamba_training import architecture_record
 from openpi.training.mamba_training import load_mamba_checkpoint
+from openpi.training.mamba_training import model_data_config
 from scripts import train
 from scripts.mamba3_diagnostics import diagnostic_config
 from scripts.mamba3_diagnostics import diagnostic_network
@@ -62,6 +64,8 @@ def group_name(path):
 
 
 def inventory(params):
+    """Count learned parameters only; fixed prior Variables never enter this inventory."""
+    params = params.filter(nnx.Param)
     groups = {}
     for path, value in traverse_util.flatten_dict(params.to_pure_dict()).items():
         if value is None:
@@ -157,23 +161,47 @@ def diagnostic_train_config(output, *, steps=10, seed=42):
     )
 
 
+def compile_train_step(config, state_sharding, mesh):
+    replicated = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
+    data_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS))
+    # Local locked JAX 0.5.3 CPU donation replay diverged with identical input
+    # bytes and StableHLO. CPU diagnostics use the native step without buffer
+    # donation; GPU diagnostics retain the production donation/sharding path.
+    return jax.jit(
+        functools.partial(train.train_step, config),
+        in_shardings=(replicated, state_sharding, data_sharding),
+        out_shardings=(state_sharding, replicated),
+        donate_argnums=() if jax.default_backend() == "cpu" else (1,),
+    )
+
+
+def place_batch(batch, mesh):
+    return jax.device_put(batch, jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS)))
+
+
+def host_copy(tree):
+    # device_get on CPU can return views into donated device buffers. Retaining
+    # these views across an optimizer update is unsafe even for read-only logs.
+    return jax.tree.map(lambda value: np.array(value, copy=True), jax.device_get(tree))
+
+
 def run_updates(config, batch, output, steps, *, diagnostic=False, checkpoint=True):
     with diagnostic_network() if diagnostic else nullcontext():
         return _run_updates(config, batch, output, steps, diagnostic=diagnostic, checkpoint=checkpoint)
 
 
 def _run_updates(config, batch, output, steps, *, diagnostic=False, checkpoint=True):
-    """Non-donation copy path is ONLY used when gathering gradient diagnostics.
+    """Audit gradients separately, then time the native train_step.
 
-    Production timing separately uses donated train_step below. Full VLM logging
-    stores aggregates only, and copies pre-step snapshots to host, not extra GPU buffers.
+    Logging snapshots own their host buffers before GPU training donates inputs.
     """
     directory = Path(output)
     mesh = sharding.make_mesh(config.fsdp_devices)
+    batch = place_batch(batch, mesh)
     rng = jax.random.key(config.seed)
     started = time.perf_counter()
     with diagnostic_network() if diagnostic else nullcontext():
-        state, _ = train.init_train_state(
+        state, state_sharding = train.init_train_state(
             config, jax.random.key(config.seed if config.model_seed is None else config.model_seed), mesh, resume=False
         )
     jax.block_until_ready(state)
@@ -183,14 +211,15 @@ def _run_updates(config, batch, output, steps, *, diagnostic=False, checkpoint=T
             nnx.merge(state.model_def, state.params), batch[0], config.weight_loader.params_path, directory
         )
     write_json(directory, "parameter_inventory.json", inventory(state.params))
-    compiled = jax.jit(functools.partial(train.train_step, config), donate_argnums=(1,))
+    compiled = compile_train_step(config, state_sharding, mesh)
     compiled_grad = jax.jit(functools.partial(task_gradient, config, rng))
     metrics = []
     with (directory / "gradients.jsonl").open("w") as grad_stream:
         for i in range(steps):
             # Separately labelled audit; never confuse this with step wall time.
             _, grads = compiled_grad(state, batch)
-            before = jax.device_get(state.params)
+            before = host_copy(state.params)
+            grads = host_copy(grads)
             started = time.perf_counter()
             state, info = compiled(rng, state, batch)
             jax.block_until_ready(state)
@@ -223,7 +252,8 @@ def _run_updates(config, batch, output, steps, *, diagnostic=False, checkpoint=T
             "step_p95_ms": float(np.percentile([m["seconds"] for m in metrics[3:]], 95) * 1000)
             if len(metrics) > 3
             else None,
-            "measurement": "synchronized donated train_step, after separate raw-gradient audit; not a standalone throughput benchmark",
+            "donation_enabled": jax.default_backend() != "cpu",
+            "measurement": "synchronized native train_step, after separate raw-gradient audit; CPU diagnostics disable donation; not a standalone throughput benchmark",
             "jax_memory_stats": jax.devices()[0].memory_stats(),
             "ema_tested": config.ema_decay is not None,
         },
@@ -252,7 +282,7 @@ def _run_updates(config, batch, output, steps, *, diagnostic=False, checkpoint=T
 
 
 def checkpoint_roundtrip(config, state, batch, output, diagnostic):
-    if diagnostic:
+    if diagnostic and not hasattr(config.model, "paper_mode"):
         stat = normalize.NormStats(
             mean=np.zeros(58, np.float32),
             std=np.ones(58, np.float32),
@@ -266,7 +296,7 @@ def checkpoint_roundtrip(config, state, batch, output, diagnostic):
             mamba_identity=architecture_record(config.model),
         )
     else:
-        data = config.data.create(config.assets_dirs, config.model)
+        data = model_data_config(config)
     loader = SmokeLoader(data)
     root = output / "checkpoints"
     manager, _ = checkpoints.initialize_checkpoint_dir(root, keep_period=None, overwrite=False, resume=False)
@@ -274,23 +304,42 @@ def checkpoint_roundtrip(config, state, batch, output, diagnostic):
     manager.wait_until_finished()
     manager.close()
     noise = jax.random.normal(jax.random.key(123), (1, 50, 58))
+    mesh = sharding.make_mesh(config.fsdp_devices)
+    state_sharding = sharding.fsdp_sharding(state, mesh)
+    sample_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS))
 
     def sample(parameters):
         m = nnx.merge(state.model_def, parameters)
         m.eval()
         return m.sample_actions(jax.random.key(123), batch[0], noise=noise, num_steps=10)
 
-    sample_jit = jax.jit(sample)
+    sample_jit = jax.jit(sample, in_shardings=(state_sharding.params,), out_shardings=sample_sharding)
     expected = np.asarray(sample_jit(state.params))
     np.save(output / "expected_sample.npy", expected)
     np.save(output / "sample_noise.npy", np.asarray(noise))
     save_batch(output / "batch.npz", batch)
-    # Same compiled path, sharding and donation in parent and child.
-    updated, _ = jax.jit(functools.partial(train.train_step, config), donate_argnums=(1,))(
-        jax.random.key(config.seed), state, batch
-    )
+    # Same compiled path, sharding and backend donation setting in parent and child.
+    before_digest = state_digest(state)
+    mesh = sharding.make_mesh(config.fsdp_devices)
+    state_sharding = sharding.fsdp_sharding(state, mesh)
+    step_function = compile_train_step(config, state_sharding, mesh)
+    updated, update_info = step_function(jax.random.key(config.seed), state, place_batch(batch, mesh))
     jax.block_until_ready(updated)
-    write_json(output, "expected_resume.json", {"digest": state_digest(updated), "step": int(updated.step)})
+    write_json(
+        output,
+        "expected_resume.json",
+        {
+            "digest": state_digest(updated),
+            "before_digest": before_digest,
+            "batch_digest": state_digest(batch),
+            "rng_digest": state_digest(jax.random.key_data(jax.random.key(config.seed))),
+            "step": int(updated.step),
+            "update_info": {k: float(v) for k, v in update_info.items()},
+        },
+    )
+    from openpi.training.reproducibility import serialize_config
+
+    (output / "effective_train_config.json").write_bytes(serialize_config(config))
     write_json(
         output,
         "restore_request.json",
@@ -298,7 +347,11 @@ def checkpoint_roundtrip(config, state, batch, output, diagnostic):
             "diagnostic_only": diagnostic,
             "step": int(updated.step) - 1,
             "asset_id": data.asset_id,
-            "config_module": "training_configs.experiments.tomato_sharpa.mamba.phase_a",
+            "config_module": (config.policy_metadata or {}).get(
+                "experiment_module", "training_configs.experiments.tomato_sharpa.mamba.phase_a"
+            ),
+            "paper_model": asdict(config.model) if hasattr(config.model, "paper_mode") else None,
+            "lr_schedule": asdict(config.lr_schedule),
             "seed": config.seed,
             "model_seed": config.model_seed,
             "steps": config.num_train_steps,
@@ -310,7 +363,9 @@ def checkpoint_roundtrip(config, state, batch, output, diagnostic):
     if result.returncode:
         raise RuntimeError(f"New-process restore failed; see {output / 'restore_child.log'}")
     record = json.loads((output / "checkpoint_roundtrip.json").read_text())
-    if record["sample_max_abs"] != 0 or not record["resume_exact"]:
+    if record["sample_max_abs"] != 0 or not all(
+        record[key] for key in ("resume_exact", "before_resume_exact", "batch_exact", "rng_exact")
+    ):
         raise AssertionError(f"Restore/resume numerical mismatch: {record}")
 
     return updated
@@ -332,17 +387,66 @@ def _restore_child(output):
     directory = Path(output)
     request = json.loads((directory / "restore_request.json").read_text())
     diagnostic = request["diagnostic_only"]
-    if diagnostic:
-        config = diagnostic_train_config(directory, steps=request["steps"], seed=request["seed"])
+    if (directory / "effective_train_config.json").exists():
+        config = decode_smoke_config(json.loads((directory / "effective_train_config.json").read_text()))
+        if hasattr(config.model, "paper_asset_dir") and not Path(config.model.paper_asset_dir).exists():
+            asset_dir = directory / "checkpoints" / str(request["step"]) / "assets" / request["asset_id"]
+            config = replace(
+                config,
+                model=replace(config.model, paper_asset_dir=str(asset_dir)),
+                data=replace(
+                    config.data,
+                    assets=replace(config.data.assets, assets_dir=str(asset_dir.parent), asset_id=asset_dir.name),
+                ),
+            )
     else:
-        import importlib
+        if request.get("paper_model") is not None:
+            from openpi.models.mamba3.config import Mamba3Config
+            from openpi.models.pi0_mamba_paper import PaperMambaPi0Config
 
-        config = replace(
-            importlib.import_module(request["config_module"]).CONFIG,
-            seed=request["seed"],
-            model_seed=request["model_seed"],
-            num_train_steps=request["steps"],
-        )
+            values = dict(request["paper_model"])
+            values["mamba"] = Mamba3Config(**values["mamba"])
+            values["paper_asset_dir"] = str(
+                directory / "checkpoints" / str(request["step"]) / "assets" / request["asset_id"]
+            )
+            model_config = PaperMambaPi0Config(**values)
+            if diagnostic:
+                config = replace(
+                    diagnostic_train_config(directory, steps=request["steps"], seed=request["seed"]), model=model_config
+                )
+            else:
+                import importlib
+
+                source = importlib.import_module(request["config_module"]).build_config()
+                asset_dir = Path(model_config.paper_asset_dir)
+                source = replace(
+                    source,
+                    data=replace(
+                        source.data,
+                        assets=replace(source.data.assets, assets_dir=str(asset_dir.parent), asset_id=asset_dir.name),
+                    ),
+                    model=model_config,
+                )
+                config = replace(
+                    source,
+                    model=model_config,
+                    seed=request["seed"],
+                    model_seed=request["model_seed"],
+                    num_train_steps=request["steps"],
+                )
+        elif diagnostic:
+            config = diagnostic_train_config(directory, steps=request["steps"], seed=request["seed"])
+        else:
+            import importlib
+
+            config = replace(
+                importlib.import_module(request["config_module"]).build_config(),
+                seed=request["seed"],
+                model_seed=request["model_seed"],
+                num_train_steps=request["steps"],
+            )
+        if "lr_schedule" in request:
+            config = replace(config, lr_schedule=optimizer.CosineDecaySchedule(**request["lr_schedule"]))
     with np.load(directory / "batch.npz", allow_pickle=False) as values:
         batch = (
             model_lib.Observation.from_dict(
@@ -353,13 +457,15 @@ def _restore_child(output):
             jnp.asarray(values["actions"]),
         )
     with diagnostic_network() if diagnostic else nullcontext():
-        shape, _ = train.init_train_state(
-            config, jax.random.key(config.seed), sharding.make_mesh(config.fsdp_devices), resume=True
-        )
+        mesh = sharding.make_mesh(config.fsdp_devices)
+        shape, state_sharding = train.init_train_state(config, jax.random.key(config.seed), mesh, resume=True)
+        batch = place_batch(batch, mesh)
         model = load_mamba_checkpoint(
             config.model, directory / "checkpoints" / str(request["step"]), request["asset_id"]
         )
-    graph, params = nnx.split(model)
+    graph = shape.model_def
+    params = jax.device_put(nnx.state(model), state_sharding.params)
+    sample_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS))
     noise = jnp.asarray(np.load(directory / "sample_noise.npy"))
 
     def sample(parameters):
@@ -367,16 +473,16 @@ def _restore_child(output):
         m.eval()
         return m.sample_actions(jax.random.key(123), batch[0], noise=noise, num_steps=10)
 
-    actual = np.asarray(jax.jit(sample)(params))
+    actual = np.asarray(jax.jit(sample, in_shardings=(state_sharding.params,), out_shardings=sample_sharding)(params))
     delta = float(np.max(np.abs(actual - np.load(directory / "expected_sample.npy"))))
     manager, _ = checkpoints.initialize_checkpoint_dir(
         directory / "checkpoints", keep_period=None, overwrite=False, resume=True
     )
     restored = checkpoints.restore_state(manager, shape, None, step=request["step"])
     manager.close()
-    updated, _ = jax.jit(functools.partial(train.train_step, config), donate_argnums=(1,))(
-        jax.random.key(config.seed), restored, batch
-    )
+    before_digest = state_digest(restored)
+    step_function = compile_train_step(config, state_sharding, mesh)
+    updated, update_info = step_function(jax.random.key(config.seed), restored, batch)
     jax.block_until_ready(updated)
     expected = json.loads((directory / "expected_resume.json").read_text())
     write_json(
@@ -387,8 +493,15 @@ def _restore_child(output):
             "new_process": True,
             "sample_max_abs": delta,
             "resume_exact": state_digest(updated) == expected["digest"],
+            "before_resume_exact": before_digest == expected.get("before_digest", before_digest),
+            "batch_exact": state_digest(batch) == expected.get("batch_digest", state_digest(batch)),
+            "rng_exact": state_digest(jax.random.key_data(jax.random.key(config.seed)))
+            == expected.get("rng_digest", state_digest(jax.random.key_data(jax.random.key(config.seed)))),
+            "update_info": {k: float(v) for k, v in update_info.items()},
+            "expected_update_info": expected.get("update_info"),
             "restored_step": request["step"],
             "continued_step": int(updated.step),
+            "batch_replay": "fixed saved batch; real iterator-position continuation is a separate check",
         },
     )
     return 0
@@ -435,3 +548,72 @@ def full_prefix_parity(mamba_model, observation, init_checkpoint, output):
     )
     if not np.isfinite(a).all() or not np.isfinite(b).all() or relative > threshold:
         raise AssertionError("Pretrained VLM Prefix-only parity failed")
+
+
+def decode_smoke_config(value):
+    """Decode our own finite replay snapshot using an explicit dataclass allowlist."""
+    from openpi import transforms
+    from openpi.models.mamba3.config import Mamba3Config
+    from openpi.models.pi0_mamba_config import MambaPi0Config
+    from openpi.models.pi0_mamba_paper import PaperMambaPi0Config
+    from openpi.training.delta_paper import PaperSharpaData
+    from openpi.training.mamba_training import MambaScheduledTrainConfig
+    from openpi.training.mamba_training import MambaSharpaData
+    from openpi.training.mamba_training import MambaTrainConfig
+    from openpi.training.mamba_weight_loader import MambaVlmInitLoader
+    from openpi.training.mamba_weight_loader import PaperMambaVlmInitLoader
+    from openpi.training.weight_loaders import NoOpWeightLoader
+
+    classes = (
+        cfg.TrainConfig,
+        cfg.ScheduledTrainConfig,
+        MambaTrainConfig,
+        MambaScheduledTrainConfig,
+        cfg.DataConfig,
+        cfg.FakeDataConfig,
+        cfg.AssetsConfig,
+        cfg.LeRobotDatasetSpec,
+        PaperSharpaData,
+        MambaSharpaData,
+        MambaPi0Config,
+        PaperMambaPi0Config,
+        Mamba3Config,
+        optimizer.AdamW,
+        optimizer.CosineDecaySchedule,
+        optimizer.RsqrtDecaySchedule,
+        NoOpWeightLoader,
+        MambaVlmInitLoader,
+        PaperMambaVlmInitLoader,
+        transforms.Group,
+    )
+    allowed = {f"{item.__module__}.{item.__qualname__}": item for item in classes}
+    tuple_fields = {
+        "sampling_groups",
+        "lerobot_datasets",
+        "action_sequence_keys",
+        "save_steps_before",
+        "inputs",
+        "outputs",
+        "local_dataset_video_keys",
+        "datasets",
+    }
+
+    def decode(item):
+        if isinstance(item, list):
+            return [decode(x) for x in item]
+        if isinstance(item, dict):
+            if item == {"type": f"{nnx.Nothing.__module__}.{nnx.Nothing.__qualname__}", "state": {}}:
+                return nnx.Nothing()
+            if set(item) == {"type", "fields"}:
+                if item["type"] not in allowed:
+                    raise ValueError(f"Unsupported smoke snapshot type: {item['type']}")
+                values = {key: decode(val) for key, val in item["fields"].items()}
+                for key in tuple_fields & values.keys():
+                    values[key] = tuple(values[key])
+                return allowed[item["type"]](**values)
+            return {key: decode(val) for key, val in item.items()}
+        if item == f"{nnx.Nothing.__module__}.{nnx.Nothing.__qualname__}":
+            return nnx.Nothing
+        return item
+
+    return decode(value)

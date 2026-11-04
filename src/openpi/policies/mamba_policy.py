@@ -52,3 +52,50 @@ class MambaOfflinePolicy:
         self.model.eval()
         actions = self.model.sample_actions(rng, observation, noise=noise, num_steps=num_steps)
         return self.outputs({"actions": np.asarray(actions)})
+
+
+class MambaPaperOfflinePolicy:
+    """Same input transforms, then existing Paper inverse using physical current state."""
+
+    def __init__(self, model, data_config):
+        from openpi.models.pi0_mamba_paper import PaperMambaPi0
+        from openpi.training.delta_paper import PaperDataView
+        from openpi.training.delta_paper_prefix import _contract
+
+        if not isinstance(model, PaperMambaPi0) or not isinstance(data_config, PaperDataView):
+            raise ValueError("Paper Mamba policy requires a Paper model and data view")
+        if data_config.paper_bundle_sha256 != model.config.paper_asset_sha256 or not data_config.use_quantile_norm:
+            raise ValueError("Paper Mamba model/data assets or normalization differ")
+        _contract(data_config)
+        self.model, self.data = model, data_config
+        self.vector_inputs = transforms.compose(
+            [*data_config.repack_transforms.inputs, *data_config.data_transforms.inputs]
+        )
+        self.model_inputs = transforms.compose(
+            [
+                transforms.Normalize(data_config.norm_stats, use_quantiles=True),
+                *data_config.model_transforms.inputs,
+            ]
+        )
+
+    def infer(self, raw_observation, *, rng, noise=None, num_steps=10):
+        from openpi.training.delta_paper_prefix import decode_actions
+
+        vectors = self.vector_inputs(raw_observation)
+        physical_state = np.asarray(vectors["state"], np.float32).copy()
+        prepared = self.model_inputs(vectors)
+        observation = model_lib.Observation.from_dict(jax.tree.map(lambda x: jnp.asarray(x)[None], prepared))
+        self.model.eval()
+        actions = self.model.sample_actions(rng, observation, noise=noise, num_steps=num_steps)
+        absolute = decode_actions(self.data, physical_state, np.asarray(actions)[0])
+        return {"actions": absolute[None]}
+
+
+def create_mamba_policy(model, data_config):
+    from openpi.models.pi0_mamba_paper import PaperMambaPi0
+
+    return (
+        MambaPaperOfflinePolicy(model, data_config)
+        if isinstance(model, PaperMambaPi0)
+        else MambaOfflinePolicy(model, data_config)
+    )

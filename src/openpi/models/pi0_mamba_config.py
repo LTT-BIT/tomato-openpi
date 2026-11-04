@@ -34,14 +34,7 @@ class MambaPi0Config(Pi0Config):
         super().__post_init__()
         if not self.pi05 or not self.discrete_state_input:
             raise ValueError("Mamba Phase A requires Pi05 discrete state text")
-        if (
-            self.rtc_max_delay
-            or self.action_representation != "absolute"
-            or self.normalization != "ordinary_per_dimension"
-        ):
-            raise ValueError("Mamba Phase A rejects RTC, Delta and Paper normalization")
-        if self.architecture != "pi05_mamba3_jax" or self.stage != "phase_a_plain_fm":
-            raise ValueError("Unsupported Mamba architecture/stage")
+        self.validate_algorithm()
         if "lora" in self.paligemma_variant or "lora" in self.action_expert_variant:
             raise ValueError("Mamba Phase A supports FullFT only, no LoRA")
         if self.dtype != self.mamba.dtype:
@@ -63,6 +56,16 @@ class MambaPi0Config(Pi0Config):
                 raise ValueError(f"{name} must be a positive integer")
         if self.mamba.hidden_size % self.context_heads:
             raise ValueError("Context heads must divide Mamba width")
+
+    def validate_algorithm(self):
+        if (
+            self.rtc_max_delay
+            or self.action_representation != "absolute"
+            or self.normalization != "ordinary_per_dimension"
+        ):
+            raise ValueError("Mamba Phase A rejects RTC, Delta and Paper normalization")
+        if self.architecture != "pi05_mamba3_jax" or self.stage != "phase_a_plain_fm":
+            raise ValueError("Unsupported Mamba architecture/stage")
 
     def create(self, rng):
         from openpi.models.pi0_mamba import MambaPi0

@@ -326,7 +326,7 @@ Sharpa可在本地 `template/<负责人>/` 选择双臂Delta、逐未来时间�
 
 独立模块 `training_configs.experiments.tomato_sharpa.mamba.phase_a` 保留完整 π0.5 SigLIP/Gemma Prefix，使用原生 NNX 的上下文压缩器和 4 层、512 宽、64 状态的 Mamba-3 SISO 动作专家。三相机 224×224、H=50、D=58；44/16/4 个视觉/语言（含离散 state）/全局条件槽位。沿用现有 `init_train_state/train_step`、AdamW、checkpoint 和数据适配，不构造原 Transformer 动作专家。继承字段 `action_expert_variant` 仅保留配置兼容，不参与新专家构造。来源、固定 commit、许可证、超参数对应和移植差异见 [NOTICE](third_party/mamba3/NOTICE)。不安装社区包、不升级锁定 JAX/Flax；wheel 携带许可证。
 
-本阶段固定 **FullFT、Absolute、普通按维 z-score、标准 Flow Matching**。独立数据身份/统计目录为 `sharpa_mamba_phase_a_absolute_v1`，配置名 `pi05_mamba3_phase_a_fullft_b1`，实验名 `mamba3_phase_a_fullft_b1_s42`；数据来自显式 `PI05_MAMBA_DATASET_ROOT`，英文任务文本来自其 `meta/tasks.jsonl`，英文 prompt 示例保存在配置中。需要从这份数据独立计算普通统计，不能拷贝 Delta/T1–T3 统计。Mamba 新配置拒绝 RTC、Delta、Paper、LoRA、冻结；原模型的这些模式保留。T1–T3 融合须等待完整 Phase A 验收，本阶段仅保留清楚的 `encode_condition/velocity/noise` 边界。
+本阶段固定 **FullFT、Absolute、普通按维 z-score、标准 Flow Matching**。独立数据身份/统计目录为 `sharpa_mamba_phase_a_absolute_v1`，配置名 `pi05_mamba3_phase_a_fullft_b1`，实验名 `mamba3_phase_a_fullft_b1_s42`；数据来自显式 `PI05_MAMBA_DATASET_ROOT`，英文任务文本来自其 `meta/tasks.jsonl`，英文 prompt 示例保存在配置中。需要从这份数据独立计算普通统计，不能拷贝 Delta/T1–T3 统计。此 plain 配置拒绝 RTC、Delta、Paper、LoRA、冻结；原模型的这些模式保留。Mamba + T1–T3 使用下节独立配置，复用同一个 `encode_condition/velocity/noise` 模型边界；完整真实设备验收可在后续执行。
 
 状态：**原型及诊断验证已准备，真实预训练全模型训练未完成，实机未验证**。本机 RTX 4070 Ti SUPER 16GB 可运行组件和缩小 VLM 的诊断更新；完整模型形状审计为 2,957,866,346 参数，FP32 参数加 Adam 两份矩状态下界为 35,494,396,152 字节（约 33.1GiB），还不含梯度/激活。资源预检会明确返回 `BLOCKED`，不把诊断结果当完整 FullFT，也不自动启动服务器训练。
 
@@ -363,3 +363,71 @@ bash scripts/python.sh -u -m scripts.run_training "$MODULE" --wandb-mode offline
 ```
 
 训练保存本地日志并启用 W&B；离线结果按前文 `wandb sync` 命令同步。原 Transformer 对照模块为 `training_configs.experiments.tomato_sharpa.mamba.transformer_control`，使用相同 Absolute 数据、普通归一化和短测优化器设置；未测性能差异，不声称 Mamba 加速或提高任务成功率。
+
+
+## Mamba + T1 / T2 / T3：融合与独立验证入口
+
+融合代码提供独立配置；真实预训练大模型训练、完整设备验收和实机验证尚未完成。plain（上节的原始 Mamba Absolute 模式）继续保留。新 Paper 模型继承同一份 Mamba FM loss/采样，仅复用原 `PaperPi0.noise` 切换 prior；统计、完整窗口、双臂 Delta、手部 Absolute 和归一化桥全部使用原 Paper 实现。新入口不包含 RTC，原 Transformer 的 trainRTC/T3+RTC 保持原样。
+
+| `--algorithm` | 配置模块尾部 | 动作监督 / 归一化 | 相关噪声 beta |
+| --- | --- | --- | ---: |
+| `plain` | `mamba.phase_a` | 全 Absolute，普通按维 z-score | 0 |
+| `t0` | `mamba.paper_t0` | 双臂 Delta、手 Absolute，全局 quantile | 0 |
+| `t1` | `mamba.paper_t1` | 同 Paper 动作空间，逐未来时间步双臂 z-score | 0 |
+| `t2` | `mamba.paper_t2` | 同 Paper 动作空间，全局 quantile | 0.5 |
+| `t3` | `mamba.paper_t3` | 同 Paper 动作空间，逐未来时间步双臂 z-score | 0.5 |
+| `tg` | `mamba.paper_tg` | 同 Paper 动作空间，全局双臂 z-score 消融 | 0 |
+
+模块前缀均为 `training_configs.experiments.tomato_sharpa.`。**plain 与 Paper T0 的动作语义、统计及数据窗口不同，不能混用资产。** T1/T2/T3 的含义与现有实验生成器完全相同。
+
+已有 Transformer Paper 实验可直接转换，使用同一份数据工厂及四个资产文件，保持归一化 provenance 合同一致。初始化权重仍为原 π0.5 基础 VLM，新增专家随机初始化；转换会生成带 `_mamba3` 的新配置名和实验名，不能把 Transformer checkpoint 当 Mamba 续训：
+
+```python
+from scripts.run_training import load_experiment
+from openpi.training.mamba_experiment import with_mamba
+
+# 在自己的本地个人配置 build_config() 中返回 with_mamba(source)。
+source = load_experiment("training_configs.experiments.tomato_sharpa.template.负责人.已有_T3_配置")
+config = with_mamba(source)  # 源配置要求 RTC=0、resume=False
+```
+
+也可给模块入口设置 `PI05_MAMBA_SOURCE_MODULE`，例如选 `paper_t3` 时要求源实验确实为 T3；不匹配会报错。包含 RTC 的源实验须先显式创建 RTC=0 的新配置，四个统计资产仍可复用。无源模块时，入口复用原 `build_experiment`，负责人由 `PI05_MAMBA_OWNER`（默认 `mamba`）指定，数据与统计沿用 `PI05_SHARPA_MULTIMODAL_DATASET_ROOT` / `PI05_PAPER_ASSETS_DIR`。因此版本、数据来源、英文 prompt 和统计身份与原 Paper 实验一致。
+
+本机组件入口（新输出目录，CPU 或 GPU 均可）：
+
+```bash
+# 不融合：原来的入口仍可用。
+CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_PREALLOCATE=false \
+  bash scripts/python.sh -m scripts.smoke_mamba3_jax \
+  --algorithm plain --suite components --steps 20 --deterministic-gpu --disable-triton-gemm \
+  --output-dir .cache/mamba3/plain_check01
+
+# 融合：执行 T1/T2/T3 的诊断矩阵，以及 T0/Tg 资产/数学消融检查。
+CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_PREALLOCATE=false \
+  bash scripts/python.sh -m scripts.smoke_mamba3_jax \
+  --algorithm t3 --suite components --deterministic-gpu --disable-triton-gemm \
+  --output-dir .cache/mamba3/paper_check01
+```
+
+当前锁定环境在本机 GPU 的小模型诊断中触发过 Triton GEMM 编译/校验错误，因此上面的本机命令显式使用 `--disable-triton-gemm`；只为该测试进程设置 XLA 开关，不修改训练默认值。`--deterministic-gpu` 在 JAX 初始化前启用确定性 GPU 运算、FP32 `highest` 矩阵精度及 CuBLAS 工作区约束，保证跨进程复算条件一致。这些环境值写入 `environment.json`。其他设备可先尝试原后端，出现同类 Triton 错误时再加禁用开关；严格恢复比较须保持同一精度设置。
+
+锁定 JAX 0.5.3 的 CPU 运行时在捐赠缓冲区后出现过跨进程续步差异（输入字节及计算图一致）；因此仅 CPU 诊断入口关闭 donation，各训练诊断用例在独立进程运行以隔离构造器替换与 JAX/NNX 缓存；GPU 仍使用原训练的 donation/sharding 路径。两者均调用原生 `train_step`、保留严格逐位恢复检查，并在 `performance.json` 标记是否启用 donation；CPU 诊断不作为生产性能数据。
+
+融合组件测试使用合成 Parquet/图像 fixture、缩小且随机初始化的 VLM、实际生产 Mamba/loader/transform/train_step/checkpoint；H50/D58 和三相机槽位保留。T1/T2/T3 分别更新并检查各参数组梯度、固定 prior 不进入优化器、四个资产字节一致、新进程恢复及固定 batch 的继续更新，并保存/重建完整有效配置快照；它不代表真实数据 iterator 位置已验收。W&B 使用明确的 offline 模式，每个诊断模式的日志、checkpoint 和数值摘要保留在输出目录中。
+
+设备可用后，用同一入口分别验证 plain / t1 / t2 / t3；`--algorithm` 与配置模块/资产算法必须一致。支持 `components/fullft/checkpoint/policy/regression/all`，完整 suite 从真实输入运行有限步，缺资源或资产返回 2，失败返回 1，所选 suite 通过返回 0；不会自动降为诊断模型。下面以 T3 为例：
+
+```bash
+CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_PREALLOCATE=false \
+  bash scripts/python.sh -m scripts.smoke_mamba3_jax \
+  --algorithm t3 --suite all --deterministic-gpu \
+  --config training_configs.experiments.tomato_sharpa.mamba.paper_t3 \
+  --init-checkpoint "$PI05_MAMBA_INIT_CHECKPOINT" \
+  --dataset "$PI05_SHARPA_MULTIMODAL_DATASET_ROOT" \
+  --norm-stats "$T3_ASSET_DIR/norm_stats.json" \
+  --steps 20 --output-dir .cache/mamba3/t3_full_check01
+```
+
+T1、T2 改为相应 algorithm、模块与配套资产；plain 用上节模块与普通 Absolute 统计。多源实验通过 `--config <自己的Mamba模块>` 指定，省略 `--dataset`，保留每个原数据源。没有统计时先用 `scripts.compute_experiment_norm <模块>`，仍调用原统计实现；已有匹配资产无需重算，不能覆盖旧目录。
+
+训练准备/启动仍走统一 `scripts.run_training <模块> --dry-run` / `--wandb-mode offline`（或 online）入口，正式训练参数由源实验提供。smoke 入口独立设 B1、单卡、有限步与短 warmup；不把源实验的正式预算、批量或 checkpoint 调度静默改掉。新模型 checkpoint 携带普通统计、四个 Paper 资产（Paper 模式）及架构身份；加载验证 mode/beta/horizon/摘要，允许按内容身份迁移统计目录。离线输出调用 `create_mamba_policy`，先逆时间归一化再反 quantile，最终仅对双臂加同一次观测的物理当前 state，返回 canonical Absolute 动作；手部不累加。

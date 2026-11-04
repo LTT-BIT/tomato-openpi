@@ -11,6 +11,7 @@ import hashlib
 import importlib.metadata
 import os
 from pathlib import Path
+import re
 import shlex
 import subprocess
 import sys
@@ -31,6 +32,9 @@ def environment():
         "lock_sha256": hashlib.sha256(Path("uv.lock").read_bytes()).hexdigest(),
         "XLA_PYTHON_CLIENT_PREALLOCATE": os.environ.get("XLA_PYTHON_CLIENT_PREALLOCATE"),
         "CUDA_VISIBLE_DEVICES": os.environ.get("CUDA_VISIBLE_DEVICES"),
+        "XLA_FLAGS": os.environ.get("XLA_FLAGS"),
+        "JAX_DEFAULT_MATMUL_PRECISION": os.environ.get("JAX_DEFAULT_MATMUL_PRECISION"),
+        "CUBLAS_WORKSPACE_CONFIG": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
     }
     result["matrix_probe"] = float((jnp.ones((128, 128)) @ jnp.ones((128, 128))).sum())
     query = subprocess.run(
@@ -58,77 +62,126 @@ def run_pytest(output, paths, name, *, cpu=False):
         raise RuntimeError(f"{name} failed; see {output / f'{name}.log'}")
 
 
+def experiment_module(args):
+    if args.config and args.config.startswith("training_configs.experiments."):
+        return args.config
+    suffix = "phase_a" if args.algorithm == "plain" else f"paper_{args.algorithm}"
+    return f"training_configs.experiments.tomato_sharpa.mamba.{suffix}"
+
+
 def full_preflight(args, output):
     from dataclasses import replace
 
     from flax import nnx
     import jax
 
+    from openpi.models.pi0_mamba import MambaPi0
+    from openpi.shared import delta_paper as paper
+    from openpi.training import optimizer
     from openpi.training.mamba_training import MambaTrainConfig
     from openpi.training.mamba_weight_loader import MambaVlmInitLoader
+    from openpi.training.mamba_weight_loader import PaperMambaVlmInitLoader
     from scripts import run_training
+    from scripts.create_delta_paper_experiments import TRIALS
     from scripts.mamba3_smoke_runtime import inventory
     from scripts.mamba3_smoke_runtime import write_json
-    from training_configs.experiments.tomato_sharpa.mamba.phase_a import CONFIG
 
+    config = run_training.load_experiment(experiment_module(args))
+    if not isinstance(config, MambaTrainConfig) or config.model.diagnostic_only:
+        raise ValueError("Real suites require a production MambaTrainConfig")
+    is_paper = hasattr(config.model, "paper_mode")
+    selected = {name: (mode, beta) for name, mode, beta in TRIALS}
+    if is_paper != (args.algorithm != "plain") or (
+        is_paper and (config.model.paper_mode, config.model.paper_beta) != selected[args.algorithm]
+    ):
+        raise ValueError("Selected module differs from --algorithm")
+    norm = (
+        Path(args.norm_stats).expanduser().resolve()
+        if args.norm_stats
+        else Path(config.data.assets.assets_dir or config.assets_dirs) / config.data.assets.asset_id / "norm_stats.json"
+    )
+    init = Path(args.init_checkpoint or config.weight_loader.params_path).expanduser().resolve()
+    specs = config.data.lerobot_datasets
+    metadata = dict(config.policy_metadata or {})
+    if args.dataset:
+        if len(specs) != 1:
+            raise ValueError("Use an explicit multi-source experiment module; --dataset overrides a single source only")
+        root = str(Path(args.dataset).expanduser().resolve())
+        specs = (replace(specs[0], root=root),)
+        metadata.update(dataset_root=root, source_datasets=[root])
+    data = replace(
+        config.data,
+        assets=replace(config.data.assets, assets_dir=str(norm.parent.parent), asset_id=norm.parent.name),
+        lerobot_datasets=specs,
+    )
+    model = config.model
     issues = []
-    for name in ("init_checkpoint", "dataset", "norm_stats"):
-        value = getattr(args, name)
-        if not value or not Path(value).exists():
-            issues.append(f"missing {name}: supply an existing local path")
-    if not any(d.platform == "gpu" for d in jax.devices()):
-        issues.append("no JAX GPU device; real FullFT suite requires GPU")
-    # Shape-only production audit never materializes billions of parameters.
-    abstract = nnx.eval_shape(CONFIG.model.create, jax.random.key(args.seed))
+    if norm.name != "norm_stats.json":
+        issues.append("--norm-stats must point to norm_stats.json in its independent asset directory")
+    for name, path in (
+        ("init_checkpoint", init),
+        ("norm_stats", norm),
+        *(("dataset", Path(spec.root)) for spec in specs),
+    ):
+        if not path.exists():
+            issues.append(f"missing {name}: {path}")
+    if is_paper:
+        missing = [
+            name for name in (paper.BUNDLE, paper.MANIFEST, "norm_metadata.json") if not (norm.parent / name).is_file()
+        ]
+        issues.extend(f"missing Paper asset: {name}" for name in missing)
+        digest = paper.sha256(norm.parent / paper.BUNDLE) if not missing else None
+        if model.paper_asset_sha256 and digest and model.paper_asset_sha256 != digest:
+            raise ValueError("Supplied statistics differ from pinned Paper bundle")
+        model = replace(model, paper_asset_dir=str(norm.parent), paper_asset_sha256=digest)
+    loader_type = PaperMambaVlmInitLoader if is_paper else MambaVlmInitLoader
+    config = replace(
+        config,
+        model=model,
+        data=data,
+        policy_metadata=metadata,
+        seed=args.seed,
+        model_seed=args.seed,
+        num_train_steps=args.steps,
+        batch_size=1,
+        num_workers=0,
+        fsdp_devices=1,
+        checkpoint_base_dir=str(output / "training_checkpoints"),
+        lr_schedule=optimizer.CosineDecaySchedule(
+            warmup_steps=1, peak_lr=2.5e-5, decay_steps=max(100, args.steps + 1), decay_lr=2.5e-6
+        ),
+        weight_loader=loader_type(str(init), report_path=str(output / "weight_load_report.json")),
+    )
+    # Shapes depend on the architecture, not the prior contents. This audit invokes
+    # only the plain composition under eval_shape, never a runnable unvalidated Paper model.
+    abstract = nnx.eval_shape(lambda rng: MambaPi0(config.model, nnx.Rngs(rng)), jax.random.key(args.seed))
     groups = inventory(nnx.state(abstract, nnx.Param))
     write_json(output, "production_parameter_inventory.json", groups)
     param_bytes = sum(v["bytes"] for v in groups.values())
-    # These are a lower bound, NOT measured peak memory: params + Adam m/v.
-    persistent_min = param_bytes * 3
+    prior_bytes = (
+        (config.model.action_horizon * config.model.action_dim) ** 2 * 4 if is_paper and config.model.paper_beta else 0
+    )
+    minimum = param_bytes * 3 + prior_bytes
     limits = [d.memory_stats().get("bytes_limit", 0) for d in jax.devices() if d.platform == "gpu"]
     write_json(
         output,
         "memory_preflight.json",
         {
             "parameters_bytes": param_bytes,
-            "parameters_and_adam_minimum_bytes": persistent_min,
+            "fixed_prior_bytes": prior_bytes,
+            "parameters_and_adam_minimum_bytes": minimum,
             "device_allocator_limits": limits,
             "measurement": "shape-derived lower bound, excludes gradients/activations/workspace; no OOM trial claimed",
         },
     )
-    if limits and sum(limits) < persistent_min:
-        issues.append(
-            "FULL_E2E_BLOCKED_BY_MEMORY_PREFLIGHT: parameters + FP32 Adam moments exceed available device budget"
-        )
+    if jax.device_count() != 1:
+        issues.append("B1 smoke requires exactly one visible device; set CUDA_VISIBLE_DEVICES before starting Python")
+    if not limits:
+        issues.append("no JAX GPU device; real FullFT suite requires GPU")
+    elif max(limits) < minimum:
+        issues.append("FULL_E2E_BLOCKED_BY_MEMORY_PREFLIGHT: parameters + Adam exceed device budget")
     if issues:
         return None, issues
-    norm = Path(args.norm_stats).resolve()
-    if norm.name != "norm_stats.json":
-        return None, ["norm-stats must point to a regular norm_stats.json in its independent Absolute asset directory"]
-    root = Path(args.dataset).resolve()
-    metadata = {
-        **CONFIG.policy_metadata,
-        "dataset_root": str(root),
-        "source_datasets": [str(root)],
-        "experiment_module": "training_configs.experiments.tomato_sharpa.mamba.phase_a",
-    }
-    config = replace(
-        CONFIG,
-        seed=args.seed,
-        model_seed=args.seed,
-        num_train_steps=args.steps,
-        checkpoint_base_dir=str(output / "training_checkpoints"),
-        weight_loader=MambaVlmInitLoader(
-            str(Path(args.init_checkpoint).resolve()), report_path=str(output / "weight_load_report.json")
-        ),
-        data=replace(
-            CONFIG.data,
-            assets=replace(CONFIG.data.assets, assets_dir=str(norm.parent.parent), asset_id=norm.parent.name),
-            lerobot_datasets=(replace(CONFIG.data.lerobot_datasets[0], root=str(root)),),
-        ),
-        policy_metadata=metadata,
-    )
-    assert isinstance(config, MambaTrainConfig)
     inputs = run_training.preflight(config)
     write_json(output, "input_preflight.json", inputs)
     return config, []
@@ -140,14 +193,37 @@ def main():
         "--suite", choices=("components", "fullft", "checkpoint", "policy", "regression", "all"), default="components"
     )
     parser.add_argument("--config")
+    parser.add_argument("--algorithm", choices=("plain", "t0", "t1", "t2", "t3", "tg"), default="plain")
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--init-checkpoint")
     parser.add_argument("--dataset")
     parser.add_argument("--norm-stats")
     parser.add_argument("--steps", type=int, default=10)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--disable-triton-gemm",
+        action="store_true",
+        help="Local workaround for locked JAX 0.5.3 Triton GEMM compiler failures; sets only this process environment",
+    )
+    parser.add_argument(
+        "--deterministic-gpu",
+        action="store_true",
+        help="Request deterministic GPU operations for exact checkpoint replay diagnostics",
+    )
     parser.add_argument("--restore-child", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args()
+    if args.disable_triton_gemm:
+        flags = re.sub(
+            r"(?<!\S)--xla_gpu_enable_triton_gemm=(?:true|false|0|1)(?=\s|$)", "", os.environ.get("XLA_FLAGS", "")
+        ).strip()
+        os.environ["XLA_FLAGS"] = (flags + " --xla_gpu_enable_triton_gemm=false").strip()
+    if args.deterministic_gpu:
+        os.environ["JAX_DEFAULT_MATMUL_PRECISION"] = "highest"
+        os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+        flags = re.sub(
+            r"(?<!\S)--xla_gpu_deterministic_ops=(?:true|false|0|1)(?=\s|$)", "", os.environ.get("XLA_FLAGS", "")
+        ).strip()
+        os.environ["XLA_FLAGS"] = (flags + " --xla_gpu_deterministic_ops=true").strip()
     if args.restore_child:
         from scripts.mamba3_smoke_runtime import restore_child
 
@@ -155,15 +231,24 @@ def main():
     if args.output_dir is None:
         parser.error("--output-dir is required")
     if args.config is None:
-        args.config = "mamba3_phase_a_components" if args.suite == "components" else "pi05_mamba3_phase_a_fullft_b1"
-    if args.suite != "components" and args.config == "mamba3_phase_a_components":
-        parser.error("Real suites require pi05_mamba3_phase_a_fullft_b1, never a diagnostic config")
-    if args.suite == "components" and args.config != "mamba3_phase_a_components":
-        parser.error("Components are diagnostic-only; use mamba3_phase_a_components")
+        args.config = (
+            ("mamba3_phase_a_components" if args.algorithm == "plain" else "mamba3_paper_components")
+            if args.suite == "components"
+            else experiment_module(args)
+        )
+    if args.suite != "components" and args.config.endswith("components"):
+        parser.error("Real suites require a production experiment module, never a diagnostic config")
+    expected_components = "mamba3_phase_a_components" if args.algorithm == "plain" else "mamba3_paper_components"
+    if args.suite == "components" and args.config != expected_components:
+        parser.error(f"Use --config {expected_components} for the selected diagnostic algorithm")
+    if (
+        args.suite != "components"
+        and not args.config.startswith("training_configs.experiments.")
+        and not (args.algorithm == "plain" and args.config == "pi05_mamba3_phase_a_fullft_b1")
+    ):
+        parser.error("Unknown configuration; supply a training_configs.experiments module")
     if args.steps < 10:
         parser.error("--steps must be at least 10 for the gate-opening audit")
-    if args.config not in ("pi05_mamba3_phase_a_fullft_b1", "mamba3_phase_a_components"):
-        parser.error("unknown Phase A config")
     output = args.output_dir.resolve()
     output.mkdir(parents=True, exist_ok=False)
     from scripts.mamba3_smoke_runtime import diagnostic_train_config
@@ -174,7 +259,8 @@ def main():
     result = {
         "schema_version": 1,
         "architecture": "pi05_mamba3_jax",
-        "stage": "phase_a_plain_fm",
+        "stage": "phase_a_plain_fm" if args.algorithm == "plain" else "paper_delta_fm",
+        "algorithm": args.algorithm,
         "suite": args.suite,
         "overall_status": "NOT_RUN",
         "PHASE_A_COMPLETE": False,
@@ -216,8 +302,17 @@ def main():
     try:
         with (output / "console.log").open("w") as log, redirect_stdout(log), redirect_stderr(log):
             if args.suite in ("components", "all"):
-                run_pytest(output, ["tests/test_mamba3_core.py", "tests/test_mamba3_integration.py"], "components")
-                if args.suite == "components":
+                paths = (
+                    ["tests/test_mamba3_core.py", "tests/test_mamba3_integration.py"]
+                    if args.algorithm == "plain"
+                    else ["tests/test_mamba3_paper.py"]
+                )
+                run_pytest(output, paths, "components")
+                if args.suite == "components" and args.algorithm != "plain":
+                    result["tests"].append(
+                        {"id": "T1_T2_T3_diagnostic_matrix", "status": "PASS", "evidence": "components.xml"}
+                    )
+                if args.suite == "components" and args.algorithm == "plain":
                     config = diagnostic_train_config(output, steps=args.steps, seed=args.seed)
                     # Local logs + explicitly offline W&B; no uploads/camera logging.
                     import wandb
@@ -274,7 +369,7 @@ def main():
                 import jax
                 import wandb
 
-                from openpi.policies.mamba_policy import MambaOfflinePolicy
+                from openpi.policies.mamba_policy import create_mamba_policy
                 from openpi.training.data_loader import create_data_loader
                 from openpi.training.mamba_training import validate_training
                 from training_configs import common
@@ -295,7 +390,7 @@ def main():
                 model = load_mamba_checkpoint(
                     config.model, output / "checkpoints" / str(int(state.step) - 1), loader.data_config().asset_id
                 )
-                policy = MambaOfflinePolicy(model, loader.data_config())
+                policy = create_mamba_policy(model, loader.data_config())
                 import numpy as np
 
                 actions = policy.infer(raw, rng=jax.random.key(args.seed))["actions"]
@@ -308,6 +403,7 @@ def main():
                         "shape": list(actions.shape),
                         "finite": True,
                         "action_semantics": "absolute",
+                        "model_action_semantics": config.model.action_representation,
                         "diagnostic_only": False,
                     },
                 )

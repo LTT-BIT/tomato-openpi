@@ -466,6 +466,9 @@ def create_data_loader(
         framework: The framework to use ("jax" or "pytorch").
     """
     data_config = config.data.create(config.assets_dirs, config.model)
+    adapt_data_config = getattr(config.model, "adapt_data_config", None)
+    if adapt_data_config is not None:
+        data_config = adapt_data_config(data_config)
     logging.info(f"data_config: {data_config}")
 
     if config.sampling_mode in _sampling.PLAN_MODES and (framework != "jax" or data_config.rlds_data_dir is not None):
