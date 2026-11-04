@@ -624,3 +624,30 @@ def test_nested_ui_names_preserve_latest_batch_and_configuration_file(tmp_path):
     dependency.parent.mkdir(parents=True)
     dependency.touch()
     assert editor.personal_presentation(source, "long_no_block_one_run", tmp_path)["available"]
+
+
+def test_collection_parent_reuses_members_and_rejects_unknown_parent(workspace, tmp_path):
+    config = editor.baseline_config(BASE)
+    parent = tmp_path / "collection"
+    roots = [parent / "B", parent / "A"]
+    for root in roots:
+        (root / "meta").mkdir(parents=True)
+        (root / "meta/info.json").write_text("{}")
+    config = replace(
+        config,
+        data=replace(
+            config.data,
+            lerobot_datasets=tuple(replace(config.data.lerobot_datasets[0], root=str(root)) for root in roots),
+        ),
+    )
+    values = editor.config_values(config)
+    values.pop("dataset_roots")
+    values["dataset_root"] = str(parent)
+    result = editor.apply_overrides(config, values)
+    assert [s.root for s in result.data.lerobot_datasets] == list(map(str, roots))
+    assert result.policy_metadata["dataset_root"] == str(roots[0])
+    assert result.data.assets.asset_id == config.data.assets.asset_id
+    other = tmp_path / "unknown_parent"
+    other.mkdir()
+    with pytest.raises(ValueError, match="数据父目录"):
+        editor.apply_overrides(config, {**values, "dataset_root": str(other)})

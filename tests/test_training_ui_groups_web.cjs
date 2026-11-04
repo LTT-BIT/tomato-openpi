@@ -125,16 +125,26 @@ test('launch request carries every selected root in order while one root keeps l
 });
 
 
-test('normal Sharpa shortcut discovers candidates without applying or starting training',async()=>{
+test('normal shortcut applies actual members in sealed order and reuses existing stats',async()=>{
   const {context,run,elements}=setup();
-  context.calls=[];
+  context.calls=[];context.statsChanges=0;
   run(`baseline='training_configs.experiments.tomato_sharpa.baseline.example';protocol={};
+    initial={dataset_roots:['/normal/b','/normal/a']};
     fields.get('dataset_root').input.dispatchEvent=()=>{};
-    api=async(path,data)=>{calls.push([path,data]);return {datasets:[{root:'/normal/source',episodes:2,frames:100,fps:30,selected:true}],warnings:[]}};`);
+    fields.set('sources',{input:{value:'',dispatchEvent(){}}});independentStats=()=>statsChanges++;
+    api=async(path,data)=>{calls.push([path,data]);return {datasets:[{root:'/normal/a',selected:true},{root:'/normal/b',selected:true}],warnings:[]}};`);
   await run('useNormalSharpaData()');
   assert.equal(context.calls.length,1);
   assert.equal(context.calls[0][0],'/api/discover-datasets');
   assert.equal(context.calls[0][1].roots[0],'/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one');
-  assert.equal(run("fields.get('dataset_root').input.value"),'/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one');
-  assert.equal(elements.get('dataset-candidates').querySelectorAll('input:checked').length,1);
+  assert.equal(run("fields.get('dataset_root').input.value"),'/normal/b\n/normal/a');
+  assert.equal(run("fields.get('sources').input.value"),'/normal/b\n/normal/a');
+  assert.equal(context.statsChanges,0);
+  assert.equal(elements.get('dataset-candidates').children.length,0);
+});
+
+test('pending discovered choices cannot be submitted before applying',()=>{
+  const {run,elements}=setup();
+  elements.get('dataset-candidates').append(new Element('label'));
+  assert.throws(()=>run('request()'),/应用选中数据集/);
 });

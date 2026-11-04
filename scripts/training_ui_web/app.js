@@ -99,6 +99,7 @@ async function useNormalSharpaData(){
   input.value='/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one';
   input.dispatchEvent(new Event('input'));
   await discoverDatasets();
+  applyDatasets();
 }
 async function discoverDatasets(){
   if(!baseline)throw Error('请先选择配置');
@@ -115,12 +116,16 @@ async function discoverDatasets(){
 }
 function applyDatasets(){
   if(fields.get('dataset_root').input.value!==$('dataset-candidates').dataset.input)throw Error('目录已修改，请重新识别');
-  const roots=[...$('dataset-candidates').querySelectorAll('input:checked')].map(el=>el.value);
+  let roots=[...$('dataset-candidates').querySelectorAll('input:checked')].map(el=>el.value);
   if(!roots.length)throw Error('请至少勾选一个数据集');
+  const original=initial?.dataset_roots||[initial?.dataset_root];
+  const same=roots.length===original.length&&roots.every(root=>original.includes(root));
+  if(same)roots=[...original];
   fields.get('dataset_root').input.value=roots.join('\n');fields.get('dataset_root').input.dispatchEvent(new Event('input'));
   fields.get('sources').input.value=roots.join('\n');fields.get('sources').input.dispatchEvent(new Event('input'));
-  independentStats();$('groups').replaceChildren();
-  if($('sampling-mode').value==='weighted_replacement')notice('已更新数据组合并清空旧分组，请点击“从数据读取分组”设置权重。');
+  if(!same){independentStats();$('groups').replaceChildren();}
+  if(same)notice('已应用 '+roots.length+' 个数据集，与当前配置相同，保持原顺序并复用现有归一化统计。');
+  else if($('sampling-mode').value==='weighted_replacement')notice('已更新数据组合并清空旧分组，请点击“从数据读取分组”设置权重。');
   else notice('已应用 '+roots.length+' 个数据集，将联合计算独立归一化统计。请核对数据版本和 repo_id。');
   $('apply-datasets').classList.add('hidden');$('dataset-candidates').replaceChildren();updatePath();
 }
@@ -151,7 +156,9 @@ function addGroup(group={name:'',weight:1,episodes:[]}){
   }const remove=node('button','移除');remove.addEventListener('click',()=>{row.remove();updatePath();});row.append(remove);$('groups').append(row);
 }
 function request(){
-  if(!baseline)throw Error('请先选择配置');const values={};let owner,statsBatch;
+  if(!baseline)throw Error('请先选择配置');
+  if($('dataset-candidates').children.length)throw Error('请先点击“应用选中数据集”，再检查或启动训练');
+  const values={};let owner,statsBatch;
   for(const [key,{input,type}] of fields){let value=input.value.trim();if(type==='int'||type==='float')value=value===''?NaN:Number(value);if(type==='optional-int')value=value===''?null:Number(value);if(type==='lines')value=value.split('\n').map(v=>v.trim()).filter(Boolean);if(type==='ints')value=parseIds(value);if(typeof value==='number'&&!Number.isFinite(value))throw Error(key+' 请输入有效数值');if(key==='owner')owner=value;else if(key==='stats_batch_size')statsBatch=value;else values[key]=value;}
   const roots=datasetPaths(values.dataset_root);values.dataset_root=roots[0]||'';if(roots.length>1)values.dataset_roots=roots;
   values.sampling_mode=$('sampling-mode').value;values.sampling_groups=[];

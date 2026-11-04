@@ -9,6 +9,7 @@ from datetime import datetime
 import getpass
 import hashlib
 import math
+from os.path import commonpath
 from pathlib import Path
 import pprint
 import re
@@ -405,6 +406,16 @@ def apply_overrides(config, values: dict):
         )
         for root in roots
     ]
+    configured_roots = [str(Path(spec.root).expanduser().resolve()) for spec in config.data.lerobot_datasets]
+    if len(roots) == 1 and len(configured_roots) > 1 and roots[0] == commonpath(configured_roots):
+        # The built-in collection parent means the existing configured members,
+        # in their sealed order; it is not itself a single LeRobot dataset.
+        roots = configured_roots
+        paths["dataset_root"] = roots[0]
+    for root in roots:
+        directory = Path(root)
+        if directory.is_dir() and not (directory / "meta/info.json").is_file():
+            raise ValueError(f"{root} 是数据父目录，不是单个 LeRobot 数据集；请识别目录并应用选中数据集")
     if len(set(roots)) != len(roots):
         raise ValueError("数据目录不能重复（含指向同一位置的链接）")
     if roots[0] != paths["dataset_root"]:
