@@ -321,7 +321,14 @@ def test_preflight_missing_and_existing_norm(workspace, monkeypatch):
         ui.preview(workspace, check_data=True)
 
 
-def test_worker_sequences_cpu_preparation_and_gpu_training(workspace, fake_launch, monkeypatch):
+@pytest.mark.parametrize("memory_settings", [None, ("false", "0.70")])
+def test_worker_sequences_cpu_preparation_and_gpu_training(workspace, fake_launch, monkeypatch, memory_settings):
+    keys = ("XLA_PYTHON_CLIENT_PREALLOCATE", "XLA_PYTHON_CLIENT_MEM_FRACTION")
+    for key in keys:
+        monkeypatch.delenv(key, raising=False)
+    if memory_settings is not None:
+        for key, value in zip(keys, memory_settings, strict=True):
+            monkeypatch.setenv(key, value)
     config, _ = ui.build_request(workspace)
     state = ui.start_job(workspace)
     monkeypatch.setattr(run_training, "load_experiment", lambda module: config)
@@ -335,7 +342,11 @@ def test_worker_sequences_cpu_preparation_and_gpu_training(workspace, fake_launc
     assert calls[-1][2]["JAX_PLATFORMS"] == "cuda"
     assert calls[-1][2]["CUDA_VISIBLE_DEVICES"] == "GPU-test0"
     assert calls[-1][1][-2:] == ["--wandb-mode", "offline"]
-    assert ui.read_job(state["id"])["status"] == "completed"
+    expected = dict(zip(keys, memory_settings or ("true", "0.90"), strict=True))
+    assert {key: calls[-1][2][key] for key in keys} == expected
+    saved = ui.read_job(state["id"])
+    assert saved["status"] == "completed"
+    assert saved["training_environment"] == expected
 
 
 def test_worker_failure_never_reaches_training(workspace, fake_launch, monkeypatch):

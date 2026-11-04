@@ -1,5 +1,7 @@
 # Tomato OpenPI 训练仓库
 
+当前论文实验分支统一为 **`train-rtc-paper-delta`**：整合原 `delta-paper-training-test` 与 `feat/trainrtc-correlated-t3` 的历史，以 T3+trainRTC 实现为主体，补回 Delta 的 UI JAX 显存设置与实际值记录。保留 T0/T1/T2/T3/TG、单源/六源数据、普通训练、原始 trainRTC 及 T3+RTC，可通过配置分别启用；不是强制所有功能同时生效。双臂 Delta、双手 Absolute 的 Paper 统计合同不变，不包含 FLASH。整合与分支改名不代表完成新的正式训练或实机验证。
+
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
 本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。
