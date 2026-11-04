@@ -70,7 +70,8 @@ function fillForm(result) {
     const container=$(section+'-fields');container.replaceChildren();
     for(const definition of defs){const key=definition[0];if(section==='advanced'&&!(key in initial))continue;let value=initial[key];if(key==='dataset_root')value=(initial.dataset_roots||[initial.dataset_root]).join('\n');if(key==='owner')value=result.owner;if(key==='exp_name')value=result.suggested_exp_name;if(key==='stats_batch_size')value=512;addField(container,definition,value,initial[key]);}
   }
-  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · ${protocol.flash_reference?'π05 对照 · 同 FLASH 数据划分':protocol.flash?'FLASH · K=6 / stride=1 / 全参':'普通 π0.5'} · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
+  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · ${protocol.flash_reference?'π05 对照 · 同 FLASH 数据':protocol.flash?'FLASH · K=6 / stride=1 / 全参':'普通 π0.5'} · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
+  if(protocol.flash)$('protocol').append(node('div',protocol.data_policy==='all_sources'?'全部来源参与训练 · 窗口等权 · 不留独立验证源 · 评估为训练内监测':'来源级训练 / 验证划分'));
   if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
   if(result.shared_weights){const button=node('button','使用服务器公共权重','text-button');button.addEventListener('click',()=>{fields.get('weight_path').input.value=result.shared_weights;fields.get('weight_path').input.dispatchEvent(new Event('input'));});$('runtime-fields').append(button);}
   $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);

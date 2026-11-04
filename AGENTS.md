@@ -15,3 +15,5 @@
 
 - FLASH 正式训练适配只在 `paper-flash-test` 修改；`train-rtc-paper-delta` 只保留 Delta/T3/RTC。统一 UI 的接入不构成跨分支混入算法的授权。每次编辑前核对 `git branch --show-current`，不以当前检出分支代替任务指定分支。
 - 28 服务器沿用 `/home/mengxiang/workspace/code/tomato-openpi-sharpa`，数据父目录 `/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one`。不另开工程、不清理其他仓库的真实 checkpoint；本轮验收后启动 UI，不自动启动正式训练。
+
+- 用户最新要求：正式 FLASH 与 π05 对照沿用昨天 T3 的全数据方式，normal480 全部来源参与训练、完整合法窗口等权 epoch_shuffle，不强制沿用 P 系列的独立验证源。旧划分资产保留，新建 all_sources 统计资产；训练内监测不得称为独立验证或泛化结果。

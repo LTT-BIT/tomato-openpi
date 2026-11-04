@@ -100,6 +100,7 @@ def prepared(tmp_path):
     (root / "meta/episodes.jsonl").write_text("\n".join(map(json.dumps, episodes)))
     config = replace(
         config,
+        policy_metadata={**config.policy_metadata, "data_policy": "source_holdout"},
         batch_size=1,
         fsdp_devices=1,
         num_workers=0,
@@ -225,3 +226,29 @@ def test_numpy_camera_batch_matches_jax_reference_without_backend_allocations(sh
     expected = np.asarray(resize_with_pad(rgb.astype(np.float32) / 127.5 - 1, 224, 224))[None]
     assert isinstance(actual, np.ndarray)
     np.testing.assert_allclose(actual, expected, atol=3e-5, rtol=1e-5)
+
+
+def test_all_sources_train_and_monitor_without_holdout(prepared, tmp_path):
+    config = replace(
+        prepared,
+        policy_metadata={**prepared.policy_metadata, "data_policy": "all_sources"},
+        data=replace(prepared.data, assets=replace(prepared.data.assets, asset_id="all_sources")),
+    )
+    report = prepare(config)
+    assert report["train_sources"] == 3
+    assert report["validation_sources"] == 0
+    assert report["evaluation_scope"] == "training_data"
+    d = NativeDataset(bind_stats(config))
+    assert len(d.train) == 6
+    assert int(d.ends[-1]) == 6 * (80 - 58)
+    assert len({d.index(i)["id"] for i in range(int(d.ends[-1]))}) == 6
+    assert {w["id"] for w in d.validation} <= set(d.records)
+    # Norm statistics include all six episodes, rather than the old holdout split.
+    actions = np.concatenate([d.window({"id": r["id"], "start": 7})[1] for r in d.train])
+    assert np.isfinite(actions).all()
+    expected = np.concatenate([np.asarray(pq.read_table(r["path"])["action"].to_pylist()) for r in d.train])
+    np.testing.assert_allclose(d.stats["actions"].mean, expected.mean(axis=0), atol=1e-6)
+    with pytest.raises(ValueError, match="policy changed"):
+        preflight(replace(config, policy_metadata={**config.policy_metadata, "data_policy": "source_holdout"}))
+    with pytest.raises(FileExistsError):
+        prepare(config)

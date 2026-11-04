@@ -1,4 +1,4 @@
-"""Native pi05 reference using exactly the FLASH train/validation windows and stats."""
+"""Native pi05 reference using exactly the FLASH training and monitoring windows and stats."""
 
 from dataclasses import fields
 from dataclasses import replace
@@ -16,8 +16,8 @@ def build_config():
     return bind_stats(
         replace(
             config,
-            name="pi05_sharpa_absolute_flash_reference_fullft_v1",
-            exp_name="sharpa_absolute_flash_reference_fullft_s42",
+            name="pi05_sharpa_absolute_flash_reference_all480_fullft_v2",
+            exp_name="sharpa_absolute_flash_reference_all480_fullft_s42",
             model=model,
             freeze_filter=model.get_freeze_filter(),
             policy_metadata={**config.policy_metadata, "algorithm": "flash_reference"},

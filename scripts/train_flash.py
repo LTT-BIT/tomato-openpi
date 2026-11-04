@@ -135,6 +135,7 @@ def validation(config, state, dataset, data_sharding, evaluator):
         if config.policy_metadata.get("algorithm") == "flash_reference"
         else "coefficient_loss": float(np.mean(coefficients)),
         "windows": len(error),
+        "evaluation_scope": dataset.manifest["contract"].get("evaluation_scope", "held_out_sources"),
     }
     for name, indices in (("all", np.arange(58)), ("arms", arms), ("hands", hands)):
         for method, delta in (("prediction", error), ("oracle", oracle)):
@@ -247,9 +248,10 @@ def main(config):
                     checkpoints.save_state(manager, state, dataset, int(state.step))
                     manager.wait_until_finished()
                     report = validation(config, state, dataset, data_sharding, evaluator)
-                    (output / f"validation_{int(state.step)}.json").write_text(json.dumps(report, indent=2))
+                    scope = "training_evaluation" if inputs["evaluation_scope"] == "training_data" else "validation"
+                    (output / f"{scope}_{int(state.step)}.json").write_text(json.dumps(report, indent=2))
                     wandb.log(
-                        {"validation/" + k: v for k, v in report.items() if isinstance(v, int | float)},
+                        {scope + "/" + k: v for k, v in report.items() if isinstance(v, int | float)},
                         step=int(state.step),
                     )
         manager.wait_until_finished()

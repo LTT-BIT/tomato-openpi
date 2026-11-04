@@ -68,7 +68,7 @@ def baseline_catalog() -> list[dict]:
         entries.append(
             {
                 "id": ".".join(path.relative_to(root).with_suffix("").parts),
-                "label": f"{TASK_LABELS.get(task, task)} / {'π05 对照（同 FLASH 划分）' if 'reference' in path.stem else 'FLASH 全参' if 'flash' in path.stem else 'LoRA' if 'lora' in path.stem else '全参'}",
+                "label": f"{TASK_LABELS.get(task, task)} / {'π05 对照（同 FLASH 数据）' if 'reference' in path.stem else 'FLASH 全参' if 'flash' in path.stem else 'LoRA' if 'lora' in path.stem else '全参'}",
                 "task": task,
                 "kind": "experiment" if path.parent.name == "flash" else "baseline",
                 "file": str(path.relative_to(root)),
@@ -201,6 +201,7 @@ def defaults(module: str) -> dict:
             else None,
             "flash": config.policy_metadata.get("algorithm") in ("flash", "flash_reference"),
             "flash_reference": config.policy_metadata.get("algorithm") == "flash_reference",
+            "data_policy": config.policy_metadata.get("data_policy"),
             "actions": values["action_semantics"],
             "delta_available": delta_supported(config),
         },

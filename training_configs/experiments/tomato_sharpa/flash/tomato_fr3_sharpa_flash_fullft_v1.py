@@ -13,13 +13,13 @@ from training_configs.recipes.pi05_fullft_v1 import build_config as build_recipe
 
 ROOT = "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one"
 MEMBERS = (
-    "10.16before",
     "A/1022_121_430_normal_lerobot",
     "A/1022_54_120_normal_lerobot",
     "A/1026_444_513_normal_lerobot",
     "B/1022_130_423_normal_lerobot",
     "B/1022_56_106_normal_lerobot",
     "B/1026_446_510_normal_lerobot",
+    "10.16before",
 )
 
 
@@ -27,14 +27,14 @@ def build_config():
     dataset = replace(
         build_dataset(),
         root=ROOT + "/" + MEMBERS[0],
-        version="normal480_flash_absolute_k6_s1_v1",
+        version="normal480_flash_absolute_k6_s1_all_sources_v2",
         repo_id="fr3_sharpa/normal480_flash",
-        asset_id="normal480_flash_absolute_k6_s1_train_split_v1",
+        asset_id="normal480_flash_absolute_k6_s1_all_sources_v2",
         sources=tuple(ROOT + "/" + part for part in MEMBERS),
     )
     config = build_recipe(
-        name="pi05_sharpa_flash_absolute_k6_s1_fullft_v1",
-        exp_name="sharpa_flash_absolute_k6_s1_fullft_s42",
+        name="pi05_sharpa_flash_absolute_k6_s1_all480_fullft_v2",
+        exp_name="sharpa_flash_absolute_k6_s1_all480_fullft_s42",
         embodiment=FR3_SHARPA_MULTIMODAL,
         dataset=dataset,
     )
@@ -63,6 +63,7 @@ def build_config():
             policy_metadata={
                 **config.policy_metadata,
                 "algorithm": "flash",
+                "data_policy": "all_sources",
                 "dataset_roots": [ROOT + "/" + part for part in MEMBERS],
                 "K": 6,
                 "stride": 1,

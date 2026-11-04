@@ -111,14 +111,22 @@ def inventory(config):
     return records
 
 
+def data_policy(config):
+    policy = config.policy_metadata.get("data_policy", "source_holdout")
+    if policy not in ("all_sources", "source_holdout"):
+        raise ValueError(f"Unsupported FLASH data policy: {policy}")
+    return policy
+
+
 def prepare(config, *, batch_size=512):
     del batch_size
     records = inventory(config)
     groups = sorted({r["source_recording_id"] for r in records})
-    if len(groups) < 2:
+    policy = data_policy(config)
+    if policy == "source_holdout" and len(groups) < 2:
         raise ValueError("At least two independent original recordings required")
     shuffled = np.random.default_rng(config.data_seed).permutation(groups)
-    validation = set(shuffled[: max(1, round(len(groups) * 0.2))])
+    validation = set(shuffled[: max(1, round(len(groups) * 0.2))]) if policy == "source_holdout" else set()
     train = [r for r in records if r["source_recording_id"] not in validation]
     chunks, states = [], []
     for record in train:
@@ -142,6 +150,8 @@ def prepare(config, *, batch_size=512):
         "roots": [str(Path(s.root).resolve()) for s in config.data.lerobot_datasets],
         "joint_names": list(ORDER),
         "fit_scope": "train_episodes_only",
+        "data_policy": policy,
+        "evaluation_scope": "held_out_sources" if validation else "training_data",
     }
     manifest = {
         "contract": contract,
@@ -150,11 +160,13 @@ def prepare(config, *, batch_size=512):
         "validation_sources": sorted(validation),
     }
     manifest["sha256"] = digest(manifest)
+    # Full-data runs monitor training windows; they have no held-out validation.
+    evaluation_sources = validation if validation else set(groups)
     # Fix evaluation windows once, before any model is trained.
     windows = [
         {"id": r["id"], "start": int(t)}
         for r in records
-        if r["source_recording_id"] in validation
+        if r["source_recording_id"] in evaluation_sources
         for t in sorted(set(np.linspace(7, r["rows"] - 52, 3, dtype=int).tolist()))
     ]
     chosen = np.random.default_rng(config.data_seed + 1).permutation(len(windows))[:64]
@@ -177,12 +189,15 @@ def preflight(config, *, require_norm=True):
         raise ValueError("Standard FLASH requires FullFT Absolute without RTC")
     if config.sampling_mode != "epoch_shuffle" or config.sampling_groups:
         raise ValueError("FLASH requires deterministic epoch_shuffle, without weighted groups")
+    policy = data_policy(config)
     records = inventory(config)
     result = {
         "episodes": len(records),
         "frames": sum(r["rows"] for r in records),
         "legal_windows": sum(r["rows"] - 58 for r in records),
         "source_count": len({r["source_recording_id"] for r in records}),
+        "data_policy": policy,
+        "evaluation_scope": "training_data" if policy == "all_sources" else "held_out_sources",
         "training_action_semantics": "absolute",
         "K": 6,
         "stride": 1,
@@ -195,6 +210,8 @@ def preflight(config, *, require_norm=True):
     unsigned = {k: v for k, v in manifest.items() if k != "sha256"}
     if digest(unsigned) != manifest["sha256"] or seal["manifest_sha256"] != manifest["sha256"]:
         raise ValueError("FLASH manifest fingerprint mismatch")
+    if manifest["contract"].get("data_policy", "source_holdout") != policy:
+        raise ValueError("FLASH data policy changed; use a new asset_id")
     if manifest["records"] != records or manifest["contract"]["data_seed"] != config.data_seed:
         raise ValueError("Data/source order/content or split seed changed; use a new asset_id")
     if seal["norm_sha256"] != hashlib.sha256((directory / "norm_stats.json").read_bytes()).hexdigest():
@@ -204,6 +221,23 @@ def preflight(config, *, require_norm=True):
         raise ValueError("FLASH evaluation windows changed")
     if set(manifest["train_sources"]) & set(manifest["validation_sources"]):
         raise ValueError("Recording leakage across train/validation")
+    train_sources, val_sources = set(manifest["train_sources"]), set(manifest["validation_sources"])
+    sources = {r["source_recording_id"] for r in records}
+    if train_sources | val_sources != sources or not train_sources:
+        raise ValueError("FLASH source allocation does not cover the dataset")
+    if policy == "all_sources" and (val_sources or train_sources != sources):
+        raise ValueError("Full-data FLASH requires every source in training and no holdout")
+    if policy == "source_holdout" and not val_sources:
+        raise ValueError("Source holdout requires independent validation sources")
+    lookup = {r["id"]: r for r in records}
+    evaluation_sources = train_sources if policy == "all_sources" else val_sources
+    if not plan or any(
+        w["id"] not in lookup
+        or lookup[w["id"]]["source_recording_id"] not in evaluation_sources
+        or not 7 <= w["start"] <= lookup[w["id"]]["rows"] - 52
+        for w in plan
+    ):
+        raise ValueError("FLASH evaluation windows do not match their declared data scope")
     result.update(
         manifest_sha256=manifest["sha256"],
         normalization_sha256=seal["norm_sha256"],
