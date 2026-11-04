@@ -294,6 +294,9 @@ def start_job(request):
 
 
 def resume_job(request):
+    from openpi.training.reproducibility import serialize_config
+    from scripts import training_ui_config as config_ui
+
     with submit_lock():
         original = read_job(request["id"])
         if original.get("host") != socket.gethostname():
@@ -324,6 +327,8 @@ def resume_job(request):
             "resume": resume,
             "gpus": selected,
             "parent_job": original["id"],
+            "values": config_ui.config_values(config),
+            "resolved_config": json.loads(serialize_config(config)),
         }
         for key in ("error", "worker_pid", "worker_start", "child_pid", "child_start", "returncode"):
             state.pop(key, None)
