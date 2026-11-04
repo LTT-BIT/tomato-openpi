@@ -1,0 +1,45 @@
+{
+  "purpose": "normal480_all_sources_training_setup",
+  "data_policy": "all_sources",
+  "training_sources": 480,
+  "held_out_sources": 0,
+  "episodes": 480,
+  "frames": 451270,
+  "legal_flash_windows": 423430,
+  "sampling_mode": "epoch_shuffle",
+  "sampling_groups": [],
+  "source_groups": {
+    "A_new_311": {
+      "episodes": 311,
+      "windows": 276168
+    },
+    "B_historical_169": {
+      "episodes": 169,
+      "windows": 147262
+    }
+  },
+  "evaluation_scope": "training_data",
+  "monitoring_windows": 64,
+  "asset_id": "normal480_flash_absolute_k6_s1_all_sources_v2",
+  "manifest_sha256": "d27dd1d976f8766d096658f97c415a98e42576b4604e93c4845bd4e5b42368c2",
+  "normalization_sha256": "a5d7bd2dd422148736c69f1bf52a721d5770ba810f3bace9a2dd413395544d52",
+  "evaluation_windows_sha256": "c763a1d9ca9989c5f35b1e92b37477d0ee82dbf43b7d5a960e421b536cec95ce",
+  "server": "28",
+  "code_commit": "3cd1b27f",
+  "branch": "paper-flash-test",
+  "flash_and_pi05_reference_api_checks": "passed; identical data fingerprints; statistics reusable",
+  "old_holdout_assets_preserved": true,
+  "active_training_jobs": 0,
+  "formal_updates": 0,
+  "tests": {
+    "python_related": 67,
+    "node_ui": 13,
+    "ruff": "passed"
+  },
+  "commands": [
+    "bash scripts/python.sh -m scripts.compute_experiment_norm training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_flash_fullft_v1",
+    "GET /api/baseline?id=<FLASH or reference module>",
+    "POST /api/check with default source values; no POST /api/start"
+  ],
+  "note": "Same all-data, equal-window sampling principle as the November 3 T3 run. FLASH retains causal history/extended labels, so its window count differs from T3. No independent validation or generalization claim."
+}
