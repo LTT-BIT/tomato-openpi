@@ -297,7 +297,9 @@ CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training \
 
 GitLab 自动验证目前暂停。本地代码检查命令为 `bash scripts/check_training.sh`，协作与验证规则见 [多人开发 README](多人开发README.md)。本项目遵循 [LICENSE](LICENSE) 和 [Gemma 许可](LICENSE_GEMMA.txt)。
 
-### FLASH 独立实验（paper-flash-test）
+### FLASH 实验（paper-flash-test）
+
+当前唯一工作目录为 `/home/user/tomato-openpi`。按用户要求，本机已清理旧 P1/P2/P3 Checkpoint、Step100/250 的优化器状态及中断保存文件，释放约57.75GiB；旧目录软链接已移除。以下 P1/P2/P3 数字与恢复测试均为历史记录，相关模型目前不能直接恢复。代码、已提交报告/图表、normal 数据清单与缓存、冻结 Split/Normalization、原始 `pi05_base` 权重保留。后续 FullFT 从基础权重、新优化器与 Step 0 开始，不依赖旧诊断步数。
 
 FLASH 已新增显式 **FullFT** 模式：`Pi0FlashConfig(freeze_vlm=False)` 训练视觉编码器、语言骨干、Action Expert、时间 MLP 和动作投影；默认 `freeze_vlm=True` 保留 P1/P2/P3 冻结实验。FullFT 的 prefix/KV 在每步求梯度内部重新编码。两种模式的更新、非有限梯度拦截与模型/Adam 恢复回归测试已通过；正式尺寸训练参数覆盖为 3,353,487,146。梯度回归使用缩小视觉编码器与 dummy Gemma，尚未验证正式尺寸 FullFT 的 GPU 容量或学习效果。
 

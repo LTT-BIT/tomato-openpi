@@ -2,7 +2,8 @@
 
 - 工作目录规则：默认在用户指定的现有目录和分支中继续开发。未经用户明确要求，不新建 Git worktree、不另建 clone 或复制工程、不迁移工作目录；不能仅以隔离实验或方便开发为由另开目录。
 - 开始工作前核对当前路径、分支、未提交修改及 `git worktree list`。分支已在其他 worktree 检出时，先说明占用路径和原因，不自行另建目录，也不强制检出、重置或删除现有 worktree。涉及搬回原目录或清理 worktree 时，先确认用户指定的目标目录，并保全未提交修改、实验结果和 Checkpoint。
-- 当前工作区：按用户明确要求，`paper-flash-test` 已迁回唯一 Git 工作区 `/home/user/tomato-openpi`，后续在此目录开发和切换分支。独立 FLASH worktree 已移除；旧路径 `/home/user/tomato-openpi-paper-flash` 仅为指向原目录的兼容软链接，用于保全历史 Checkpoint 的绝对路径引用，不是独立工程或 worktree。数据、缓存、结果及 Checkpoint 已迁回原目录，重名缓存保留于 `.cache/flash_worktree_preserved_conflicts/`。不得重新创建 FLASH 独立工作区。
+- 当前工作区：`paper-flash-test` 位于唯一 Git 工作区 `/home/user/tomato-openpi`，后续在此目录开发和切换分支。独立 FLASH worktree 及旧路径 `/home/user/tomato-openpi-paper-flash` 的兼容软链接均已移除，不得重新创建。
+- FLASH 当前训练起点：按用户要求已清理本机 P1/P2/P3 实验权重、Step100/250 优化器状态及中断保存文件；报告和数据保留为历史记录，不再声称这些 Checkpoint 本机可恢复。后续正式训练从 `pi05_base`、全新优化器和 Global Step=0 开始，不自动接续旧诊断步数。基础权重、真实数据、Split 和 Normalization 不属于清理对象；以后按实际恢复需要制定 Checkpoint 保留策略，避免反复保存多份未变化的完整权重。
 - 用户要求：以后每轮修改完成并验证后，自动保存文件、提交 Git，并推送到 GitHub 对应分支完成同步，无需再次询问；用户当轮另有明确要求时以当轮要求为准。
 - Git 提交说明使用中文，明确写清修改了哪些内容、修改原因及验证命令和结果；未完成或未验证的部分如实备注。
 - 本仓库 GitHub 远程为 `github`（`https://github.com/LTT-BIT/tomato-openpi.git`）；当前 FLASH 实验推送到 `paper-flash-test`。推送失败时保留本地提交，明确报告失败原因及尚未同步的状态，不得声称已上传。
