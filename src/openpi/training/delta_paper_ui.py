@@ -29,6 +29,7 @@ def paper_available(config):
 
     return (
         isinstance(config.data, LeRobotFr3SharpaMultimodalDataConfig)
+        and config.policy_metadata.get("algorithm") not in ("flash", "flash_reference")
         and config.model.pi05
         and config.model.action_dim == 58
         and "lora" not in config.model.paligemma_variant

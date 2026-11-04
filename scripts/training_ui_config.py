@@ -59,7 +59,9 @@ TEXT_FIELDS = (
 def baseline_catalog() -> list[dict]:
     root = common.repository_root()
     entries = []
-    for path in sorted((root / "training_configs/experiments").glob("*/baseline/*.py")):
+    paths = list((root / "training_configs/experiments").glob("*/baseline/*.py"))
+    paths += list((root / "training_configs/experiments").glob("tomato_sharpa/flash/*.py"))
+    for path in sorted(paths):
         if not any(
             isinstance(node, ast.FunctionDef) and node.name == "build_config"
             for node in ast.parse(path.read_text()).body
@@ -69,7 +71,7 @@ def baseline_catalog() -> list[dict]:
         entries.append(
             {
                 "id": ".".join(path.relative_to(root).with_suffix("").parts),
-                "label": f"{TASK_LABELS.get(task, task)} / {'LoRA' if 'lora' in path.stem else '全参'}",
+                "label": f"{TASK_LABELS.get(task, task)} / {'π05 对照（同 FLASH 划分）' if 'reference' in path.stem else 'FLASH 全参' if 'flash' in path.stem else 'LoRA' if 'lora' in path.stem else '全参'}",
                 "task": task,
                 "file": str(path.relative_to(root)),
             }
@@ -146,6 +148,8 @@ def changed_parameters(module: str, values: dict) -> list[str]:
 
 
 def delta_supported(config) -> bool:
+    if config.policy_metadata.get("algorithm") in ("flash", "flash_reference"):
+        return False
     return isinstance(config.data, train_config.LeRobotFr3WujiDataConfig | train_config.LeRobotFr3SharpaDataConfig)
 
 
@@ -198,7 +202,13 @@ def defaults(module: str) -> dict:
             "task_view": asdict(config.data.base_config.task_view)
             if getattr(config.data.base_config, "task_view", None)
             else None,
-            "model_family": "Paper" if getattr(config.data, "paper_contract", None) else "pi05",
+            "model_family": "FLASH"
+            if config.policy_metadata.get("algorithm") in ("flash", "flash_reference")
+            else "Paper"
+            if getattr(config.data, "paper_contract", None)
+            else "pi05",
+            "flash": config.policy_metadata.get("algorithm") in ("flash", "flash_reference"),
+            "flash_reference": config.policy_metadata.get("algorithm") == "flash_reference",
             "rtc_max_delay": config.model.rtc_max_delay,
             "norm_asset": str(Path(config.data.assets.assets_dir) / config.data.assets.asset_id),
             **(
@@ -246,6 +256,10 @@ def apply_overrides(config, values: dict):
     source_semantics = "delta" if getattr(config.data, "extra_delta_transform", False) else "absolute"
     config = select_trial(config, values.get("paper_trial", selected_trial(config)), values["asset_id"])
     action_semantics = values.get("action_semantics", source_semantics)
+    if config.policy_metadata.get("algorithm") in ("flash", "flash_reference") and (
+        action_semantics != "absolute" or values.get("rtc_max_delay", 0)
+    ):
+        raise ValueError("Standard FLASH requires Absolute actions and RTC=0")
     if action_semantics not in ("absolute", "delta"):
         raise ValueError("动作监督只能选择 absolute 或 delta")
     if getattr(config.data, "paper_contract", None) and (
@@ -425,6 +439,10 @@ def apply_overrides(config, values: dict):
             },
         )
     validate_config(result)
+    if result.policy_metadata.get("algorithm") in ("flash", "flash_reference"):
+        from openpi.training.flash_native import bind_stats
+
+        result = bind_stats(result)
     return result
 
 

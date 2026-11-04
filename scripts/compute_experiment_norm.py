@@ -13,6 +13,11 @@ def main():
     args, overrides = parser.parse_known_args()
     config = resolve_experiment(args.experiment, overrides)
     preflight(config, require_norm=False)
+    if config.policy_metadata.get("algorithm") in ("flash", "flash_reference"):
+        from openpi.training.flash_native import prepare
+
+        prepare(config, batch_size=args.stats_batch_size)
+        return
     custom_compute = getattr(config.data, "compute_normalization", None)
     if custom_compute is not None:
         custom_compute(config, batch_size=args.stats_batch_size)

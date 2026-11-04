@@ -1,0 +1,188 @@
+"""Formal FLASH contracts: causal local data, source split, FSDP update and resume."""
+
+from dataclasses import fields
+from dataclasses import replace
+import json
+
+import jax
+import jax.numpy as jnp
+import numpy as np
+import pyarrow as pa
+import pyarrow.parquet as pq
+import pytest
+from test_delta_paper_training import shrink_network
+
+from openpi.models.pi0_config import Pi0Config
+from openpi.policies.fr3_sharpa_protocol import ORDER
+from openpi.training import checkpoints
+from openpi.training import sharding
+from openpi.training import weight_loaders
+from openpi.training.flash_native import NativeDataset
+from openpi.training.flash_native import bind_stats
+from openpi.training.flash_native import preflight
+from openpi.training.flash_native import prepare
+from scripts import training_ui_config as editor
+from scripts.train import init_train_state
+from scripts.train_flash import evaluate_batch
+from scripts.train_flash import step
+from training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_flash_fullft_v1 import build_config
+
+
+@pytest.fixture
+def prepared(tmp_path):
+    config = build_config()
+    root = tmp_path / "dataset"
+    (root / "meta").mkdir(parents=True)
+    (root / "data").mkdir()
+    (root / "videos").mkdir()
+    info = {
+        "fps": 30,
+        "codebase_version": "v2.1",
+        "chunks_size": 1000,
+        "data_path": "data/episode_{episode_index:06d}.parquet",
+        "total_episodes": 6,
+        "total_frames": 480,
+        "features": {
+            "action": {"shape": [58], "names": [x + ".command" for x in ORDER]},
+            "observation.state": {
+                "shape": [116],
+                "names": [x + ".position" for x in ORDER] + [x + ".velocity" for x in ORDER],
+            },
+        },
+    }
+    (root / "meta/info.json").write_text(json.dumps(info))
+    (root / "meta/tasks.jsonl").write_text(json.dumps({"task_index": 0, "task": "Pick a tomato."}))
+    episodes = []
+    for i in range(6):
+        frames = np.arange(80)
+        actions = frames[:, None] * 0.001 + np.arange(58)[None, :] * 0.01 + i * 0.1
+        pq.write_table(
+            pa.table(
+                {
+                    "action": actions.tolist(),
+                    "observation.state": np.concatenate([actions - 0.005, actions * 0], axis=1).tolist(),
+                    "frame_index": frames,
+                    "timestamp": frames / 30,
+                    "task_index": frames * 0,
+                }
+            ),
+            root / f"data/episode_{i:06d}.parquet",
+        )
+        episodes.append({"episode_index": i, "length": 80, "source_recording_id": f"recording_{i // 2}"})
+    (root / "meta/episodes.jsonl").write_text("\n".join(map(json.dumps, episodes)))
+    config = replace(
+        config,
+        batch_size=1,
+        fsdp_devices=1,
+        num_workers=0,
+        data=replace(
+            config.data,
+            lerobot_datasets=(replace(config.data.lerobot_datasets[0], root=str(root)),),
+            assets=replace(config.data.assets, assets_dir=str(tmp_path / "assets"), asset_id="new"),
+        ),
+    )
+    prepare(config)
+    return bind_stats(config)
+
+
+def test_causal_data_split_sampler_and_fingerprints(prepared):
+    report = preflight(prepared)
+    assert report["episodes"] == 6
+    d = NativeDataset(prepared)
+    other = NativeDataset(prepared)
+    assert not set(d.manifest["train_sources"]) & set(d.manifest["validation_sources"])
+    for position in (0, 1, 21, 22, 87, 88, 101, 10000):
+        assert d.index(position) == other.index(position)
+    window = d.index(0)
+    history, target, current, _ = d.window(window)
+    assert history.shape == (8, 58)
+    assert target.shape == (54, 58)
+    np.testing.assert_array_equal(history[-1], current)
+    ident, start = window["id"], window["start"]
+    actions, states, _ = d.numeric[ident]
+    original = history.copy()
+    actions[start + 1 :] += 100
+    states[start + 1 :] -= 100
+    np.testing.assert_array_equal(original, d.window(window)[0])
+    record = d.records[ident]
+    with open(record["path"], "ab") as stream:
+        stream.write(b"changed")
+    with pytest.raises(ValueError, match="changed"):
+        preflight(prepared)
+
+
+@pytest.mark.parametrize("reference", [False, True])
+def test_fullft_update_checkpoint_and_rejected_nonfinite(prepared, monkeypatch, tmp_path, reference):
+    shrink_network(monkeypatch)
+    config = replace(
+        prepared,
+        model=replace(prepared.model, dtype="float32", max_token_len=8),
+        weight_loader=weight_loaders.NoOpWeightLoader(),
+        lr_schedule=replace(prepared.lr_schedule, warmup_steps=0, peak_lr=2.5e-4, decay_steps=100, decay_lr=1e-5),
+    )
+    if reference:
+        config = bind_stats(
+            replace(
+                config,
+                model=Pi0Config(**{f.name: getattr(config.model, f.name) for f in fields(Pi0Config)}),
+                policy_metadata={**config.policy_metadata, "algorithm": "flash_reference"},
+            )
+        )
+    mesh = sharding.make_mesh(1)
+    state, _ = init_train_state(config, jax.random.key(42), mesh, resume=False)
+    obs = config.model.fake_obs()
+    obs = replace(
+        obs,
+        images={k: jnp.full_like(v, 0.3) for k, v in obs.images.items()},
+        tokenized_prompt=jnp.ones_like(obs.tokenized_prompt),
+    )
+    d = NativeDataset(config)
+    history, target, _, _ = d.window(d.index(0))
+    batch = (obs, jnp.asarray(history[None]), jnp.asarray(target[None]))
+    update = jax.jit(lambda s, b: step(config, jax.random.key(42), s, b))
+    initial = {p: np.array(v.value) for p, v in state.params.flat_state().items()}
+    for _ in range(2):
+        state, metrics = jax.block_until_ready(update(state, batch))
+        assert bool(metrics["finite"])
+    changed = {p for p, v in state.params.flat_state().items() if not np.array_equal(initial[p], np.asarray(v.value))}
+    assert any(p[:2] == ("PaliGemma", "img") for p in changed)
+    assert any(p[:2] == ("PaliGemma", "llm") for p in changed)
+    manager, _ = checkpoints.initialize_checkpoint_dir(
+        tmp_path / "checkpoint", keep_period=None, overwrite=False, resume=False
+    )
+    try:
+        checkpoints.save_state(manager, state, d, 2)
+        manager.wait_until_finished()
+        restored = checkpoints.restore_state(manager, state, d)
+        left, _ = update(state, batch)
+        right, _ = update(restored, batch)
+        for a, b in zip(jax.tree.leaves(left), jax.tree.leaves(right), strict=True):
+            np.testing.assert_array_equal(a, b)
+        bad, metrics = update(state, (obs, batch[1], batch[2] * jnp.nan))
+        assert not bool(metrics["finite"])
+        for a, b in zip(jax.tree.leaves(state), jax.tree.leaves(bad), strict=True):
+            np.testing.assert_array_equal(a, b)
+        result = evaluate_batch(
+            state.model_def,
+            state.params,
+            batch,
+            jax.random.key(0),
+            reference=reference,
+            q01=tuple(d.stats["actions"].q01),
+            q99=tuple(d.stats["actions"].q99),
+        )
+        assert result["prediction"].shape == (1, 50, 58)
+        assert np.isfinite(np.asarray(result["prediction"])).all()
+    finally:
+        manager.close()
+
+
+def test_ui_flash_enforces_standard_method():
+    module = "training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_flash_fullft_v1"
+    config = editor.baseline_config(module)
+    values = editor.defaults(module)["values"]
+    assert not config.model.freeze_vlm
+    assert editor.defaults(module)["protocol"]["flash"]
+    for delta in ({"action_semantics": "delta"}, {"rtc_max_delay": 10}, {"paper_trial": "t3", "asset_id": "different"}):
+        with pytest.raises(ValueError, match="Absolute|论文功能"):
+            editor.apply_overrides(config, {**values, **delta})
