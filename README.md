@@ -320,6 +320,8 @@ FLASH 已新增显式 **FullFT** 模式：`Pi0FlashConfig(freeze_vlm=False)` 训
 
 28 服务器沿用 `/home/mengxiang/workspace/code/tomato-openpi-sharpa`，在本分支运行 `bash scripts/python.sh -m scripts.training_ui --port 8765`。UI 显示实际分支和版本，提供独立的 FLASH 全参及使用同一数据的 π₀.₅ 对照，不合并 Delta/T3 代码。
 
+UI 的 GPU 训练子进程显式设置 `XLA_PYTHON_CLIENT_PREALLOCATE=false`、`XLA_PYTHON_CLIENT_MEM_FRACTION=0.90`，并将生效值写入任务状态和控制台日志；容量验收与正式入口均启用 state buffer donation。此前 Batch512 单步验收不能替代修正后正式入口的容量复验：2026-11-04 首次正式启动在首步 OOM，未生成有效训练步或模型 Checkpoint。环境配置补齐不代表 OOM 已解决，重新长训前需受控复验。
+
 - FLASH：`training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_flash_fullft_v1`；对照：同目录 `tomato_fr3_sharpa_reference_fullft_v1`。VLM 与 Action Expert 均训练，从 `pi05_base`、新 AdamW、Step 0 开始。
 - 数据为 `normal/no-block-one` 七个实际 LeRobot 根目录，共 480 集、451270 帧；按最新要求全部 480 个原始录制源参与训练，窗口等权 epoch_shuffle，不设置 A/B 权重，不留独立验证源。归一化使用全部训练来源；统计、Manifest、64 个固定训练内监测窗口及各自 SHA256 保存在 `assets/normal480_flash_absolute_k6_s1_all_sources_v2`。旧 384/96 划分资产保留，不覆盖。首次准备：`bash scripts/python.sh -m scripts.compute_experiment_norm training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_flash_fullft_v1`；已存在时只核验，不覆盖。
 - Absolute `(50,58)`，K=6（7 个系数 token）、stride=1；当前测量历史 `(8,58)`，监督扩展目标 `(54,58)`，未来目标不进入条件输入。不是论文 stride=4 长时实验。

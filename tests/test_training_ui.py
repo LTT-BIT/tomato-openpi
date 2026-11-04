@@ -328,6 +328,8 @@ def test_preflight_missing_and_existing_norm(workspace, monkeypatch):
 
 
 def test_worker_sequences_cpu_preparation_and_gpu_training(workspace, fake_launch, monkeypatch):
+    monkeypatch.setenv("XLA_PYTHON_CLIENT_PREALLOCATE", "true")
+    monkeypatch.setenv("XLA_PYTHON_CLIENT_MEM_FRACTION", "0.75")
     config, _ = ui.build_request(workspace)
     state = ui.start_job(workspace)
     monkeypatch.setattr(run_training, "load_experiment", lambda module: config)
@@ -339,9 +341,16 @@ def test_worker_sequences_cpu_preparation_and_gpu_training(workspace, fake_launc
     assert [row[0] for row in calls] == ["校验数据", "计算归一化统计", "核对数据与统计", "训练中"]
     assert all(row[2]["JAX_PLATFORMS"] == "cpu" and row[2]["CUDA_VISIBLE_DEVICES"] == "" for row in calls[:-1])
     assert calls[-1][2]["JAX_PLATFORMS"] == "cuda"
+    assert calls[-1][2]["XLA_PYTHON_CLIENT_PREALLOCATE"] == "false"
+    assert calls[-1][2]["XLA_PYTHON_CLIENT_MEM_FRACTION"] == "0.90"
     assert calls[-1][2]["CUDA_VISIBLE_DEVICES"] == "GPU-test0"
     assert calls[-1][1][-2:] == ["--wandb-mode", "offline"]
     assert ui.read_job(state["id"])["status"] == "completed"
+    assert ui.read_job(state["id"])["training_environment"] == {
+        "JAX_PLATFORMS": "cuda",
+        "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
+        "XLA_PYTHON_CLIENT_MEM_FRACTION": "0.90",
+    }
 
 
 def test_worker_failure_never_reaches_training(workspace, fake_launch, monkeypatch):

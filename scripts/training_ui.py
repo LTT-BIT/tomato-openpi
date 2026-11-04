@@ -453,11 +453,29 @@ def worker(job_id):
             [*python, "scripts.run_training", state["module"], *overrides, "--check"],
             cpu_env,
         )
-        env = {**os.environ, "CUDA_VISIBLE_DEVICES": ",".join(state["gpus"]), "PYTHONUNBUFFERED": "1"}
+        env = {
+            **os.environ,
+            "CUDA_VISIBLE_DEVICES": ",".join(state["gpus"]),
+            "PYTHONUNBUFFERED": "1",
+            # Keep the formal UI launch aligned with the documented GPU tests.
+            # Disable upfront reservation and cap the XLA pool to leave headroom
+            # for compilation and transient allocations.
+            "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
+            "XLA_PYTHON_CLIENT_MEM_FRACTION": "0.90",
+        }
         env.pop("JAX_PLATFORMS", None)
         env.pop("JAX_PLATFORM_NAME", None)
         # Fail if CUDA cannot initialize rather than accidentally training on CPU.
         env["JAX_PLATFORMS"] = "cuda"
+        state["training_environment"] = {
+            key: env[key]
+            for key in (
+                "JAX_PLATFORMS",
+                "XLA_PYTHON_CLIENT_PREALLOCATE",
+                "XLA_PYTHON_CLIENT_MEM_FRACTION",
+            )
+        }
+        print("Training environment: " + json.dumps(state["training_environment"], sort_keys=True), flush=True)
         if hashlib.sha256(path.read_bytes()).hexdigest() != state["config_sha256"]:
             raise ValueError("准备过程中配置被修改，请新建实验")
         command = [*python, "scripts.run_training", state["module"], *overrides, "--wandb-mode", state["wandb_mode"]]

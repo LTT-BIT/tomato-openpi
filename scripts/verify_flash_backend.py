@@ -109,6 +109,7 @@ def main():
             functools.partial(step, config),
             in_shardings=(replicated, layout, data_layout),
             out_shardings=(layout, replicated),
+            donate_argnums=(1,),
         )
 
         def advance(current, function=update):
