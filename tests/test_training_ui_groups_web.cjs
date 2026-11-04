@@ -123,3 +123,18 @@ test('launch request carries every selected root in order while one root keeps l
   run("fields.get('dataset_root').input.value='/a'");
   assert.equal(run('request().values.dataset_roots'),undefined);
 });
+
+
+test('normal Sharpa shortcut discovers candidates without applying or starting training',async()=>{
+  const {context,run,elements}=setup();
+  context.calls=[];
+  run(`baseline='training_configs.experiments.tomato_sharpa.baseline.example';protocol={};
+    fields.get('dataset_root').input.dispatchEvent=()=>{};
+    api=async(path,data)=>{calls.push([path,data]);return {datasets:[{root:'/normal/source',episodes:2,frames:100,fps:30,selected:true}],warnings:[]}};`);
+  await run('useNormalSharpaData()');
+  assert.equal(context.calls.length,1);
+  assert.equal(context.calls[0][0],'/api/discover-datasets');
+  assert.equal(context.calls[0][1].roots[0],'/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one');
+  assert.equal(run("fields.get('dataset_root').input.value"),'/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one');
+  assert.equal(elements.get('dataset-candidates').querySelectorAll('input:checked').length,1);
+});

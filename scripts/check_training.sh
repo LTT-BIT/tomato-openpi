@@ -17,6 +17,9 @@ mkdir -p .cache/ci
 uv lock --check --offline
 CHECK_PATHS=(
   training_configs tests
+  scripts/train_flash.py scripts/verify_flash_backend.py
+  src/openpi/models/pi0_flash.py src/openpi/shared/flash_polynomial.py
+  src/openpi/training/flash_native.py src/openpi/training/flash_checkpoint.py
   scripts/training_ui.py scripts/training_ui_config.py
   scripts/run_training.py scripts/compute_experiment_norm.py scripts/train.py scripts/train_reproducibility_test.py
   src/openpi/training/norm_provenance.py examples/fr3_wuji/compute_norm_stats.py
@@ -43,7 +46,9 @@ for experiment in \
   training_configs.experiments.cup_grasping.baseline.cup_single_franka_lora_v1 \
   training_configs.experiments.cup_grasping.baseline.cup_single_franka_fullft_v1 \
   training_configs.experiments.lemon_scooping.baseline.lemon_ur_o30_lora_v1 \
-  training_configs.experiments.lemon_scooping.baseline.lemon_ur_o30_fullft_v1; do
+  training_configs.experiments.lemon_scooping.baseline.lemon_ur_o30_fullft_v1 \
+  training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_flash_fullft_v1 \
+  training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_reference_fullft_v1; do
   bash scripts/python.sh -m scripts.run_training "$experiment" --dry-run
 done
 

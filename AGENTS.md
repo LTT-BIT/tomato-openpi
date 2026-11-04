@@ -12,3 +12,6 @@
 - 更新训练行为时同步维护根 README、多人开发文档或对应任务训练说明；区分准备完成、训练完成和实机验证。
 - 只提交本轮及本任务相关内容，保留用户其他未提交修改；不把数据集、权重、密钥提交 Git。
 - 训练日志同时保存到本地并启用 W&B；无法联网时明确采用 offline 模式，之后执行 sync。
+
+- FLASH 正式训练适配只在 `paper-flash-test` 修改；`train-rtc-paper-delta` 只保留 Delta/T3/RTC。统一 UI 的接入不构成跨分支混入算法的授权。每次编辑前核对 `git branch --show-current`，不以当前检出分支代替任务指定分支。
+- 28 服务器沿用 `/home/mengxiang/workspace/code/tomato-openpi-sharpa`，数据父目录 `/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one`。不另开工程、不清理其他仓库的真实 checkpoint；本轮验收后启动 UI，不自动启动正式训练。

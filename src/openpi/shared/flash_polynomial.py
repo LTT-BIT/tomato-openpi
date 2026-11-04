@@ -18,7 +18,7 @@ import numpy as np
 from numpy.polynomial import legendre
 
 
-@dataclasses.dataclass(frozen=True, eq=False)
+@dataclasses.dataclass(frozen=True)
 class FlashPolynomial:
     degree: int = 6
     horizon: int = 50

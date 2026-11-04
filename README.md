@@ -315,3 +315,17 @@ FLASH 已新增显式 **FullFT** 模式：`Pi0FlashConfig(freeze_vlm=False)` 训
 - [P2.5 扩大离线验证与 P3 候选方案](docs/flash/08_p25_extended_validation.md)：全部101验证源、813窗；Step100 MAE 0.15935→0.05676 rad，101源平均误差均改善。新增10/15/50帧重规划、初始模型/Oracle对照及恢复审计；零训练更新，P3仅规划，手指局部误差与跨进程数值漂移仍需跟踪。
 
 - [P3 Step100→250 受控续训](docs/flash/09_p3_step250.md)：固定813窗MAE改善12.87%，预先冻结505均匀窗改善14.38%；增量Expert+Adam引用冻结VLM的实际恢复通过。关键手指尾误差及重规划速度Gap仍有退化；保留中断与获准恢复计算记录，未训练Step500或执行实机部署。
+
+### FLASH 正式全参训练入口（paper-flash-test）
+
+28 服务器沿用 `/home/mengxiang/workspace/code/tomato-openpi-sharpa`，在本分支运行 `bash scripts/python.sh -m scripts.training_ui --port 8765`。UI 显示实际分支和版本，提供独立的 FLASH 全参及使用同一数据划分的 π₀.₅ 对照，不合并 Delta/T3 代码。
+
+- FLASH：`training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_flash_fullft_v1`；对照：同目录 `tomato_fr3_sharpa_reference_fullft_v1`。VLM 与 Action Expert 均训练，从 `pi05_base`、新 AdamW、Step 0 开始。
+- 数据为 `normal/no-block-one` 七个实际 LeRobot 根目录，共 480 集、451270 帧；按原始录制源冻结 384/96 训练/验证划分，仅训练集计算归一化。统计、Manifest、固定验证窗口及各自 SHA256 保存在 `assets/normal480_flash_absolute_k6_s1_train_split_v1`。首次准备：`bash scripts/python.sh -m scripts.compute_experiment_norm training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_flash_fullft_v1`；已存在时只核验，不覆盖。
+- Absolute `(50,58)`，K=6（7 个系数 token）、stride=1；当前测量历史 `(8,58)`，监督扩展目标 `(54,58)`，未来目标不进入条件输入。不是论文 stride=4 长时实验。
+- 默认 global batch 8、8 卡 FSDP、30000 步、每 1000 步保存；UI 可调整预算和优化器。固定验证 64 窗口，不能宣称覆盖全部 96 个验证源。FLASH 与对照沿用相同划分、统计、窗口和预算。FLASH 禁止叠加 Delta、RTC 或有放回分组采样。
+- 启动经过 `scripts.run_training` 的预检和运行记录，调用 `scripts.train_flash`；保存完整模型/优化器、global step、数据资产及恢复契约。恢复核对代码、配置、数据 Hash，重建优化器布局并从完成步数确定下一窗口；PRNG 由 seed 和 global step 派生。保存后才做周期评估，避免评估错误导致该次权重丢失。
+- 真实全尺寸验收：8 卡、3353487146 参数、视觉/语言/Expert 梯度均非零、输出 `(8,50,58)`；模型与 Adam 恢复最大差为 0，恢复后的下一更新最大差 `1.74623e-10`，不声称 bitwise 一致。稳定更新约 0.73 秒/步（不含首次编译），JAX 活跃峰值约 23.8 GiB/卡，池预留约 32 GiB/卡；正式长训耗时仍需实际测量。
+- 本次离线验收累计 5 次更新计算（其中有恢复重算），独立于正式预算，正式训练尚未开始。临时完整验收 Checkpoint 已删除，保留小型结果和 W&B offline 日志；后续需 `wandb sync`，未声称已上传 W&B。验收命令入口 `python -m scripts.verify_flash_backend --help`；其小样本 MAE 不是正式训练收敛结论。
+
+正式训练、完整公平对照和实机部署是后续独立阶段；启动 UI 不会自动启动训练。RTC/Delta 分支继续独立维护，不能以接 UI 为由迁入 FLASH 算法。

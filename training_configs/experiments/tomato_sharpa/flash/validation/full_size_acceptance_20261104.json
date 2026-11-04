@@ -1,0 +1,241 @@
+{
+  "purpose": "bounded_full_size_gpu_acceptance",
+  "status": "passed",
+  "formal_updates": 0,
+  "update_computations": 5,
+  "data": {
+    "episodes": 480,
+    "frames": 451270,
+    "legal_windows": 423430,
+    "source_count": 480,
+    "training_action_semantics": "absolute",
+    "K": 6,
+    "stride": 1,
+    "manifest_sha256": "6714a7de97e5132645b651a67f4891568a0f39f692d06e9ae8daa2e6d165c032",
+    "normalization_sha256": "a7a0bac53866e806f2baf6cdc5bd2b7da958731a1d5d2206e71faecabb8b6b1e",
+    "validation_sha256": "f806766f0842b8a28c766dbec89acf0f7ef52add39cc3416e710760e18091e4b",
+    "train_sources": 384,
+    "validation_sources": 96
+  },
+  "updates": [
+    {
+      "expert_gradient_norm": 18.410566329956055,
+      "flow_matching_loss": 1.6521940231323242,
+      "gradient_norm": 18.780445098876953,
+      "language_gradient_norm": 3.6872901916503906,
+      "loss": 4.385654449462891,
+      "polynomial_consistency_loss": 2.7334604263305664,
+      "vision_gradient_norm": 0.4000858962535858,
+      "completed_step": 1,
+      "seconds": 50.121197435073555
+    },
+    {
+      "expert_gradient_norm": 18.55660629272461,
+      "flow_matching_loss": 1.70008385181427,
+      "gradient_norm": 18.965423583984375,
+      "language_gradient_norm": 3.8797996044158936,
+      "loss": 4.434865951538086,
+      "polynomial_consistency_loss": 2.7347824573516846,
+      "vision_gradient_norm": 0.5354888439178467,
+      "completed_step": 2,
+      "seconds": 0.7317651649937034
+    },
+    {
+      "expert_gradient_norm": 18.259492874145508,
+      "flow_matching_loss": 1.6941940784454346,
+      "gradient_norm": 18.716686248779297,
+      "language_gradient_norm": 4.070820331573486,
+      "loss": 4.374222278594971,
+      "polynomial_consistency_loss": 2.680027723312378,
+      "vision_gradient_norm": 0.5776107907295227,
+      "completed_step": 3,
+      "seconds": 0.7764324259478599
+    },
+    {
+      "expert_gradient_norm": 18.259492874145508,
+      "flow_matching_loss": 1.6941940784454346,
+      "gradient_norm": 18.716686248779297,
+      "language_gradient_norm": 4.070820331573486,
+      "loss": 4.374222278594971,
+      "polynomial_consistency_loss": 2.680027723312378,
+      "vision_gradient_norm": 0.5776107907295227,
+      "completed_step": 3,
+      "seconds": 33.402411542017944
+    },
+    {
+      "expert_gradient_norm": 18.259492874145508,
+      "flow_matching_loss": 1.6941940784454346,
+      "gradient_norm": 18.716686248779297,
+      "language_gradient_norm": 4.070820331573486,
+      "loss": 4.374222278594971,
+      "polynomial_consistency_loss": 2.680027723312378,
+      "vision_gradient_norm": 0.5776107907295227,
+      "completed_step": 3,
+      "seconds": 7.904320948990062
+    }
+  ],
+  "training_windows": [
+    {
+      "id": "61461fb3215a7da0",
+      "start": 381
+    },
+    {
+      "id": "da84170d2f8e521c",
+      "start": 232
+    },
+    {
+      "id": "6e07f2fd40cee966",
+      "start": 303
+    },
+    {
+      "id": "df76509cf4d4f5dd",
+      "start": 434
+    },
+    {
+      "id": "e8299b9a26ad6d35",
+      "start": 789
+    },
+    {
+      "id": "6318d92ecdb94ab0",
+      "start": 562
+    },
+    {
+      "id": "174d98a2b3e89cea",
+      "start": 586
+    },
+    {
+      "id": "a8b521b6a2eaf2b0",
+      "start": 80
+    }
+  ],
+  "batch_shapes": {
+    "history": [
+      8,
+      8,
+      58
+    ],
+    "target": [
+      8,
+      54,
+      58
+    ]
+  },
+  "parameter_count": 3353487146,
+  "vlm_frozen": false,
+  "sampling_shape": [
+    8,
+    50,
+    58
+  ],
+  "validation_prediction_mae": 0.15147665143013,
+  "validation_oracle_mae": 0.0008124627638608217,
+  "checkpoint_seconds": 33.98048443708103,
+  "restore_max_abs_difference": 0.0,
+  "failure_history": [
+    "ValueError: pytree structure error: different pytree metadata at key path\n    pjit in_shardings[1]\nAt that key path, the prefix pytree pjit in_shardings has a subtree of type\n    <class 'openpi.training.utils.TrainState'>\nwith metadata\n    (GradientTransformationExtraArgs(init=<function chain.<locals>.init_fn at 0x7f11c8094ae0>, update=<function chain.<locals>.update_fn at 0x7f11c8094c20>), None)\nbut at the same key path the full pytree has a subtree of the same type but with metadata\n    (GradientTransformationExtraArgs(init=<function chain.<locals>.init_fn at 0x7f107c1132e0>, update=<function chain.<locals>.update_fn at 0x7f107c113240>), None)\nso the diff in the metadata at these pytree nodes is\n    - (GradientTransformationExtraArgs(init=<function chain.<locals>.init_fn at 0x7f11c8094ae0>, update=<function chain.<locals>.update_fn at 0x7f11c8094c20>), None)\n    ?                                                                                 ^^^^^^                                                        ^^^^ --\n\n    + (GradientTransformationExtraArgs(init=<function chain.<locals>.init_fn at 0x7f107c1132e0>, update=<function chain.<locals>.update_fn at 0x7f107c113240>), None)\n    ?                                                                                +++ ^^^                                                       +++ ^^^\n"
+  ],
+  "resumed_from_completed_step": 2,
+  "next_update_max_abs_difference": 1.7462298274040222e-10,
+  "sampler_restore_matches": true,
+  "device_memory": [
+    {
+      "num_allocs": 1871,
+      "bytes_in_use": 20506030848,
+      "peak_bytes_in_use": 25548007936,
+      "largest_alloc_size": 5041973248,
+      "bytes_limit": 68731658057,
+      "bytes_reserved": 0,
+      "peak_bytes_reserved": 0,
+      "largest_free_block_bytes": 0,
+      "pool_bytes": 34374418432,
+      "peak_pool_bytes": 34374418432
+    },
+    {
+      "num_allocs": 1859,
+      "bytes_in_use": 20430533376,
+      "peak_bytes_in_use": 25472510464,
+      "largest_alloc_size": 5041973248,
+      "bytes_limit": 68731658057,
+      "bytes_reserved": 0,
+      "peak_bytes_reserved": 0,
+      "largest_free_block_bytes": 0,
+      "pool_bytes": 34374418432,
+      "peak_pool_bytes": 34374418432
+    },
+    {
+      "num_allocs": 1859,
+      "bytes_in_use": 20506030848,
+      "peak_bytes_in_use": 25548007936,
+      "largest_alloc_size": 5041973248,
+      "bytes_limit": 68731658057,
+      "bytes_reserved": 0,
+      "peak_bytes_reserved": 0,
+      "largest_free_block_bytes": 0,
+      "pool_bytes": 34374418432,
+      "peak_pool_bytes": 34374418432
+    },
+    {
+      "num_allocs": 1859,
+      "bytes_in_use": 20430533376,
+      "peak_bytes_in_use": 25472510464,
+      "largest_alloc_size": 5041973248,
+      "bytes_limit": 68731658057,
+      "bytes_reserved": 0,
+      "peak_bytes_reserved": 0,
+      "largest_free_block_bytes": 0,
+      "pool_bytes": 34374418432,
+      "peak_pool_bytes": 34374418432
+    },
+    {
+      "num_allocs": 1859,
+      "bytes_in_use": 20430533376,
+      "peak_bytes_in_use": 25472510464,
+      "largest_alloc_size": 5041973248,
+      "bytes_limit": 68731658057,
+      "bytes_reserved": 0,
+      "peak_bytes_reserved": 0,
+      "largest_free_block_bytes": 0,
+      "pool_bytes": 34374418432,
+      "peak_pool_bytes": 34374418432
+    },
+    {
+      "num_allocs": 1859,
+      "bytes_in_use": 20430533376,
+      "peak_bytes_in_use": 25472510464,
+      "largest_alloc_size": 5041973248,
+      "bytes_limit": 68731658057,
+      "bytes_reserved": 0,
+      "peak_bytes_reserved": 0,
+      "largest_free_block_bytes": 0,
+      "pool_bytes": 34374418432,
+      "peak_pool_bytes": 34374418432
+    },
+    {
+      "num_allocs": 1859,
+      "bytes_in_use": 20430533376,
+      "peak_bytes_in_use": 25472510464,
+      "largest_alloc_size": 5041973248,
+      "bytes_limit": 68731658057,
+      "bytes_reserved": 0,
+      "peak_bytes_reserved": 0,
+      "largest_free_block_bytes": 0,
+      "pool_bytes": 34374418432,
+      "peak_pool_bytes": 34374418432
+    },
+    {
+      "num_allocs": 1859,
+      "bytes_in_use": 20506030848,
+      "peak_bytes_in_use": 25548007936,
+      "largest_alloc_size": 5041973248,
+      "bytes_limit": 68731658057,
+      "bytes_reserved": 0,
+      "peak_bytes_reserved": 0,
+      "largest_free_block_bytes": 0,
+      "pool_bytes": 34374418432,
+      "peak_pool_bytes": 34374418432
+    }
+  ],
+  "temporary_checkpoint_removed": true,
+  "acceptance_code_commit": "03ac1df",
+  "branch_correction": "Acceptance ran before moving authored FLASH files back onto paper-flash-test; no Delta/T3 algorithm was enabled. Core backend/model/math are unchanged; branch integration tested separately."
+}

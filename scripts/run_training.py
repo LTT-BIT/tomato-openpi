@@ -104,6 +104,10 @@ def validate_config(config: cfg.TrainConfig) -> None:
 def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     """Check metadata/statistics without constructing models or downloading tokenizers."""
     validate_config(config)
+    if config.policy_metadata.get("algorithm") in ("flash", "flash_reference"):
+        from openpi.training.flash_native import preflight as flash_preflight
+
+        return flash_preflight(config, require_norm=require_norm)
     if len(config.data.lerobot_datasets) > 1:
         return preflight_collection(config, require_norm=require_norm)
     metadata = config.policy_metadata
@@ -123,7 +127,10 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     if features["observation.state"]["shape"] not in [[dim] for dim in metadata["raw_state_dims"]]:
         raise ValueError("Dataset raw state shape is not supported by the embodiment")
     joint_names = metadata.get("joint_names")
-    for key, source_names in (("observation.state", "source_state_joint_names"), ("action", "source_action_joint_names")):
+    for key, source_names in (
+        ("observation.state", "source_state_joint_names"),
+        ("action", "source_action_joint_names"),
+    ):
         expected_names = metadata.get(source_names, joint_names)
         if expected_names is not None and features[key].get("names") != expected_names:
             raise ValueError(f"Dataset {key} joint names/order differ from the embodiment protocol")
@@ -334,7 +341,10 @@ def launch(config: cfg.TrainConfig, *, wandb_mode: str, inputs: dict) -> None:
             logging.basicConfig(level=logging.INFO, stream=stderr, force=True)
             print(f"Run manifest: {manifest_path}\nW&B: {wandb_mode}\nCheckpoint: {config.checkpoint_dir}")
             try:
-                from scripts import train
+                if config.policy_metadata.get("algorithm") in ("flash", "flash_reference"):
+                    from scripts import train_flash as train
+                else:
+                    from scripts import train
 
                 train.main(config)
             except BaseException as error:
