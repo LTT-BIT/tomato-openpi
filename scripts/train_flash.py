@@ -62,6 +62,13 @@ def step(config, rng, state, batch):
         model
     )
     info["gradient_norm"] = optax.global_norm(grads)
+    from openpi.training.flash_checkpoint import is_vlm_parameter
+
+    info["vision_gradient_norm"] = optax.global_norm(grads.filter(lambda p, _: p[:2] == ("PaliGemma", "img")))
+    info["language_gradient_norm"] = optax.global_norm(
+        grads.filter(lambda p, _: p[:2] == ("PaliGemma", "llm") and is_vlm_parameter(p))
+    )
+    info["expert_gradient_norm"] = optax.global_norm(grads.filter(lambda p, _: not is_vlm_parameter(p)))
     finite = jnp.all(jnp.stack([jnp.all(jnp.isfinite(x)) for x in jax.tree.leaves(grads)]))
     finite &= jnp.all(jnp.stack([jnp.isfinite(v) for v in info.values()]))
 
