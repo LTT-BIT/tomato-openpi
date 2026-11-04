@@ -204,6 +204,9 @@ def local_camera_views(images: dict[str, at.Array], *, max_images: int = 5) -> l
 
 def main(config: _config.TrainConfig):
     init_logging()
+    validate_training = getattr(config.model, "validate_training", None)
+    if validate_training is not None:
+        validate_training(config)
     logging.info(f"Running on: {platform.node()}")
 
     if config.batch_size % jax.device_count() != 0:

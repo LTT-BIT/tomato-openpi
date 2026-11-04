@@ -144,6 +144,9 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/openpi", "training_configs", "scripts", "examples"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"third_party/mamba3" = "openpi/models/mamba3/licenses"
+
 [tool.pytest.ini_options]
 markers = ["manual: should be run manually."]
 testpaths = ["src", "scripts", "packages", "tests"]

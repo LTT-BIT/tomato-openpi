@@ -321,3 +321,45 @@ Sharpa可在本地 `template/<负责人>/` 选择双臂Delta、逐未来时间�
 `10` 表示每条训练样本均匀采样 0～10 步干净前缀，含两端，并非固定10步。T3 噪声先生成完整相关块，再用真值覆盖前缀；仅监督后缀，按有效 token 总数归一化。模型只保留一份 `Pi0.compute_loss/sample_actions`，Paper 子类只改变噪声。**不实现论文第9页的 correlation-aware correction、条件协方差修正或 soft inpainting。** PyTorch 不支持此组合。
 
 仅改 RTC、实验名、batch 等可在合同一致时复用原 T3 的四个资产文件；改变 mode/beta/horizon/数据必须使用匹配的独立资产，不能覆盖或跳过摘要检查。新 RTC 实验必须使用新实验名，已有 T3 权重可作为新 run 的初始化，不能以 `resume` 强行切换算法。生成命令、资产校验、跨 chunk 物理前缀接口和验证边界见 [Sharpa T3+RTC 说明](training_configs/experiments/tomato_sharpa/README.md#t3--trainrtc-集成)。
+
+## 可选 Mamba-3 JAX 动作专家：Phase A
+
+独立模块 `training_configs.experiments.tomato_sharpa.mamba.phase_a` 保留完整 π0.5 SigLIP/Gemma Prefix，使用原生 NNX 的上下文压缩器和 4 层、512 宽、64 状态的 Mamba-3 SISO 动作专家。三相机 224×224、H=50、D=58；44/16/4 个视觉/语言（含离散 state）/全局条件槽位。沿用现有 `init_train_state/train_step`、AdamW、checkpoint 和数据适配，不构造原 Transformer 动作专家。继承字段 `action_expert_variant` 仅保留配置兼容，不参与新专家构造。来源、固定 commit、许可证、超参数对应和移植差异见 [NOTICE](third_party/mamba3/NOTICE)。不安装社区包、不升级锁定 JAX/Flax；wheel 携带许可证。
+
+本阶段固定 **FullFT、Absolute、普通按维 z-score、标准 Flow Matching**。独立数据身份/统计目录为 `sharpa_mamba_phase_a_absolute_v1`，配置名 `pi05_mamba3_phase_a_fullft_b1`，实验名 `mamba3_phase_a_fullft_b1_s42`；数据来自显式 `PI05_MAMBA_DATASET_ROOT`，英文任务文本来自其 `meta/tasks.jsonl`，英文 prompt 示例保存在配置中。需要从这份数据独立计算普通统计，不能拷贝 Delta/T1–T3 统计。Mamba 新配置拒绝 RTC、Delta、Paper、LoRA、冻结；原模型的这些模式保留。T1–T3 融合须等待完整 Phase A 验收，本阶段仅保留清楚的 `encode_condition/velocity/noise` 边界。
+
+状态：**原型及诊断验证已准备，真实预训练全模型训练未完成，实机未验证**。本机 RTX 4070 Ti SUPER 16GB 可运行组件和缩小 VLM 的诊断更新；完整模型形状审计为 2,957,866,346 参数，FP32 参数加 Adam 两份矩状态下界为 35,494,396,152 字节（约 33.1GiB），还不含梯度/激活。资源预检会明确返回 `BLOCKED`，不把诊断结果当完整 FullFT，也不自动启动服务器训练。
+
+以下命令在仓库根目录执行；使用自己的锁定环境，或本机已建立的 `PI05_SHARED_ENV=/home/user/.cache/mamba3-openpi-runtime`。每次指定新的输出目录，入口拒绝覆盖已有证据：
+
+```bash
+CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_PREALLOCATE=false \
+  bash scripts/python.sh -m scripts.smoke_mamba3_jax \
+  --suite components --config mamba3_phase_a_components \
+  --steps 20 --output-dir .cache/mamba3/components_run01
+
+# 真实 B1 验收：必须有本地真实数据、完整基础权重、独立 Absolute 统计和足够 GPU 显存。
+CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_PREALLOCATE=false \
+  bash scripts/python.sh -m scripts.smoke_mamba3_jax \
+  --suite all --config pi05_mamba3_phase_a_fullft_b1 \
+  --init-checkpoint "$PI05_MAMBA_INIT_CHECKPOINT" \
+  --dataset "$PI05_MAMBA_DATASET_ROOT" \
+  --norm-stats "$PI05_MAMBA_ASSETS_DIR/sharpa_mamba_phase_a_absolute_v1/norm_stats.json" \
+  --steps 20 --seed 42 --output-dir .cache/mamba3/fullft_run01
+```
+
+入口也支持 `fullft/checkpoint/policy/regression`；前三项执行有限的真实训练及 checkpoint/离线 Policy 链路，不会用 tiny 自动替代缺失输入。退出码 0 表示所选 suite 通过，1 表示失败，2 表示前置条件阻塞；`results.json` 独立记录是否达到整体 Phase A 验收，不能由退出码 0 推断整体完成。组件含独立 PyTorch 递推前向/梯度对照、FP32/BF16、H50/非整块长度、mask、Flow 随机流、门控连通性与固定目标学习；诊断训练保持三相机/H50/D58，用缩小且随机初始化的 VLM，明确标注 `diagnostic_only=true`。保存/恢复测试启动新 Python 进程，对比固定噪声采样和完整优化器续训。可复核结果、环境、命令和各组梯度写入指定本地目录；不提交权重/数据/过程日志。
+
+Mamba checkpoint 在配套统计旁保存 `mamba_architecture.json`，绑定架构、模型配置、上游版本与统计 SHA256；推理使用 `load_mamba_checkpoint` 和只返回动作数组的 `MambaOfflinePolicy`。训练恢复检查架构及当前/保存统计身份；普通旧 checkpoint 无需新增文件。采样仅在单次查询复用条件，SSM carry 每次 velocity 重置。
+
+正常实验仍使用统一入口。设置三个 `PI05_MAMBA_*` 本地路径后，先运行统计和 dry-run；统计计算入口与旧模式相同：
+
+```bash
+MODULE=training_configs.experiments.tomato_sharpa.mamba.phase_a
+bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE"
+bash scripts/python.sh -m scripts.run_training "$MODULE" --dry-run
+# 资源满足且决定执行本地训练时：
+bash scripts/python.sh -u -m scripts.run_training "$MODULE" --wandb-mode offline
+```
+
+训练保存本地日志并启用 W&B；离线结果按前文 `wandb sync` 命令同步。原 Transformer 对照模块为 `training_configs.experiments.tomato_sharpa.mamba.transformer_control`，使用相同 Absolute 数据、普通归一化和短测优化器设置；未测性能差异，不声称 Mamba 加速或提高任务成功率。
