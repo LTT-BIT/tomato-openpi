@@ -333,3 +333,5 @@ FLASH 已新增显式 **FullFT** 模式：`Pi0FlashConfig(freeze_vlm=False)` 训
 正式训练、完整公平对照和实机部署是后续独立阶段；启动 UI 不会自动启动训练。RTC/Delta 分支继续独立维护，不能以接 UI 为由迁入 FLASH 算法。
 
 训练 UI 的个人配置使用中文方法、数据范围和已记录 Batch 展示；补充归一化与噪声说明，原文件名在悬停提示中保留。其他分支依赖缺失的 Delta/T3 配置折叠到“其他分支的历史配置”，禁止误选；只调整展示，不重命名配置文件、实验路径或 Checkpoint，也不执行历史配置来生成目录。
+
+2026-11-04 已完成 28 服务器 FLASH Batch512 / FSDP8 的一次真实更新容量验收（3353487146 参数）：FM、Consistency、Total Loss 和全部分组梯度有限且非零，无 OOM；JAX 活跃峰值约 39.53 GiB/卡。仅 1 次独立诊断更新，未启动 8000 步正式训练、未写完整 Checkpoint；结果见 `training_configs/experiments/tomato_sharpa/flash/validation/b512_capacity_20261104.json`。π05 对照的 Batch512 未单独做本次 GPU 容量验收。
