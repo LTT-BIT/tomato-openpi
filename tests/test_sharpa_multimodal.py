@@ -60,15 +60,8 @@ def test_only_official_sharpa_baselines_are_published_and_share_statistics():
         assert config.model.action_horizon == 50
     assert (lora.batch_size, lora.fsdp_devices) == (8, 1)
     assert (fullft.batch_size, fullft.fsdp_devices) == (32, 8)
-    entries = [
-        entry["id"] for entry in baseline_catalog() if entry["task"] == "tomato_sharpa" and entry["kind"] == "baseline"
-    ]
+    entries = [entry["id"] for entry in baseline_catalog() if entry["task"] == "tomato_sharpa"]
     assert set(entries) == {MODULE, MODULE.replace("lora", "fullft")}
-    experiments = [
-        entry for entry in baseline_catalog() if entry["task"] == "tomato_sharpa" and entry["kind"] == "experiment"
-    ]
-    assert len(experiments) == 2
-    assert all(".flash." in entry["id"] for entry in experiments)
 
 
 def test_preflight_checks_raw_names_and_rejects_wrong_order(tmp_path, monkeypatch):

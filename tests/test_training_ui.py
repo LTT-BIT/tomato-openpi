@@ -29,11 +29,7 @@ BASE = "training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1"
 def test_all_baseline_defaults_roundtrip_and_personal_snapshot(entry):
     module = entry["id"]
     baseline = editor.baseline_config(module)
-    assert baseline.weight_loader.params_path == (
-        "/mnt/data/train_platform/weights/pi05/pi05_base/params"
-        if baseline.policy_metadata.get("algorithm") in ("flash", "flash_reference")
-        else common.SERVER_BASE_PARAMS
-    )
+    assert baseline.weight_loader.params_path == common.SERVER_BASE_PARAMS
     values = editor.defaults(module)["values"]
     restored = editor.apply_overrides(baseline, values)
     assert restored == baseline
@@ -78,9 +74,7 @@ def test_invalid_edits_fail_before_saving(change):
         editor.apply_overrides(editor.baseline_config(BASE), values)
 
 
-@pytest.mark.parametrize(
-    "entry", [e for e in editor.baseline_catalog() if "fullft" in e["id"] and ".flash." not in e["id"]]
-)
+@pytest.mark.parametrize("entry", [e for e in editor.baseline_catalog() if "fullft" in e["id"]])
 def test_rtc_fullft_ui_and_cli_preserve_dataset_and_trainable_scope(entry):
     module = entry["id"]
     baseline = editor.baseline_config(module)
@@ -439,9 +433,6 @@ def test_http_requires_token_and_json_for_mutations(workspace, monkeypatch):
             urlopen(url + "/api/baselines", timeout=5)
         assert error.value.code == 403
         headers = {"X-Training-Token": "test-token", "Content-Type": "application/json"}
-        monkeypatch.setattr(ui, "workspace_revision", lambda: {"branch": "train-rtc-paper-delta", "commit": "test"})
-        with urlopen(Request(url + "/api/baselines", headers=headers), timeout=5) as response:
-            assert json.load(response)["revision"]["commit"] == "test"
         with urlopen(Request(url + "/api/start", data=b"{}", headers=headers), timeout=5) as response:
             assert json.load(response)["status"] == "queued"
         assert requests == [{}]

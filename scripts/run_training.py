@@ -104,10 +104,6 @@ def validate_config(config: cfg.TrainConfig) -> None:
 def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     """Check metadata/statistics without constructing models or downloading tokenizers."""
     validate_config(config)
-    if config.policy_metadata.get("algorithm") in ("flash", "flash_reference"):
-        from openpi.training.flash_native import preflight as flash_preflight
-
-        return flash_preflight(config, require_norm=require_norm)
     if len(config.data.lerobot_datasets) > 1:
         return preflight_collection(config, require_norm=require_norm)
     metadata = config.policy_metadata
@@ -345,10 +341,7 @@ def launch(config: cfg.TrainConfig, *, wandb_mode: str, inputs: dict) -> None:
             logging.basicConfig(level=logging.INFO, stream=stderr, force=True)
             print(f"Run manifest: {manifest_path}\nW&B: {wandb_mode}\nCheckpoint: {config.checkpoint_dir}")
             try:
-                if config.policy_metadata.get("algorithm") in ("flash", "flash_reference"):
-                    from scripts import train_flash as train
-                else:
-                    from scripts import train
+                from scripts import train
 
                 train.main(config)
             except BaseException as error:

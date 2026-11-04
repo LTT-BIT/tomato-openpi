@@ -77,7 +77,6 @@ function fillForm(result) {
   if(result.shared_weights){const button=node('button','使用服务器公共权重','text-button');button.addEventListener('click',()=>{fields.get('weight_path').input.value=result.shared_weights;fields.get('weight_path').input.dispatchEvent(new Event('input'));});$('runtime-fields').append(button);}
   $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);
   $('groups-panel').classList.toggle('hidden',initial.sampling_mode!=='weighted_replacement');
-  if(protocol.flash){fields.get('rtc_max_delay').input.disabled=true;$('sampling-mode').querySelector('[value=weighted_replacement]').disabled=true;}
   syncPaperControls();renderProtocol();
   fields.get('exp_name').input.dispatchEvent(new Event('input'));updatePath();
 }
@@ -94,9 +93,9 @@ function syncPaperControls(){
   $('paper-timestamp').checked=['t1','t3'].includes(paperChoice);
   $('paper-correlated').checked=['t2','t3'].includes(paperChoice);
   $('paper-timestamp').disabled=!available;$('paper-correlated').disabled=!available;
-  $('paper-help').textContent=protocol.flash?'此配置固定 Absolute，不叠加 T3 或 RTC；使用相同划分的 π05 对照评估 FLASH。':available?'两项同时勾选为 T3；可与 Train RTC 组合。论文功能使用双臂 delta、双手 absolute、完整动作窗口及无放回采样。切换功能自动分配独立统计。':'论文勾选仅支持 30 Hz Sharpa multimodal π0.5 全参；已有自定义论文配置保留原算法。';
+  $('paper-help').textContent=available?'两项同时勾选为 T3；可与 Train RTC 组合。论文功能使用双臂 delta、双手 absolute、完整动作窗口及无放回采样。切换功能自动分配独立统计。':'论文勾选仅支持 30 Hz Sharpa multimodal π0.5 全参；已有自定义论文配置保留原算法。';
   fields.get('action_semantics').input.querySelector('[value=absolute]').disabled=active;
-  $('sampling-mode').querySelector('[value=weighted_replacement]').disabled=active||protocol.flash;
+  $('sampling-mode').querySelector('[value=weighted_replacement]').disabled=active;
   if(active){
     fields.get('action_semantics').input.value='delta';
     $('sampling-mode').value='epoch_shuffle';$('groups').replaceChildren();$('groups-panel').classList.add('hidden');
@@ -115,13 +114,13 @@ function changePaperFeatures(){
 }
 function renderProtocol(){
   const current=key=>fields.get(key)?.input.value??initial[key], p=paperAlgorithm();
-  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · ${protocol.flash_reference?'π05 对照 · 同 FLASH 数据划分':protocol.flash?'FLASH · K=6 / stride=1 / 全参':p?'Paper 专用配置':'普通 π0.5'} · RTC 最大延迟 ${current('rtc_max_delay')} 步 · 动作监督 ${current('action_semantics')}`),node('div','统计资产：'+current('assets_dir')+'/'+current('asset_id')),node('div','英文 prompt 示例：'+protocol.prompt));
+  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · ${p?'Paper 专用配置':'普通 π0.5'} · RTC 最大延迟 ${current('rtc_max_delay')} 步 · 动作监督 ${current('action_semantics')}`),node('div','统计资产：'+current('assets_dir')+'/'+current('asset_id')),node('div','英文 prompt 示例：'+protocol.prompt));
   if(p)$('protocol').append(node('div',`Paper mode=${p.mode} · beta=${p.beta} · bundle SHA256=${p.asset_sha256||'待计算'}`));
   if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
 }
 async function chooseBaseline(module){
   const version=++loadingVersion;$('start').disabled=true;
-  try{const result=await api('/api/baseline?id='+encodeURIComponent(module));if(version!==loadingVersion)return;baseline=module;fillForm(result);for(const el of document.querySelectorAll('#baseline-list button, #paper-list button, #personal-list button'))el.classList.toggle('selected',el.dataset.id===module);}
+  try{const result=await api('/api/baseline?id='+encodeURIComponent(module));if(version!==loadingVersion)return;baseline=module;fillForm(result);for(const el of document.querySelectorAll('#baseline-list button, #personal-list button'))el.classList.toggle('selected',el.dataset.id===module);}
   finally{if(version===loadingVersion)$('start').disabled=false;}
 }
 function parseIds(text){
@@ -133,14 +132,6 @@ function parseIds(text){
 }
 function appendDatasetPath(current,path){const original=(initial.dataset_roots||[initial.dataset_root]).join('\n');return current===original?path:[...new Set([...datasetPaths(current),path])].join('\n');}
 function datasetPaths(text){return text.split('\n').map(p=>p.trim()).filter(Boolean);}
-async function useNormalSharpaData(){
-  if(!baseline||baseline.split('.')[2]!=='tomato_sharpa')throw Error('请先选择番茄 Sharpa 配置');
-  if(protocol.paper_algorithm)throw Error('已有论文配置固定了数据来源。更换组合请先选择公共 Sharpa 全参，再重新选择论文功能。');
-  const input=fields.get('dataset_root').input;
-  input.value='/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one';
-  input.dispatchEvent(new Event('input'));
-  await discoverDatasets();
-}
 async function discoverDatasets(){
   if(!baseline)throw Error('请先选择配置');
   const version=loadingVersion, input=fields.get('dataset_root').input, original=input.value;
@@ -249,7 +240,6 @@ $('start').addEventListener('click',()=>perform(async()=>{const job=await api('/
 $('reset').addEventListener('click',()=>perform(()=>chooseBaseline(baseline),$('reset')));
 $('new-stats').addEventListener('click',independentStats);
 $('sampling-mode').addEventListener('change',()=>{const enabled=$('sampling-mode').value==='weighted_replacement';$('groups-panel').classList.toggle('hidden',!enabled);if(enabled&&!$('groups').children.length){addGroup({name:'A',weight:7,episodes:[]});addGroup({name:'B',weight:3,episodes:[]});}updatePath();});
-$('normal-sharpa-data').addEventListener('click',()=>perform(useNormalSharpaData,$('normal-sharpa-data')));
 $('discover-datasets').addEventListener('click',()=>perform(discoverDatasets,$('discover-datasets')));
 $('apply-datasets').addEventListener('click',()=>perform(async()=>applyDatasets(),$('apply-datasets')));
 $('detect-groups').addEventListener('click',()=>perform(detectGroups,$('detect-groups')));
@@ -265,8 +255,8 @@ $('browse-parent').addEventListener('click',()=>perform(()=>browse(browseState.p
 $('browse-select').addEventListener('click',()=>{browseTarget.value=browseTarget.id==='field-dataset_root'?appendDatasetPath(browseTarget.value,browseState.path):browseState.path;browseTarget.dispatchEvent(new Event('input'));browseTarget.dispatchEvent(new Event('change'));$('browser').close();});
 async function refreshCatalog(){
   const info=await api('/api/baselines');
-  $('runtime').textContent=info.repository+'\n'+(info.revision?.branch||'未知分支')+' @ '+(info.revision?.commit||'未知版本')+'\nPython: '+info.python;
-  for(const [id,entries] of [['baseline-list',info.baselines.filter(e=>e.kind!=='experiment')],['paper-list',info.baselines.filter(e=>e.kind==='experiment')],['personal-list',info.personal||[]]]){
+  $('runtime').textContent=info.repository+'\nPython: '+info.python;
+  for(const [id,entries] of [['baseline-list',info.baselines],['personal-list',info.personal||[]]]){
     $(id).replaceChildren();
     for(const entry of entries){const button=node('button',entry.label,'baseline');button.dataset.id=entry.id;button.classList.toggle('selected',baseline===entry.id);button.addEventListener('click',()=>perform(()=>chooseBaseline(entry.id)));$(id).append(button);}
     if(!entries.length)$(id).textContent='暂无本地个人配置。';
@@ -274,5 +264,5 @@ async function refreshCatalog(){
   return info;
 }
 $('refresh-configs').addEventListener('click',()=>perform(refreshCatalog,$('refresh-configs')));
-perform(async()=>{const info=await refreshCatalog();if(info.baselines.length)await chooseBaseline(info.baselines.find(e=>e.id.includes('tomato_sharpa')&&e.id.includes('flash_fullft'))?.id||info.baselines[0].id);await Promise.all([refreshGPUs(),refreshJobs()]);});
+perform(async()=>{const info=await refreshCatalog();if(info.baselines.length)await chooseBaseline(info.baselines.find(e=>e.id.includes('tomato_wuji')&&e.id.includes('lora'))?.id||info.baselines[0].id);await Promise.all([refreshGPUs(),refreshJobs()]);});
 let polling=false;setInterval(async()=>{if(polling||document.hidden)return;polling=true;try{if(currentJob)await showJob(currentJob);await refreshJobs();}catch(error){notice('连接中断：'+error.message,true);}finally{polling=false;}},5000);

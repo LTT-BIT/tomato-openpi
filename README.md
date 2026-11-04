@@ -2,10 +2,6 @@
 
 当前论文实验分支统一为 **`train-rtc-paper-delta`**：整合原 `delta-paper-training-test` 与 `feat/trainrtc-correlated-t3` 的历史，以 T3+trainRTC 实现为主体，补回 Delta 的 UI JAX 显存设置与实际值记录。保留 T0/T1/T2/T3/TG、单源/六源数据、普通训练、原始 trainRTC 及 T3+RTC，可通过配置分别启用；不是强制所有功能同时生效。双臂 Delta、双手 Absolute 的 Paper 统计合同不变，不包含 FLASH。整合与分支改名不代表完成新的正式训练或实机验证。
 
-统一 UI 新增两份可选配置：`番茄 · Sharpa / FLASH 全参` 和 `π05 对照（同 FLASH 划分）`。两者共享 normal/no-block-one 七源数据的原始录制级20%验证划分、训练集归一化、严格合法窗口和 epoch-shuffle；均从 pi05_base、新 Adam、Step0 开始，默认 global batch=8、FSDP=8、30000步，每1000步固定验证并保存完整模型/优化器，默认只保留最新 Checkpoint。FLASH 固定 Absolute (50,58)、K=6、stride=1、实测 history=8、监督 context=54、VLM+Expert FullFT；对照使用原生π05动作模型与独立高斯，不能将两个不同空间的 FM Loss 直接比较。UI 的 T3/RTC 控件对这两份受控配置禁用。通过原 `scripts.compute_experiment_norm` / `scripts.run_training` 入口自动分派专用数据与训练后端，CPU预检查不会构造模型。源级清单、统计和固定验证窗口封存于独立 assets，不能套用已有 T3 统计或旧 FLASH 诊断统计。
-
-正式后端包含确定性跨epoch采样、FSDP全参更新、非有限值拒绝更新、固定验证的物理动作/分组/逐关节误差及K6 Oracle参考、完整参数/Adam/步数与随机策略/数据指纹恢复。当前已通过缩小模型 CPU 更新和恢复测试；28 正式尺寸真实 Batch 的容量、数值及部署验收仍在进行，不能把接口实现当作完整训练效果验证。页面提供 normal/no-block-one 的目录扫描快捷入口并显示实际分支/Commit，仍需用户核对数据后显式点击训练。
-
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
 本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。

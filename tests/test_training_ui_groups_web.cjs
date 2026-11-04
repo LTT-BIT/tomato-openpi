@@ -181,19 +181,3 @@ test('GUI checkboxes select T1/T2/T3, lock sampling, rotate assets and restore n
   assert.equal(run("fields.get('asset_id').input.value"),'ordinary');
   assert.equal(run('request().values.paper_trial'),'none');
 });
-
-test('normal Sharpa shortcut discovers candidates without applying or starting training',async()=>{
-  const {context,run,elements}=setup();
-  context.calls=[];
-  run(`baseline='training_configs.experiments.tomato_sharpa.baseline.example';protocol={};
-    fields.get('dataset_root').input.dispatchEvent=()=>{};
-    api=async(path,data)=>{calls.push([path,data]);return {datasets:[{root:'/normal/source',episodes:2,frames:100,fps:30,selected:true}],warnings:[]}};`);
-  await run('useNormalSharpaData()');
-  assert.equal(context.calls.length,1);
-  assert.equal(context.calls[0][0],'/api/discover-datasets');
-  assert.equal(context.calls[0][1].roots[0],'/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one');
-  assert.equal(run("fields.get('dataset_root').input.value"),'/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-one');
-  assert.equal(elements.get('dataset-candidates').querySelectorAll('input:checked').length,1);
-  run('protocol={paper_algorithm:{mode:"timestamp_zscore_arms"}}');
-  await assert.rejects(run('useNormalSharpaData()'),/固定了数据来源/);
-});

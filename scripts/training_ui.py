@@ -509,24 +509,6 @@ def detect_sampling_groups(request):
     return detect_groups(request["dataset_root"])
 
 
-def workspace_revision():
-    """Identify the checked-out code without fetching or changing Git state."""
-    result = {}
-    for key, args in (("branch", ["branch", "--show-current"]), ("commit", ["rev-parse", "--short", "HEAD"])):
-        try:
-            value = subprocess.run(
-                ["git", "-C", str(common.repository_root()), *args],
-                capture_output=True,
-                text=True,
-                timeout=5,
-                check=True,
-            )
-            result[key] = value.stdout.strip()
-        except (OSError, subprocess.SubprocessError):
-            result[key] = "unknown"
-    return result
-
-
 def handler_class(token):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, _format, *args):
@@ -575,7 +557,6 @@ def handler_class(token):
                         "personal": config_ui.personal_catalog(),
                         "repository": str(common.repository_root()),
                         "python": sys.executable,
-                        "revision": workspace_revision(),
                     }
                 elif url.path == "/api/baseline":
                     value = config_ui.defaults(query["id"])
