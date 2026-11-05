@@ -3,6 +3,7 @@
 from dataclasses import fields
 from dataclasses import replace
 import json
+from pathlib import Path
 
 import jax
 import jax.numpy as jnp
@@ -252,3 +253,59 @@ def test_all_sources_train_and_monitor_without_holdout(prepared, tmp_path):
         preflight(replace(config, policy_metadata={**config.policy_metadata, "data_policy": "source_holdout"}))
     with pytest.raises(FileExistsError):
         prepare(config)
+
+
+def test_prefetch_real_video_order_resume_and_cpu_workers(prepared, tmp_path):
+    import av
+
+    from openpi.models.tokenizer import PaligemmaTokenizer
+    from openpi.training.flash_loader import PrefetchedBatches
+    from openpi.training.flash_loader import WorkerDataset
+
+    # Same numeric fixture, now with real videos for all three camera roles.
+    root = prepared.data.lerobot_datasets[0].root
+    info_path = Path(root) / "meta/info.json"
+    info = json.loads(info_path.read_text())
+    info["video_path"] = "videos/{video_key}/episode_{episode_index:06d}.mp4"
+    info_path.write_text(json.dumps(info))
+    for episode in range(6):
+        for camera in ("cam0", "cam1", "cam2"):
+            path = Path(root) / f"videos/observation.images.{camera}/episode_{episode:06d}.mp4"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with av.open(str(path), "w") as container:
+                stream = container.add_stream("mpeg4", rate=30)
+                stream.width, stream.height, stream.pix_fmt = 32, 32, "yuv420p"
+                for i in range(80):
+                    frame = av.VideoFrame.from_ndarray(np.full((32, 32, 3), i * 2, np.uint8), format="rgb24")
+                    for packet in stream.encode(frame):
+                        container.mux(packet)
+                for packet in stream.encode():
+                    container.mux(packet)
+    config = replace(
+        prepared,
+        batch_size=2,
+        num_workers=2,
+        data=replace(prepared.data, assets=replace(prepared.data.assets, asset_id="videos")),
+    )
+    prepare(config)
+    dataset = NativeDataset(config, tokenizer=PaligemmaTokenizer(max_len=config.model.max_token_len))
+    originals = [dataset.batch([dataset.index(completed * 2 + i) for i in range(2)]) for completed in range(3, 6)]
+    with PrefetchedBatches(dataset, 3, 6) as batches:
+        for expected, actual in zip(originals, batches, strict=True):
+            for a, b in zip(jax.tree.leaves(expected), jax.tree.leaves(actual), strict=True):
+                np.testing.assert_array_equal(a, b)
+    # Restart at the last completed update; read-ahead must never skip a sample.
+    with PrefetchedBatches(dataset, 4, 5) as batches:
+        for a, b in zip(jax.tree.leaves(originals[1]), jax.tree.leaves(next(batches)), strict=True):
+            np.testing.assert_array_equal(a, b)
+    cached = WorkerDataset(dataset, decoder_limit=2, frame_limit=2)
+    try:
+        for start in (7, 20, 9, 35, 7):
+            index = {"id": dataset.train[0]["id"], "start": start}
+            actual = cached.resized_image(index, "base_0_rgb")
+            expected = dataset.resize_image(dataset.image(index, "base_0_rgb"))
+            np.testing.assert_array_equal(actual, expected)
+        assert len(cached.decoders) <= 2
+        assert len(cached.frames) <= 2
+    finally:
+        cached.close()
