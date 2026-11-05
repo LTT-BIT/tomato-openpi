@@ -367,6 +367,12 @@ bash scripts/python.sh -u -m scripts.run_training "$MODULE" --wandb-mode offline
 
 ## Mamba + T1 / T2 / T3：融合与独立验证入口
 
+现在可从现有 GUI 直接配置 Mamba，无需先手动生成 Python 配置：启动训练工作台（`bash scripts/python.sh -m scripts.training_ui --port 8765`），打开终端给出的带 token 地址，选择“番茄 · Sharpa / 全参”。在“动作专家架构”选择 **Mamba-3**，在“算法组合”选择不融合 / T0 / T1 / T2 / T3 / Tg，也可用两个勾选项组合 T1/T2/T3。填写数据目录（支持多源）、数据版本与来源、统计目录、基座权重路径、实验名和训练参数；用“查看最终配置”核对，再选择 GPU、W&B online/offline 并启动。保留“缺少统计时自动计算”即可由后台依次执行数据校验、统计准备、统计核对、训练。个人配置由界面自动保存，并可从“本地个人配置”重新载入；源码快照、架构选择、数据来源、英文 prompt、统计身份和实验名随配置及运行记录保留。
+
+Mamba GUI 当前固定 H=50、RTC=0、epoch_shuffle、FullFT，不支持 LoRA；界面禁用不兼容选项，后端也拒绝不合法请求。**不融合**使用全 Absolute + 普通按维 z-score；T0/T1/T2/T3/Tg 使用双臂 Delta、手部 Absolute 及各自论文统计，不能互换统计。切换普通 Transformer/Mamba 必须建立新实验和新统计；已有匹配 Paper 统计可显式填回原目录，经合同验证后复用。数据来源与版本由已有 Paper 个人配置固定；更换数据组合时从公共 Sharpa 全参重新创建实验即可，无需手写配置。切换架构不能续训旧架构 checkpoint；任务记录中的续训沿用原配置和原架构。离线 W&B 记录保存在本地，联网后执行 `wandb sync <离线运行目录>`。
+
+GUI 配置生成、保存重载、统计与后台调度已做自动化验证，真实浏览器已核对 Mamba/T3 预览。后台调度测试模拟训练阶段，统计测试实际使用合成 LeRobot fixture；**这不表示已通过完整真实数据/VLM 训练或实机验证**。已有命令行及独立验证入口继续保留。
+
 融合代码提供独立配置；真实预训练大模型训练、完整设备验收和实机验证尚未完成。plain（上节的原始 Mamba Absolute 模式）继续保留。新 Paper 模型继承同一份 Mamba FM loss/采样，仅复用原 `PaperPi0.noise` 切换 prior；统计、完整窗口、双臂 Delta、手部 Absolute 和归一化桥全部使用原 Paper 实现。新入口不包含 RTC，原 Transformer 的 trainRTC/T3+RTC 保持原样。
 
 | `--algorithm` | 配置模块尾部 | 动作监督 / 归一化 | 相关噪声 beta |

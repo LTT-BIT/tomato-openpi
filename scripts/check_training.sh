@@ -21,7 +21,7 @@ CHECK_PATHS=(
   scripts/mamba3_diagnostics.py scripts/mamba3_smoke_runtime.py scripts/smoke_mamba3_jax.py
   src/openpi/models/mamba3 src/openpi/models/pi0_mamba.py src/openpi/models/pi0_mamba_config.py
   src/openpi/training/mamba_training.py src/openpi/training/mamba_weight_loader.py
-  src/openpi/training/mamba_experiment.py src/openpi/models/pi0_mamba_paper.py
+  src/openpi/training/mamba_experiment.py src/openpi/training/mamba_ui.py src/openpi/models/pi0_mamba_paper.py
   src/openpi/policies/mamba_policy.py
   scripts/create_delta_paper_experiments.py
   src/openpi/models/pi0.py src/openpi/models/pi0_config.py src/openpi/models/pi0_delta_paper.py

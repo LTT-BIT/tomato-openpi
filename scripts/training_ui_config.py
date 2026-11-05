@@ -14,6 +14,7 @@ import re
 from zoneinfo import ZoneInfo
 
 from openpi.training import config as train_config
+from openpi.training import mamba_ui
 from openpi.training.delta_paper_ui import paper_available
 from openpi.training.delta_paper_ui import select_trial
 from openpi.training.delta_paper_ui import selected_trial
@@ -170,6 +171,7 @@ def config_values(config) -> dict:
         sampling_mode=config.sampling_mode,
         sampling_groups=[asdict(group) for group in config.sampling_groups],
         paper_trial=selected_trial(config),
+        model_architecture=mamba_ui.architecture(config),
     )
     if len(config.data.lerobot_datasets) > 1:
         values["dataset_roots"] = [spec.root for spec in config.data.lerobot_datasets]
@@ -198,7 +200,13 @@ def defaults(module: str) -> dict:
             "task_view": asdict(config.data.base_config.task_view)
             if getattr(config.data.base_config, "task_view", None)
             else None,
-            "model_family": "Paper" if getattr(config.data, "paper_contract", None) else "pi05",
+            "mamba_available": mamba_ui.available(config),
+            "architecture": mamba_ui.architecture(config),
+            "model_family": "Mamba"
+            if mamba_ui.architecture(config) == "mamba3"
+            else "Paper"
+            if getattr(config.data, "paper_contract", None)
+            else "pi05",
             "rtc_max_delay": config.model.rtc_max_delay,
             "norm_asset": str(Path(config.data.assets.assets_dir) / config.data.assets.asset_id),
             **(
@@ -230,6 +238,7 @@ def apply_overrides(config, values: dict):
         "sampling_groups",
         "dataset_roots",
         "paper_trial",
+        "model_architecture",
     }
     if unknown := set(values) - allowed:
         raise ValueError(f"不支持的参数: {sorted(unknown)}")
@@ -242,6 +251,25 @@ def apply_overrides(config, values: dict):
     }
     if missing := required - set(values):
         raise ValueError(f"缺少参数: {sorted(missing)}")
+    source = config
+    selected_architecture = values.get("model_architecture", mamba_ui.architecture(source))
+    if selected_architecture not in ("transformer", "mamba3"):
+        raise ValueError("未知模型架构")
+    if selected_architecture != mamba_ui.architecture(source):
+        if values["exp_name"] == source.exp_name:
+            raise ValueError("切换架构必须使用新的实验名称，不能续训旧checkpoint")
+        if (
+            selected_trial(source) == "none"
+            and values.get("paper_trial", "none") == "none"
+            and values["asset_id"] == source.data.assets.asset_id
+        ):
+            raise ValueError("切换普通Mamba/Transformer必须使用新的asset_id，普通z-score与quantile不能混用")
+    if selected_architecture == "mamba3":
+        if not mamba_ui.available(source):
+            raise ValueError("Mamba仅支持30Hz Sharpa multimodal全参训练，不支持LoRA、冻结或诊断模型")
+        if values["sampling_mode"] != "epoch_shuffle" or values["sampling_groups"]:
+            raise ValueError("Mamba当前要求epoch_shuffle，不支持加权重复采样")
+    config = mamba_ui.editable(config)
     source_was_paper = bool(getattr(config.data, "paper_contract", None))
     source_semantics = "delta" if getattr(config.data, "extra_delta_transform", False) else "absolute"
     config = select_trial(config, values.get("paper_trial", selected_trial(config)), values["asset_id"])
@@ -424,6 +452,8 @@ def apply_overrides(config, values: dict):
                 "statistics_shape": {"state": [58], "actions": [result.model.action_horizon, 58]},
             },
         )
+    if selected_architecture == "mamba3":
+        result = mamba_ui.select(result, source)
     validate_config(result)
     return result
 

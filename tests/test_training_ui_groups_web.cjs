@@ -153,13 +153,13 @@ test('Paper action selector disables absolute without affecting ordinary baselin
 
 test('GUI checkboxes select T1/T2/T3, lock sampling, rotate assets and restore native mode',()=>{
   const {run,elements,context}=setup();
-  for(const id of ['paper-timestamp','paper-correlated','paper-help','protocol','groups-panel'])elements.set(id,new Element('div'));
+  for(const id of ['paper-timestamp','paper-correlated','paper-mode','paper-help','protocol','groups-panel'])elements.set(id,new Element('div'));
   elements.get('sampling-mode').append(Object.assign(new Element('option'),{value:'weighted_replacement'}));
   run(`initial={paper_trial:'none',asset_id:'ordinary',assets_dir:'/assets'};
     protocol={paper_available:true,action_dim:58,model_action_dim:58,action_hz:30,prompt:'Pick tomato.'};
     for(const [key,value] of Object.entries({exp_name:'run01',asset_id:'ordinary',assets_dir:'/assets',rtc_max_delay:'10'}))fields.set(key,{input:{value}});
     `);
-  const input=new Element('select');input.value='absolute';input.append(Object.assign(new Element('option'),{value:'absolute'}));
+  const input=new Element('select');input.value='absolute';input.append(Object.assign(new Element('option'),{value:'absolute'}),Object.assign(new Element('option'),{value:'delta'}));
   context.inputForTest=input;
   run("fields.set('action_semantics',{input:inputForTest});independentStats=()=>{fields.get('asset_id').input.value='independent_paper_'+paperChoice};");
   elements.get('paper-timestamp').checked=true;
@@ -180,4 +180,35 @@ test('GUI checkboxes select T1/T2/T3, lock sampling, rotate assets and restore n
   assert.equal(input.querySelector('[value=absolute]').disabled,false);
   assert.equal(run("fields.get('asset_id').input.value"),'ordinary');
   assert.equal(run('request().values.paper_trial'),'none');
+});
+
+
+test('Mamba form sends architecture and enforces scalar-time modes without stale assets',()=>{
+  const {run,elements,context}=setup();
+  for(const id of ['paper-timestamp','paper-correlated','paper-mode','paper-help','protocol','groups-panel'])elements.set(id,new Element('div'));
+  elements.get('sampling-mode').append(Object.assign(new Element('option'),{value:'weighted_replacement'}));
+  context.actionSelect=new Element('select');
+  context.actionSelect.append(...['absolute','delta'].map(value=>Object.assign(new Element('option'),{value})));
+  run(`initial={model_architecture:'transformer',paper_trial:'none',asset_id:'old',action_horizon:50};
+    protocol={mamba_available:true,paper_available:true,delta_available:true,action_dim:58,model_action_dim:58,action_hz:30,prompt:'Pick tomato.'};
+    for(const [key,value] of Object.entries({model_architecture:'mamba3',exp_name:'mamba_run',asset_id:'new_mamba',assets_dir:'/assets',rtc_max_delay:'10',action_horizon:'30'}))fields.set(key,{input:{value}});
+    fields.set('action_semantics',{input:actionSelect});
+    independentStats=()=>{fields.get('asset_id').input.value='new_'+paperChoice};paperChoice='none';syncPaperControls();renderProtocol();`);
+  assert.equal(run("fields.get('rtc_max_delay').input.value"),'0');
+  assert.equal(run("fields.get('rtc_max_delay').input.disabled"),true);
+  assert.equal(run("fields.get('action_horizon').input.value"),'50');
+  assert.equal(context.actionSelect.value,'absolute');
+  assert.equal(context.actionSelect.querySelector('[value=delta]').disabled,true);
+  assert.equal(elements.get('sampling-mode').value,'epoch_shuffle');
+  assert.equal(run('request().values.model_architecture'),'mamba3');
+  run("changePaperFeatures('t3')");
+  assert.equal(context.actionSelect.value,'delta');
+  assert.equal(run('paperAlgorithm().beta'),.5);
+  assert.match(elements.get('protocol').children[0].textContent,/Mamba-3/);
+  run("changePaperFeatures('none')");
+  assert.equal(context.actionSelect.value,'absolute');
+  assert.notEqual(run("fields.get('asset_id').input.value"),'old');
+  for(const trial of ['t0','tg']){run(`changePaperFeatures('${trial}')`);assert.equal(context.actionSelect.value,'delta');}
+  run("fields.get('model_architecture').input.value='transformer';syncPaperControls()");
+  assert.equal(run("fields.get('rtc_max_delay').input.disabled"),false);
 });

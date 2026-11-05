@@ -644,3 +644,159 @@ def test_gui_rejects_unsupported_paper_recipes(task, method):
             editor.source_config(module),
             {**editor.defaults(module)["values"], "paper_trial": "t3", "asset_id": "new_paper"},
         )
+
+
+@pytest.mark.parametrize("trial", ["none", "t0", "t1", "t2", "t3", "tg"])
+def test_gui_mamba_save_reload_edit_and_switch_back(tmp_path, trial):
+    from openpi.models.pi0_mamba_config import MambaPi0Config
+    from openpi.models.pi0_mamba_paper import PaperMambaPi0Config
+    from openpi.training.mamba_training import MambaTrainConfig
+    from openpi.training.mamba_weight_loader import MambaVlmInitLoader
+
+    module = next(e["id"] for e in editor.baseline_catalog() if e["task"] == "tomato_sharpa" and "fullft" in e["id"])
+    source = editor.source_config(module)
+    assert editor.defaults(module)["protocol"]["mamba_available"]
+    values = {
+        **editor.defaults(module)["values"],
+        "model_architecture": "mamba3",
+        "paper_trial": trial,
+        "action_semantics": "absolute" if trial == "none" else "delta",
+        "exp_name": f"gui_mamba_{trial}",
+        "asset_id": f"mamba_{trial}",
+        "assets_dir": str(tmp_path),
+        "dataset_root": "/data/a",
+        "dataset_roots": ["/data/a", "/data/b"],
+        "sources": ["capture_a", "capture_b"],
+        "dataset_version": "gui_mamba_v1",
+    }
+    result = editor.apply_overrides(source, values)
+    assert isinstance(result, MambaTrainConfig)
+    assert type(result.model) is (MambaPi0Config if trial == "none" else PaperMambaPi0Config)
+    assert isinstance(result.weight_loader, MambaVlmInitLoader)
+    assert result.freeze_filter is result.model.get_freeze_filter()
+    assert result.exp_name == values["exp_name"]
+    assert [s.root for s in result.data.lerobot_datasets] == values["dataset_roots"]
+    assert result.policy_metadata["prompt_example"] == source.policy_metadata["prompt_example"]
+    assert result.policy_metadata["source_datasets"] == values["sources"]
+    scope = {}
+    exec(editor.personal_source(module, "alice", values), scope)
+    restored = scope["build_config"]()
+    assert replace(restored, policy_metadata=result.policy_metadata) == result
+
+    def clean(metadata):
+        return {k: v for k, v in metadata.items() if not k.startswith("ui_") and k != "experiment_module"}
+
+    assert clean(restored.policy_metadata) == clean(result.policy_metadata)
+    edited = editor.apply_overrides(restored, {**editor.config_values(restored), "batch_size": 1})
+    assert edited.model == result.model
+    assert edited.name == result.name
+    assert type(edited) is type(result)
+    assert edited.data == result.data
+    assert edited.policy_metadata["architecture"] == "pi05_mamba3_jax"
+    assert editor.config_values(edited)["model_architecture"] == "mamba3"
+    off = editor.apply_overrides(
+        result,
+        {
+            **editor.config_values(result),
+            "model_architecture": "transformer",
+            "asset_id": "new_transformer",
+            "exp_name": "transformer_new",
+        },
+    )
+    assert not isinstance(off.model, MambaPi0Config)
+    assert not isinstance(off, MambaTrainConfig)
+    assert "architecture" not in off.policy_metadata
+    assert editor.source_config(module) == source
+
+
+@pytest.mark.parametrize(
+    ("changes", "message"),
+    [
+        ({"rtc_max_delay": 10}, "RTC"),
+        ({"action_horizon": 30}, "horizon"),
+        ({"action_semantics": "delta"}, "absolute"),
+        ({"sampling_mode": "weighted_replacement"}, "epoch_shuffle"),
+        ({"model_architecture": "typo"}, "未知"),
+    ],
+)
+def test_gui_mamba_invalid_combinations_fail_before_save(changes, message):
+    module = next(e["id"] for e in editor.baseline_catalog() if e["task"] == "tomato_sharpa" and "fullft" in e["id"])
+    values = {
+        **editor.defaults(module)["values"],
+        "model_architecture": "mamba3",
+        "action_semantics": "absolute",
+        "asset_id": "mamba_new",
+        "exp_name": "mamba_new",
+        **changes,
+    }
+    with pytest.raises(ValueError, match=message):
+        editor.apply_overrides(editor.source_config(module), values)
+
+
+def test_gui_mamba_blocks_old_plain_stats_and_experiment_and_lora():
+    module = next(e["id"] for e in editor.baseline_catalog() if e["task"] == "tomato_sharpa" and "fullft" in e["id"])
+    source = editor.source_config(module)
+    values = {
+        **editor.defaults(module)["values"],
+        "model_architecture": "mamba3",
+        "action_semantics": "absolute",
+        "asset_id": "new_mamba",
+        "exp_name": "new_mamba",
+    }
+    for changes, message in [
+        ({"asset_id": source.data.assets.asset_id}, "asset_id"),
+        ({"exp_name": source.exp_name}, "实验名称"),
+    ]:
+        with pytest.raises(ValueError, match=message):
+            editor.apply_overrides(source, {**values, **changes})
+    for entry in editor.baseline_catalog():
+        if "lora" in entry["id"] or entry["task"] != "tomato_sharpa":
+            assert not editor.defaults(entry["id"])["protocol"]["mamba_available"]
+            with pytest.raises(ValueError, match="Mamba"):
+                editor.apply_overrides(
+                    editor.source_config(entry["id"]),
+                    {
+                        **editor.defaults(entry["id"])["values"],
+                        "model_architecture": "mamba3",
+                        "exp_name": "new_mamba",
+                        "asset_id": "new_mamba",
+                    },
+                )
+
+
+@pytest.mark.parametrize("trial", ["none", "t3"])
+def test_gui_mamba_start_persists_type_and_uses_worker_pipeline(workspace, fake_launch, monkeypatch, trial):
+    from openpi.models.pi0_mamba_config import MambaPi0Config
+
+    module = next(e["id"] for e in editor.baseline_catalog() if e["task"] == "tomato_sharpa" and "fullft" in e["id"])
+    workspace.update(
+        baseline=module,
+        values={
+            **editor.defaults(module)["values"],
+            "model_architecture": "mamba3",
+            "paper_trial": trial,
+            "action_semantics": "absolute" if trial == "none" else "delta",
+            "asset_id": f"new_mamba_{trial}",
+            "exp_name": f"new_mamba_{trial}",
+            "batch_size": 1,
+            "fsdp_devices": 1,
+        },
+    )
+    monkeypatch.setattr(run_training, "load_experiment", editor.source_config)
+    state = ui.start_job(workspace)
+    restored = ui.job_config(state)
+    assert isinstance(restored.model, MambaPi0Config)
+    assert state["values"]["model_architecture"] == "mamba3"
+    calls = []
+
+    def stage(directory, state, label, command, env):
+        assert isinstance(ui.job_config(state).model, MambaPi0Config)
+        calls.append((label, command, env))
+
+    monkeypatch.setattr(ui, "run_stage", stage)
+    ui.worker(state["id"])
+    assert [x[0] for x in calls] == ["校验数据", "计算归一化统计", "核对数据与统计", "训练中"]
+    assert all(x[2]["JAX_PLATFORMS"] == "cpu" for x in calls[:-1])
+    assert calls[-1][2]["JAX_PLATFORMS"] == "cuda"
+    assert calls[-1][1][-2:] == ["--wandb-mode", "offline"]
+    assert ui.read_job(state["id"])["status"] == "completed"
