@@ -1,0 +1,93 @@
+{
+  "time": "2026-11-05T10:32:41.748445+08:00",
+  "new_job": "ea7b2cecabbf48a69404cc02640c5a02",
+  "parent_job": "8e9c5e5ec5f549a187c250e7d72300f6",
+  "status": "running",
+  "restored_step": 2000,
+  "first_new_step": 2001,
+  "latest_step": 2023,
+  "batch_size": 256,
+  "target_step": 8000,
+  "discarded_and_recomputed_updates": 791,
+  "old_metrics_preserved": true,
+  "checkpoint2000_unchanged": true,
+  "input_pipeline": "multiprocess",
+  "mean_update_seconds_excluding_compile": 4.419388812839646,
+  "mean_data_wait_seconds_excluding_first_batch": 0.4311488747004081,
+  "measured_wall_seconds_per_step": 4.8798589905103045,
+  "wall_observation_step_range": [
+    2011,
+    2023
+  ],
+  "old_new_scalar_max_abs_difference": {
+    "loss": 0.0,
+    "flow_matching_loss": 0.0,
+    "polynomial_consistency_loss": 0.0,
+    "gradient_norm": 0.0
+  },
+  "compared_steps": [
+    2001,
+    2023
+  ],
+  "weights_bitwise_comparison": "not performed; scalar log parity is not a parameter bitwise guarantee",
+  "wandb_mode": "offline",
+  "checkpoint_migration": {
+    "from_code_sha256": "7a9a3aad3b3794574bfb5da787b880dc962402d62d06a3ff89a5f5e0d4546891",
+    "to_code_sha256": "181b4078ff6eb1624277cade2841dc12d2bb726262e14e3dd7e1912e91de1649",
+    "audited_base_commit": "e64c9a41ecb24494ea6c81e2df3dd4bbbfdcc45c",
+    "kind": "cpu_prefetch_only",
+    "completed_step": 2000,
+    "next_sample_position": 512000,
+    "loader_code_sha256": "4337ed4a15fc3f195e1d22b60680c5d46f2b46d7a0cd387600b0a0bb3ade4c0b"
+  },
+  "new_recent_metrics": [
+    {
+      "expert_gradient_norm": 0.7953293323516846,
+      "flow_matching_loss": 0.07090892642736435,
+      "gradient_norm": 0.8485995531082153,
+      "language_gradient_norm": 0.2804912328720093,
+      "loss": 0.09620943665504456,
+      "polynomial_consistency_loss": 0.025300515815615654,
+      "vision_gradient_norm": 0.09432493150234222,
+      "step": 2021,
+      "seconds": 4.441878420999274,
+      "data_wait_seconds": 0.47047028003726155,
+      "input_pipeline": "multiprocess",
+      "learning_rate": 2.4931390726123936e-05,
+      "effective_samples": 517376,
+      "peak_device_bytes": 24880910592
+    },
+    {
+      "expert_gradient_norm": 0.8634991645812988,
+      "flow_matching_loss": 0.06537426263093948,
+      "gradient_norm": 0.9117778539657593,
+      "language_gradient_norm": 0.2822333574295044,
+      "loss": 0.08699158579111099,
+      "polynomial_consistency_loss": 0.021617326885461807,
+      "vision_gradient_norm": 0.07779736816883087,
+      "step": 2022,
+      "seconds": 4.441864271997474,
+      "data_wait_seconds": 0.45660059596411884,
+      "input_pipeline": "multiprocess",
+      "learning_rate": 2.493125430191867e-05,
+      "effective_samples": 517632,
+      "peak_device_bytes": 24880910592
+    },
+    {
+      "expert_gradient_norm": 0.867459774017334,
+      "flow_matching_loss": 0.06536915153265,
+      "gradient_norm": 0.9290831089019775,
+      "language_gradient_norm": 0.319059818983078,
+      "loss": 0.09163272380828857,
+      "polynomial_consistency_loss": 0.026263568550348282,
+      "vision_gradient_norm": 0.09439129382371902,
+      "step": 2023,
+      "seconds": 4.438418923993595,
+      "data_wait_seconds": 0.4209653849247843,
+      "input_pipeline": "multiprocess",
+      "learning_rate": 2.4931119696702808e-05,
+      "effective_samples": 517888,
+      "peak_device_bytes": 24880910592
+    }
+  ]
+}
