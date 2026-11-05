@@ -294,6 +294,10 @@ def test_prefetch_real_video_order_resume_and_cpu_workers(prepared, tmp_path):
         for expected, actual in zip(originals, batches, strict=True):
             for a, b in zip(jax.tree.leaves(expected), jax.tree.leaves(actual), strict=True):
                 np.testing.assert_array_equal(a, b)
+    # Discard an active prefetch queue after only one accepted batch.
+    with PrefetchedBatches(dataset, 3, 9) as batches:
+        for a, b in zip(jax.tree.leaves(originals[0]), jax.tree.leaves(next(batches)), strict=True):
+            np.testing.assert_array_equal(a, b)
     # Restart at the last completed update; read-ahead must never skip a sample.
     with PrefetchedBatches(dataset, 4, 5) as batches:
         for a, b in zip(jax.tree.leaves(originals[1]), jax.tree.leaves(next(batches)), strict=True):
@@ -309,3 +313,31 @@ def test_prefetch_real_video_order_resume_and_cpu_workers(prepared, tmp_path):
         assert len(cached.frames) <= 2
     finally:
         cached.close()
+
+
+def test_prefetch_migration_preserves_math_and_rejects_contract_changes():
+    import subprocess
+
+    from openpi.training.flash_loader import verify_input_migration
+    from openpi.training.flash_native import digest
+
+    root = Path(__file__).resolve().parents[1]
+    names = (
+        "scripts/train_flash.py",
+        "src/openpi/training/flash_native.py",
+        "src/openpi/models/pi0_flash.py",
+        "src/openpi/shared/flash_polynomial.py",
+        "src/openpi/training/optimizer.py",
+        "src/openpi/models/pi0.py",
+        "src/openpi/models/gemma.py",
+        "src/openpi/models/siglip.py",
+        "scripts/train.py",
+    )
+    before = {name: subprocess.check_output(["git", "show", "e64c9a41:" + name], cwd=root, text=True) for name in names}
+    saved = {"batch_size": 256, "training_code_sha256": digest(before)}
+    current = {**saved, "training_code_sha256": "new-input-only-version"}
+    assert verify_input_migration(saved, current, root)["kind"] == "cpu_prefetch_only"
+    with pytest.raises(ValueError, match="RNG/batch"):
+        verify_input_migration(saved, {**current, "batch_size": 512}, root)
+    with pytest.raises(ValueError, match="audited"):
+        verify_input_migration({**saved, "training_code_sha256": "unrecognized"}, current, root)

@@ -1,8 +1,10 @@
 """FullFT FLASH training using native causal data and the shared FSDP/checkpoint stack."""
 
+from contextlib import ExitStack
 from dataclasses import replace
 import functools
 import json
+import os
 from pathlib import Path
 import time
 
@@ -160,6 +162,12 @@ def main(config):
     manager, resuming = checkpoints.initialize_checkpoint_dir(
         config.checkpoint_dir, keep_period=config.keep_period, overwrite=False, resume=config.resume
     )
+    loader_scope = ExitStack()
+    pipeline = os.environ.get("FLASH_INPUT_PIPELINE", "legacy")
+    if pipeline not in ("legacy", "multiprocess"):
+        manager.close()
+        raise ValueError("FLASH_INPUT_PIPELINE must be legacy or multiprocess")
+    migration = None
     try:
         state, layout = init_train_state(config, jax.random.key(config.model_seed), mesh, resume=resuming)
         contract = {
@@ -192,8 +200,15 @@ def main(config):
         contract["training_code_sha256"] = digest({name: (root / name).read_text() for name in source_files})
         seal_path = Path(config.checkpoint_dir) / "flash_training_contract.json"
         if resuming:
-            if json.loads(seal_path.read_text()) != contract:
-                raise ValueError("FLASH resume data/model/optimizer/RNG/batch contract changed")
+            saved_contract = json.loads(seal_path.read_text())
+            if saved_contract != contract:
+                if pipeline != "multiprocess" or os.environ.get("FLASH_ALLOW_INPUT_MIGRATION") != "1":
+                    raise ValueError(
+                        "FLASH resume contract changed; audited CPU prefetch upgrade requires explicit opt-in"
+                    )
+                from openpi.training.flash_loader import verify_input_migration
+
+                migration = verify_input_migration(saved_contract, contract, root)
             state = checkpoints.restore_state(manager, state, dataset)
         else:
             seal_path.write_text(json.dumps(contract, indent=2, ensure_ascii=False))
@@ -216,11 +231,32 @@ def main(config):
         )
         output = Path(config.checkpoint_dir) / "flash_metrics"
         output.mkdir(exist_ok=True)
+        if pipeline == "multiprocess":
+            from openpi.training.flash_loader import PrefetchedBatches
+
+            batches = loader_scope.enter_context(PrefetchedBatches(dataset, start, config.num_train_steps))
+        if migration is not None:
+            from time import time_ns
+
+            transition = {
+                **migration,
+                "completed_step": start,
+                "next_sample_position": start * config.batch_size,
+                "loader_code_sha256": digest((root / "src/openpi/training/flash_loader.py").read_text()),
+            }
+            (output / f"input_migration_{start}_{time_ns()}.json").write_text(json.dumps(transition, indent=2))
         with tracking.session(config, resuming=resuming, start_step=start):
             for completed in range(start, config.num_train_steps):
                 # This cursor also determines the next window exactly after checkpoint restore.
-                indices = [dataset.index(completed * config.batch_size + i) for i in range(config.batch_size)]
-                batch = jax.device_put(dataset.batch(indices), data_sharding)
+                data_before = time.perf_counter()
+                if pipeline == "multiprocess":
+                    host_batch = next(batches)
+                else:
+                    indices = [dataset.index(completed * config.batch_size + i) for i in range(config.batch_size)]
+                    host_batch = dataset.batch(indices)
+                batch = jax.device_put(host_batch, data_sharding)
+                data_wait = time.perf_counter() - data_before
+                del host_batch
                 before = time.perf_counter()
                 with sharding.set_mesh(mesh):
                     candidate, metrics = update(jax.random.key(config.seed), state, batch)
@@ -232,6 +268,8 @@ def main(config):
                 row.update(
                     step=int(state.step),
                     seconds=time.perf_counter() - before,
+                    data_wait_seconds=data_wait,
+                    input_pipeline=pipeline,
                     learning_rate=float(config.lr_schedule.create()(completed)),
                     effective_samples=int(state.step) * config.batch_size,
                 )
@@ -256,4 +294,5 @@ def main(config):
                     )
         manager.wait_until_finished()
     finally:
+        loader_scope.close()
         manager.close()

@@ -339,3 +339,13 @@ UI 的 GPU 训练子进程显式设置 `XLA_PYTHON_CLIENT_PREALLOCATE=false`、`
 2026-11-04 已完成 28 服务器 FLASH Batch512 / FSDP8 的一次真实更新容量验收（3353487146 参数）：FM、Consistency、Total Loss 和全部分组梯度有限且非零，无 OOM；JAX 活跃峰值约 39.53 GiB/卡。仅 1 次独立诊断更新，未启动 8000 步正式训练、未写完整 Checkpoint；结果见 `training_configs/experiments/tomato_sharpa/flash/validation/b512_capacity_20261104.json`。π05 对照的 Batch512 未单独做本次 GPU 容量验收。
 
 normal 数据快捷按钮会识别并直接应用真实 LeRobot 成员目录；成员与当前来源相同则保持封存顺序并复用现有统计。父目录不能作为单个 LeRobot 根：已配置集合的父目录会展开为原成员，其他父目录要求先识别并应用，未应用的发现结果不能启动任务。
+
+### FLASH 可选多进程输入链路
+
+新增 `openpi.training.flash_loader.PrefetchedBatches`：8 个常驻 spawn CPU 进程、每 worker 预取 2 个小批任务，按原始 sample cursor 保序拼回全局 Batch。每 worker 最多保留 16 个视频解码器和 128 张缩放后图像；FFmpeg 单线程，加载进程不接触 GPU。窗口索引、视频时间对齐、图像缩放、Token、Normalization、历史和标签沿用原实现。`FLASH_INPUT_PIPELINE=legacy` 为默认值，不会热切换已经运行的训练。
+
+只读基准入口：`JAX_PLATFORMS=cpu CUDA_VISIBLE_DEVICES= bash scripts/python.sh -m scripts.benchmark_flash_loader --output .cache/new_loader_benchmark.json --batch-size 256 --workers 8 --batches 3 --start-step 2800`。先比较相同窗口的新旧整批字节 Hash，再报告启动与后续批次耗时；并发训练会影响基准数值，不能直接当作端到端训练加速比。
+
+后续从完整 Checkpoint 切换需显式设置 `FLASH_INPUT_PIPELINE=multiprocess`。旧 e64c9a41 代码写出的 Checkpoint 还需 `FLASH_ALLOW_INPUT_MIGRATION=1`：只接受该已审计版本的旧代码 Hash，要求模型/优化器/数据/种子/Batch 合同不变，并逐函数检查更新、Loss、评估数学定义未变。原始合同不覆盖，新增迁移记录保留来源和目标指纹、已完成步数与下一样本位置；预读位置不写成训练进度。新增 `data_wait_seconds` 与 `seconds` 分别观测取批等待和更新耗时。CPU 一致性通过不等于新链路完整 GPU 续训验收通过；未切换前不宣称当前任务已提速。
+
+2026-11-05 真实 normal480 / Batch256、8 worker 连续 8 批只读对比：旧链路平均取批 20.30 秒；新链路启动首批 50.55 秒，后 7 批平均等待 2.41 秒。含启动的 8 批等待合计 162.38 → 67.42 秒。全部图像/Token/历史/目标叶子的字节 Hash 相同，两轮共 11 批通过；结果 `training_configs/experiments/tomato_sharpa/flash/validation/prefetch_benchmark_20261105.json`。基准与原训练并发、固定旧链路先跑，不能把取批等待比当作 GPU 训练提速比。当前训练进程未切换；完整 GPU 续训还需在新保存点做实际验收，保留 Batch256 和 8000 步，不从 Step2000 回退重算当前未保存进度。
