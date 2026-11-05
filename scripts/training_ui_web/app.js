@@ -42,7 +42,7 @@ function addField(container, definition, value, original) {
   if(type==='architecture'){
     for(const [mode,text] of [['transformer','Transformer · 原 π0.5'],['mamba3','Mamba-3 · Sharpa 全参']]){const option=node('option',text);option.value=mode;input.append(option);}
     input.querySelector('[value=mamba3]').disabled=!protocol.mamba_available;
-    wrapper.append(node('small','Mamba 支持 H=50、RTC=0、逐轮无放回采样；普通模式为 Absolute + 普通 z-score，论文模式为双臂 Delta、手 Absolute。','default'));
+    wrapper.append(node('small','Mamba 支持 H=50、Train RTC（例如 10）、逐轮无放回采样；普通模式为 Absolute + 普通 z-score，论文模式为双臂 Delta、手 Absolute。','default'));
     input.addEventListener('change',()=>{syncPaperControls();independentStats();renderProtocol();updatePath();});
   }
   if(type==='action-semantics'){
@@ -101,12 +101,14 @@ function syncPaperControls(){
   $('paper-correlated').checked=['t2','t3'].includes(paperChoice);
   $('paper-timestamp').disabled=!available;$('paper-correlated').disabled=!available;
   $('paper-mode').value=paperChoice;$('paper-mode').disabled=!available;
-  $('paper-help').textContent=available&&isMamba()?'Mamba 可组合论文功能；RTC 固定为 0，H=50。选择“不融合”时使用普通 Absolute + z-score。':available?'两项同时勾选为 T3；可与 Train RTC 组合。论文功能使用双臂 delta、双手 absolute、完整动作窗口及无放回采样。切换功能自动分配独立统计。':'论文勾选仅支持 30 Hz Sharpa multimodal π0.5 全参；已有自定义论文配置保留原算法。';
+  const presets=$('paper-presets');
+  if(presets){const hide=isMamba()&&['none','t1','t2','t3'].includes(paperChoice);presets.hidden=hide;presets.classList[hide?'add':'remove']('hidden');}
+  $('paper-help').textContent=available&&isMamba()?'Mamba 可组合论文功能和 Train RTC（例如 10），H=50。选择“不融合”时使用普通 Absolute + z-score。':available?'两项同时勾选为 T3；可与 Train RTC 组合。论文功能使用双臂 delta、双手 absolute、完整动作窗口及无放回采样。切换功能自动分配独立统计。':'论文勾选仅支持 30 Hz Sharpa multimodal π0.5 全参；已有自定义论文配置保留原算法。';
   fields.get('action_semantics').input.querySelector('[value=absolute]').disabled=active;
   fields.get('action_semantics').input.querySelector('[value=delta]').disabled=isMamba()&&!active||!protocol.delta_available;
   $('sampling-mode').querySelector('[value=weighted_replacement]').disabled=active||isMamba();
   const rtc=fields.get('rtc_max_delay')?.input, horizon=fields.get('action_horizon')?.input;
-  if(rtc){rtc.disabled=isMamba();if(isMamba())rtc.value='0';}
+  if(rtc){rtc.disabled=false;}
   if(horizon){horizon.disabled=isMamba();if(isMamba())horizon.value='50';}
   if(isMamba()&&!active)fields.get('action_semantics').input.value='absolute';
   if(active||isMamba()){
@@ -128,6 +130,7 @@ function changePaperFeatures(selected){
 function renderProtocol(){
   const current=key=>fields.get(key)?.input.value??initial[key], p=paperAlgorithm();
   $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · ${isMamba()?'Mamba-3':'Transformer'} · ${p?'Paper 专用配置':isMamba()?'普通 Absolute / z-score':'普通 π0.5'} · RTC 最大延迟 ${current('rtc_max_delay')} 步 · 动作监督 ${current('action_semantics')}`),node('div','统计资产：'+current('assets_dir')+'/'+current('asset_id')),node('div','英文 prompt 示例：'+protocol.prompt));
+  if(isMamba())$('protocol').append(node('div',`逐时间步归一化 ${['t1','t3'].includes(paperChoice)?'开':'关'} · 相关高斯噪声 ${p?.beta?'开':'关'}`));
   if(p)$('protocol').append(node('div',`Paper mode=${p.mode} · beta=${p.beta} · bundle SHA256=${p.asset_sha256||'待计算'}`));
   if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
 }

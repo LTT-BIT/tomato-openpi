@@ -35,6 +35,7 @@ import openpi.training.optimizer as _optimizer
 from openpi.training.sampling import SamplingGroup
 from openpi.training.sampling import validate_groups
 from openpi.training.task_view import TaskView
+from openpi.training.video_cache import VideoCacheConfig
 import openpi.training.weight_loaders as weight_loaders
 import openpi.transforms as _transforms
 
@@ -130,6 +131,9 @@ class DataConfig:
     action_hz: float | None = None
     # Optional explicit LeRobot video decoder (for example, "pyav").
     video_backend: str | None = None
+
+    # One bounded CPU video cache per worker, shared across source datasets.
+    video_cache: VideoCacheConfig | None = None
 
     # Only used for RLDS data loader (ie currently only used for DROID).
     rlds_data_dir: str | None = None

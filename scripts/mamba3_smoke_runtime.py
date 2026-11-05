@@ -179,6 +179,19 @@ def place_batch(batch, mesh):
     return jax.device_put(batch, jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS)))
 
 
+def resume_step(config, state_sharding, mesh, state, batch, *, diagnostic):
+    """GPU replays the production JIT; CPU tiny checks use an eager reference.
+
+    The local locked CPU whole-program compiler has produced divergent update
+    values for identical inputs/StableHLO. Compare checkpoint values using the
+    same native train_step without whole-program fusion, never relaxed tolerances.
+    """
+    if diagnostic and jax.default_backend() == "cpu":
+        with jax.disable_jit():
+            return train.train_step(config, jax.random.key(config.seed), state, batch)
+    return compile_train_step(config, state_sharding, mesh)(jax.random.key(config.seed), state, batch)
+
+
 def host_copy(tree):
     # device_get on CPU can return views into donated device buffers. Retaining
     # these views across an optimizer update is unsafe even for read-only logs.
@@ -307,23 +320,33 @@ def checkpoint_roundtrip(config, state, batch, output, diagnostic):
     mesh = sharding.make_mesh(config.fsdp_devices)
     state_sharding = sharding.fsdp_sharding(state, mesh)
     sample_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS))
+    prefix_length = min(10, config.model.rtc_max_delay)
 
     def sample(parameters):
         m = nnx.merge(state.model_def, parameters)
         m.eval()
-        return m.sample_actions(jax.random.key(123), batch[0], noise=noise, num_steps=10)
+        return m.sample_actions(
+            jax.random.key(123),
+            batch[0],
+            noise=noise,
+            num_steps=10,
+            prefix_actions=batch[1] if prefix_length else None,
+            prefix_length=prefix_length,
+        )
 
     sample_jit = jax.jit(sample, in_shardings=(state_sharding.params,), out_shardings=sample_sharding)
     expected = np.asarray(sample_jit(state.params))
+    np.testing.assert_array_equal(expected[:, :prefix_length], np.asarray(batch[1])[:, :prefix_length])
     np.save(output / "expected_sample.npy", expected)
     np.save(output / "sample_noise.npy", np.asarray(noise))
     save_batch(output / "batch.npz", batch)
-    # Same compiled path, sharding and backend donation setting in parent and child.
+    # Same replay execution mode and sharding in parent and child.
     before_digest = state_digest(state)
     mesh = sharding.make_mesh(config.fsdp_devices)
     state_sharding = sharding.fsdp_sharding(state, mesh)
-    step_function = compile_train_step(config, state_sharding, mesh)
-    updated, update_info = step_function(jax.random.key(config.seed), state, place_batch(batch, mesh))
+    updated, update_info = resume_step(
+        config, state_sharding, mesh, state, place_batch(batch, mesh), diagnostic=diagnostic
+    )
     jax.block_until_ready(updated)
     write_json(
         output,
@@ -348,7 +371,7 @@ def checkpoint_roundtrip(config, state, batch, output, diagnostic):
             "step": int(updated.step) - 1,
             "asset_id": data.asset_id,
             "config_module": (config.policy_metadata or {}).get(
-                "experiment_module", "training_configs.experiments.tomato_sharpa.mamba.phase_a"
+                "experiment_module", "training_configs.experiments.tomato_sharpa.mamba.train"
             ),
             "paper_model": asdict(config.model) if hasattr(config.model, "paper_mode") else None,
             "lr_schedule": asdict(config.lr_schedule),
@@ -364,7 +387,7 @@ def checkpoint_roundtrip(config, state, batch, output, diagnostic):
         raise RuntimeError(f"New-process restore failed; see {output / 'restore_child.log'}")
     record = json.loads((output / "checkpoint_roundtrip.json").read_text())
     if record["sample_max_abs"] != 0 or not all(
-        record[key] for key in ("resume_exact", "before_resume_exact", "batch_exact", "rng_exact")
+        record[key] for key in ("resume_exact", "before_resume_exact", "batch_exact", "rng_exact", "prefix_exact")
     ):
         raise AssertionError(f"Restore/resume numerical mismatch: {record}")
 
@@ -467,11 +490,19 @@ def _restore_child(output):
     params = jax.device_put(nnx.state(model), state_sharding.params)
     sample_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS))
     noise = jnp.asarray(np.load(directory / "sample_noise.npy"))
+    prefix_length = min(10, config.model.rtc_max_delay)
 
     def sample(parameters):
         m = nnx.merge(graph, parameters)
         m.eval()
-        return m.sample_actions(jax.random.key(123), batch[0], noise=noise, num_steps=10)
+        return m.sample_actions(
+            jax.random.key(123),
+            batch[0],
+            noise=noise,
+            num_steps=10,
+            prefix_actions=batch[1] if prefix_length else None,
+            prefix_length=prefix_length,
+        )
 
     actual = np.asarray(jax.jit(sample, in_shardings=(state_sharding.params,), out_shardings=sample_sharding)(params))
     delta = float(np.max(np.abs(actual - np.load(directory / "expected_sample.npy"))))
@@ -481,8 +512,7 @@ def _restore_child(output):
     restored = checkpoints.restore_state(manager, shape, None, step=request["step"])
     manager.close()
     before_digest = state_digest(restored)
-    step_function = compile_train_step(config, state_sharding, mesh)
-    updated, update_info = step_function(jax.random.key(config.seed), restored, batch)
+    updated, update_info = resume_step(config, state_sharding, mesh, restored, batch, diagnostic=diagnostic)
     jax.block_until_ready(updated)
     expected = json.loads((directory / "expected_resume.json").read_text())
     write_json(
@@ -492,6 +522,11 @@ def _restore_child(output):
             "diagnostic_only": diagnostic,
             "new_process": True,
             "sample_max_abs": delta,
+            "prefix_length": prefix_length,
+            "prefix_exact": np.array_equal(actual[:, :prefix_length], np.asarray(batch[1])[:, :prefix_length]),
+            "resume_execution": "cpu_eager_reference"
+            if diagnostic and jax.default_backend() == "cpu"
+            else "jitted_native_trainer",
             "resume_exact": state_digest(updated) == expected["digest"],
             "before_resume_exact": before_digest == expected.get("before_digest", before_digest),
             "batch_exact": state_digest(batch) == expected.get("batch_digest", state_digest(batch)),
@@ -570,6 +605,7 @@ def decode_smoke_config(value):
         MambaTrainConfig,
         MambaScheduledTrainConfig,
         cfg.DataConfig,
+        cfg.VideoCacheConfig,
         cfg.FakeDataConfig,
         cfg.AssetsConfig,
         cfg.LeRobotDatasetSpec,

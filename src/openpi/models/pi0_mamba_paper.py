@@ -2,7 +2,7 @@
 
 Multiple inheritance shares the original Paper configuration identity, allowing
 unmodified PaperSharpaData/statistics/provenance to serve both architectures.
-Only scalar-time FM is enabled; original Transformer RTC stays unchanged.
+RTC uses the same clean-prefix training semantics as the Transformer.
 """
 
 from dataclasses import dataclass
@@ -30,11 +30,8 @@ class PaperMambaPi0Config(MambaPi0Config, PaperPi0Config):
             or self.stage != "paper_delta_fm"
             or self.action_representation != "delta_arms_absolute_hands"
             or self.normalization != "paper"
-            or self.rtc_max_delay
         ):
-            raise ValueError(
-                "Paper Mamba requires scalar-time FM, arm Delta and matching Paper normalization; RTC unsupported"
-            )
+            raise ValueError("Paper Mamba requires arm Delta and matching Paper normalization")
         if not math.isfinite(self.paper_std_floor) or self.paper_std_floor <= 0:
             raise ValueError("Paper standard deviation floor must be positive and finite")
 
@@ -48,6 +45,7 @@ class PaperMambaPi0Config(MambaPi0Config, PaperPi0Config):
 
         if not isinstance(data, PaperDataView) or data.paper_bundle_sha256 != self.paper_asset_sha256:
             raise ValueError("Paper Mamba requires its matching validated PaperDataView")
+        data = super().adapt_data_config(data)
         values = {k: v for k, v in vars(data).items() if k != "mamba_identity"}
         return MambaPaperDataView(**values, mamba_identity=architecture_record(self))
 

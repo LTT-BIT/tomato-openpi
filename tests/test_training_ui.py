@@ -647,7 +647,8 @@ def test_gui_rejects_unsupported_paper_recipes(task, method):
 
 
 @pytest.mark.parametrize("trial", ["none", "t0", "t1", "t2", "t3", "tg"])
-def test_gui_mamba_save_reload_edit_and_switch_back(tmp_path, trial):
+@pytest.mark.parametrize("rtc_delay", [0, 10])
+def test_gui_mamba_save_reload_edit_and_switch_back(tmp_path, trial, rtc_delay):
     from openpi.models.pi0_mamba_config import MambaPi0Config
     from openpi.models.pi0_mamba_paper import PaperMambaPi0Config
     from openpi.training.mamba_training import MambaTrainConfig
@@ -660,6 +661,7 @@ def test_gui_mamba_save_reload_edit_and_switch_back(tmp_path, trial):
         **editor.defaults(module)["values"],
         "model_architecture": "mamba3",
         "paper_trial": trial,
+        "rtc_max_delay": rtc_delay,
         "action_semantics": "absolute" if trial == "none" else "delta",
         "exp_name": f"gui_mamba_{trial}",
         "asset_id": f"mamba_{trial}",
@@ -671,6 +673,7 @@ def test_gui_mamba_save_reload_edit_and_switch_back(tmp_path, trial):
     }
     result = editor.apply_overrides(source, values)
     assert isinstance(result, MambaTrainConfig)
+    assert result.model.rtc_max_delay == rtc_delay
     assert type(result.model) is (MambaPi0Config if trial == "none" else PaperMambaPi0Config)
     assert isinstance(result.weight_loader, MambaVlmInitLoader)
     assert result.freeze_filter is result.model.get_freeze_filter()
@@ -694,6 +697,12 @@ def test_gui_mamba_save_reload_edit_and_switch_back(tmp_path, trial):
     assert edited.data == result.data
     assert edited.policy_metadata["architecture"] == "pi05_mamba3_jax"
     assert editor.config_values(edited)["model_architecture"] == "mamba3"
+    rtc_values = {**editor.config_values(result), "rtc_max_delay": 10 if rtc_delay == 0 else 0}
+    with pytest.raises(ValueError, match="实验名称"):
+        editor.apply_overrides(result, rtc_values)
+    rtc_changed = editor.apply_overrides(result, {**rtc_values, "exp_name": result.exp_name + "_new_rtc"})
+    assert rtc_changed.data.assets == result.data.assets
+    assert rtc_changed.model.rtc_max_delay == rtc_values["rtc_max_delay"]
     off = editor.apply_overrides(
         result,
         {
@@ -712,7 +721,7 @@ def test_gui_mamba_save_reload_edit_and_switch_back(tmp_path, trial):
 @pytest.mark.parametrize(
     ("changes", "message"),
     [
-        ({"rtc_max_delay": 10}, "RTC"),
+        ({"rtc_max_delay": 50}, "rtc_max_delay"),
         ({"action_horizon": 30}, "horizon"),
         ({"action_semantics": "delta"}, "absolute"),
         ({"sampling_mode": "weighted_replacement"}, "epoch_shuffle"),
@@ -800,3 +809,36 @@ def test_gui_mamba_start_persists_type_and_uses_worker_pipeline(workspace, fake_
     assert calls[-1][2]["JAX_PLATFORMS"] == "cuda"
     assert calls[-1][1][-2:] == ["--wandb-mode", "offline"]
     assert ui.read_job(state["id"])["status"] == "completed"
+
+
+@pytest.mark.parametrize("trial", ["none", "t1", "t2", "t3"])
+def test_server_mamba_entry_preserves_six_rgb_sources_cache_and_rtc(trial, tmp_path):
+    module = "training_configs.experiments.tomato_sharpa.mamba.train"
+    source = editor.source_config(module)
+    values = {
+        **editor.defaults(module)["values"],
+        "paper_trial": trial,
+        "action_semantics": "absolute" if trial == "none" else "delta",
+        "rtc_max_delay": 10,
+        "exp_name": f"server_features_{trial}_rtc10",
+        "asset_id": f"server_features_{trial}",
+        "assets_dir": str(tmp_path),
+    }
+    result = editor.apply_overrides(source, values)
+    assert result.batch_size == 512
+    assert result.fsdp_devices == result.num_workers == 8
+    assert result.num_train_steps == 8000
+    assert result.model.rtc_max_delay == 10
+    assert result.data.lerobot_datasets == source.data.lerobot_datasets
+    assert len(result.data.lerobot_datasets) == 6
+    assert result.data.base_config.video_cache == source.data.base_config.video_cache
+    assert result.data.base_config.video_cache.max_readers == 768
+    assert result.data.base_config.video_cache.max_bytes == 2 * 1024**3
+    assert result.policy_metadata["source_datasets"] == source.policy_metadata["source_datasets"]
+    assert result.policy_metadata["prompt_example"] == source.policy_metadata["prompt_example"]
+    scope = {}
+    exec(editor.personal_source(module, "alice", values), scope)
+    saved = scope["build_config"]()
+    assert saved.model == result.model
+    assert saved.data == result.data
+    run_training.validate_config(saved)

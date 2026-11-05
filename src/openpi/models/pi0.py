@@ -9,6 +9,7 @@ from typing_extensions import override
 
 from openpi.models import model as _model
 from openpi.models import pi0_config
+from openpi.models import rtc
 import openpi.models.gemma as _gemma
 import openpi.models.siglip as _siglip
 from openpi.shared import array_typing as at
@@ -218,10 +219,7 @@ class Pi0(_model.BaseModel):
         noise = self.noise(noise_rng, actions.shape)
         time = jax.random.beta(time_rng, 1.5, 1, batch_shape) * 0.999 + 0.001
         if self.rtc_max_delay:
-            delay = jax.random.randint(delay_rng, batch_shape, 0, self.rtc_max_delay + 1)
-            action_prefix_mask = jnp.arange(self.action_horizon) < delay[..., None]
-            # OpenPI uses t=0 for clean data (opposite to the RTC paper).
-            time = jnp.where(action_prefix_mask, 0.0, time[..., None])
+            time, action_prefix_mask = rtc.token_times(time, delay_rng, self.action_horizon, self.rtc_max_delay)
             time_expanded = time[..., None]
         else:
             time_expanded = time[..., None, None]
@@ -244,8 +242,7 @@ class Pi0(_model.BaseModel):
         if self.rtc_max_delay:
             # train_step takes a mean over this array. Normalize by the actual
             # number of supervised tokens, so larger delays do not dilute loss.
-            postfix_mask = ~action_prefix_mask
-            loss = jnp.where(postfix_mask, loss, 0.0) * (loss.size / jnp.sum(postfix_mask))
+            loss = rtc.suffix_loss(loss, action_prefix_mask)
         return loss
 
     @override
@@ -266,16 +263,12 @@ class Pi0(_model.BaseModel):
         pass static_argnames=("prefix_length",) when JIT-compiling this method.
         Only a checkpoint trained with RTC supports a nonzero prefix.
         """
-        if type(prefix_length) is not int or not 0 <= prefix_length <= self.rtc_max_delay:
-            raise ValueError("prefix_length must be a static integer in [0, rtc_max_delay]")
-        if prefix_length and prefix_actions is None:
-            raise ValueError("prefix_actions is required for a nonzero prefix_length")
-        if prefix_actions is not None and prefix_actions.shape != (
-            observation.state.shape[0],
-            self.action_horizon,
-            self.action_dim,
-        ):
-            raise ValueError("prefix_actions must have shape (batch, action_horizon, action_dim)")
+        rtc.validate_prefix(
+            prefix_actions,
+            prefix_length,
+            (observation.state.shape[0], self.action_horizon, self.action_dim),
+            self.rtc_max_delay,
+        )
         observation = _model.preprocess_observation(None, observation, train=False)
         # note that we use the convention more common in diffusion literature, where t=1 is noise and t=0 is the target
         # distribution. yes, this is the opposite of the pi0 paper, and I'm sorry.

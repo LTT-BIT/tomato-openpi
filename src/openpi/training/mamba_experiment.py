@@ -1,6 +1,7 @@
 """Architecture conversion of existing Paper experiments; data/statistics stay identical."""
 
 from dataclasses import fields
+from dataclasses import replace
 import os
 
 from openpi.models.pi0_delta_paper import PaperPi0Config
@@ -22,8 +23,8 @@ def with_mamba(config, *, model_options=None):
     """
     if not isinstance(config.model, PaperPi0Config) or isinstance(config.model, MambaPi0Config):
         raise ValueError("with_mamba expects an existing Transformer Paper experiment")
-    if config.model.rtc_max_delay or config.resume:
-        raise ValueError("Mamba fusion currently requires RTC=0 and a new experiment, not Transformer resume")
+    if config.resume:
+        raise ValueError("Mamba fusion requires a new experiment, not Transformer resume")
     allowed = {field.name for field in fields(MambaPi0Config)} - {
         "architecture",
         "stage",
@@ -59,7 +60,7 @@ def with_mamba(config, *, model_options=None):
     )
 
 
-def build_experiment(trial, *, owner=None, dataset=None):
+def build_experiment(trial, *, owner=None, dataset=None, rtc_max_delay=None):
     trials = {name: (mode, beta) for name, mode, beta in TRIALS}
     if trial not in trials:
         raise ValueError(f"Unknown Paper trial: {trial}")
@@ -71,7 +72,17 @@ def build_experiment(trial, *, owner=None, dataset=None):
         config = load_experiment(source)
         if (config.model.paper_mode, config.model.paper_beta) != trials[trial]:
             raise ValueError("Source experiment algorithm differs from selected Mamba trial")
+        if rtc_max_delay is not None and rtc_max_delay != config.model.rtc_max_delay:
+            suffix = f"_rtc_d{rtc_max_delay}"
+            config = replace(
+                config,
+                model=replace(config.model, rtc_max_delay=rtc_max_delay),
+                name=config.name + suffix,
+                exp_name=config.exp_name + suffix,
+            )
     else:
         mode, beta = trials[trial]
-        config = build_paper(owner=owner, trial=trial, mode=mode, beta=beta, dataset=dataset)
+        config = build_paper(
+            owner=owner, trial=trial, mode=mode, beta=beta, dataset=dataset, rtc_max_delay=rtc_max_delay or 0
+        )
     return with_mamba(config)

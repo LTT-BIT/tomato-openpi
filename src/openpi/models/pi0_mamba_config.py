@@ -58,14 +58,15 @@ class MambaPi0Config(Pi0Config):
             raise ValueError("Context heads must divide Mamba width")
 
     def validate_algorithm(self):
-        if (
-            self.rtc_max_delay
-            or self.action_representation != "absolute"
-            or self.normalization != "ordinary_per_dimension"
-        ):
-            raise ValueError("Mamba Phase A rejects RTC, Delta and Paper normalization")
+        if self.action_representation != "absolute" or self.normalization != "ordinary_per_dimension":
+            raise ValueError("Mamba Phase A rejects Delta and Paper normalization")
         if self.architecture != "pi05_mamba3_jax" or self.stage != "phase_a_plain_fm":
             raise ValueError("Unsupported Mamba architecture/stage")
+
+    def adapt_data_config(self, data):
+        from openpi.training.video_cache import VideoCacheConfig
+
+        return dataclasses.replace(data, video_cache=data.video_cache or VideoCacheConfig())
 
     def create(self, rng):
         from openpi.models.pi0_mamba import MambaPi0

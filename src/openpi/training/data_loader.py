@@ -21,6 +21,7 @@ from openpi.training.dataset_collection import collection_layout
 from openpi.training.dataset_collection import validate_collection_features
 from openpi.training.droid_rlds_dataset import DroidRldsDataset
 import openpi.training.sampling as _sampling
+from openpi.training.video_cache import CachedLeRobotDataset
 import openpi.transforms as _transforms
 
 T_co = TypeVar("T_co", covariant=True)
@@ -318,12 +319,17 @@ def create_torch_dataset(
         action_delta_timestamps = [
             round(t * dataset_meta.fps / action_hz) / dataset_meta.fps for t in range(action_horizon)
         ]
-        dataset: Dataset = lerobot_dataset.LeRobotDataset(
+        dataset_type = lerobot_dataset.LeRobotDataset
+        if data_config.video_cache is not None and hasattr(dataset_type, "_query_videos"):
+            dataset_type = CachedLeRobotDataset
+        dataset: Dataset = dataset_type(
             dataset_repo_id,
             root=dataset_root,
             delta_timestamps=dict.fromkeys(data_config.action_sequence_keys, action_delta_timestamps),
             video_backend=data_config.video_backend,
         )
+        if isinstance(dataset, CachedLeRobotDataset):
+            dataset.video_cache_config = data_config.video_cache
         if getattr(data_config, "paper_complete_windows", False):
             from openpi.training.delta_paper import CompleteWindows
 
@@ -776,9 +782,8 @@ def _collate_fn(items):
 
 
 def _worker_init_fn(worker_id: int) -> None:
-    """Tell JAX inside the worker process not to preallocate the GPU memory."""
-    # NOTE: This is called after jax is imported inside the worker process. This
-    # means that this approach will not work for selecting the backend.
+    """Keep transforms/decoders on CPU; workers must not create GPU contexts."""
+    jax.config.update("jax_platforms", "cpu")
     os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
     os.environ["XLA_PYTHON_CLIENT_ALLOCATOR"] = "platform"
 

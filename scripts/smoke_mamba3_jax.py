@@ -47,12 +47,13 @@ def environment():
     return result
 
 
-def run_pytest(output, paths, name, *, cpu=False):
+def run_pytest(output, paths, name, *, cpu=False, rtc_max_delay=0):
     from scripts.mamba3_smoke_runtime import write_json
 
     command = [sys.executable, "-m", "pytest", *paths, "-q", "--disable-warnings", f"--junitxml={output / name}.xml"]
     env = {**os.environ, "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1", "OPENBLAS_NUM_THREADS": "2", "OMP_NUM_THREADS": "2"}
     env["MAMBA_SMOKE_EVIDENCE"] = str(output)
+    env["MAMBA_SMOKE_RTC_MAX_DELAY"] = str(rtc_max_delay)
     if cpu:
         env["JAX_PLATFORMS"] = "cpu"
     with (output / f"{name}.log").open("w") as log:
@@ -65,7 +66,7 @@ def run_pytest(output, paths, name, *, cpu=False):
 def experiment_module(args):
     if args.config and args.config.startswith("training_configs.experiments."):
         return args.config
-    suffix = "phase_a" if args.algorithm == "plain" else f"paper_{args.algorithm}"
+    suffix = "train" if args.algorithm == "plain" else f"paper_{args.algorithm}"
     return f"training_configs.experiments.tomato_sharpa.mamba.{suffix}"
 
 
@@ -87,6 +88,14 @@ def full_preflight(args, output):
     from scripts.mamba3_smoke_runtime import write_json
 
     config = run_training.load_experiment(experiment_module(args))
+    if args.rtc_max_delay is not None and args.rtc_max_delay != config.model.rtc_max_delay:
+        suffix = f"_rtc_d{args.rtc_max_delay}"
+        config = replace(
+            config,
+            model=replace(config.model, rtc_max_delay=args.rtc_max_delay),
+            name=config.name + suffix,
+            exp_name=config.exp_name + suffix,
+        )
     if not isinstance(config, MambaTrainConfig) or config.model.diagnostic_only:
         raise ValueError("Real suites require a production MambaTrainConfig")
     is_paper = hasattr(config.model, "paper_mode")
@@ -201,6 +210,9 @@ def main():
     parser.add_argument("--steps", type=int, default=10)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
+        "--rtc-max-delay", type=int, help="Train RTC maximum clean prefix, e.g. 10; default preserves config"
+    )
+    parser.add_argument(
         "--disable-triton-gemm",
         action="store_true",
         help="Local workaround for locked JAX 0.5.3 Triton GEMM compiler failures; sets only this process environment",
@@ -212,6 +224,8 @@ def main():
     )
     parser.add_argument("--restore-child", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args()
+    if args.rtc_max_delay is not None and not 0 <= args.rtc_max_delay < 50:
+        parser.error("--rtc-max-delay must be in [0, 50)")
     if args.disable_triton_gemm:
         flags = re.sub(
             r"(?<!\S)--xla_gpu_enable_triton_gemm=(?:true|false|0|1)(?=\s|$)", "", os.environ.get("XLA_FLAGS", "")
@@ -261,6 +275,7 @@ def main():
         "architecture": "pi05_mamba3_jax",
         "stage": "phase_a_plain_fm" if args.algorithm == "plain" else "paper_delta_fm",
         "algorithm": args.algorithm,
+        "rtc_max_delay": args.rtc_max_delay or 0,
         "suite": args.suite,
         "overall_status": "NOT_RUN",
         "PHASE_A_COMPLETE": False,
@@ -274,6 +289,7 @@ def main():
     source_paths = [
         Path("scripts/train.py"),
         Path("src/openpi/models/pi0.py"),
+        Path("src/openpi/models/rtc.py"),
         Path("src/openpi/models/gemma.py"),
         Path("src/openpi/models/siglip.py"),
         *Path("src/openpi/models/mamba3").glob("*.py"),
@@ -303,17 +319,21 @@ def main():
         with (output / "console.log").open("w") as log, redirect_stdout(log), redirect_stderr(log):
             if args.suite in ("components", "all"):
                 paths = (
-                    ["tests/test_mamba3_core.py", "tests/test_mamba3_integration.py"]
+                    ["tests/test_mamba3_core.py", "tests/test_mamba3_integration.py", "tests/test_mamba3_rtc.py"]
                     if args.algorithm == "plain"
-                    else ["tests/test_mamba3_paper.py"]
+                    else ["tests/test_mamba3_paper.py", "tests/test_mamba3_rtc.py"]
                 )
-                run_pytest(output, paths, "components")
+                run_pytest(output, paths, "components", rtc_max_delay=args.rtc_max_delay or 0)
                 if args.suite == "components" and args.algorithm != "plain":
                     result["tests"].append(
                         {"id": "T1_T2_T3_diagnostic_matrix", "status": "PASS", "evidence": "components.xml"}
                     )
                 if args.suite == "components" and args.algorithm == "plain":
                     config = diagnostic_train_config(output, steps=args.steps, seed=args.seed)
+                    if args.rtc_max_delay:
+                        from dataclasses import replace
+
+                        config = replace(config, model=replace(config.model, rtc_max_delay=args.rtc_max_delay))
                     # Local logs + explicitly offline W&B; no uploads/camera logging.
                     import wandb
 
@@ -365,6 +385,7 @@ def main():
                     )
                     write_json(output, "results.json", result)
                     return 2
+                result["rtc_max_delay"] = config.model.rtc_max_delay
                 # No alternate trainer: use real data, existing transforms, init and train_step.
                 import jax
                 import wandb
@@ -396,6 +417,16 @@ def main():
                 actions = policy.infer(raw, rng=jax.random.key(args.seed))["actions"]
                 if actions.shape != (1, 50, 58) or not np.isfinite(actions).all():
                     raise AssertionError("Invalid physical Absolute policy output")
+                prefix_length = min(10, config.model.rtc_max_delay)
+                if prefix_length:
+                    queued = actions[0, :prefix_length].copy()
+                    next_raw = source[min(1, len(source) - 1)]
+                    continued = policy.infer(next_raw, rng=jax.random.key(args.seed + 1), absolute_prefix=queued)[
+                        "actions"
+                    ]
+                    np.testing.assert_array_equal(continued[0, :prefix_length], queued)
+                    if not np.isfinite(continued).all():
+                        raise AssertionError("Nonfinite RTC physical policy output")
                 write_json(
                     output,
                     "policy_roundtrip.json",
@@ -405,6 +436,7 @@ def main():
                         "action_semantics": "absolute",
                         "model_action_semantics": config.model.action_representation,
                         "diagnostic_only": False,
+                        "prefix_length": prefix_length,
                     },
                 )
                 result["tests"].append({"id": "T01_K01_K02_K03_P01", "status": "PASS"})

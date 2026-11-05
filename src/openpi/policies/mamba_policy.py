@@ -13,6 +13,20 @@ from openpi.models import model as model_lib
 from openpi.training.mamba_training import validate_stats
 
 
+def _physical_prefix(model, absolute_prefix):
+    if absolute_prefix is None:
+        return None, 0
+    prefix = np.asarray(absolute_prefix, np.float32)
+    if (
+        prefix.ndim != 2
+        or prefix.shape[1] != model.action_dim
+        or len(prefix) > model.rtc_max_delay
+        or not np.isfinite(prefix).all()
+    ):
+        raise ValueError("absolute_prefix must be finite canonical physical (0..rtc_max_delay, action_dim) actions")
+    return (prefix, len(prefix)) if len(prefix) else (None, 0)
+
+
 class MambaOfflinePolicy:
     def __init__(self, model, data_config):
         from openpi.models.pi0_mamba import MambaPi0
@@ -28,6 +42,7 @@ class MambaOfflinePolicy:
         ):
             raise ValueError("Mamba Phase A policy does not accept Delta transforms")
         self.model = model
+        self.action_stats = data_config.norm_stats["actions"]
         self.inputs = transforms.compose(
             [
                 *data_config.repack_transforms.inputs,
@@ -45,13 +60,32 @@ class MambaOfflinePolicy:
             ]
         )
 
-    def infer(self, raw_observation, *, rng, noise=None, num_steps=10):
+    def infer(self, raw_observation, *, rng, noise=None, num_steps=10, absolute_prefix=None):
+        prefix, length = _physical_prefix(self.model, absolute_prefix)
+        encoded = None
+        if length:
+            padded = np.zeros((self.model.action_horizon, self.model.action_dim), np.float32)
+            padded[:length] = prefix
+            encoded = transforms.Normalize({"actions": self.action_stats}, use_quantiles=False)({"actions": padded})[
+                "actions"
+            ]
         prepared = self.inputs(raw_observation)
         batched = jax.tree.map(lambda x: jnp.asarray(x)[None], prepared)
         observation = model_lib.Observation.from_dict(batched)
         self.model.eval()
-        actions = self.model.sample_actions(rng, observation, noise=noise, num_steps=num_steps)
-        return self.outputs({"actions": np.asarray(actions)})
+        actions = self.model.sample_actions(
+            rng,
+            observation,
+            noise=noise,
+            num_steps=num_steps,
+            prefix_actions=None if encoded is None else jnp.asarray(encoded)[None],
+            prefix_length=length,
+        )
+        result = self.outputs({"actions": np.asarray(actions)})
+        if length:
+            result["actions"] = np.array(result["actions"], copy=True)
+            result["actions"][:, :length] = prefix
+        return result
 
 
 class MambaPaperOfflinePolicy:
@@ -78,16 +112,28 @@ class MambaPaperOfflinePolicy:
             ]
         )
 
-    def infer(self, raw_observation, *, rng, noise=None, num_steps=10):
+    def infer(self, raw_observation, *, rng, noise=None, num_steps=10, absolute_prefix=None):
         from openpi.training.delta_paper_prefix import decode_actions
+        from openpi.training.delta_paper_prefix import encode_prefix
 
+        prefix, length = _physical_prefix(self.model, absolute_prefix)
         vectors = self.vector_inputs(raw_observation)
         physical_state = np.asarray(vectors["state"], np.float32).copy()
+        encoded = encode_prefix(self.data, physical_state, prefix) if length else None
         prepared = self.model_inputs(vectors)
         observation = model_lib.Observation.from_dict(jax.tree.map(lambda x: jnp.asarray(x)[None], prepared))
         self.model.eval()
-        actions = self.model.sample_actions(rng, observation, noise=noise, num_steps=num_steps)
+        actions = self.model.sample_actions(
+            rng,
+            observation,
+            noise=noise,
+            num_steps=num_steps,
+            prefix_actions=None if encoded is None else jnp.asarray(encoded)[None],
+            prefix_length=length,
+        )
         absolute = decode_actions(self.data, physical_state, np.asarray(actions)[0])
+        if length:
+            absolute[:length] = prefix
         return {"actions": absolute[None]}
 
 

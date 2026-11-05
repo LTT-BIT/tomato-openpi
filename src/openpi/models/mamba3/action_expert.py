@@ -46,7 +46,8 @@ class ActionBlock(nnx.Module):
         return scale, shift, jax.nn.sigmoid(gate)
 
     def __call__(self, h, time, film):
-        h = h + self.cond_proj(jax.nn.silu(time))[:, None]
+        projected_time = self.cond_proj(jax.nn.silu(time))
+        h = h + (projected_time[:, None] if projected_time.ndim == 2 else projected_time)
         scale, shift, gate = film
         u = self.mamba(self.mamba_norm(h))
         h = h + gate[:, None] * ((1 + scale[:, None]) * u + shift[:, None])
@@ -72,9 +73,11 @@ class MambaActionExpert(nnx.Module):
         return tuple(block.condition(z) for block in self.blocks.values())
 
     def __call__(self, noisy_actions, time, condition):
-        if time.ndim != 1:
-            raise ValueError("Phase A supports scalar Flow time per sample; tokenwise RTC is not implemented")
-        time = posemb_sincos(time, self.width, min_period=4e-3, max_period=4.0)
+        if time.shape not in (noisy_actions.shape[:1], noisy_actions.shape[:2]):
+            raise ValueError("Flow time must have shape (batch,) or (batch, action_horizon)")
+        time = posemb_sincos(time.reshape(-1), self.width, min_period=4e-3, max_period=4.0).reshape(
+            *time.shape, self.width
+        )
         time = jax.nn.silu(self.time_mlp_out(jax.nn.silu(self.time_mlp_in(time))))
         h = self.action_in_proj(noisy_actions)
         for block, film in zip(self.blocks.values(), condition, strict=True):

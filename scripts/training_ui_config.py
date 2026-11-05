@@ -75,6 +75,14 @@ def baseline_catalog() -> list[dict]:
                 "file": str(path.relative_to(root)),
             }
         )
+    entries.append(
+        {
+            "id": "training_configs.experiments.tomato_sharpa.mamba.train",
+            "label": "番茄 · Sharpa / Mamba 全参 · 311集",
+            "task": "tomato_sharpa",
+            "file": "training_configs/experiments/tomato_sharpa/mamba/train.py",
+        }
+    )
     return entries
 
 
@@ -373,15 +381,21 @@ def apply_overrides(config, values: dict):
         raise ValueError("数据目录不能重复（含指向同一位置的链接）")
     if roots[0] != paths["dataset_root"]:
         raise ValueError("dataset_root 必须与 dataset_roots 的第一项一致")
-    specs = tuple(
-        replace(
-            config.data.lerobot_datasets[0],
-            root=root,
-            repo_id=values["repo_id"] if len(roots) == 1 else f"{values['repo_id']}_part{i:03d}",
-            weight=1.0,
+    source_roots = [str(Path(spec.root).expanduser().resolve()) for spec in config.data.lerobot_datasets]
+    if values["repo_id"] == config.data.repo_id and roots == source_roots:
+        # Runtime/algorithm edits must not rename unchanged source datasets and
+        # invalidate otherwise matching normalization provenance.
+        specs = config.data.lerobot_datasets
+    else:
+        specs = tuple(
+            replace(
+                config.data.lerobot_datasets[0],
+                root=root,
+                repo_id=values["repo_id"] if len(roots) == 1 else f"{values['repo_id']}_part{i:03d}",
+                weight=1.0,
+            )
+            for i, root in enumerate(roots)
         )
-        for i, root in enumerate(roots)
-    )
     data = replace(
         config.data,
         repo_id=values["repo_id"],

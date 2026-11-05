@@ -59,10 +59,14 @@ def editable(config):
 
 def select(config, source):
     """Wrap edited fields together, so model/data asset directories never drift."""
+    if (
+        architecture(source) == "mamba3"
+        and config.model.rtc_max_delay != source.model.rtc_max_delay
+        and config.exp_name == source.exp_name
+    ):
+        raise ValueError("修改Mamba RTC必须使用新的实验名称，不能改变原实验的续训行为")
     if not available(config):
         raise ValueError("Mamba仅支持30Hz Sharpa multimodal π0.5全参训练，不支持LoRA或冻结")
-    if config.model.rtc_max_delay:
-        raise ValueError("Mamba当前要求RTC=0")
     if config.model.action_horizon != 50:
         raise ValueError("Mamba当前要求action_horizon=50")
     if config.sampling_mode != "epoch_shuffle" or config.sampling_groups:

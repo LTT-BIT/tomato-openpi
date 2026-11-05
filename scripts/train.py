@@ -2,6 +2,7 @@ import dataclasses
 import functools
 import logging
 import platform
+import time
 from typing import Any
 
 import flax.nnx as nnx
@@ -261,7 +262,11 @@ def main(config: _config.TrainConfig):
                     start_step * config.batch_size,
                 )
             data_iter = iter(data_loader)
+            timing_start = time.perf_counter()
+            input_wait = 0.0
+            wait_start = time.perf_counter()
             batch = next(data_iter)
+            input_wait += time.perf_counter() - wait_start
             logging.info(f"Initialized data loader:\n{training_utils.array_tree_to_info(batch)}")
             images_to_log = [wandb.Image(image) for image in local_camera_views(batch[0].images)]
             wandb.log({"camera_views": images_to_log}, step=start_step)
@@ -288,14 +293,27 @@ def main(config: _config.TrainConfig):
                 if step % config.log_interval == 0:
                     stacked_infos = common_utils.stack_forest(infos)
                     reduced_info = jax.device_get(jax.tree.map(jnp.mean, stacked_infos))
+                    # device_get above waits for completed steps; avoid a new per-step GPU barrier.
+                    elapsed = time.perf_counter() - timing_start
+                    reduced_info.update(
+                        {
+                            "perf/input_wait_s": input_wait / len(infos),
+                            "perf/step_wall_s": elapsed / len(infos),
+                            "perf/samples_per_s": len(infos) * config.batch_size / elapsed,
+                        }
+                    )
                     if sampling_summary is not None:
                         reduced_info.update(data_loader.sampling_progress(step + 1))
                     info_str = ", ".join(f"{k}={v:.4f}" for k, v in reduced_info.items())
                     pbar.write(f"Step {step}: {info_str}")
                     wandb.log(reduced_info, step=step)
                     infos = []
+                    input_wait = 0.0
+                    timing_start = time.perf_counter()
                 if step + 1 < config.num_train_steps:
+                    wait_start = time.perf_counter()
                     batch = next(data_iter)
+                    input_wait += time.perf_counter() - wait_start
 
                 if should_save_checkpoint(config, step, start_step):
                     checkpoint_step = step + 1 if isinstance(config, _config.ScheduledTrainConfig) else step

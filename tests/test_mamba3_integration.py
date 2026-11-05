@@ -189,16 +189,15 @@ def test_strict_loader_and_invalid_configurations(tiny):
     with pytest.raises(ValueError, match="Missing required"):
         merge_vlm_weights(ref, broken)
     for changes in (
-        {"rtc_max_delay": 10},
         {"paligemma_variant": "gemma_2b_lora"},
         {"action_representation": "delta"},
         {"normalization": "paper"},
     ):
         with pytest.raises(ValueError, match="Phase A"):
             replace(MambaPi0Config(), **changes)
-    with pytest.raises(ValueError, match="tokenwise"):
-        model.velocity(jnp.ones((1, 50, 58)), jnp.ones((1, 50)), model.encode_condition(cfg.fake_obs()))
-    with pytest.raises(ValueError, match="prefixes"):
+    with pytest.raises(ValueError, match="Flow time"):
+        model.velocity(jnp.ones((1, 50, 58)), jnp.ones((1, 49)), model.encode_condition(cfg.fake_obs()))
+    with pytest.raises(ValueError, match="prefix_length"):
         model.sample_actions(jax.random.key(0), cfg.fake_obs(), prefix_length=1)
     stats = NormStats(mean=np.zeros(58), std=np.ones(58), q01=-np.ones(58), q99=np.ones(58))
     validate_stats({"state": stats, "actions": stats}, 58)
@@ -210,7 +209,10 @@ def test_strict_loader_and_invalid_configurations(tiny):
         replace(CONFIG, freeze_filter=nnx.Param)
     assert isinstance(CONFIG, MambaTrainConfig)
     assert CONFIG.ema_decay is None
-    assert CONFIG.batch_size == 1
+    assert CONFIG.batch_size == 512
+    assert CONFIG.num_workers == CONFIG.fsdp_devices == 8
+    assert CONFIG.num_train_steps == 8000
+    assert len(CONFIG.data.lerobot_datasets) == 6
 
 
 def test_absolute_transform_roundtrip_and_no_delta():

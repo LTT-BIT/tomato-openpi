@@ -1,6 +1,6 @@
-"""Ordinary Transformer control sharing Phase A data, shape and short schedule."""
+"""Ordinary Transformer control sharing server data, batch and schedule."""
 
-from training_configs.experiments.tomato_sharpa.mamba.phase_a import TRANSFORMER_CONTROL
+from training_configs.experiments.tomato_sharpa.mamba.train import TRANSFORMER_CONTROL
 
 
 def build_config():

@@ -206,6 +206,8 @@ def test_real_h50_training_checkpoint_new_process_policy(prepared, monkeypatch, 
     source = build(trial=trial, mode=mode, beta=beta)
     compute(source, batch_size=3)
     source = build(trial=trial, mode=mode, beta=beta)
+    rtc_delay = int(os.environ.get("MAMBA_SMOKE_RTC_MAX_DELAY", "0"))
+    source = replace(source, model=replace(source.model, rtc_max_delay=rtc_delay))
     config = with_mamba(source, model_options=diagnostic_options())
     config = replace(
         config,
@@ -284,11 +286,30 @@ def test_real_h50_training_checkpoint_new_process_policy(prepared, monkeypatch, 
         policy = create_mamba_policy(restored, view)
         result = policy.infer(raw, rng=jax.random.key(2))["actions"]
         np.testing.assert_allclose(result[0], absolute, atol=2e-5)
+        if rtc_delay:
+            from openpi.training.delta_paper_prefix import encode_prefix
+
+            captured = {}
+
+            def with_prefix(self, *args, **kwargs):
+                captured.update(kwargs)
+                return jnp.asarray(target)[None]
+
+            monkeypatch.setattr(PaperMambaPi0, "sample_actions", with_prefix)
+            prefix = absolute[:rtc_delay].copy()
+            prefix[:, 0] += 0.1
+            prefix[:, 29] += 0.2
+            reply = policy.infer(raw, rng=jax.random.key(2), absolute_prefix=prefix)["actions"][0]
+            np.testing.assert_array_equal(reply[:rtc_delay], prefix)
+            expected_prefix = encode_prefix(view, vector["state"], prefix)
+            np.testing.assert_array_equal(np.asarray(captured["prefix_actions"])[0], expected_prefix.astype(np.float32))
+            assert captured["prefix_length"] == rtc_delay
         record_evidence(
             f"fusion_{trial}",
             {
                 "diagnostic_only": True,
                 "updates": 5,
+                "rtc_max_delay": rtc_delay,
                 "new_process_restore": record,
                 "physical_roundtrip_max_abs": float(np.max(np.abs(result[0] - absolute))),
             },
@@ -322,15 +343,20 @@ def test_conversion_preserves_schedules_and_rejects_resume_or_mismatches(prepare
     assert isinstance(converted, MambaScheduledTrainConfig)
     assert converted.save_steps_before == (5000,)
     assert converted.data is source.data
+    rtc_source = replace(source, model=replace(source.model, rtc_max_delay=2))
+    rtc_config = with_mamba(rtc_source, model_options=diagnostic_options())
+    assert rtc_config.data is source.data
+    assert norm_provenance.build_contract(rtc_config) == norm_provenance.build_contract(source)
     with pytest.raises(ValueError, match="new experiment"):
         with_mamba(replace(source, resume=True), model_options=diagnostic_options())
     with pytest.raises(ValueError, match="mismatch"):
         replace(converted, data=replace(source.data, paper_beta=0))
 
 
-def test_mamba_paper_rejects_mismatched_algorithm_and_rtc():
-    with pytest.raises(ValueError, match="RTC"):
-        PaperMambaPi0Config(rtc_max_delay=10)
+def test_mamba_paper_rejects_mismatched_algorithm_and_invalid_rtc():
+    assert PaperMambaPi0Config(rtc_max_delay=10).rtc_max_delay == 10
+    with pytest.raises(ValueError, match="rtc_max_delay"):
+        PaperMambaPi0Config(rtc_max_delay=50)
     with pytest.raises(ValueError, match="Paper model"):
         PaperMambaPi0Config(paper_beta=1)
     with pytest.raises(ValueError, match="Compute matching"):
