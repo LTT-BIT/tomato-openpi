@@ -2,6 +2,8 @@
 
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
+Sharpa 整串番茄新增[粗阶段 A/B 实验与决策 agent](training_configs/experiments/tomato_sharpa/README.md#整串番茄粗阶段-ab-实验)：保留完整 episode，审核完全部数据后统一准备；A 使用总体目标，B 使用粗阶段英文。两者共用原始录制分组划分，输入仍为256 tokens。阶段 agent 仅判断阶段、提供指令，不发送机器人动作；当前未训练或实机验证。
+
 本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。
 
 多人在同一服务器训练时，各自在自己的目录独立 clone。日常训练直接使用公共 baseline，或在本地 `template/<负责人>/` 保存个人配置；个人配置已被 Git 忽略，不创建分支、不提交、不上传。只有团队决定新增或修改公共 baseline 时才进入公共开发流程。目录和配置类的组合关系见[开发结构说明](多人开发README.md#目录与配置的组合关系)。
