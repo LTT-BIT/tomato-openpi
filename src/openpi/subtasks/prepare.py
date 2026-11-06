@@ -18,6 +18,7 @@ import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from openpi.subtasks.binding import bind_annotation, verify_annotation
 from openpi.subtasks.tomato import GOAL
 from openpi.subtasks.tomato import PHASES
 from openpi.subtasks.tomato import PROCEDURE
@@ -92,7 +93,8 @@ def inspect_plan(plan):
         entries = [json.loads(line) for line in (root / "meta/episodes.jsonl").read_text().splitlines() if line]
         entry = next(row for row in entries if row["episode_index"] == episode)
         annotation_path = Path(item["annotation"]).expanduser().resolve(strict=True)
-        doc = json.loads(annotation_path.read_text())
+        annotation_bytes = annotation_path.read_bytes()
+        doc = json.loads(annotation_bytes)
         rows = reviewed_segments(doc, entry["length"])
         identity = doc["source"]
         if (
@@ -115,6 +117,7 @@ def inspect_plan(plan):
         for relative, expected in hashes.items():
             if digest(safe_file(root, relative)) != expected:
                 raise ValueError(f"Source changed since review: {relative}")
+        verify_annotation(root, doc)
         path = safe_file(root, info["data_path"].format(episode_chunk=episode // 1000, episode_index=episode))
         table = pq.read_table(path)
         if (
@@ -135,7 +138,8 @@ def inspect_plan(plan):
                 "table": table,
                 "segments": rows,
                 "annotation": doc,
-                "annotation_sha256": digest(annotation_path),
+                "annotation_sha256": hashlib.sha256(annotation_bytes).hexdigest(),
+                "annotation_bytes": annotation_bytes,
                 "source_sha256": hashes,
             }
         )
@@ -230,6 +234,7 @@ def prepare(plan, output, tokenizer):
                 entry.pop("task_index", None)
                 episodes.append(entry)
                 offset += len(table)
+                # Keep the exact reviewed upstream document separate from the active label.
                 write_json(dest / f"annotations/episode_{new_id:06d}.json", record["annotation"])
                 if mode == "a_goal":
                     mapping.append(
@@ -239,6 +244,8 @@ def prepare(plan, output, tokenizer):
                             "source_episode_index": record["episode"],
                             "recording_group": record["recording_group"],
                             "annotation_sha256": record["annotation_sha256"],
+                            "annotation_role": "upstream_reviewed_snapshot",
+                            "source_annotation_snapshot": f"provenance/source_annotations/episode_{new_id:06d}.json",
                             "source_sha256": record["source_sha256"],
                         }
                     )
@@ -262,6 +269,21 @@ def prepare(plan, output, tokenizer):
             write_jsonl(dest / "meta/episodes.jsonl", episodes)
             write_jsonl(dest / "meta/episodes_stats.jsonl", episode_stats)
             write_jsonl(dest / "meta/tasks.jsonl", [{"task_index": i, "task": text} for i, text in enumerate(texts)])
+            # Shared metadata must be final before binding any per-episode label.
+            for new_id, record in enumerate(records):
+                active = bind_annotation(
+                    dest, output / mode, new_id, record["annotation"],
+                    f"provenance/source_annotations/episode_{new_id:06d}.json",
+                    snapshot_bytes=record["annotation_bytes"],
+                )
+                write_json(dest / f"annotations/episode_{new_id:06d}.json", active)
+                verify_annotation(dest, active)
+                mapping[new_id].setdefault("active_annotations", {})[mode] = {
+                    "path": f"{mode}/annotations/episode_{new_id:06d}.json",
+                    "sha256": digest(dest / f"annotations/episode_{new_id:06d}.json"),
+                    "dataset": str(output / mode),
+                }
+
         # Verify all source hashes again before publishing. Source files remain untouched.
         for record in records:
             for relative, expected in record["source_sha256"].items():

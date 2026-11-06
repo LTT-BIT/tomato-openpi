@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from pathlib import Path
 
 import numpy as np
 import pyarrow as pa
@@ -11,6 +12,7 @@ import pytest
 from openpi.subtasks.phase_model import canonical_state
 from openpi.subtasks.phase_model import history_indices
 from openpi.subtasks.phase_model import training_statistics
+from openpi.subtasks.binding import verify_annotation
 from openpi.subtasks.prepare import grouped_split
 from openpi.subtasks.prepare import inspect_plan
 from openpi.subtasks.prepare import prepare
@@ -121,6 +123,7 @@ def plan(tmp_path):
     (root / "meta/info.json").write_text(json.dumps(info))
     entries = [{"episode_index": i, "length": 14, "source_recording_id": f"recording-{i // 2}"} for i in range(20)]
     (root / "meta/episodes.jsonl").write_text("".join(json.dumps(e) + "\n" for e in entries))
+    (root / "meta/tasks.jsonl").write_text(json.dumps({"task_index": 0, "task": GOAL}) + "\n")
     result = {"review_complete": True, "episodes": []}
     for i, entry in enumerate(entries):
         table = pa.table(
@@ -137,7 +140,7 @@ def plan(tmp_path):
         relative = info["data_path"].format(episode_chunk=0, episode_index=i)
         (root / relative).parent.mkdir(parents=True, exist_ok=True)
         pq.write_table(table, root / relative)
-        files = [relative, "meta/info.json", "meta/episodes.jsonl"]
+        files = [relative, "meta/info.json", "meta/episodes.jsonl", "meta/tasks.jsonl"]
         for cam in range(3):
             relative = info["video_path"].format(
                 episode_chunk=0, episode_index=i, video_key=f"observation.images.cam{cam}"
@@ -186,6 +189,29 @@ def test_preparation_keeps_whole_episodes_and_all_physical_columns(plan, tmp_pat
             for column in ("frame_index", "timestamp", "observation.state", "action"):
                 assert actual[column].equals(original[column])
             assert actual["coarse_phase_index"].to_pylist() == [p for p in range(7) for _ in range(2)]
+            annotation = json.loads((output / mode / f"annotations/episode_{i:06d}.json").read_text())
+            verify_annotation(output / mode, annotation)
+            assert annotation["source"]["dataset"] == str(output / mode)
+            assert annotation["source"]["episode_index"] == i
+            original_doc = json.loads(Path(plan["episodes"][i]["annotation"]).read_text())
+            assert annotation["segments"] == original_doc["segments"]
+            snapshot = output / mode / annotation["source_migration"]["upstream_annotation"]
+            assert json.loads(snapshot.read_text()) == original_doc
+            assert snapshot.read_bytes() == Path(plan["episodes"][i]["annotation"]).read_bytes()
+            if mode == "b_coarse":
+                goal = json.loads((output / "a_goal" / f"annotations/episode_{i:06d}.json").read_text())
+                assert goal["source"]["sha256"] != annotation["source"]["sha256"]
+
+    bundle = json.loads((output / "bundle.json").read_text())
+    assert bundle["mapping"][0]["annotation_role"] == "upstream_reviewed_snapshot"
+    for mode in ("a_goal", "b_coarse"):
+        derived = {"review_complete": True, "episodes": [
+            {**row, "dataset": str(output / mode), "episode_index": i,
+             "annotation": str(output / mode / f"annotations/episode_{i:06d}.json")}
+            for i, row in enumerate(plan["episodes"])
+        ]}
+        assert len(inspect_plan(derived)) == 20
+        assert bundle["mapping"][0]["active_annotations"][mode]["dataset"] == str(output / mode)
     with pytest.raises(ValueError, match="new bundle"):
         prepare(plan, output, SyntheticTokenizer())
 
@@ -218,7 +244,7 @@ def test_failed_video_publication_leaves_no_partial_bundle(plan, tmp_path):
     del doc["source"]["sha256"][key]
     path.write_text(json.dumps(doc))
     output = tmp_path / "incomplete"
-    with pytest.raises(ValueError, match="every RGB video"):
+    with pytest.raises(ValueError, match="required hashes"):
         prepare(plan, output, SyntheticTokenizer())
     assert not output.exists()
     assert not list(tmp_path.glob(".tomato-subtasks-*"))
@@ -242,3 +268,12 @@ def test_decision_jsonl_interface_resets_between_runs():
     assert messages[0]["phase_index"] == 0
     assert messages[0]["prompt"] == PROMPTS[0]
     assert messages[1] == {"id": 2, "reset": True}
+
+
+def test_preparation_requires_shared_metadata_hashes(plan):
+    annotation = Path(plan["episodes"][0]["annotation"])
+    doc = json.loads(annotation.read_text())
+    del doc["source"]["sha256"]["meta/tasks.jsonl"]
+    annotation.write_text(json.dumps(doc))
+    with pytest.raises(ValueError, match="required hashes"):
+        inspect_plan(plan)

@@ -300,3 +300,5 @@ CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training \
 历史训练参数、checkpoint 与指标见 [历史实验记录](docs/records/历史实验记录.md)。本仓库不包含这些历史运行产物。
 
 GitLab 自动验证目前暂停。本地代码检查命令为 `bash scripts/check_training.sh`，协作与验证规则见 [多人开发 README](多人开发README.md)。本项目遵循 [LICENSE](LICENSE) 和 [Gemma 许可](LICENSE_GEMMA.txt)。
+
+番茄 subtask A/B 数据准备工具 `openpi.subtasks.prepare` 在各模式的共享元数据完成后，为 `annotations/episode_*.json` 绑定该模式实际输出的数据哈希和新编号；原审定标签保存在 `provenance/source_annotations`，由 `source_migration` 记录上游来源及快照哈希。A/B 的 task_index/tasks 不同，标签各自校验，不得交叉复用。此步骤仅准备数据，不代表训练或实机验证完成。
