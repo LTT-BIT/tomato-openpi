@@ -18,15 +18,15 @@ SOURCE_ACTION_NAMES = tuple(
 
 PHASES = ("pickup_1", "harvest_1", "return_truss", "adjust", "pickup_2", "harvest_2", "return_stem")
 COARSE_SEQUENCE = ("pickup", "harvest", "return", "adjust", "pickup", "harvest", "return")
-PROMPTS = (
-    "Right hand grasps and lifts the truss to the center.",
-    "Right hand holds truss while left hand picks tomatoes into left basket.",
-    "Right hand returns the truss to the right plate.",
-    "Right fingers reposition the truss on the right plate.",
-    "Right hand grasps and lifts the truss to the center.",
-    "Right hand holds truss while left hand picks tomatoes into left basket.",
-    "Right hand returns the bare stem to the right plate.",
-)
+ACTION_PROMPTS = {
+    "pickup": "Right hand grasps and lifts the truss to the center",
+    "harvest": "Right hand holds truss while left hand picks tomatoes into left basket",
+    "return": "Right hand returns the held object to the right plate",
+    "adjust": "Right fingers reposition the truss on the right plate",
+}
+# Seven progress states select four action instructions. Both returns share one
+# instruction; their different successors are determined by the progress state.
+PROMPTS = tuple(ACTION_PROMPTS[action] for action in COARSE_SEQUENCE)
 # A is a concise overall goal, not an enumeration of every motion. The complete
 # procedure remains in the annotation and this metadata; B uses the phase texts.
 GOAL = "Harvest all tomatoes into the left basket and return stem to right plate."
@@ -132,6 +132,7 @@ class PhaseDecision:
         return {
             "phase": PHASES[self.phase],
             "phase_index": self.phase,
+            "action_class": COARSE_SEQUENCE[self.phase],
             "prompt": PROMPTS[self.phase],
             "changed": changed,
             "needs_review": uncertain or proposed not in (self.phase, self.phase + 1),

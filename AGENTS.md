@@ -6,3 +6,5 @@
 - 更新训练行为时同步维护根 README、多人开发文档或对应任务训练说明；区分准备完成、训练完成和实机验证。
 - 只提交本轮及本任务相关内容，保留用户其他未提交修改；不把数据集、权重、密钥提交 Git。
 - 训练日志同时保存到本地并启用 W&B；无法联网时明确采用 offline 模式，之后执行 sync。
+
+- 番茄粗阶段当前采用四类动作与四种无标点 prompt 一一对应；两个 return 共用 `Right hand returns the held object to the right plate`。七阶段 PHASES 仅表达进度，不意味着七种不同指令。修改时需同时核对标注端 vocabulary、训练 ACTION_PROMPTS、token预算和阶段 Agent 输出，不能恢复第七段裸杆 prompt 特判。不要自动覆盖旧 checkpoint 或训练副本；新四类 Agent＋状态机属于另一个待实现实验。

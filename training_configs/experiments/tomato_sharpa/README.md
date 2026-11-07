@@ -119,3 +119,7 @@ bash scripts/python.sh -m scripts.check_converter_dataset \
 ```
 
 统计和报告使用新路径；检查其他批次不代表默认 10.16_2 批次已通过验证。
+
+#### 四类动作 prompt 与七阶段进度
+
+当前 B 使用四类动作到四种无标点指令的一对一映射，定义在 `openpi.subtasks.tomato.ACTION_PROMPTS`。两次放回共用 `Right hand returns the held object to the right plate`，不再用不同裸杆指令。七个 `PHASES` 和 `coarse_phase_index` 保留，`PROMPTS` 由七位置的 `COARSE_SEQUENCE` 映射得到，因此仍有七个位置但只有四种不同文本。Agent 输出同时包含 `phase`、`phase_index`、`action_class`、`prompt`；其完成状态仍需独立判断，不因进入最后阶段自动完成。A 的总指令未改；旧五指令训练副本或 checkpoint 不会自动迁移，需使用新文本重新准备实验数据。该修改未运行训练或实机控制。

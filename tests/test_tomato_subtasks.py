@@ -277,3 +277,20 @@ def test_preparation_requires_shared_metadata_hashes(plan):
     annotation.write_text(json.dumps(doc))
     with pytest.raises(ValueError, match="required hashes"):
         inspect_plan(plan)
+
+
+def test_seven_progress_states_select_four_action_prompts():
+    from openpi.subtasks.tomato import ACTION_PROMPTS
+    assert len(PHASES) == 7 and len(set(PROMPTS)) == 4
+    assert PROMPTS[0] == PROMPTS[4] == ACTION_PROMPTS['pickup']
+    assert PROMPTS[1] == PROMPTS[5] == ACTION_PROMPTS['harvest']
+    assert PROMPTS[2] == PROMPTS[6] == ACTION_PROMPTS['return']
+    assert all(p.replace(' ', '').isalpha() for p in PROMPTS)
+    decision = PhaseDecision(confirmations=1)
+    for index in range(7):
+        probs = [float(i == index) for i in range(7)]
+        result = decision.update(probs, float(index))
+        assert result['phase'] == PHASES[index]
+        assert result['action_class'] == COARSE_SEQUENCE[index]
+        assert result['prompt'] == ACTION_PROMPTS[result['action_class']]
+        assert result['task_complete'] is False

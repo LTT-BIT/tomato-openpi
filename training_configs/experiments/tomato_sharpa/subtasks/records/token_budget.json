@@ -15,25 +15,44 @@
       "max_input_tokens": 256
     },
     {
-      "prompt": "Right hand grasps and lifts the truss to the center.",
+      "prompt": "Right hand grasps and lifts the truss to the center",
       "max_input_tokens": 254
     },
     {
-      "prompt": "Right hand holds truss while left hand picks tomatoes into left basket.",
+      "prompt": "Right hand holds truss while left hand picks tomatoes into left basket",
       "max_input_tokens": 255
     },
     {
-      "prompt": "Right hand returns the truss to the right plate.",
-      "max_input_tokens": 252
-    },
-    {
-      "prompt": "Right fingers reposition the truss on the right plate.",
-      "max_input_tokens": 252
-    },
-    {
-      "prompt": "Right hand returns the bare stem to the right plate.",
+      "prompt": "Right hand returns the held object to the right plate",
       "max_input_tokens": 253
+    },
+    {
+      "prompt": "Right fingers reposition the truss on the right plate",
+      "max_input_tokens": 252
     }
   ],
-  "real_training_frames_audited": false
+  "action_prompts": {
+    "pickup": "Right hand grasps and lifts the truss to the center",
+    "harvest": "Right hand holds truss while left hand picks tomatoes into left basket",
+    "return": "Right hand returns the held object to the right plate",
+    "adjust": "Right fingers reposition the truss on the right plate"
+  },
+  "phases": [
+    "pickup_1",
+    "harvest_1",
+    "return_truss",
+    "adjust",
+    "pickup_2",
+    "harvest_2",
+    "return_stem"
+  ],
+  "phase_prompts": [
+    "Right hand grasps and lifts the truss to the center",
+    "Right hand holds truss while left hand picks tomatoes into left basket",
+    "Right hand returns the held object to the right plate",
+    "Right fingers reposition the truss on the right plate",
+    "Right hand grasps and lifts the truss to the center",
+    "Right hand holds truss while left hand picks tomatoes into left basket",
+    "Right hand returns the held object to the right plate"
+  ]
 }
