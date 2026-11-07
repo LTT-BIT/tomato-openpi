@@ -1,0 +1,28 @@
+{
+  "protocol": "tomato-stage-prediction-v1",
+  "enabled": false,
+  "transport": "external_jsonl_bridge",
+  "agent_checkpoint": null,
+  "labels": ["pickup", "harvest", "return", "adjust"],
+  "camera_order": ["cam0", "cam1", "cam2"],
+  "history_frames": 16,
+  "history_sample_hz": 10,
+  "prediction_hz": 2,
+  "future_horizon_s": 1.0,
+  "decision": {
+    "threshold": 0.8,
+    "confirmations": 2,
+    "max_age_s": 2.0,
+    "future_usage": "warning_only",
+    "initial_phase": "pickup_1",
+    "explicit_session_reset_required": true,
+    "automatic_task_completion": false
+  },
+  "execution": {
+    "action_horizon": 50,
+    "action_dimension": 58,
+    "prompt_updates": "caller_existing_safe_replan_boundary",
+    "chunk_prompt_version_required": true,
+    "robot_control_enabled": false
+  }
+}
