@@ -37,6 +37,34 @@ bash scripts/python.sh -m scripts.check_tomato_ab --require-norm \
 
 正式训练另行明确参数后，沿用 `scripts.run_training`；默认使用新的 all_sources_v2 包；若设置 bundle 环境变量，必须指向该新包，W&B online/offline与本地日志同时保存，不覆盖旧实验目录。
 
+## 已准备的启动入口
+
+本轮以 **B 阶段指令**为主方案，A 总目标保留为对照，不改batch64、FSDP8、30000步、学习率、采样、随机种子或50步跨阶段监督。默认使用revision2全93条数据及独立统计，不接Agent，不改部署端。
+
+在28既有工程内执行，默认命令只预检、保存最终配置和数据/统计指纹，不启动训练：
+
+```bash
+cd /home/mengxiang/workspace/code/tomato-openpi-sharpa
+bash scripts/python.sh -m scripts.tomato_ab_run
+# A 对照预检
+bash scripts/python.sh -m scripts.tomato_ab_run check --variant a
+# 查看当前GPU占用，不加载模型
+bash scripts/python.sh -m scripts.tomato_ab_run gpus
+```
+
+预检快照保存到 `logs/normal93_preflight/`，正式运行由原 `scripts.run_training` 保存本地日志、最终配置、数据采样审计、W&B记录和checkpoint。入口默认W&B offline，避免未验明的网络或登录阻断启动，之后使用wandb sync上传；明确配置网络和登录后可传 `--wandb-mode online`。
+
+以下为**正式启动命令，本轮未执行**。必须等8张卡空闲；入口发现已有计算进程或明显占用会拒绝启动，不自动排队、不停止现有任务。A/B需要顺序运行，不能同时占用同一组卡。
+
+```bash
+# B 主方案，默认GPU 0..7；不会改变训练参数
+bash scripts/python.sh -m scripts.tomato_ab_run start
+# B结束后，A对照使用独立实验目录
+bash scripts/python.sh -m scripts.tomato_ab_run start --variant a
+```
+
+入口使用基础权重开始全新优化器，不续训、不覆盖已有checkpoint。默认实验目录已存在时会拒绝，可用 `--exp-name` 指定新的运行名。资源检查只是启动时快照，不能替代实际8卡数值训练和显存容量验收。
+
 ## 历史粗阶段 A/B 准备设计（不用于当前全数据训练）
 
 新配置位于 `subtasks/`，不替换下方历史单果 baseline。先完成人工粗阶段审核，再准备数据，当前没有启动训练或移动生产数据。粗阶段是4种动作按顺序出现7段：拿起、摘取、放回、调整、再次拿起、继续摘取、放回裸杆。异常轨迹不强套模板，退回人工判断；细阶段本轮不用于训练。
