@@ -15,3 +15,5 @@
 - 番茄粗阶段当前采用四类动作与四种无标点 prompt 一一对应；两个 return 共用 `Right hand returns the held object to the right plate`。七阶段 PHASES 仅表达进度，不意味着七种不同指令。修改时需同时核对标注端 vocabulary、训练 ACTION_PROMPTS、token预算和阶段 Agent 输出，不能恢复第七段裸杆 prompt 特判。不要自动覆盖旧 checkpoint 或训练副本；新四类 Agent＋状态机属于另一个待实现实验。
 
 - 用户已选27服务器承载本次训练；连接47.116.73.163端口27、mengxiang。27与28共用/mnt/data，修改工程会同步可见。UI和CLI通过training_environment统一固定JAX=cuda、PREALLOCATE=false、MEM_FRACTION=0.90，并经公共run-python预加载NCCL；UI本身与数据检查仍用CPU。本轮只配置并打开27训练UI，不启动训练。
+
+- normal93 A/B现采用手臂14维Delta、手部44维Absolute，原始数据仍为绝对目标；使用独立_delta_30hz统计和_delta配置/实验名，不复用历史Absolute统计/checkpoint。训练数据及其余参数不变。

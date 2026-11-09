@@ -431,3 +431,37 @@ def test_ab_ui_retains_all_data_and_rejects_dataset_or_supervision_changes(froze
     entries = editor.experiment_catalog()
     assert entries[0]["id"] == editor.DEFAULT_AB_MODULE
     assert len(entries) == 2
+
+
+@pytest.mark.parametrize("mode", ["a_goal", "b_coarse"])
+def test_normal93_delta_arm_only_and_inverse(frozen_selection, tmp_path, monkeypatch, mode):
+    from openpi import transforms
+    from scripts import training_ui_config as editor
+    from scripts.prepare_tomato_ab import build_plan
+    from training_configs.experiments.tomato_sharpa.subtasks.common import build
+
+    root, selection = frozen_selection
+    bundle = prepare(build_plan(root, selection), tmp_path / "delta_bundle", SyntheticTokenizer())
+    monkeypatch.setenv("PI05_TOMATO_SUBTASK_BUNDLE", str(bundle))
+    absolute = build(mode, selection_path=selection)
+    delta = build(mode, selection_path=selection, action_semantics="delta")
+    assert delta.data.assets.asset_id != absolute.data.assets.asset_id
+    assert delta.name == absolute.name + "_delta"
+    assert delta.exp_name == absolute.exp_name + "_delta"
+    assert delta.policy_metadata["training_action_semantics"] == "delta_arm_joint_target_absolute_hand"
+    assert delta.batch_size == absolute.batch_size == 64
+    assert delta.num_train_steps == absolute.num_train_steps == 30000
+    assert delta.data.base_config == absolute.data.base_config
+    assert editor.apply_overrides(delta, editor.config_values(delta)) == delta
+    _, vectors = delta.data.create_vector_transforms(delta.model)
+    forward = next(t for t in vectors.inputs if isinstance(t, transforms.DeltaActions))
+    inverse = next(t for t in vectors.outputs if isinstance(t, transforms.AbsoluteActions))
+    state = np.arange(58, dtype=np.float32) / 8
+    actions = np.arange(50 * 58, dtype=np.float32).reshape(50, 58) / 8
+    expected = actions.copy()
+    expected[:, :7] -= state[:7]
+    expected[:, 29:36] -= state[29:36]
+    transformed = forward({"state": state, "actions": actions.copy()})
+    np.testing.assert_array_equal(transformed["actions"], expected)
+    np.testing.assert_array_equal(inverse(transformed)["actions"], actions)
+    np.testing.assert_array_equal(transformed["state"], state)

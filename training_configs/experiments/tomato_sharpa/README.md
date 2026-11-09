@@ -8,7 +8,7 @@
 
 A/B 均使用全部93条原始轨迹训练，410456帧，不预留验证或测试集。保留完整视频和所有物理列；仅更新合并索引、task_index，新增 coarse_phase_index。B 的七个位置映射到四种无标点文本，两次 return 共用 held object 指令。50步动作窗口允许跨阶段，尾部沿用 episode 内末帧补齐，不在阶段边界制造保持动作。`splits.json` 仅包含 train=0..92，是全部训练数据的显式清单。
 
-两套新配置分别为 `training_configs.experiments.tomato_sharpa.subtasks.normal93_a_goal` 和 `normal93_b_stage`。默认 π0.5 全参、58D absolute、batch64、FSDP8、30000步，种子42/42/42001/42002，学习率与原 fullft recipe 相同；这只是待启动默认值，不是训练已完成或显存容量验收。没有开启论文增强或 Agent。数据身份、统计目录、实验目录均与旧单果/FLASH/Agent实验分开；归一化覆盖全部93条，A/B分别保存绑定统计。
+两套新配置分别为 `training_configs.experiments.tomato_sharpa.subtasks.normal93_a_goal` 和 `normal93_b_stage`。默认 π0.5 全参、58D（手臂14维Delta、手部44维Absolute）、batch64、FSDP8、30000步，种子42/42/42001/42002，学习率与原 fullft recipe 相同；这只是待启动默认值，不是训练已完成或显存容量验收。没有开启论文增强或 Agent。数据身份、统计目录、实验目录均与旧单果/FLASH/Agent实验分开；归一化覆盖全部93条，A/B分别保存绑定统计。
 
 在28的既有工程 `/home/mengxiang/workspace/code/tomato-openpi-sharpa` 使用公共环境：
 
@@ -31,6 +31,8 @@ bash scripts/python.sh -m scripts.check_tomato_ab --require-norm \
 
 本次已接收 B/1106_750_791_normal 原 episode4 的人工 revision2：最终放回为 `[2908,2990)`，82帧（2.73秒）。冻结清单仅该条标注SHA改变，93条成员、物理轨迹、四种prompt和全部训练策略不变。新包采用 `annotation_r2_all_sources_v2` 身份，旧包保留，不会覆盖；默认配置读取清单中的 bundle_name。B 在帧2908至2988从harvest更新为return。
 
+当前normal93两配置采用手臂Delta/手部Absolute：原始action仍为绝对关节目标，左右臂目标各7维减去当前帧实测state，50步窗口均使用同一当前state；手部44维不变，推理输出通过逆变换还原绝对目标。新asset_id以`_delta_30hz`结尾，配置名及实验名新增`_delta`，必须重新计算统计，不复用Absolute统计或续训旧checkpoint。历史验收记录仍对应当时Absolute配置。
+
 本次使用独立 `all_sources_v2` 数据、统计和实验身份。旧75/9/9包和75条统计保留为历史，当前配置拒绝加载它们。93条物理示教和prompt没有变化，仅纠正训练选择及其统计。batch64、FSDP8、30000步、学习率、采样方式和各随机种子均保持本分支既定值，不因修改数据选择而更改。
 
 2026-11-09 revision2 已在28完成真实验收：A/B均实际加载93条、410456帧；episode89最终阶段为82帧，B的帧2908至2988正确改为return，A总目标指令不变；原始revision2标注快照SHA核对通过。两套统计已重新生成绑定，数值与上一版全数据统计一致。全部物理列、媒体SHA、逐帧指令、阶段边界50步窗口和真实归一化batch验收通过，16项相关测试通过。摘要见 `subtasks/records/normal93_20261109_annotation_r2_validation.json`；完整报告在服务器 `outputs/normal93_annotation_r2_ab_verification.json`。未加载模型权重、未启动训练、未修改部署端。
@@ -41,7 +43,7 @@ bash scripts/python.sh -m scripts.check_tomato_ab --require-norm \
 
 27使用 `mengxiang@47.116.73.163`、SSH端口27；与28共用同一工程、revision2训练数据、统计和基础权重，无需复制。27的8张RTX PRO 5000 72GB已通过JAX/CUDA/NCCL八卡AllReduce检查；这不代表batch64/FSDP8容量验收。
 
-UI服务单独监听27的127.0.0.1:8767，本地通过SSH转发到18767，不修改28既有UI。界面默认选择B阶段指令（全93条），A总体目标保留对照，默认W&B offline；固定数据、统计、horizon、absolute、无RTC和等权采样，训练参数仍显示既定batch64/FSDP8/30000步，打开页面不会启动训练。
+UI服务单独监听27的127.0.0.1:8767，本地通过SSH转发到18767，不修改28既有UI。界面默认选择B阶段指令（全93条），A总体目标保留对照，默认W&B offline；固定数据、统计、horizon、手臂Delta/手部Absolute、无RTC和等权采样，训练参数仍显示既定batch64/FSDP8/30000步，打开页面不会启动训练。
 
 UI与CLI共用 `scripts/training_environment.py`：正式训练进程显式设置 `JAX_PLATFORMS=cuda`、所选 `CUDA_VISIBLE_DEVICES`、`XLA_PYTHON_CLIENT_PREALLOCATE=false`、`XLA_PYTHON_CLIENT_MEM_FRACTION=0.90`，不依赖登录shell默认值。公共 `scripts/python.sh` 负责环境和NCCL；UI服务和预检进程保持CPU。正式任务state.json记录实际训练环境变量。
 

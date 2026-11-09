@@ -16,7 +16,10 @@ from training_configs.embodiments.fr3_sharpa_multimodal import FR3_SHARPA_MULTIM
 from training_configs.recipes.pi05_fullft_v1 import build_config as build_recipe
 
 
-def build(mode, *, selection_path=None):
+def build(mode, *, selection_path=None, action_semantics="absolute"):
+    if action_semantics not in ("absolute", "delta"):
+        raise ValueError("Unknown action supervision")
+    delta = action_semantics == "delta"
     if mode not in ("a_goal", "b_coarse"):
         raise ValueError("Unknown experiment variant")
     default_bundle = "tomato_truss_normal93_20261109_all_sources_v2" if selection_path else "tomato_truss_v1"
@@ -70,7 +73,7 @@ def build(mode, *, selection_path=None):
         repo_id=f"fr3_sharpa/{version}_{mode}_v1",
         root=str(bundle / mode),
         assets_dir=str(common.repository_root() / "assets"),
-        asset_id=f"{version}_{mode}_v1_absolute_30hz",
+        asset_id=f"{version}_{mode}_v1_{action_semantics}_30hz",
         sources=(str(bundle / "bundle.json"),),
         prompt_example=GOAL if mode == "a_goal" else PROMPTS[1],
     )
@@ -80,13 +83,22 @@ def build(mode, *, selection_path=None):
         embodiment=FR3_SHARPA_MULTIMODAL,
         dataset=dataset,
     )
+    if delta:
+        config = replace(config, name=config.name + "_delta", exp_name=config.exp_name + "_delta")
     view = TaskView(split_path=str(bundle / "splits.json"), split="train")
     return replace(
         config,
         fsdp_devices=8 if selection_path is not None else config.fsdp_devices,
-        data=replace(config.data, base_config=TaskDataConfig(prompt_from_task=True, task_view=view)),
+        data=replace(
+            config.data,
+            extra_delta_transform=delta,
+            base_config=TaskDataConfig(prompt_from_task=True, task_view=view),
+        ),
         policy_metadata={
             **config.policy_metadata,
+            "training_action_semantics": (
+                "delta_arm_joint_target_absolute_hand" if delta else "absolute_joint_target"
+            ),
             "subtask_variant": mode,
             "reviewed_bundle": str(bundle / "bundle.json"),
             "max_token_len": 256,

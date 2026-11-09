@@ -71,8 +71,8 @@ def experiment_catalog():
     root = common.repository_root()
     entries = []
     for stem, label in (
-        ("normal93_b_stage", "整串番茄 · B 阶段指令 · 全93条 · 全参"),
-        ("normal93_a_goal", "整串番茄 · A 总体目标 · 全93条 · 全参"),
+        ("normal93_b_stage", "整串番茄 · B 阶段指令 · 手臂Delta · 全93条 · 全参"),
+        ("normal93_a_goal", "整串番茄 · A 总体目标 · 手臂Delta · 全93条 · 全参"),
     ):
         path = Path("training_configs/experiments/tomato_sharpa/subtasks") / f"{stem}.py"
         if (root / path).is_file():

@@ -6,4 +6,8 @@ from training_configs.experiments.tomato_sharpa.subtasks.common import build
 
 
 def build_config():
-    return build("b_coarse", selection_path=Path(__file__).parent / "records/normal93_20261109_selection.json")
+    return build(
+        "b_coarse",
+        selection_path=Path(__file__).parent / "records/normal93_20261109_selection.json",
+        action_semantics="delta",
+    )

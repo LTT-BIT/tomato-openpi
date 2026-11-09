@@ -39,7 +39,7 @@ function addField(container, definition, value, original) {
   const [key,label,type]=definition; const wrapper=node('label',label,(['path','paths','lines'].includes(type))?'full':'');
   const input=document.createElement(['lines','paths'].includes(type)?'textarea':type==='action-semantics'?'select':'input');input.id='field-'+key;input.name=key;
   if(type==='action-semantics'){
-    for(const [mode,text] of [['absolute','absolute · 原始绝对目标'],['delta','delta · 关节目标减当前状态']]){const option=node('option',text);option.value=mode;input.append(option);}
+    for(const [mode,text] of [['absolute','absolute · 原始绝对目标'],['delta','delta · 手臂目标减当前状态，手部保持绝对目标']]){const option=node('option',text);option.value=mode;input.append(option);}
     if(!protocol.delta_available){input.querySelector('[value=delta]').disabled=true;wrapper.append(node('small','当前仅番茄 Wuji / Sharpa 支持 delta。','default'));}
   }
   if(['int','float','optional-int'].includes(type)){input.type='number';input.step=type==='float'?'any':'1';}
