@@ -1,0 +1,679 @@
+{
+  "schema_version": 1,
+  "name": "tomato_truss_normal93_20261109",
+  "source_host": "28",
+  "source_root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more",
+  "variants": [
+    "a_goal",
+    "b_coarse"
+  ],
+  "episodes": [
+    {
+      "dataset": "A/1102_588_616_normal_lerobot",
+      "episode_index": 0,
+      "source_recording_id": "5c83746e032f4c70af823437b698f84c",
+      "length": 7658,
+      "annotation_sha256": "867ea280b6271c35dd34aafb1e975f49f031f773717310f4d48b076f9c11e0a9"
+    },
+    {
+      "dataset": "A/1102_588_616_normal_lerobot",
+      "episode_index": 1,
+      "source_recording_id": "435fc6da99284d7ba15cf09193352c06",
+      "length": 4542,
+      "annotation_sha256": "fd4410cd47e571c32e7b0cbbbabbec264a7d54fdda709528eb95d964337d6e45"
+    },
+    {
+      "dataset": "A/1103_620_642_normal_lerobot",
+      "episode_index": 0,
+      "source_recording_id": "76354615cf9746758c5c7e6e5ab579d4",
+      "length": 4016,
+      "annotation_sha256": "64e2f6bfa06b99f57ba29528580b8cf6c10ffb1dc3245502f448ab9fab6da446"
+    },
+    {
+      "dataset": "A/1103_620_642_normal_lerobot",
+      "episode_index": 1,
+      "source_recording_id": "e826c474e80547d5a3b24e5eb0f30977",
+      "length": 5350,
+      "annotation_sha256": "79889b12cebdd0e7c0f1e379e1e0f3dea4d2c90482bb355f641818c0470d97fc"
+    },
+    {
+      "dataset": "A/1103_620_642_normal_lerobot",
+      "episode_index": 2,
+      "source_recording_id": "7d879f9d5d5a4be09beb55cf88591b0d",
+      "length": 5250,
+      "annotation_sha256": "88f06ef9f62f5626b7f518c87da5e3960f1ab346c8ce34ae75068577eed64cba"
+    },
+    {
+      "dataset": "A/1103_620_642_normal_lerobot",
+      "episode_index": 3,
+      "source_recording_id": "f53005fcd0124474963cf8a0f48a75eb",
+      "length": 5006,
+      "annotation_sha256": "ef20e39f460cdb2600c1c341e587b60e46a51ff1e8606036ff38ef81cab76e05"
+    },
+    {
+      "dataset": "A/1103_620_642_normal_lerobot",
+      "episode_index": 4,
+      "source_recording_id": "b0e4b49bfa1641beb783ec4a2e4e66ee",
+      "length": 5266,
+      "annotation_sha256": "56651613b485ccfa9fb635d0190fa43ec3b9fd1679bc5990294b9cd7b0740b84"
+    },
+    {
+      "dataset": "A/1103_620_642_normal_lerobot",
+      "episode_index": 5,
+      "source_recording_id": "6b8eb1ba3f3843e2b952e7a2228dedd1",
+      "length": 5804,
+      "annotation_sha256": "6463fc3088b322a73d79e5f95b4f6aee1d377f1cae4fa6b09f23fb29f908ebf8"
+    },
+    {
+      "dataset": "A/1103_620_642_normal_lerobot",
+      "episode_index": 6,
+      "source_recording_id": "582a9d90ba1246fb948a32cba6a70ab3",
+      "length": 6726,
+      "annotation_sha256": "3be8c48f01790cc0dc4727fa25105db6aeeffa763104954cef7d9d957f45b166"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 0,
+      "source_recording_id": "0c4d5c84112d4f1f993877f6b854eaa0",
+      "length": 4427,
+      "annotation_sha256": "a31bc56d0f3849d6337d6fad77221e7ecefb5dd824ed99958c812ff8fe89453a"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 1,
+      "source_recording_id": "f36134a910264a68b3ebc3be473d2e15",
+      "length": 4593,
+      "annotation_sha256": "4be87ead383bfe0232e9015e8fe5b87d952df4cec713e947466d28db30e931dd"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 2,
+      "source_recording_id": "2c30455ce7794b87af8b0a60af0a0dab",
+      "length": 5415,
+      "annotation_sha256": "109708e7d940abb8a44e64d9e61297c3ce4805a97efc9128152a4566551e9e3d"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 3,
+      "source_recording_id": "b8b78d4a14144ab1b441a100b880929a",
+      "length": 4704,
+      "annotation_sha256": "0e57db58ad60790e3d5ec1db443c4ec1be9868d0876e2f59f557bfa12ee75acb"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 4,
+      "source_recording_id": "9e19bb249db04f8781577bc3ad22d753",
+      "length": 3870,
+      "annotation_sha256": "33f5e66795b631654e3b54fd61c7ca98e641c7d397818c85721bf2ccc05d1bdf"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 5,
+      "source_recording_id": "8b6950279df34fe898952c53644aa458",
+      "length": 5441,
+      "annotation_sha256": "3b079c25bc087d9471d063ecaa9e3f8f45d3e6cd497d5a48eb6ae7beb0846bde"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 6,
+      "source_recording_id": "b200c493aea6474fbdc4e114a9650bd3",
+      "length": 5145,
+      "annotation_sha256": "c7e2eee01cd5bbd27381bb6a1edef298bce68a6ab8d0d98436a6c7e2b53c235c"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 7,
+      "source_recording_id": "1b2e1a577afa442cb057c595cf27c48f",
+      "length": 4285,
+      "annotation_sha256": "64b6044cceda07ad70f19899f39910de4ba1324550b3a5aa1ec18d493ffb3ac7"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 8,
+      "source_recording_id": "7f2b191c99d14bf1834641e867dfa66e",
+      "length": 4513,
+      "annotation_sha256": "a34a49a89c91a3eba3d6cdcd48f984b102a3fdf780621a5599f2c26c2a14724f"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 9,
+      "source_recording_id": "9a90a945e77e49aabb7a3d4e44246155",
+      "length": 4212,
+      "annotation_sha256": "ece74cd377bfa49fd37c358efdb3900cae8f7ec5844859aadea3466b450f7564"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 10,
+      "source_recording_id": "d673201bbf804640a75110175bbe0b45",
+      "length": 3867,
+      "annotation_sha256": "3fe015a4dd8ddc9114894c5ae174030d373cad832717a6d164fe7b4c8e1224de"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 11,
+      "source_recording_id": "e2772eb099e84674a0b6f46f3a89db22",
+      "length": 3850,
+      "annotation_sha256": "86de7c09e8ef4f59bca4346c9cae924ab21c754a47fa036c775f1a734b3f4770"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 12,
+      "source_recording_id": "eb03aa84529944808c05efa24179f45f",
+      "length": 6065,
+      "annotation_sha256": "91d340965ee30b8c5c65d77664840e4f830f789c768a0a6df32f50568437fcfe"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 13,
+      "source_recording_id": "5d8ad555472e4581a1768e9c27eb03e2",
+      "length": 4807,
+      "annotation_sha256": "93c7fdd56ea7ad279b9065a94c1e8bc4e820df117be27d2c302176998c7bb4f9"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 14,
+      "source_recording_id": "15cf727eaed2406fb2ea6dc7fd4e52e9",
+      "length": 4415,
+      "annotation_sha256": "983bc4fa53e9832252e12443ebf4ad4e26f6bcdee035fd7b17f92c8f80e98238"
+    },
+    {
+      "dataset": "A/1104_652_697_normal_lerobot",
+      "episode_index": 15,
+      "source_recording_id": "e33257a2421b4f03b0d786ed7bda4699",
+      "length": 4990,
+      "annotation_sha256": "3b58b2988d33401d9c7d91dd24284e9a8c84566f675dcc24acea5053ae4d7147"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 0,
+      "source_recording_id": "bb378a3fc949476d98a5a21b68a157c5",
+      "length": 4574,
+      "annotation_sha256": "4a93e8da1106f6bc090edab3cfaeb33d09d7a4938f9c5ceb0de9bca599b7d3c0"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 1,
+      "source_recording_id": "f6e25ffdb2744acf95fc92f22815f319",
+      "length": 3932,
+      "annotation_sha256": "48a655a2debc043c9bf2df9c4eceaf59b7844ac697d493f59ae36aaae7727103"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 2,
+      "source_recording_id": "97b0a0e7b27140cc933c1c6f8bc7ca1f",
+      "length": 5566,
+      "annotation_sha256": "ac13f38d05cd13635a69e4f187b453f046144a847b5af84d7fb62c3a0952ae5f"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 3,
+      "source_recording_id": "19e729d039fc41c587f597f857099965",
+      "length": 4893,
+      "annotation_sha256": "d6c3816e85b904090bdef0820c5f13a4f67ca50d2e1d2ae92009e56c7b4b1148"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 4,
+      "source_recording_id": "7bedea6b1c034982bf1cec5050ad2dc3",
+      "length": 5371,
+      "annotation_sha256": "a144b16699679e341ab853261fa7b544229cf909679b4aa95875972787e3139d"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 5,
+      "source_recording_id": "f0911f9ed7414ad3853ccdbc25e8078b",
+      "length": 4088,
+      "annotation_sha256": "938dad68eb384d06159713e95263058e3f99e4443d64527962a67b44763d8fb5"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 6,
+      "source_recording_id": "2256d59c5b8d4dbba5bb13f06bde7e00",
+      "length": 6735,
+      "annotation_sha256": "e865dfde263b63c062ebddcd3d3eb44208de3bd8f7d89df589a7e887ae9218f3"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 7,
+      "source_recording_id": "d7c0fe71a6ce4330a65beaf26c41c820",
+      "length": 4197,
+      "annotation_sha256": "77417f250eaa0d9c5922072373478002fe3f38a45a84100b089704962a916a4e"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 8,
+      "source_recording_id": "9c6fd4d27e9e4713819c96a88264c853",
+      "length": 5019,
+      "annotation_sha256": "1249aba2dabadd8934bc4aca762cc2138c09b3dc3eb792646175152ba5122e3a"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 9,
+      "source_recording_id": "1ae08349f74447428c83b42863ddd33e",
+      "length": 4512,
+      "annotation_sha256": "b1944bffaf9ec0c2099c51be15b1d54bbff33b42ac6bf893e0a417cb775018af"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 10,
+      "source_recording_id": "7e7664e1f87f46c79c74a49b7ac7e531",
+      "length": 3953,
+      "annotation_sha256": "abce9a4709160448f4ca34f93c84bd98176b985f3adf3f2c48f0d01e783b66c2"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 11,
+      "source_recording_id": "e5b435cf5e6442a2bfb0046bc163bb6a",
+      "length": 3571,
+      "annotation_sha256": "fa2e622f951deb0db932be21c0821447b2e99bcfd5a74a5a39de1f6bc15baa3e"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 12,
+      "source_recording_id": "40d26db9982f4d508076f5686d38d664",
+      "length": 5423,
+      "annotation_sha256": "20c33358f75cf9ee0029650922f8c22ee531a767a7e54ba3404bc1cb2b4a6947"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 13,
+      "source_recording_id": "5215e4140cd046888b4a2d0188bba720",
+      "length": 2821,
+      "annotation_sha256": "cf2d8d1de96e2ad7ae803de1f0d6603236b64d70ac35e979472facf07b262210"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 14,
+      "source_recording_id": "477ba193a59d4309bce161ecb82f0a23",
+      "length": 4068,
+      "annotation_sha256": "5d6229d73eac4316ec6cd1c60c046615be3e6e7a2e0f21f8be2ff7d32fae8f1b"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 15,
+      "source_recording_id": "2903463c46534789a1d5c1cf4b8ad455",
+      "length": 4722,
+      "annotation_sha256": "7f5854e0a9149eab4b26ad196b1fefdaa3845d47e5f223eb911a7196e0bcbd42"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 16,
+      "source_recording_id": "b693693c0fd34115989b89177cbe78c2",
+      "length": 3703,
+      "annotation_sha256": "d20c15add7f56ceeb988503e182b66393b0b44c0329597e0c99ba72f6d1b85b8"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 17,
+      "source_recording_id": "34a4b430af2c4fd6a1912ff03628ef3f",
+      "length": 2234,
+      "annotation_sha256": "5a9af87380ef119020c89268f49da9f4f865664429614f81fde591aac2561987"
+    },
+    {
+      "dataset": "A/1106_702_739_normal_lerobot",
+      "episode_index": 18,
+      "source_recording_id": "32f9ed66d86b4ade8d669406e5d8fe20",
+      "length": 3486,
+      "annotation_sha256": "fbf4e9d4d041eac8f2e1afac501418121d4014be0c609ef9c417f02109c1b4e5"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 0,
+      "source_recording_id": "c4735706f30843569cc2693c5802fae4",
+      "length": 3029,
+      "annotation_sha256": "d99a88d9023e299f03be31f5ec3d0aeea4bdf12dcbee824fc03c56fc15e358df"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 1,
+      "source_recording_id": "26e5fdf1f6fc4f36b56aaeeb12164385",
+      "length": 3786,
+      "annotation_sha256": "a6f416ba483770d41e9b195cbc0c4a3ea8db8cc0b797dcdf2ce4bb6c42a53acb"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 2,
+      "source_recording_id": "26a781329cd64ac2b99e19c41fb02f10",
+      "length": 4603,
+      "annotation_sha256": "2265570502f51fee648000fb8f42f7664fcc8d93a22c0b8477645b39fd388a29"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 3,
+      "source_recording_id": "bc59ee7fef2848b9bfc7197815bdffc7",
+      "length": 2595,
+      "annotation_sha256": "b3b70265acc6604e290df93f33903713f579eb88ef31c47b448048bedcd73860"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 4,
+      "source_recording_id": "db91f18699b244b2a14687f538c00340",
+      "length": 3189,
+      "annotation_sha256": "1563fd77bd863e3618a02067e5a85fb5cdc2cde784e54b0cb3005137040d72ef"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 5,
+      "source_recording_id": "a2d3cd24f74e4ec1ba30f1a6abc81193",
+      "length": 3835,
+      "annotation_sha256": "a358c13a2dc88127ea14219387c0b6b3626d3fc5fce2815ff8d96863cc6c422d"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 6,
+      "source_recording_id": "f4b8c842064840e1af56f7f5fe749345",
+      "length": 2331,
+      "annotation_sha256": "a50a863707588e338cc64736203b63dab106b23d39057d2663c9c501ae9926ad"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 7,
+      "source_recording_id": "0d9d11aa369a49d7879f1bb5d911fc96",
+      "length": 3225,
+      "annotation_sha256": "7ebd56f9c352218298eafd0ddac72d42b2334edf11e975ceca0845db7029a550"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 8,
+      "source_recording_id": "3e6465da9c424af6aa3d5bbe5fca25a0",
+      "length": 3345,
+      "annotation_sha256": "53f9bc220ac85d156274a5121ad0cd02d26020526961c09517884082204c1972"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 10,
+      "source_recording_id": "08145c5d72af443dad2b3c80c3541b49",
+      "length": 3848,
+      "annotation_sha256": "0d3d686bc8b3e66f016ed2df1360916e76b2a993b076ddf0f17bba0a18dc9348"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 11,
+      "source_recording_id": "6a3a33cde77a47aea4f3d4c0e3882c56",
+      "length": 3654,
+      "annotation_sha256": "979b8e5ffc1e5bde9ec6523176b64e38eed21255f0f7bfe3d8f6e859513b0ea5"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 12,
+      "source_recording_id": "45954bb22f4149f496592e7c4c377e52",
+      "length": 3117,
+      "annotation_sha256": "393e42b342a18127a5c5e833be69649cd6fbdc3155aabe7622cd77e4e7b0d845"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 13,
+      "source_recording_id": "48dd84ffc94443e2aa98807238327d71",
+      "length": 2902,
+      "annotation_sha256": "4a9143f4127f2e0e2c64d4bf1535d23d99c69e2b02856677e133a484bdcdd0c2"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 14,
+      "source_recording_id": "ad8ff4147a9a40748709d65a94c1fb14",
+      "length": 3369,
+      "annotation_sha256": "416dc51d60da8830ba53c8a34d26a4cce86861a8e5843b152dd58bcf1210e3bb"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 15,
+      "source_recording_id": "03c4f749f53e4ceca32a1b73c8dbbf54",
+      "length": 3198,
+      "annotation_sha256": "b41f72e91498de12b2f9c4f947836a89e0c24cf9a9ce8bba90a8f4a0e874732c"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 16,
+      "source_recording_id": "666d070f4a194cefae4bf7e9437710c7",
+      "length": 3652,
+      "annotation_sha256": "bee6acc6053e1f03a10446a94eb7b0f50a735436a39bd93af9813ee3343f63f2"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 17,
+      "source_recording_id": "ffdd92b4f7924956acd476e88f2ff1a6",
+      "length": 2567,
+      "annotation_sha256": "9e4b7b172c4bbcf928e0b382dac6d5523cfd22c99b68baf7f95896194e3e5a2c"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 18,
+      "source_recording_id": "963bef134ce54ad29733a761d8fd5948",
+      "length": 2760,
+      "annotation_sha256": "2953adc79ae64818515651e077d0f1627c93c1ebbdd376791a2d4d7277a94f96"
+    },
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 19,
+      "source_recording_id": "3b7d153b61764f4b9920e382f7f1083b",
+      "length": 3254,
+      "annotation_sha256": "be8b7640524ff68acf5adf9dc8d0ecebfe21046c4e22a784e69d3fd87d5e28aa"
+    },
+    {
+      "dataset": "A/1107_783_783_normal",
+      "episode_index": 0,
+      "source_recording_id": "5befbcd6c7f143028144b68d754c6883",
+      "length": 2685,
+      "annotation_sha256": "66b4431c3d08b810a7a3ecc8f22793fe8bd58118f4428d8beb152b5c4cce3b77"
+    },
+    {
+      "dataset": "B/1101_572_601_normal_lerobot",
+      "episode_index": 0,
+      "source_recording_id": "c0298a852584430885235869cde14f02",
+      "length": 8367,
+      "annotation_sha256": "21d04381b0510de746a51e14bb11d40ec0c0ec5455ceadee6624e7d99db3bd11"
+    },
+    {
+      "dataset": "B/1101_572_601_normal_lerobot",
+      "episode_index": 1,
+      "source_recording_id": "34d3f5750f7049e0a0e73024589b7863",
+      "length": 6376,
+      "annotation_sha256": "329e53b29561257dee690f4d627b7b6f3a6ffa86232ecf9c2e186338751b38bb"
+    },
+    {
+      "dataset": "B/1101_572_601_normal_lerobot",
+      "episode_index": 2,
+      "source_recording_id": "8560d21c947840b194bc3da0a80a6981",
+      "length": 5207,
+      "annotation_sha256": "422f496cb03b55c915692ecdc778833cd072c393e04e9813bcfabfff7e8718a8"
+    },
+    {
+      "dataset": "B/1103_604_632_normal_lerobot",
+      "episode_index": 0,
+      "source_recording_id": "cc129554ec8340dab7716bdd1a772a5a",
+      "length": 6177,
+      "annotation_sha256": "c061b99771f3445f0c93603400dc7684abc3f3583d2a5b67655687fefeee2f55"
+    },
+    {
+      "dataset": "B/1103_604_632_normal_lerobot",
+      "episode_index": 1,
+      "source_recording_id": "031906d13dc3439a82f379aee2ed5273",
+      "length": 7428,
+      "annotation_sha256": "7750634a6c1261ea3bbf7183656bc218d22a277cedab1310e7f3e5be9eb25e96"
+    },
+    {
+      "dataset": "B/1103_604_632_normal_lerobot",
+      "episode_index": 2,
+      "source_recording_id": "0340d869ea074774b09441f2339cec30",
+      "length": 5474,
+      "annotation_sha256": "866ed24255f94ebd8a028760abf0202925228401e2aea3ee32cbe5d3ca97d94c"
+    },
+    {
+      "dataset": "B/1103_604_632_normal_lerobot",
+      "episode_index": 3,
+      "source_recording_id": "2ca332c2796249bf86bee08f90e8e0d6",
+      "length": 3229,
+      "annotation_sha256": "3275bbd51eadfaa67f34315f7abc86dcc6d62a0b5c8b900b7a0fa743fc601806"
+    },
+    {
+      "dataset": "B/1103_604_632_normal_lerobot",
+      "episode_index": 4,
+      "source_recording_id": "20ad614dc0de475d9c04f2f26d110386",
+      "length": 4301,
+      "annotation_sha256": "02bc3024d725f4d3d7bbee18e46393a021d1895245986b128b67319c2c67a96a"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 0,
+      "source_recording_id": "b7cf52379f064a20aa1035b9c57843d9",
+      "length": 4980,
+      "annotation_sha256": "acf8e389f81573cb70e2b36b3457bbe39790d8a5980d6b0d04899e4d9cf98177"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 1,
+      "source_recording_id": "209695586e5d42a092580087e8595080",
+      "length": 6534,
+      "annotation_sha256": "63fe41dd3dddd89f136c5e18f12cd33c417dccff305e6c76ca8090e8714762c9"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 2,
+      "source_recording_id": "57c0a74671b647f7945837489275283a",
+      "length": 5628,
+      "annotation_sha256": "408f0c20e63a6941eb2eb07d63356b62bbd9aaba8fa74ffeecc8da1ebb71a1e0"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 3,
+      "source_recording_id": "ccfc3dc266ef4161b5620a74f9065287",
+      "length": 3834,
+      "annotation_sha256": "b31e2ff31f525d8d9cd6d52ff4bdb90bbed7ac6c40a5c2c044e93bf110a6325a"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 4,
+      "source_recording_id": "3c153e6888614010895ac4158fb3733e",
+      "length": 3125,
+      "annotation_sha256": "127e1de733a07379f8fa59c6ab6a0997c13ea98eb0679b60d22968270e678786"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 5,
+      "source_recording_id": "1d82688b0f8c4a6d8c12d82f07561e51",
+      "length": 4226,
+      "annotation_sha256": "0a4d5376a540cd008af1b438816ab7bda212d2f07a800664ae9585453f1e1400"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 6,
+      "source_recording_id": "e8c88bdc015b4be6bee7e90f8c94e86a",
+      "length": 3758,
+      "annotation_sha256": "83654ae265002a468cfe86a76de07e5decf1f8142a2c9a9d75c9dcc74f1745f2"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 7,
+      "source_recording_id": "270fddd8068a436cb140f81a338eee6c",
+      "length": 5665,
+      "annotation_sha256": "c4eb71004a6a5ad4817182b024ee03ab5ca1adf0422b10615f9666d426197833"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 8,
+      "source_recording_id": "4cffd838ea0e4b81af120d4236bbeb93",
+      "length": 5224,
+      "annotation_sha256": "6444b17c045388c9a8e9756d131f9af401551c9c4aab30c2c352f1e74f3249db"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 9,
+      "source_recording_id": "7880e2a6f1524495b95fe052249fc434",
+      "length": 5753,
+      "annotation_sha256": "fe71cc1d3f1484efbfef51e8472d99aa52c7c4f73f9e550ff6eaccb164f5e0e4"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 10,
+      "source_recording_id": "2c7dea1400834c86bd057bf60f0db9e2",
+      "length": 4978,
+      "annotation_sha256": "bba9336d57231f4119fb4abeed929f8ee4fc67bd4b8af6628a3c6a768e4a8e8c"
+    },
+    {
+      "dataset": "B/1104_637_701_normal_lerobot",
+      "episode_index": 11,
+      "source_recording_id": "0e2221c7c284497098d5f1e509d36171",
+      "length": 6089,
+      "annotation_sha256": "47e6436ec902c7d8b40d32fdf79edf515e02a530ec7bc57f8fb820c7cf01e580"
+    },
+    {
+      "dataset": "B/1105_703_713_normal_lerobot",
+      "episode_index": 0,
+      "source_recording_id": "7ed15b57f5fc4643a0333cfd99c1edd6",
+      "length": 4685,
+      "annotation_sha256": "9e3f49a657959d5cb8852e2139c2cea018c1c5d7b240b78f8c901a1a2fbe6844"
+    },
+    {
+      "dataset": "B/1106_750_791_normal",
+      "episode_index": 0,
+      "source_recording_id": "45ece5143b704a3fb609c2e4a8c5c8d2",
+      "length": 3464,
+      "annotation_sha256": "317d6a15996e5ebef20cdaab941be4cca7e54b3e6b5b10fc2fa815191f10b8df"
+    },
+    {
+      "dataset": "B/1106_750_791_normal",
+      "episode_index": 1,
+      "source_recording_id": "bcd0001b7394475e9a178740c81cc79d",
+      "length": 3847,
+      "annotation_sha256": "920260443e842bbb35207b7be58e8c1a2440d7dc59e2a76c377491cbfa08d2e4"
+    },
+    {
+      "dataset": "B/1106_750_791_normal",
+      "episode_index": 2,
+      "source_recording_id": "30246f5f7f0f45dba996e3cc3adbcd25",
+      "length": 4570,
+      "annotation_sha256": "950e98804a8be65175a7f8b8a4fbcafcdaea5fe012c72df76f84e7ce2b5168ce"
+    },
+    {
+      "dataset": "B/1106_750_791_normal",
+      "episode_index": 3,
+      "source_recording_id": "6ad08a7f55384561bfcc1fc4806ae613",
+      "length": 3414,
+      "annotation_sha256": "9c2c348d4c3867761bf34f66358da0379c7891989016fb782c8e307d4897d1c5"
+    },
+    {
+      "dataset": "B/1106_750_791_normal",
+      "episode_index": 4,
+      "source_recording_id": "651eb2271bae4971a62273985ed85c2d",
+      "length": 2990,
+      "annotation_sha256": "ca93d3c93e66508fbddfadeda3954b6a1bf65d29b15d4b7328aac91544a99008"
+    },
+    {
+      "dataset": "B/1106_750_791_normal",
+      "episode_index": 5,
+      "source_recording_id": "471c02da39ac4fa7ba4fcd140f9cb1ed",
+      "length": 2773,
+      "annotation_sha256": "c8ab7d1086a70bf97b65058409154fb0b1c8c90f3ceaadcb0e833b94e7e7c87e"
+    },
+    {
+      "dataset": "B/1106_750_791_normal",
+      "episode_index": 6,
+      "source_recording_id": "59fe475f41454fedb1d5a229292e569c",
+      "length": 4079,
+      "annotation_sha256": "23cfe04636c0137b259669a21d71507940429276f6a238fe67805bafdc562828"
+    },
+    {
+      "dataset": "B/1106_750_791_normal",
+      "episode_index": 7,
+      "source_recording_id": "db6fb478cff64df893f81e390d436662",
+      "length": 2252,
+      "annotation_sha256": "a1a9f5bc206fa526f299bf06f4745860d0a8d3a5d87d5bb401a9d1844b04db8e"
+    }
+  ],
+  "excluded": [
+    {
+      "dataset": "A/1106_740_796_normal",
+      "episode_index": 9,
+      "source_recording_id": "ef866ed4c8f949d7b1a7d7fb3ef8ffbb",
+      "length": 1065,
+      "reason": "Only three reviewed segments; excluded by user"
+    },
+    {
+      "dataset": "B/1107_696_696_normal",
+      "episode_index": 0,
+      "source_recording_id": "2099dc5c4d9443338d0d7c3b90f1df0c",
+      "length": 6441,
+      "reason": "Previously rejected recording; no published coarse annotation"
+    }
+  ]
+}

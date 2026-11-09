@@ -1,11 +1,42 @@
 # FR3 + Sharpa 番茄训练
 
+## normal93 无 Agent 训练准备
+
+分支 `tomato-subtasks-ab-train`，从四类指令统一后的 `56ca763` 建立。此实验不调用任何阶段 Agent；B 训练使用人工审核的阶段文本，未来部署由人观察并点击阶段，在线 prompt 与动作队列切换属于后续部署任务。
+
+固定清单为 `subtasks/records/normal93_20261109_selection.json`：28 上 `normal/no-block-more/A`、`B` 的93个独立录制，410456帧，30Hz。排除 `A/1106_740_796_normal/episode_000009`（仅三段）及 `B/1107_696_696_normal/episode_000000`（历史剔除、无发布粗标注）。不用 speedup 或 C。清单绑定各条来源ID、帧数和标注SHA，新增、缺失或改动均需人工检查并新建实验版本，不自动纳入。
+
+A/B 保持同一93条原始轨迹及 seed42 录制分组划分，75 train / 9 val / 9 test。保留完整视频和所有物理列；仅更新合并索引、task_index，新增 coarse_phase_index。B 的七个位置映射到四种无标点文本，两次 return 共用 held object 指令。50步动作窗口允许跨阶段，尾部沿用 episode 内末帧补齐，不在阶段边界制造保持动作。
+
+两套新配置分别为 `training_configs.experiments.tomato_sharpa.subtasks.normal93_a_goal` 和 `normal93_b_stage`。默认 π0.5 全参、58D absolute、batch64、FSDP8、30000步，种子42/42/42001/42002，学习率与原 fullft recipe 相同；这只是待启动默认值，不是训练已完成或显存容量验收。没有开启论文增强或 Agent。数据身份、统计目录、实验目录均与旧单果/FLASH/Agent实验分开；归一化只取75条 train，A/B分别保存绑定统计。
+
+在28的既有工程 `/home/mengxiang/workspace/code/tomato-openpi-sharpa` 使用公共环境：
+
+```bash
+export PI05_TOMATO_SUBTASK_BUNDLE="$PWD/data/tomato_truss_normal93_20261109"
+bash scripts/python.sh -m scripts.prepare_tomato_ab \
+  --source-root /mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more \
+  --output "$PI05_TOMATO_SUBTASK_BUNDLE" \
+  --tokenizer "$HOME/.cache/openpi/big_vision/paligemma_tokenizer.model"
+# 生成新目录，拒绝覆盖。准备过程核验全部源SHA和真实token预算，不修改源数据。
+for mode in a_goal b_stage; do
+  MODULE="training_configs.experiments.tomato_sharpa.subtasks.normal93_${mode}"
+  bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE" --stats-batch-size 128
+done
+bash scripts/python.sh -m scripts.check_tomato_ab --require-norm \
+  --output outputs/normal93_ab_verification.json
+```
+
+检查器比较所有源与派生 Parquet 的物理列、逐帧阶段/task映射、全部派生媒体SHA、三个划分的实际加载结果、全部阶段边界的50步动作窗口，并为A/B各读取一个真实归一化模型batch；不加载模型权重、不运行训练。该准备不证明动作效果或实机成功率。上述80/10/10按独立录制组取整，不是按帧等分；这组test与历史Agent数据可能重叠，不能称跨实验从未查看的全新测试集。
+
+正式训练另行明确参数后，沿用 `scripts.run_training`；必须设置同一 bundle 环境变量，W&B online/offline与本地日志同时保存，不覆盖旧实验目录。
+
 ## 整串番茄粗阶段 A/B 实验
 
 新配置位于 `subtasks/`，不替换下方历史单果 baseline。先完成人工粗阶段审核，再准备数据，当前没有启动训练或移动生产数据。粗阶段是4种动作按顺序出现7段：拿起、摘取、放回、调整、再次拿起、继续摘取、放回裸杆。异常轨迹不强套模板，退回人工判断；细阶段本轮不用于训练。
 
 - A：`training_configs.experiments.tomato_sharpa.subtasks.coarse_a_goal_v1`，全帧使用 `Harvest all tomatoes into the left basket and return stem to right plate.`。这是紧凑的总体目标，没有枚举左右手分工和中途调整；完整流程保存在 bundle 的 `procedure` 和人工阶段标注中。它不等同于把完整流程文本都输入模型。
-- B：`training_configs.experiments.tomato_sharpa.subtasks.coarse_b_stage_v1`，逐帧读取当前粗阶段英文。左右手分工、盘上调整及最后裸杆使用独立文本，见 `src/openpi/subtasks/tomato.py`。模型学到的是阶段条件动作，实机需要阶段调度器。
+- B：`training_configs.experiments.tomato_sharpa.subtasks.coarse_b_stage_v1`，逐帧读取当前粗阶段英文。左右手分工、盘上调整使用对应动作文本，两次放回共用同一句指令，见 `src/openpi/subtasks/tomato.py`。模型学到的是阶段条件动作，实机需要阶段调度器。
 
 两者保持完整 episode、图像、时间戳、state/action、horizon 50，不切视频、不制造边界静止动作。B 在交界附近仍保留跨阶段的真实未来动作窗口；因此当前指令不保证覆盖窗口内每个动作，这需要后续对比评估，不能靠补造保持动作解决。统计通过既有 TaskView 仅对 train split 计算。验证/测试应同样使用 `splits.json` 的 val/test 条目，不用训练集结果代替评估。普通训练入口不自动评测整条任务成功率。
 

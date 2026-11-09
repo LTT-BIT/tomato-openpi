@@ -295,6 +295,8 @@ def prepare(plan, output, tokenizer):
             {
                 "schema_version": 1,
                 "review_complete": True,
+                "selection_sha256": plan.get("selection_sha256"),
+                "tokenizer_sha256": plan.get("tokenizer_sha256"),
                 "phases": PHASES,
                 "goal": GOAL,
                 "procedure": PROCEDURE,
