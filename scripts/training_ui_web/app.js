@@ -71,7 +71,17 @@ function fillForm(result) {
     for(const definition of defs){const key=definition[0];if(section==='advanced'&&!(key in initial))continue;let value=initial[key];if(key==='dataset_root')value=(initial.dataset_roots||[initial.dataset_root]).join('\n');if(key==='owner')value=result.owner;if(key==='exp_name')value=result.suggested_exp_name;if(key==='stats_batch_size')value=512;addField(container,definition,value,initial[key]);}
   }
   $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
-  if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
+  if(protocol.subtask_variant){
+    $('protocol').append(node('div','revision2 · 全部93条 / 410456帧训练 · 无验证测试留出 · 无Agent · 50步动作窗口'));
+    $('protocol').append(node('div','训练环境：JAX=cuda · PREALLOCATE=false · MEM_FRACTION=0.90 · 公共NCCL 2.31.2'));
+    const texts=Object.values(protocol.action_prompts||{});
+    if(protocol.subtask_variant==='b_coarse')for(const [i,text] of texts.entries())$('protocol').append(node('div',`${i+1}. ${text}`));
+    $('wandb-mode').value='offline';
+  }else if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。'));
+  for(const key of protocol.locked_fields||[]){if(fields.has(key))fields.get(key).input.disabled=true;}
+  for(const id of ['discover-datasets','apply-datasets','new-stats'])$(id).disabled=Boolean(protocol.subtask_variant);
+  $('sampling-mode').disabled=Boolean(protocol.subtask_variant);
+
   if(result.shared_weights){const button=node('button','使用服务器公共权重','text-button');button.addEventListener('click',()=>{fields.get('weight_path').input.value=result.shared_weights;fields.get('weight_path').input.dispatchEvent(new Event('input'));});$('runtime-fields').append(button);}
   $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);
   $('groups-panel').classList.toggle('hidden',initial.sampling_mode!=='weighted_replacement');
@@ -212,7 +222,7 @@ $('browse-parent').addEventListener('click',()=>perform(()=>browse(browseState.p
 $('browse-select').addEventListener('click',()=>{browseTarget.value=browseTarget.id==='field-dataset_root'?appendDatasetPath(browseTarget.value,browseState.path):browseState.path;browseTarget.dispatchEvent(new Event('input'));browseTarget.dispatchEvent(new Event('change'));$('browser').close();});
 async function refreshCatalog(){
   const info=await api('/api/baselines');
-  $('runtime').textContent=info.repository+'\nPython: '+info.python;
+  $('runtime').textContent=(info.host?'服务器：'+(info.server_label||info.host)+' · '+info.host+'\n':'')+info.repository+'\nPython: '+info.python;
   for(const [id,entries] of [['baseline-list',info.baselines],['personal-list',info.personal||[]]]){
     $(id).replaceChildren();
     for(const entry of entries){const button=node('button',entry.label,'baseline');button.dataset.id=entry.id;button.classList.toggle('selected',baseline===entry.id);button.addEventListener('click',()=>perform(()=>chooseBaseline(entry.id)));$(id).append(button);}
@@ -221,5 +231,5 @@ async function refreshCatalog(){
   return info;
 }
 $('refresh-configs').addEventListener('click',()=>perform(refreshCatalog,$('refresh-configs')));
-perform(async()=>{const info=await refreshCatalog();if(info.baselines.length)await chooseBaseline(info.baselines.find(e=>e.id.includes('tomato_wuji')&&e.id.includes('lora'))?.id||info.baselines[0].id);await Promise.all([refreshGPUs(),refreshJobs()]);});
+perform(async()=>{const info=await refreshCatalog();if(info.baselines.length)await chooseBaseline(info.default_baseline||info.baselines.find(e=>e.id.includes('tomato_wuji')&&e.id.includes('lora'))?.id||info.baselines[0].id);await Promise.all([refreshGPUs(),refreshJobs()]);});
 let polling=false;setInterval(async()=>{if(polling||document.hidden)return;polling=true;try{if(currentJob)await showJob(currentJob);await refreshJobs();}catch(error){notice('连接中断：'+error.message,true);}finally{polling=false;}},5000);

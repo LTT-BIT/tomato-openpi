@@ -404,3 +404,30 @@ def test_ab_config_binds_selection_splits_and_preserves_cross_phase_windows(froz
     splits_path.write_text(json.dumps(splits))
     with pytest.raises(ValueError, match="all selected recordings"):
         build("a_goal", selection_path=selection)
+
+
+def test_ab_ui_retains_all_data_and_rejects_dataset_or_supervision_changes(frozen_selection, tmp_path, monkeypatch):
+    from scripts import training_ui_config as editor
+    from scripts.prepare_tomato_ab import build_plan
+    from training_configs.experiments.tomato_sharpa.subtasks.common import build
+
+    root, selection = frozen_selection
+    bundle = prepare(build_plan(root, selection), tmp_path / "bundle_ui", SyntheticTokenizer())
+    monkeypatch.setenv("PI05_TOMATO_SUBTASK_BUNDLE", str(bundle))
+    config = build("b_coarse", selection_path=selection)
+    values = editor.config_values(config)
+    restored = editor.apply_overrides(config, values)
+    assert restored == config
+    assert editor.apply_overrides(config, {**values, "exp_name": "ui_new_run"}).data == config.data
+    for change in (
+        {"dataset_root": "/another_dataset"},
+        {"sampling_mode": "weighted_replacement"},
+        {"rtc_max_delay": 10},
+        {"action_semantics": "delta"},
+        {"asset_id": "old_stats"},
+    ):
+        with pytest.raises(ValueError, match="固定全93条"):
+            editor.apply_overrides(config, {**values, **change})
+    entries = editor.experiment_catalog()
+    assert entries[0]["id"] == editor.DEFAULT_AB_MODULE
+    assert len(entries) == 2

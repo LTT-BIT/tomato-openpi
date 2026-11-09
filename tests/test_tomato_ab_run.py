@@ -59,3 +59,22 @@ def test_default_only_checks_b_and_never_launches(tmp_path, monkeypatch):
     tomato_ab_run.main()
     assert selected == ["b"]
     assert len(list((tmp_path / "logs/normal93_preflight").glob("*.json"))) == 1
+
+
+def test_cuda_environment_overrides_stale_cpu_and_memory_settings():
+    from scripts.training_environment import cuda_environment
+
+    source = {
+        "JAX_PLATFORMS": "cpu",
+        "JAX_PLATFORM_NAME": "cpu",
+        "CUDA_VISIBLE_DEVICES": "",
+        "XLA_PYTHON_CLIENT_PREALLOCATE": "true",
+        "XLA_PYTHON_CLIENT_MEM_FRACTION": "0.75",
+    }
+    env = cuda_environment(["0", "1"], source)
+    assert env["JAX_PLATFORMS"] == "cuda"
+    assert "JAX_PLATFORM_NAME" not in env
+    assert env["CUDA_VISIBLE_DEVICES"] == "0,1"
+    assert env["XLA_PYTHON_CLIENT_PREALLOCATE"] == "false"
+    assert env["XLA_PYTHON_CLIENT_MEM_FRACTION"] == "0.90"
+    assert source["JAX_PLATFORMS"] == "cpu"

@@ -51,6 +51,35 @@ TEXT_FIELDS = (
     "weight_path",
     "project_name",
 )
+DEFAULT_AB_MODULE = "training_configs.experiments.tomato_sharpa.subtasks.normal93_b_stage"
+AB_LOCKED_FIELDS = (
+    "dataset_root",
+    "repo_id",
+    "dataset_version",
+    "sources",
+    "assets_dir",
+    "asset_id",
+    "action_horizon",
+    "rtc_max_delay",
+    "action_semantics",
+    "sampling_mode",
+    "sampling_groups",
+)
+
+
+def experiment_catalog():
+    root = common.repository_root()
+    entries = []
+    for stem, label in (
+        ("normal93_b_stage", "整串番茄 · B 阶段指令 · 全93条 · 全参"),
+        ("normal93_a_goal", "整串番茄 · A 总体目标 · 全93条 · 全参"),
+    ):
+        path = Path("training_configs/experiments/tomato_sharpa/subtasks") / f"{stem}.py"
+        if (root / path).is_file():
+            entries.append(
+                {"id": ".".join(path.with_suffix("").parts), "label": label, "task": "tomato_sharpa", "file": str(path)}
+            )
+    return entries
 
 
 def baseline_catalog() -> list[dict]:
@@ -107,7 +136,7 @@ def personal_catalog() -> list[dict]:
 
 
 def source_path(module: str) -> Path:
-    entries = baseline_catalog() + personal_catalog()
+    entries = baseline_catalog() + experiment_catalog() + personal_catalog()
     entry = next((item for item in entries if item["id"] == module), None)
     if entry is None:
         raise ValueError("请选择当前仓库的 baseline 或个人配置")
@@ -124,6 +153,8 @@ def config_from_source(source: str, module: str, filename: str):
 def source_config(module: str):
     if module in {item["id"] for item in baseline_catalog()}:
         return baseline_config(module)
+    if module in {item["id"] for item in experiment_catalog()}:
+        return load_experiment(module)
     path = source_path(module)
     config = config_from_source(path.read_text(), module, str(path))
     validate_config(config)
@@ -173,6 +204,8 @@ def config_values(config) -> dict:
 
 
 def defaults(module: str) -> dict:
+    from openpi.subtasks.tomato import ACTION_PROMPTS
+
     config = source_config(module)
     values = config_values(config)
     owner = re.sub(r"\W", "_", getpass.getuser())
@@ -196,6 +229,10 @@ def defaults(module: str) -> dict:
             else None,
             "actions": values["action_semantics"],
             "delta_available": delta_supported(config),
+            "subtask_variant": config.policy_metadata.get("subtask_variant"),
+            "data_policy": config.policy_metadata.get("data_policy"),
+            "locked_fields": list(AB_LOCKED_FIELDS) if config.policy_metadata.get("selection_sha256") else [],
+            "action_prompts": ACTION_PROMPTS if config.policy_metadata.get("subtask_variant") == "b_coarse" else {},
         },
     }
 
@@ -228,6 +265,19 @@ def apply_overrides(config, values: dict):
     }
     if missing := required - set(values):
         raise ValueError(f"缺少参数: {sorted(missing)}")
+    if config.policy_metadata.get("selection_sha256"):
+        original = config_values(config)
+        for key in AB_LOCKED_FIELDS:
+            actual, expected = values.get(key, original[key]), original[key]
+            if key in ("dataset_root", "assets_dir"):
+                actual, expected = Path(actual).expanduser().resolve(), Path(expected).expanduser().resolve()
+            if actual != expected:
+                raise ValueError(f"当前AB方案固定全93条数据、统计和监督，不能修改 {key}；请新建实验版本")
+        roots = values.get("dataset_roots", [values["dataset_root"]])
+        if [str(Path(root).expanduser().resolve()) for root in roots] != [
+            str(Path(original["dataset_root"]).resolve())
+        ]:
+            raise ValueError("当前AB方案固定全93条数据，不能更换或增加数据目录")
     source_semantics = "delta" if getattr(config.data, "extra_delta_transform", False) else "absolute"
     action_semantics = values.get("action_semantics", source_semantics)
     if action_semantics not in ("absolute", "delta"):

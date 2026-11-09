@@ -37,6 +37,21 @@ bash scripts/python.sh -m scripts.check_tomato_ab --require-norm \
 
 正式训练另行明确参数后，沿用 `scripts.run_training`；默认使用新的 all_sources_v2 包；若设置 bundle 环境变量，必须指向该新包，W&B online/offline与本地日志同时保存，不覆盖旧实验目录。
 
+## 27服务器训练UI
+
+27使用 `mengxiang@47.116.73.163`、SSH端口27；与28共用同一工程、revision2训练数据、统计和基础权重，无需复制。27的8张RTX PRO 5000 72GB已通过JAX/CUDA/NCCL八卡AllReduce检查；这不代表batch64/FSDP8容量验收。
+
+UI服务单独监听27的127.0.0.1:8767，本地通过SSH转发到18767，不修改28既有UI。界面默认选择B阶段指令（全93条），A总体目标保留对照，默认W&B offline；固定数据、统计、horizon、absolute、无RTC和等权采样，训练参数仍显示既定batch64/FSDP8/30000步，打开页面不会启动训练。
+
+UI与CLI共用 `scripts/training_environment.py`：正式训练进程显式设置 `JAX_PLATFORMS=cuda`、所选 `CUDA_VISIBLE_DEVICES`、`XLA_PYTHON_CLIENT_PREALLOCATE=false`、`XLA_PYTHON_CLIENT_MEM_FRACTION=0.90`，不依赖登录shell默认值。公共 `scripts/python.sh` 负责环境和NCCL；UI服务和预检进程保持CPU。正式任务state.json记录实际训练环境变量。
+
+```bash
+# 在27现有工程启动独立UI（终端保持运行）
+PI05_UI_SERVER_LABEL=27 WANDB_MODE=offline bash scripts/python.sh -m scripts.training_ui --port 8767
+# 在本机转发；用UI终端输出的token打开18767页面
+ssh -N -p 27 -L 127.0.0.1:18767:127.0.0.1:8767 mengxiang@47.116.73.163
+```
+
 ## 已准备的启动入口
 
 本轮以 **B 阶段指令**为主方案，A 总目标保留为对照，不改batch64、FSDP8、30000步、学习率、采样、随机种子或50步跨阶段监督。默认使用revision2全93条数据及独立统计，不接Agent，不改部署端。

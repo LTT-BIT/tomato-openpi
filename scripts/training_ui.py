@@ -448,11 +448,12 @@ def worker(job_id):
             [*python, "scripts.run_training", state["module"], *overrides, "--check"],
             cpu_env,
         )
-        env = {**os.environ, "CUDA_VISIBLE_DEVICES": ",".join(state["gpus"]), "PYTHONUNBUFFERED": "1"}
-        env.pop("JAX_PLATFORMS", None)
-        env.pop("JAX_PLATFORM_NAME", None)
-        # Fail if CUDA cannot initialize rather than accidentally training on CPU.
-        env["JAX_PLATFORMS"] = "cuda"
+        from scripts.training_environment import CUDA_SETTINGS
+        from scripts.training_environment import cuda_environment
+
+        env = cuda_environment(state["gpus"])
+        state["training_environment"] = {key: env[key] for key in (*CUDA_SETTINGS, "CUDA_VISIBLE_DEVICES")}
+        atomic_json(directory / "state.json", state)
         if hashlib.sha256(path.read_bytes()).hexdigest() != state["config_sha256"]:
             raise ValueError("准备过程中配置被修改，请新建实验")
         command = [*python, "scripts.run_training", state["module"], *overrides, "--wandb-mode", state["wandb_mode"]]
@@ -546,10 +547,13 @@ def handler_class(token):
                 query = {key: value[0] for key, value in parse_qs(url.query).items()}
                 if url.path == "/api/baselines":
                     value = {
-                        "baselines": config_ui.baseline_catalog(),
+                        "baselines": config_ui.experiment_catalog() + config_ui.baseline_catalog(),
                         "personal": config_ui.personal_catalog(),
                         "repository": str(common.repository_root()),
                         "python": sys.executable,
+                        "host": socket.gethostname(),
+                        "server_label": os.environ.get("PI05_UI_SERVER_LABEL", socket.gethostname()),
+                        "default_baseline": config_ui.DEFAULT_AB_MODULE if config_ui.experiment_catalog() else None,
                     }
                 elif url.path == "/api/baseline":
                     value = config_ui.defaults(query["id"])

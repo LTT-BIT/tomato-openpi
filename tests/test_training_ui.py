@@ -334,6 +334,8 @@ def test_worker_sequences_cpu_preparation_and_gpu_training(workspace, fake_launc
     assert all(row[2]["JAX_PLATFORMS"] == "cpu" and row[2]["CUDA_VISIBLE_DEVICES"] == "" for row in calls[:-1])
     assert calls[-1][2]["JAX_PLATFORMS"] == "cuda"
     assert calls[-1][2]["CUDA_VISIBLE_DEVICES"] == "GPU-test0"
+    assert calls[-1][2]["XLA_PYTHON_CLIENT_PREALLOCATE"] == "false"
+    assert calls[-1][2]["XLA_PYTHON_CLIENT_MEM_FRACTION"] == "0.90"
     assert calls[-1][1][-2:] == ["--wandb-mode", "offline"]
     assert ui.read_job(state["id"])["status"] == "completed"
 

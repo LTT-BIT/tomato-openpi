@@ -144,13 +144,9 @@ def main():
         except BlockingIOError as error:
             raise RuntimeError("Another normal93 launcher already holds the GPU lock") from error
         validate_gpus(gpu_inventory(), selected, fsdp_devices=config.fsdp_devices, batch_size=config.batch_size)
-        env = {
-            **os.environ,
-            "CUDA_VISIBLE_DEVICES": ",".join(selected),
-            "JAX_PLATFORMS": "cuda",
-            "PYTHONUNBUFFERED": "1",
-        }
-        env.pop("JAX_PLATFORM_NAME", None)
+        from scripts.training_environment import cuda_environment
+
+        env = cuda_environment(selected)
         command = [
             "bash",
             str(ROOT / "scripts/python.sh"),
