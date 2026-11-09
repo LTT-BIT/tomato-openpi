@@ -4,7 +4,7 @@
 
 当前 `tomato-subtasks-ab-train` 分支用于[无 Agent 的整串番茄 A/B 实验](training_configs/experiments/tomato_sharpa/README.md#normal93-无-agent-训练准备)。固定93条完整七段 normal 轨迹，A 使用总体目标，B 使用人工阶段指令；两者均使用全部93条训练，不留验证或测试集，保留完整50步动作窗口与256-token输入。本轮仅准备和校验，不启动正式训练，部署端手动切换尚未接线。
 
-本次训练使用27服务器（SSH端口27），[27训练UI与环境设置](training_configs/experiments/tomato_sharpa/README.md#27服务器训练ui)。当前整串实验默认准备B阶段prompt，A保留对照；两者均采用手臂14维Delta、手部44维Absolute及独立Delta统计。`bash scripts/python.sh -m scripts.tomato_ab_run` 只预检并保存最终配置；正式训练必须显式使用 `start`，启动前拒绝占用中的GPU。使用说明见[任务训练入口](training_configs/experiments/tomato_sharpa/README.md#已准备的启动入口)。
+本次训练使用27服务器（SSH端口27），[27训练UI与环境设置](training_configs/experiments/tomato_sharpa/README.md#27服务器训练ui)。当前整串实验默认准备B阶段prompt，A保留对照；两者均采用手臂14维Delta、手部44维Absolute及独立Delta统计，训练规模为batch512/FSDP8/8000步，学习率计划保持原值。`bash scripts/python.sh -m scripts.tomato_ab_run` 只预检并保存最终配置；正式训练必须显式使用 `start`，启动前拒绝占用中的GPU。使用说明见[任务训练入口](training_configs/experiments/tomato_sharpa/README.md#已准备的启动入口)。
 
 本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。
 

@@ -17,3 +17,5 @@
 - 用户已选27服务器承载本次训练；连接47.116.73.163端口27、mengxiang。27与28共用/mnt/data，修改工程会同步可见。UI和CLI通过training_environment统一固定JAX=cuda、PREALLOCATE=false、MEM_FRACTION=0.90，并经公共run-python预加载NCCL；UI本身与数据检查仍用CPU。本轮只配置并打开27训练UI，不启动训练。
 
 - normal93 A/B现采用手臂14维Delta、手部44维Absolute，原始数据仍为绝对目标；使用独立_delta_30hz统计和_delta配置/实验名，不复用历史Absolute统计/checkpoint。训练数据及其余参数不变。
+
+- 用户已要求部分对齐既有训练：normal93 A/B均为batch512、8000总步数、FSDP8；保留原学习率计划（warmup1000/decay_steps30000）、普通Delta与其统计，不迁移T3额外归一化或噪声。本轮只同步配置和UI，不开训。

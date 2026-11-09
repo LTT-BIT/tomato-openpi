@@ -369,7 +369,7 @@ def test_ab_config_binds_selection_splits_and_preserves_cross_phase_windows(froz
         config = build(mode, selection_path=selection)
         validate_config(config)
         assert config.fsdp_devices == 8
-        assert config.batch_size == 64
+        assert config.batch_size == 512
         assert config.policy_metadata["agent_enabled"] is False
         data_root = bundle / mode
         files = sorted((data_root / "data/chunk-000").glob("*.parquet"))
@@ -449,8 +449,11 @@ def test_normal93_delta_arm_only_and_inverse(frozen_selection, tmp_path, monkeyp
     assert delta.name == absolute.name + "_delta"
     assert delta.exp_name == absolute.exp_name + "_delta"
     assert delta.policy_metadata["training_action_semantics"] == "delta_arm_joint_target_absolute_hand"
-    assert delta.batch_size == absolute.batch_size == 64
-    assert delta.num_train_steps == absolute.num_train_steps == 30000
+    assert delta.batch_size == absolute.batch_size == 512
+    assert delta.num_train_steps == absolute.num_train_steps == 8000
+    assert delta.lr_schedule.decay_steps == 30000
+    assert delta.lr_schedule.warmup_steps == 1000
+    assert delta.lr_schedule.peak_lr == 2.5e-5
     assert delta.data.base_config == absolute.data.base_config
     assert editor.apply_overrides(delta, editor.config_values(delta)) == delta
     _, vectors = delta.data.create_vector_transforms(delta.model)

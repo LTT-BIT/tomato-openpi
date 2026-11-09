@@ -88,6 +88,8 @@ def build(mode, *, selection_path=None, action_semantics="absolute"):
     view = TaskView(split_path=str(bundle / "splits.json"), split="train")
     return replace(
         config,
+        batch_size=512 if selection_path is not None else config.batch_size,
+        num_train_steps=8000 if selection_path is not None else config.num_train_steps,
         fsdp_devices=8 if selection_path is not None else config.fsdp_devices,
         data=replace(
             config.data,
