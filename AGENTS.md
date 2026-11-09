@@ -3,6 +3,7 @@
 - 本分支 `tomato-subtasks-ab-train` 用于无 Agent 的整串番茄 A/B 训练；用户明确要求分支不使用 codex 前缀。在现有 `/home/user/tomato-openpi` 开发，28 沿用 `/home/mengxiang/workspace/code/tomato-openpi-sharpa`，不另建 clone/worktree。本轮只准备、校验和同步，不启动正式训练，不改部署端。
 - 用户已授权验证通过后自动中文提交并推送 GitHub 对应分支；本分支推送 `github/tomato-subtasks-ab-train`，不强推。数据和权重不纳入 Git。
 - 本实验固定 `records/normal93_20261109_selection.json`：采集 A/B 组共93条完整七段 normal 轨迹，不用 speedup、C、三段轨迹和已剔除无标注条目。新清单必须新建实验版本；不按目录扫描悄悄改变训练集。
+- 用户最新要求：A/B动作模型按正常全数据方式训练，93条全部参与，不留val/test；归一化覆盖全部93条。不能自行新增划分或更改既定训练参数。旧75/9/9统计仅保留为历史，新all_sources_v2身份禁止复用旧统计。
 - 用户要求：每轮开发完成并验证后提交一次 Git，使用中文提交说明。
 - 不新增开发日志或过程性文档；改动及验证结果写入 Git 提交说明，保留可核对的实验配置和真实结果记录。
 - 训练版本必须记录数据来源、配置名称、实验名称、归一化统计和英文 prompt。

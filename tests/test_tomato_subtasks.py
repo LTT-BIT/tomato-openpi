@@ -357,7 +357,6 @@ def test_ab_config_binds_selection_splits_and_preserves_cross_phase_windows(froz
 
     import datasets
 
-    from openpi.training.task_view import TaskView
     from openpi.training.task_view import TaskViewDataset
     from scripts.prepare_tomato_ab import build_plan
     from scripts.run_training import validate_config
@@ -389,7 +388,9 @@ def test_ab_config_binds_selection_splits_and_preserves_cross_phase_windows(froz
             ),
         )
 
-        view = TaskViewDataset(source, TaskView(), 50)
+        view = TaskViewDataset(source, config.data.base_config.task_view, 50)
+        assert len(view) == len(hf)
+        assert set(view.ids[:, 0]) == set(range(20))
         actions = np.asarray(pq.read_table(files[0])["action"].to_pylist(), dtype=np.float32)
         for frame in (1, 2, 5, 6, 11, 12, 13):
             sample = view.vectors(frame)
@@ -397,12 +398,9 @@ def test_ab_config_binds_selection_splits_and_preserves_cross_phase_windows(froz
             np.testing.assert_array_equal(sample["action"], actions[np.minimum(frame + np.arange(50), 13)])
     splits_path = bundle / "splits.json"
     splits = json.loads(splits_path.read_text())
-    splits["splits"]["val"].append(splits["splits"]["train"][0])
+    assert splits["splits"] == {"train": list(range(20))}
+    assert config.data.base_config.task_view.split == "train"
+    splits["splits"] = {"train": list(range(16)), "val": [16, 17], "test": [18, 19]}
     splits_path.write_text(json.dumps(splits))
-    with pytest.raises(ValueError, match="exactly once"):
-        build("a_goal", selection_path=selection)
-    splits["splits"]["val"].pop()
-    splits["splits"]["val"], splits["splits"]["test"] = splits["splits"]["test"], splits["splits"]["val"]
-    splits_path.write_text(json.dumps(splits))
-    with pytest.raises(ValueError, match="frozen seed42"):
+    with pytest.raises(ValueError, match="all selected recordings"):
         build("a_goal", selection_path=selection)

@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 
 from openpi.subtasks.prepare import digest
-from openpi.subtasks.prepare import grouped_split
 from openpi.subtasks.tomato import GOAL
 from openpi.subtasks.tomato import PHASES
 from openpi.subtasks.tomato import PROMPTS
@@ -20,7 +19,8 @@ from training_configs.recipes.pi05_fullft_v1 import build_config as build_recipe
 def build(mode, *, selection_path=None):
     if mode not in ("a_goal", "b_coarse"):
         raise ValueError("Unknown experiment variant")
-    bundle = Path(os.environ.get("PI05_TOMATO_SUBTASK_BUNDLE", common.repository_root() / "data/tomato_truss_v1"))
+    default_bundle = "tomato_truss_normal93_20261109_all_sources_v2" if selection_path else "tomato_truss_v1"
+    bundle = Path(os.environ.get("PI05_TOMATO_SUBTASK_BUNDLE", common.repository_root() / "data" / default_bundle))
     if not (bundle / "bundle.json").is_file():
         raise ValueError("Finish coarse review and prepare a unified A/B bundle before loading this experiment")
     manifest = json.loads((bundle / "bundle.json").read_text())
@@ -49,18 +49,8 @@ def build(mode, *, selection_path=None):
             ):
                 raise ValueError("Bundle mapping differs from frozen normal93 selection")
         splits = json.loads((bundle / "splits.json").read_text())["splits"]
-        ids = [i for split in splits.values() for i in split]
-        if (
-            set(splits) != {"train", "val", "test"}
-            or any(not v for v in splits.values())
-            or (len(ids) != len(expected) or set(ids) != set(range(len(expected))))
-        ):
-            raise ValueError("A/B splits must cover every selected episode exactly once")
-        group_sets = [{mapping[i]["recording_group"] for i in split} for split in splits.values()]
-        if any(a & b for i, a in enumerate(group_sets) for b in group_sets[i + 1 :]):
-            raise ValueError("Original recordings must not cross A/B splits")
-        if splits != grouped_split(mapping):
-            raise ValueError("A/B splits differ from the frozen seed42 recording assignment")
+        if manifest.get("data_policy") != "all_sources" or splits != {"train": list(range(len(expected)))}:
+            raise ValueError("normal93 requires all selected recordings in training, with no validation/test holdout")
         for variant in ("a_goal", "b_coarse"):
             info = json.loads((bundle / variant / "meta/info.json").read_text())
             tasks = [
@@ -72,7 +62,7 @@ def build(mode, *, selection_path=None):
                 or tasks != ([GOAL] if variant == "a_goal" else list(dict.fromkeys(PROMPTS)))
             ):
                 raise ValueError("Prepared dataset dimensions or prompts differ from frozen A/B contract")
-        version = selection["name"]
+        version = selection["name"] + "_all_sources_v2"
     dataset = common.Dataset(
         version=f"{version}_coarse_{mode}_v1",
         repo_id=f"fr3_sharpa/{version}_{mode}_v1",
@@ -101,6 +91,7 @@ def build(mode, *, selection_path=None):
             "whole_episodes": True,
             "decision_agent_trained": False,
             "agent_enabled": False,
+            "data_policy": manifest.get("data_policy", "source_holdout"),
             "selection_sha256": manifest.get("selection_sha256"),
         },
     )

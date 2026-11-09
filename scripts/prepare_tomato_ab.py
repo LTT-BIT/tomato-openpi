@@ -62,7 +62,12 @@ def build_plan(source_root, selection_path=SELECTION):
                 "recording_group": row["source_recording_id"],
             }
         )
-    return {"review_complete": True, "selection_sha256": digest(selection_path), "episodes": episodes}
+    return {
+        "review_complete": True,
+        "selection_sha256": digest(selection_path),
+        "data_policy": "all_sources",
+        "episodes": episodes,
+    }
 
 
 def main():

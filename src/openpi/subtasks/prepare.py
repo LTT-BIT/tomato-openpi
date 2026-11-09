@@ -18,7 +18,8 @@ import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from openpi.subtasks.binding import bind_annotation, verify_annotation
+from openpi.subtasks.binding import bind_annotation
+from openpi.subtasks.binding import verify_annotation
 from openpi.subtasks.tomato import GOAL
 from openpi.subtasks.tomato import PHASES
 from openpi.subtasks.tomato import PROCEDURE
@@ -167,7 +168,10 @@ def prepare(plan, output, tokenizer):
         raise ValueError("Choose a new bundle directory; never overwrite existing data")
     budget = audit_token_budget(tokenizer)
     records = inspect_plan(plan)
-    splits = grouped_split(records)
+    data_policy = plan.get("data_policy", "source_holdout")
+    if data_policy not in ("all_sources", "source_holdout"):
+        raise ValueError("Unknown data policy")
+    splits = {"train": list(range(len(records)))} if data_policy == "all_sources" else grouped_split(records)
     cameras = [key for key, value in records[0]["info"]["features"].items() if value.get("dtype") == "video"]
     if set(cameras) != {f"observation.images.cam{i}" for i in range(3)}:
         raise ValueError("Expected exactly three Sharpa RGB cameras")
@@ -272,7 +276,10 @@ def prepare(plan, output, tokenizer):
             # Shared metadata must be final before binding any per-episode label.
             for new_id, record in enumerate(records):
                 active = bind_annotation(
-                    dest, output / mode, new_id, record["annotation"],
+                    dest,
+                    output / mode,
+                    new_id,
+                    record["annotation"],
                     f"provenance/source_annotations/episode_{new_id:06d}.json",
                     snapshot_bytes=record["annotation_bytes"],
                 )
@@ -289,13 +296,22 @@ def prepare(plan, output, tokenizer):
             for relative, expected in record["source_sha256"].items():
                 if digest(safe_file(record["root"], relative)) != expected:
                     raise ValueError("Source changed during preparation")
-        write_json(temporary / "splits.json", {"splits": splits, "seed": 42, "grouping": "original recording"})
+        write_json(
+            temporary / "splits.json",
+            {
+                "splits": splits,
+                "seed": 42 if data_policy == "source_holdout" else None,
+                "grouping": "original recording",
+                "data_policy": data_policy,
+            },
+        )
         write_json(
             temporary / "bundle.json",
             {
                 "schema_version": 1,
                 "review_complete": True,
                 "selection_sha256": plan.get("selection_sha256"),
+                "data_policy": data_policy,
                 "tokenizer_sha256": plan.get("tokenizer_sha256"),
                 "phases": PHASES,
                 "goal": GOAL,

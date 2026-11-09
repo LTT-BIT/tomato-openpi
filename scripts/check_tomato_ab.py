@@ -1,4 +1,4 @@
-"""Verify paired physical trajectories, phase boundaries, splits and a real model batch; never train."""
+"""Verify paired physical trajectories, phase boundaries, all-source selection and a real model batch; never train."""
 
 import argparse
 from dataclasses import replace
@@ -23,6 +23,8 @@ def check(*, require_norm=False):
     bundle = Path(configs["a_goal"].policy_metadata["reviewed_bundle"]).parent
     manifest = json.loads((bundle / "bundle.json").read_text())
     splits = json.loads((bundle / "splits.json").read_text())["splits"]
+    if splits != {"train": list(range(len(manifest["mapping"])))}:
+        raise ValueError("All selected recordings must participate in training")
     frames = 0
     for row in manifest["mapping"]:
         index = row["episode_index"]

@@ -2,7 +2,7 @@
 
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
-当前 `tomato-subtasks-ab-train` 分支用于[无 Agent 的整串番茄 A/B 实验](training_configs/experiments/tomato_sharpa/README.md#normal93-无-agent-训练准备)。固定93条完整七段 normal 轨迹，A 使用总体目标，B 使用人工阶段指令；两者共用录制分组划分、完整50步动作窗口与256-token输入。本轮仅准备和校验，不启动正式训练，部署端手动切换尚未接线。
+当前 `tomato-subtasks-ab-train` 分支用于[无 Agent 的整串番茄 A/B 实验](training_configs/experiments/tomato_sharpa/README.md#normal93-无-agent-训练准备)。固定93条完整七段 normal 轨迹，A 使用总体目标，B 使用人工阶段指令；两者均使用全部93条训练，不留验证或测试集，保留完整50步动作窗口与256-token输入。本轮仅准备和校验，不启动正式训练，部署端手动切换尚未接线。
 
 本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。
 
