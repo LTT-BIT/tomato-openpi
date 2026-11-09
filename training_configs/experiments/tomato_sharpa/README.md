@@ -33,7 +33,7 @@ bash scripts/python.sh -m scripts.check_tomato_ab --require-norm \
 
 本次使用独立 `all_sources_v2` 数据、统计和实验身份。旧75/9/9包和75条统计保留为历史，当前配置拒绝加载它们。93条物理示教和prompt没有变化，仅纠正训练选择及其统计。batch64、FSDP8、30000步、学习率、采样方式和各随机种子均保持本分支既定值，不因修改数据选择而更改。
 
-2026-11-09 已在28重建并验收全数据版本：A/B均实际加载93条、410456帧，归一化覆盖相同的全部训练数据且数值SHA一致；逐帧指令、原始物理列、媒体SHA、阶段边界50步窗口及真实归一化batch全部通过。76项相关测试通过。结果摘要见 `subtasks/records/normal93_20261109_all_sources_validation.json`，完整报告位于服务器 `outputs/normal93_annotation_r2_ab_verification.json`。未加载模型权重、未启动正式训练、未修改部署端。
+2026-11-09 revision2 已在28完成真实验收：A/B均实际加载93条、410456帧；episode89最终阶段为82帧，B的帧2908至2988正确改为return，A总目标指令不变；原始revision2标注快照SHA核对通过。两套统计已重新生成绑定，数值与上一版全数据统计一致。全部物理列、媒体SHA、逐帧指令、阶段边界50步窗口和真实归一化batch验收通过，16项相关测试通过。摘要见 `subtasks/records/normal93_20261109_annotation_r2_validation.json`；完整报告在服务器 `outputs/normal93_annotation_r2_ab_verification.json`。未加载模型权重、未启动训练、未修改部署端。
 
 正式训练另行明确参数后，沿用 `scripts.run_training`；默认使用新的 all_sources_v2 包；若设置 bundle 环境变量，必须指向该新包，W&B online/offline与本地日志同时保存，不覆盖旧实验目录。
 

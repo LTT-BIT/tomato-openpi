@@ -104,5 +104,7 @@
   },
   "training_started": false,
   "model_weights_loaded": false,
-  "deployment_modified": false
+  "deployment_modified": false,
+  "scope": "Historical all-source revision1 annotation verification",
+  "superseded_by": "normal93_20261109_annotation_r2_validation.json"
 }
