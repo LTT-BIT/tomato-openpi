@@ -5,6 +5,8 @@ data/
 wandb/
 replay_checks/
 logs/
+# Local normal93 validation reports and resolved machine-specific configs.
+/outputs/normal93_*.json
 # Legacy runtime files remain local.
 .runtime/
 .cache/
