@@ -1,0 +1,108 @@
+{
+  "date": "2026-11-09",
+  "host": "28",
+  "branch": "tomato-subtasks-ab-train",
+  "code_commit": "bf96f803b9e4a42058dde7d4aaddcbc108d904ee",
+  "status": "passed",
+  "data_policy": "all_sources",
+  "episodes": 93,
+  "frames": 410456,
+  "selection": {
+    "train": 93
+  },
+  "bundle": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/data/tomato_truss_normal93_20261109_all_sources_v2",
+  "bundle_sha256": "7275c69d9464987213d0bde4bf996ead97367d091ca9be497ed3b1250cebf9ed",
+  "selection_sha256": "e35bbd617c3a13c7a5f8dcc22114c722ee4e0fdc8ec21737ad4b4d313f92ab44",
+  "training_selection_sha256": "ce029e3a22c48108331426873f76d50b30534ae1215d3a2c744dd6ebbd2d07db",
+  "verification_report": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/outputs/normal93_all_sources_ab_verification.json",
+  "verification_report_sha256": "809e95097de25d05d93a981e79039d0dcb0df0df839a9e326328ca23aa709062",
+  "variants": {
+    "a_goal": {
+      "training_episodes": 93,
+      "training_frames": 410456,
+      "batch": {
+        "state": [
+          1,
+          58
+        ],
+        "actions": [
+          1,
+          50,
+          58
+        ],
+        "tokens": [
+          1,
+          256
+        ],
+        "images": {
+          "base_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ],
+          "left_wrist_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ],
+          "right_wrist_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ]
+        }
+      },
+      "norm_stats_path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/assets/tomato_truss_normal93_20261109_all_sources_v2_a_goal_v1_absolute_30hz/norm_stats.json",
+      "norm_stats_sha256": "50de51c1374b1c470bafc30c7be81e035ec998c3e18ec707ff928bd7078c0597",
+      "norm_metadata_sha256": "320c0adf65fb282f2ce8229d381a1f24475f8988922d35792a777760c19fa237"
+    },
+    "b_coarse": {
+      "training_episodes": 93,
+      "training_frames": 410456,
+      "batch": {
+        "state": [
+          1,
+          58
+        ],
+        "actions": [
+          1,
+          50,
+          58
+        ],
+        "tokens": [
+          1,
+          256
+        ],
+        "images": {
+          "base_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ],
+          "left_wrist_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ],
+          "right_wrist_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ]
+        }
+      },
+      "norm_stats_path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/assets/tomato_truss_normal93_20261109_all_sources_v2_b_coarse_v1_absolute_30hz/norm_stats.json",
+      "norm_stats_sha256": "50de51c1374b1c470bafc30c7be81e035ec998c3e18ec707ff928bd7078c0597",
+      "norm_metadata_sha256": "d7da5bdecd0f3e8f072c5f6672e349cf988268380d3a3d387dfda47e43dc3610"
+    }
+  },
+  "training_started": false,
+  "model_weights_loaded": false,
+  "deployment_modified": false
+}

@@ -105,5 +105,7 @@
     }
   },
   "training_started": false,
-  "deployment_modified": false
+  "deployment_modified": false,
+  "scope": "Historical 75/9/9 verification; not the active training policy",
+  "superseded_by": "normal93_20261109_all_sources_validation.json"
 }

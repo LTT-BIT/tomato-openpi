@@ -8,7 +8,6 @@
 
 A/B 均使用全部93条原始轨迹训练，410456帧，不预留验证或测试集。保留完整视频和所有物理列；仅更新合并索引、task_index，新增 coarse_phase_index。B 的七个位置映射到四种无标点文本，两次 return 共用 held object 指令。50步动作窗口允许跨阶段，尾部沿用 episode 内末帧补齐，不在阶段边界制造保持动作。`splits.json` 仅包含 train=0..92，是全部训练数据的显式清单。
 
-
 两套新配置分别为 `training_configs.experiments.tomato_sharpa.subtasks.normal93_a_goal` 和 `normal93_b_stage`。默认 π0.5 全参、58D absolute、batch64、FSDP8、30000步，种子42/42/42001/42002，学习率与原 fullft recipe 相同；这只是待启动默认值，不是训练已完成或显存容量验收。没有开启论文增强或 Agent。数据身份、统计目录、实验目录均与旧单果/FLASH/Agent实验分开；归一化覆盖全部93条，A/B分别保存绑定统计。
 
 在28的既有工程 `/home/mengxiang/workspace/code/tomato-openpi-sharpa` 使用公共环境：
@@ -32,7 +31,9 @@ bash scripts/python.sh -m scripts.check_tomato_ab --require-norm \
 
 本次使用独立 `all_sources_v2` 数据、统计和实验身份。旧75/9/9包和75条统计保留为历史，当前配置拒绝加载它们。93条物理示教和prompt没有变化，仅纠正训练选择及其统计。batch64、FSDP8、30000步、学习率、采样方式和各随机种子均保持本分支既定值，不因修改数据选择而更改。
 
-正式训练另行明确参数后，沿用 `scripts.run_training`；必须设置同一 bundle 环境变量，W&B online/offline与本地日志同时保存，不覆盖旧实验目录。
+2026-11-09 已在28重建并验收全数据版本：A/B均实际加载93条、410456帧，归一化覆盖相同的全部训练数据且数值SHA一致；逐帧指令、原始物理列、媒体SHA、阶段边界50步窗口及真实归一化batch全部通过。76项相关测试通过。结果摘要见 `subtasks/records/normal93_20261109_all_sources_validation.json`，完整报告位于服务器 `outputs/normal93_all_sources_ab_verification.json`。未加载模型权重、未启动正式训练、未修改部署端。
+
+正式训练另行明确参数后，沿用 `scripts.run_training`；默认使用新的 all_sources_v2 包；若设置 bundle 环境变量，必须指向该新包，W&B online/offline与本地日志同时保存，不覆盖旧实验目录。
 
 ## 历史粗阶段 A/B 准备设计（不用于当前全数据训练）
 
