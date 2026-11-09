@@ -20,6 +20,8 @@ def build(mode, *, selection_path=None):
     if mode not in ("a_goal", "b_coarse"):
         raise ValueError("Unknown experiment variant")
     default_bundle = "tomato_truss_normal93_20261109_all_sources_v2" if selection_path else "tomato_truss_v1"
+    if selection_path is not None:
+        default_bundle = json.loads(Path(selection_path).read_text()).get("bundle_name", default_bundle)
     bundle = Path(os.environ.get("PI05_TOMATO_SUBTASK_BUNDLE", common.repository_root() / "data" / default_bundle))
     if not (bundle / "bundle.json").is_file():
         raise ValueError("Finish coarse review and prepare a unified A/B bundle before loading this experiment")

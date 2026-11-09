@@ -13,7 +13,7 @@ A/B 均使用全部93条原始轨迹训练，410456帧，不预留验证或测�
 在28的既有工程 `/home/mengxiang/workspace/code/tomato-openpi-sharpa` 使用公共环境：
 
 ```bash
-export PI05_TOMATO_SUBTASK_BUNDLE="$PWD/data/tomato_truss_normal93_20261109_all_sources_v2"
+export PI05_TOMATO_SUBTASK_BUNDLE="$PWD/data/tomato_truss_normal93_20261109_annotation_r2_all_sources_v2"
 bash scripts/python.sh -m scripts.prepare_tomato_ab \
   --source-root /mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more \
   --output "$PI05_TOMATO_SUBTASK_BUNDLE" \
@@ -24,14 +24,16 @@ for mode in a_goal b_stage; do
   bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE" --stats-batch-size 128
 done
 bash scripts/python.sh -m scripts.check_tomato_ab --require-norm \
-  --output outputs/normal93_all_sources_ab_verification.json
+  --output outputs/normal93_annotation_r2_ab_verification.json
 ```
 
 检查器比较所有源与派生 Parquet 的物理列、逐帧阶段/task映射、全部派生媒体SHA、全部93条实际加载结果和全部阶段边界的50步动作窗口，并为A/B各读取一个真实归一化模型batch。不加载模型权重、不运行训练；效果后续通过实机测试判断。
 
+本次已接收 B/1106_750_791_normal 原 episode4 的人工 revision2：最终放回为 `[2908,2990)`，82帧（2.73秒）。冻结清单仅该条标注SHA改变，93条成员、物理轨迹、四种prompt和全部训练策略不变。新包采用 `annotation_r2_all_sources_v2` 身份，旧包保留，不会覆盖；默认配置读取清单中的 bundle_name。B 在帧2908至2988从harvest更新为return。
+
 本次使用独立 `all_sources_v2` 数据、统计和实验身份。旧75/9/9包和75条统计保留为历史，当前配置拒绝加载它们。93条物理示教和prompt没有变化，仅纠正训练选择及其统计。batch64、FSDP8、30000步、学习率、采样方式和各随机种子均保持本分支既定值，不因修改数据选择而更改。
 
-2026-11-09 已在28重建并验收全数据版本：A/B均实际加载93条、410456帧，归一化覆盖相同的全部训练数据且数值SHA一致；逐帧指令、原始物理列、媒体SHA、阶段边界50步窗口及真实归一化batch全部通过。76项相关测试通过。结果摘要见 `subtasks/records/normal93_20261109_all_sources_validation.json`，完整报告位于服务器 `outputs/normal93_all_sources_ab_verification.json`。未加载模型权重、未启动正式训练、未修改部署端。
+2026-11-09 已在28重建并验收全数据版本：A/B均实际加载93条、410456帧，归一化覆盖相同的全部训练数据且数值SHA一致；逐帧指令、原始物理列、媒体SHA、阶段边界50步窗口及真实归一化batch全部通过。76项相关测试通过。结果摘要见 `subtasks/records/normal93_20261109_all_sources_validation.json`，完整报告位于服务器 `outputs/normal93_annotation_r2_ab_verification.json`。未加载模型权重、未启动正式训练、未修改部署端。
 
 正式训练另行明确参数后，沿用 `scripts.run_training`；默认使用新的 all_sources_v2 包；若设置 bundle 环境变量，必须指向该新包，W&B online/offline与本地日志同时保存，不覆盖旧实验目录。
 

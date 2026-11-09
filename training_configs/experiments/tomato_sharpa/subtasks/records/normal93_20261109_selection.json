@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "name": "tomato_truss_normal93_20261109",
+  "name": "tomato_truss_normal93_20261109_annotation_r2",
   "source_host": "28",
   "source_root": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/no-block-more",
   "variants": [
@@ -636,7 +636,7 @@
       "episode_index": 4,
       "source_recording_id": "651eb2271bae4971a62273985ed85c2d",
       "length": 2990,
-      "annotation_sha256": "ca93d3c93e66508fbddfadeda3954b6a1bf65d29b15d4b7328aac91544a99008"
+      "annotation_sha256": "4b64e72b2f5274e1b747c9f8b133b27f77b341c45c5c786d57d156152ed9c373"
     },
     {
       "dataset": "B/1106_750_791_normal",
@@ -675,5 +675,6 @@
       "length": 6441,
       "reason": "Previously rejected recording; no published coarse annotation"
     }
-  ]
+  ],
+  "bundle_name": "tomato_truss_normal93_20261109_annotation_r2_all_sources_v2"
 }
