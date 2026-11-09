@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 
 from openpi.subtasks.prepare import digest
+from openpi.subtasks.prepare import grouped_split
 from openpi.subtasks.tomato import GOAL
 from openpi.subtasks.tomato import PHASES
 from openpi.subtasks.tomato import PROMPTS
@@ -58,6 +59,8 @@ def build(mode, *, selection_path=None):
         group_sets = [{mapping[i]["recording_group"] for i in split} for split in splits.values()]
         if any(a & b for i, a in enumerate(group_sets) for b in group_sets[i + 1 :]):
             raise ValueError("Original recordings must not cross A/B splits")
+        if splits != grouped_split(mapping):
+            raise ValueError("A/B splits differ from the frozen seed42 recording assignment")
         for variant in ("a_goal", "b_coarse"):
             info = json.loads((bundle / variant / "meta/info.json").read_text())
             tasks = [

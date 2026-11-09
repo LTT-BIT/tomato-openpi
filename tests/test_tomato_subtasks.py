@@ -401,3 +401,8 @@ def test_ab_config_binds_selection_splits_and_preserves_cross_phase_windows(froz
     splits_path.write_text(json.dumps(splits))
     with pytest.raises(ValueError, match="exactly once"):
         build("a_goal", selection_path=selection)
+    splits["splits"]["val"].pop()
+    splits["splits"]["val"], splits["splits"]["test"] = splits["splits"]["test"], splits["splits"]["val"]
+    splits_path.write_text(json.dumps(splits))
+    with pytest.raises(ValueError, match="frozen seed42"):
+        build("a_goal", selection_path=selection)
