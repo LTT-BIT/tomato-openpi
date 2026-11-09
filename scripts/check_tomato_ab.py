@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import pyarrow.parquet as pq
 
+from openpi import transforms
 from openpi.subtasks.prepare import digest
 from openpi.subtasks.tomato import GOAL
 from openpi.subtasks.tomato import PROMPTS
@@ -84,6 +85,13 @@ def check(*, require_norm=False):
             if set(source.ids[:, 0]) != set(expected):
                 raise ValueError("Loader selected wrong split")
             result["splits"][split] = len(expected)
+            # Compare the full training transform against the absolute adapter on real samples.
+            vector_transform = transforms.compose([*data.repack_transforms.inputs, *data.data_transforms.inputs])
+            absolute_data = replace(config.data, extra_delta_transform=False).create(config.assets_dirs, config.model)
+            absolute_transform = transforms.compose(
+                [*absolute_data.repack_transforms.inputs, *absolute_data.data_transforms.inputs]
+            )
+            cameras = dict.fromkeys(config.policy_metadata["camera_keys"], np.zeros((1, 1, 3), dtype=np.uint8))
             # Both sides of all six phase boundaries, plus the true episode end.
             for episode, (_, actions, _, _) in source.records.items():
                 label = json.loads((bundle / mode / f"annotations/episode_{episode:06d}.json").read_text())
@@ -97,13 +105,25 @@ def check(*, require_norm=False):
                     actual = source.vectors(first + frame)
                     expected_window = actions[np.minimum(frame + np.arange(50), len(actions) - 1)]
                     np.testing.assert_array_equal(actual["action"], expected_window)
+                    absolute = absolute_transform({**actual, **cameras})
+                    expected_actions = absolute["actions"].copy()
+                    if config.data.extra_delta_transform:
+                        expected_actions[:, :7] -= absolute["state"][:7]
+                        expected_actions[:, 29:36] -= absolute["state"][29:36]
+                    supervised = vector_transform({**actual, **cameras})
+                    np.testing.assert_array_equal(supervised["actions"], expected_actions)
+                    np.testing.assert_array_equal(supervised["state"], absolute["state"])
                     phase = next(
                         i for i, s in enumerate(label["segments"]) if s["start_frame"] <= frame < s["end_frame"]
                     )
                     if actual["prompt"] != (GOAL if mode == "a_goal" else PROMPTS[phase]):
                         raise ValueError("Loader prompt differs at phase boundary")
             del source
-        result["variants"][mode] = {"preflight": basic}
+        result["variants"][mode] = {
+            "preflight": basic,
+            "training_action_semantics": config.policy_metadata["training_action_semantics"],
+            "phase_boundary_supervision_checked": True,
+        }
         if require_norm:
             loader = data_loader.create_torch_data_loader(
                 data,

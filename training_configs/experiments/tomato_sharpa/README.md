@@ -56,6 +56,8 @@ ssh -N -p 27 -L 127.0.0.1:18767:127.0.0.1:8767 mengxiang@47.116.73.163
 
 2026-11-09 已在27启动8767 UI并建立本地18767 SSH转发，真实浏览器默认B加载通过：revision2全部93条/410456帧、batch64/FSDP8/30000步、四种阶段prompt、W&B Offline，八张空闲卡已在页面勾选。点击“检查数据与统计”后返回“已验证，可复用”，norm_provenance=verified；UI配置真实roundtrip保留原训练参数。80项Python测试与12项JS交互测试通过。页面已打开并保留，未点击启动训练；27 UI进程信息与私有启动日志保存在本工程 `.runtime/training_ui_27_8767.{json,log}`，本机转发进程记录在本地 `.runtime/training_ui_27_tunnel.json`。不记录token到Git，不修改28既有服务。
 
+2026-11-09 Delta切换已在27验收：A/B各自重新计算全93条、410456帧的独立Delta统计；逐条物理数据、媒体SHA、阶段指令与所有阶段边界50步动作监督检查通过，14维手臂差分及44维手部绝对目标与既有适配器逐值一致，真实归一化batch通过。UI默认B和Delta，数据与统计检查返回已验证，保留八卡选择与offline记录。82项Python和12项JS测试通过；摘要见 `subtasks/records/normal93_20261109_delta_validation.json`。未启动训练，尚未验证GPU训练容量或实机效果。
+
 ## 已准备的启动入口
 
 本轮以 **B 阶段指令**为主方案，A 总目标保留为对照，不改batch64、FSDP8、30000步、学习率、采样、随机种子或50步跨阶段监督。默认使用revision2全93条数据及独立统计，不接Agent，不改部署端。
