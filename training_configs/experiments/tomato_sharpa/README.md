@@ -63,6 +63,8 @@ bash scripts/python.sh -m scripts.tomato_ab_run start
 bash scripts/python.sh -m scripts.tomato_ab_run start --variant a
 ```
 
+2026-11-09 开训准备实测：revision2的93条源SHA重新核验通过，A/B最终配置和归一化绑定预检通过，实验目录均未占用且输出可写；官方pi05_base已在CPU用实际训练加载器加载校验，51组参数中48组加载、3组58维投影按原设计初始化，51组均可训练。batch64/FSDP8在8个CPU抽象设备上完成损失/梯度/优化器形状追踪；没有执行数值训练或GPU容量测试。W&B offline真实写入/结束测试通过。入口与原launcher等54项测试、配置/Sharpa/统计等64项回归通过（含重复入口测试，不相加）。摘要见 `subtasks/records/normal93_20261109_training_readiness.json`。检查时28的8卡正被其他用户训练占用，资源保护验证会拒绝启动；没有停止既有任务或自动排队。
+
 入口使用基础权重开始全新优化器，不续训、不覆盖已有checkpoint。默认实验目录已存在时会拒绝，可用 `--exp-name` 指定新的运行名。资源检查只是启动时快照，不能替代实际8卡数值训练和显存容量验收。
 
 ## 历史粗阶段 A/B 准备设计（不用于当前全数据训练）
