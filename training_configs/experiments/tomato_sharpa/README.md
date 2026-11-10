@@ -213,3 +213,33 @@ bash scripts/python.sh -m scripts.check_converter_dataset \
 #### 四类动作 prompt 与七阶段进度
 
 当前 B 使用四类动作到四种无标点指令的一对一映射，定义在 `openpi.subtasks.tomato.ACTION_PROMPTS`。两次放回共用 `Right hand returns the held object to the right plate`，不再用不同裸杆指令。七个 `PHASES` 和 `coarse_phase_index` 保留，`PROMPTS` 由七位置的 `COARSE_SEQUENCE` 映射得到，因此仍有七个位置但只有四种不同文本。Agent 输出同时包含 `phase`、`phase_index`、`action_class`、`prompt`；其完成状态仍需独立判断，不因进入最后阶段自动完成。A 的总指令未改；旧五指令训练副本或 checkpoint 不会自动迁移，需使用新文本重新准备实验数据。该修改未运行训练或实机控制。
+
+
+## 阶段指令可控性与局部图离线探针
+
+B阶段指令方案已于2026-11-10 08:55在27正常完成8000步，最终checkpoint为`7999`。本节的GPU诊断使用28，不使用27；不执行机器人动作，不更新权重、统计或默认配置。
+
+`scripts.tomato_prompt_probe`固定同一观测的三路图像、58维状态和噪声，只更换四种训练过的英文阶段指令。每条录制选择七段中点、六个边界前45/15帧及边界0/+15帧；去重后保留样本标记，两组噪声42/43。原生训练适配器、checkpoint统计、10步flow采样及Delta逆变换全部复用；checkpoint内只有统计数值文件，来源校验使用原训练assets的norm_metadata并核对两处norm_stats SHA一致，不开启legacy绕过；每个观测检查监督目标反归一化/逆Delta还原一致，首个样本重复推理检查确定性。固定图像/状态在四个条件下逐值相等。左右臂、左右手分别报告；主要1/5/15/50步误差只比较真实阶段内的前缀，保留完整50步原始输出用于诊断。不得把错误prompt对原示教的误差称为反事实动作正确率，也不把换prompt产生差异当作服从成功。
+
+最小真实checkpoint检查（28工程内，选空闲GPU；输出必须新目录）：
+
+```bash
+JAX_PLATFORMS=cuda CUDA_VISIBLE_DEVICES=0 \
+XLA_PYTHON_CLIENT_PREALLOCATE=false XLA_PYTHON_CLIENT_MEM_FRACTION=0.85 \
+bash scripts/python.sh -u -m scripts.tomato_prompt_probe \
+  --checkpoint /absolute/path/to/finalized/checkpoint/7999 \
+  --output outputs/normal93_prompt_new_check --gpu 0 --limit 3 --seeds 42 43
+```
+
+全量四分片按episode_index模4分配，分别选择28的GPU0～3；脚本启动前检查空闲状态，不停止其他进程。`scripts.summarize_tomato_prompt_probe <分片父目录> <新summary.json>`校验四分片代码、数据、统计、模型身份和两组噪声一致，并要求覆盖全部93条后汇总；`scripts.plot_tomato_prompt_examples`导出固定示例的绝对关节目标曲线。所有原始预测、日志和图像留在忽略的`outputs/normal93_*/`中，仅提交结果摘要。
+
+`scripts.tomato_crop_audit`从原始分辨率帧输出三路全图、右腕中心半幅及右下候选ROI并排图。候选ROI只是工程可行性示意，未经训练或效果验收。当前`model.preprocess_observation`默认仅保留三路IMAGE_KEYS，额外crop键会被丢弃；局部图实验必须显式配置模型输入、训练及推理一致接通，不得仅给现有模型输入字典添加键后宣称已测试四视图。固定中心crop可能切掉边缘的枝梗，遮挡也不能靠放大恢复。
+
+
+2026-11-10 已在28的GPU0～3完成全量只读探针：93条训练录制、2881个去重观测、两组噪声、四个原英文prompt，共23048个动作块；四分片身份/覆盖检查、目标反归一化和Delta还原、同观测图像/状态相等、首样本同噪声重复推理均通过。摘要见`subtasks/records/normal93_20261110_prompt_probe.json`，完整报告为服务器`outputs/normal93_prompt_full_28_20261110/summary_final.json`，原预测保留在分片npz中，未改权重。
+
+前15步（最多0.5秒且不越阶段）pickup/return条件变化与噪声变化的RMS比值逐样本中位数：右臂1.659、右手0.972。分阶段右手比值分别为0.81/0.67/1.23/1.94/1.63/0.75/0.76，因此不能把右手总体值解读为所有阶段都不听指令。正确prompt在归一化误差上严格优于另外三种prompt的比例为右臂70.9%、右手68.9%；绝对关节误差口径分别67.3%、63.9%。这些是相对原示教的兼容性诊断，**不是切换或抓放成功率**。平均误差矩阵在各四类记录条件下均以原prompt最低，说明不能仅凭语言token数量少就判定模型忽略语言。
+
+adjust→pickup边界，使用新prompt更接近真实后续15步示教的比例：边界帧右臂38.7%/右手59.7%，边界后15帧右臂79.6%/右手82.3%。两次观测不同，不是测得0.5秒响应延迟；单条示教也不能提供错误prompt下的正确反事实动作。全量原训练50步窗口有27342/410456（6.661%）跨阶段，15步为1.903%，5步为0.544%。已有模型未接受“不换指令无限保持当前阶段”的严格协议训练，不能把跨阶段样本比例当模型自行切换率，也不能仅mask掉跨阶段loss就声称学会保持。
+
+固定示例`ep089_phase2_actions.png`展示在同一手持观测与相同噪声下四种指令的关节目标差异；局部图比较含3条录制×7阶段全图、中心半幅及右下候选ROI。局部图尚未进入新模型训练。下一阶段优先验证实际切换时旧动作块清理、阶段完成/保持协议及手部接触可见性；需要新的独立录制和可执行的继续/放回分支示教，才能评价闭环服从及保持能力。保留当前B，不据本次诊断切换数字编码、增加视觉token或改默认部署配置。92项相关Python测试通过。

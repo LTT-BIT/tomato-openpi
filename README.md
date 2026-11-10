@@ -2,7 +2,9 @@
 
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
-当前 `tomato-subtasks-ab-train` 分支用于[无 Agent 的整串番茄 A/B 实验](training_configs/experiments/tomato_sharpa/README.md#normal93-无-agent-训练准备)。固定93条完整七段 normal 轨迹，A 使用总体目标，B 使用人工阶段指令；两者均使用全部93条训练，不留验证或测试集，保留完整50步动作窗口与256-token输入。本轮仅准备和校验，不启动正式训练，部署端手动切换尚未接线。
+当前 `tomato-subtasks-ab-train` 分支用于[无 Agent 的整串番茄 A/B 实验](training_configs/experiments/tomato_sharpa/README.md#normal93-无-agent-训练准备)。固定93条完整七段 normal 轨迹，A 使用总体目标，B 使用人工阶段指令；两者均使用全部93条训练，不留验证或测试集，保留完整50步动作窗口与256-token输入。B阶段指令方案已在27完成batch512/8000步训练，最终checkpoint为7999；A对照尚未训练，部署端手动切换尚未接线。
+
+全量阶段指令离线探针已在28完成（93条训练录制、23048动作块），见[阶段指令可控性诊断](training_configs/experiments/tomato_sharpa/README.md#阶段指令可控性与局部图离线探针)。训练数据上的指令敏感性不等于闭环切换成功率。
 
 本次训练使用27服务器（SSH端口27），[27训练UI与环境设置](training_configs/experiments/tomato_sharpa/README.md#27服务器训练ui)。当前整串实验默认准备B阶段prompt，A保留对照；两者均采用手臂14维Delta、手部44维Absolute及独立Delta统计，训练规模为batch512/FSDP8/8000步，学习率计划保持原值。`bash scripts/python.sh -m scripts.tomato_ab_run` 只预检并保存最终配置；正式训练必须显式使用 `start`，启动前拒绝占用中的GPU。使用说明见[任务训练入口](training_configs/experiments/tomato_sharpa/README.md#已准备的启动入口)。
 

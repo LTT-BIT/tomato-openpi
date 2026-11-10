@@ -181,3 +181,6 @@ cython_debug/
 
 # Local experiment configs are machine/user specific. Public baselines remain tracked.
 training_configs/experiments/*/template/**
+
+# Read-only normal93 inference arrays and visual diagnostics
+/outputs/normal93_*/
