@@ -1,0 +1,128 @@
+{
+  "version": "tomato-memory-interface-validation-v1",
+  "agent_base": "686f68a",
+  "openpi_base": "33ce417",
+  "schema_sha256": "b00323823dfad738bf2ce8044813ac174b98f12f296354e6f9dc86c741959c4c",
+  "tests_passed": 43,
+  "default_memory": "none",
+  "token_budget": {
+    "tokenizer_sha256": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+    "base_worst_case": [
+      {
+        "prompt": "Harvest all tomatoes into the left basket and return stem to right plate.",
+        "max_input_tokens": 256
+      },
+      {
+        "prompt": "Right hand grasps and lifts the truss to the center",
+        "max_input_tokens": 254
+      },
+      {
+        "prompt": "Right hand holds truss while left hand picks tomatoes into left basket",
+        "max_input_tokens": 255
+      },
+      {
+        "prompt": "Right hand returns the held object to the right plate",
+        "max_input_tokens": 253
+      },
+      {
+        "prompt": "Right fingers reposition the truss on the right plate",
+        "max_input_tokens": 252
+      }
+    ],
+    "tested_states": 1828,
+    "max_total_tokens": 256,
+    "all_memory_omitted": 624,
+    "any_fact_retained": 1204,
+    "note": "Artificial state-bin budget audit and artificial past facts; not trained memory or action evaluation"
+  },
+  "replay": {
+    "summary": {
+      "warnings": {
+        "hits": 39,
+        "total": 50,
+        "false_events": 13,
+        "false_per_minute": 0.6744487678339819,
+        "recall": 0.78,
+        "precision": 0.75,
+        "by_transition": {
+          "adjust->pickup": {
+            "hits": 2,
+            "total": 8
+          },
+          "harvest->return": {
+            "hits": 16,
+            "total": 17
+          },
+          "pickup->harvest": {
+            "hits": 15,
+            "total": 17
+          },
+          "return->adjust": {
+            "hits": 6,
+            "total": 8
+          }
+        }
+      },
+      "prompt_counts": {
+        "on_time": 46,
+        "early": 2,
+        "late": 2
+      },
+      "mismatch_s": 40.0,
+      "mismatch_runs": 47,
+      "persistent_mismatch_s": 10.5,
+      "persistent_runs": 3,
+      "resync_updates": 0,
+      "skipped_prompt_positions": 0,
+      "illegal_updates": 0,
+      "cascade_events": 1,
+      "prompt_by_transition": {
+        "adjust->pickup": {
+          "early": 1,
+          "on_time": 5,
+          "late": 2
+        },
+        "harvest->return": {
+          "on_time": 17
+        },
+        "pickup->harvest": {
+          "on_time": 17
+        },
+        "return->adjust": {
+          "early": 1,
+          "on_time": 7
+        }
+      }
+    },
+    "observations": 2340,
+    "sidecar_cpu_ms": {
+      "p50": 0.08508750000000001,
+      "p95": 0.10536299999999998,
+      "maximum": 0.216042
+    },
+    "independent_operation_labels": 0,
+    "oracle_vs_predicted": "not_estimable_empty_oracle_no_incremental_information",
+    "action_mae": null,
+    "action_rmse": null,
+    "action_model_calls": 0,
+    "state_bin_fixture": "58 zeros, tokenizer/interface test only; not measured normalized Pi05 robot state",
+    "real_probabilities": true,
+    "openpi_checkout": "/home/user/tomato-openpi-agent",
+    "tokenizer_sha256": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+    "original_stage_outputs_preserved": true
+  },
+  "training_status": "not_started_no_approved_independent_outcome_labels",
+  "agent_report": "/home/user/vjepa2_training/docs/TOMATO_OPERATION_MEMORY_RESULTS_20261110.md",
+  "cross_repo_selection_audit": {
+    "openpi_selection": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/normal93_20261109_selection.json",
+    "sha256": "fcf1a1b9e4db11d2b187f95c119711a709ad44debcb38d094fbde23109f1fc2c",
+    "openpi_records": 93,
+    "agent_overlap_by_split": {
+      "train": 74,
+      "val": 8,
+      "test": 8
+    },
+    "note": "OpenPI all93-trained action baseline overlaps Agent partitions; Agent val/test cannot be called held-out action evaluation without checking action model training membership"
+  },
+  "not_a_deployed_policy": true
+}

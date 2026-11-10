@@ -1,0 +1,17 @@
+{
+  "version": "tomato-memory-experiment-v1",
+  "enabled": false,
+  "modes": ["none", "oracle", "predicted"],
+  "action_shape": [50, 58],
+  "max_token_len": 256,
+  "prompt_builder": "openpi.subtasks.memory_bridge.condition_prompt",
+  "training_adapter": "openpi.subtasks.memory_bridge.condition_training_sample",
+  "stage_prompt_policy": "Preserve original four English prompts verbatim as prefix; no seventh-stage special case",
+  "state_policy": "Use the same normalized58D state/discretization as existing Pi05 tokenizer; do not infer order from dimension",
+  "budget_policy": "Measure full Task+Memory+58D State+Action input; retain complete facts that fit, otherwise record omitted memory; never truncate",
+  "prerequisites": ["Independent approved operation-result labels", "Oracle incremental information demonstrated", "Source-group split frozen", "Equal init/data/steps/budget E0/E3", "Actual normalization and tokenizer identity audited"],
+  "training_status": "blocked_by_no_independent_outcome_labels_not_a_registered_active_train_recipe",
+  "kv_policy": "Existing sample_actions rebuilds prefix KV each inference; optional external cache must use language_cache_key",
+  "rtc_policy": "No queue mutation; binding is checked only at caller existing safe replan boundary",
+  "zero_shot_claim": false
+}

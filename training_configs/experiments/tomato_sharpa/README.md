@@ -123,3 +123,15 @@ bash scripts/python.sh -m scripts.check_converter_dataset \
 #### 四类动作 prompt 与七阶段进度
 
 当前 B 使用四类动作到四种无标点指令的一对一映射，定义在 `openpi.subtasks.tomato.ACTION_PROMPTS`。两次放回共用 `Right hand returns the held object to the right plate`，不再用不同裸杆指令。七个 `PHASES` 和 `coarse_phase_index` 保留，`PROMPTS` 由七位置的 `COARSE_SEQUENCE` 映射得到，因此仍有七个位置但只有四种不同文本。Agent 输出同时包含 `phase`、`phase_index`、`action_class`、`prompt`；其完成状态仍需独立判断，不因进入最后阶段自动完成。A 的总指令未改；旧五指令训练副本或 checkpoint 不会自动迁移，需使用新文本重新准备实验数据。该修改未运行训练或实机控制。
+
+## 可选操作结果记忆接口
+
+`openpi.subtasks.memory_bridge.MemoryProvider`支持`none`（默认）、`oracle`和`predicted`。配置契约在`configs/tomato_memory_experiment.json`及`configs/tomato_memory.schema.json`；它们不是已注册/可自动启动的训练recipe。当前缺少独立操作结果标签，未训练Memory-conditioned π₀.₅，也不声称零样本会利用新文本。
+
+沿用现有`PredictionPromptProvider`输出，再可选调用MemoryProvider；原四种英文阶段指令始终是完整前缀，两个return不分化。None模式直接返回原PromptContext对象。Oracle仅接收人工独立确认、证据完成时间不晚于当前观测的操作结果；Predicted仅允许操作验证器来源，阶段预测和已发送命令不能写成物理成功。摘取数量当前必须Unknown。
+
+启用前必须传实际PaliGemma tokenizer.encode和相同归一化/顺序的58维离散状态，使用完整`Task: ... State: ... Action:`输入计算预算。基线最坏状态已占252～255/256 tokens，因此只放得下的完整记忆事实才可保留，省略项写入receipt，不截断阶段指令、State或Action。`condition_training_sample`与推理共用同一构造函数，并检查当前帧身份和未来证据泄漏；需在相同normalize/binning之后显式接入，当前不自动改数据加载器。
+
+使用`bind_memory_chunk`、`memory_chunk_matches`保留原Prompt/会话/模型绑定并增加记忆语义hash与到期时刻。相同事实刷新时间戳或计数版本不改变Prompt版本；事实改变时`requires_prefill`为真。旧Chunk的记忆有效期不能被新快照延长。这里只产生请求元数据，在调用方原有安全replan边界检查，不清空或修改执行队列、不改变RTC。现有pi0.sample_actions每次调用本来就重建prefix KV；若未来另加持久语言缓存，必须按language_cache_key失效。
+
+真实token预算检查入口：`scripts.audit_tomato_memory_tokens --tokenizer /path/paligemma_tokenizer.model --out /new/output.json`。小规模受控训练仍需独立结果标签、Oracle增量信息、相同数据/初始化/步数预算及动作离线评价；接口和随机张量测试不是训练结果或实机成功率。
