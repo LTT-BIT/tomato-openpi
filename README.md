@@ -6,6 +6,8 @@
 
 全量阶段指令离线探针已在28完成（93条训练录制、23048动作块），见[阶段指令可控性诊断](training_configs/experiments/tomato_sharpa/README.md#阶段指令可控性与局部图离线探针)。训练数据上的指令敏感性不等于闭环切换成功率。
 
+已另存一条录制的抓取与采摘局部图样例：258帧、30 FPS，原三视图加独立交互区裁剪图；仅离线选框与插值预览，未训练自动定位器，B权重、数据及输入配置保持原样。复现入口见上述诊断章节。
+
 本次训练使用27服务器（SSH端口27），[27训练UI与环境设置](training_configs/experiments/tomato_sharpa/README.md#27服务器训练ui)。当前整串实验默认准备B阶段prompt，A保留对照；两者均采用手臂14维Delta、手部44维Absolute及独立Delta统计，训练规模为batch512/FSDP8/8000步，学习率计划保持原值。`bash scripts/python.sh -m scripts.tomato_ab_run` 只预检并保存最终配置；正式训练必须显式使用 `start`，启动前拒绝占用中的GPU。使用说明见[任务训练入口](training_configs/experiments/tomato_sharpa/README.md#已准备的启动入口)。
 
 本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。

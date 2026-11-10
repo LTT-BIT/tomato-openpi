@@ -243,3 +243,24 @@ bash scripts/python.sh -u -m scripts.tomato_prompt_probe \
 adjust→pickup边界，使用新prompt更接近真实后续15步示教的比例：边界帧右臂38.7%/右手59.7%，边界后15帧右臂79.6%/右手82.3%。两次观测不同，不是测得0.5秒响应延迟；单条示教也不能提供错误prompt下的正确反事实动作。全量原训练50步窗口有27342/410456（6.661%）跨阶段，15步为1.903%，5步为0.544%。已有模型未接受“不换指令无限保持当前阶段”的严格协议训练，不能把跨阶段样本比例当模型自行切换率，也不能仅mask掉跨阶段loss就声称学会保持。
 
 固定示例`ep089_phase2_actions.png`展示在同一手持观测与相同噪声下四种指令的关节目标差异；局部图比较含3条录制×7阶段全图、中心半幅及右下候选ROI。局部图尚未进入新模型训练。下一阶段优先验证实际切换时旧动作块清理、阶段完成/保持协议及手部接触可见性；需要新的独立录制和可执行的继续/放回分支示教，才能评价闭环服从及保持能力。保留当前B，不据本次诊断切换数字编码、增加视觉token或改默认部署配置。92项相关Python测试通过。
+
+### 交互区域逐帧裁剪样例（不训练）
+
+参考 [FoveaVLA论文附录A](https://arxiv.org/html/2610.20064v2#A1) 和 [官方数据准备代码](https://github.com/Stanford-TML/FoveaVLA/blob/main/src/droid_foveation/repack_direct.py)：其训练框来自RoboInter的手、操作物和目标区域标注的最小包围框；视觉输入在框外扩1.5倍取正方形，边界处移动/缩小，无法容纳时补零，再从原分辨率直接缩放224。其在线策略预测下一查询时刻的框，使用PaliGemma位置token；不是按阶段选择一张固定照片。训练阶段当前框用于当前裁剪，未来框用于预测监督。论文还使用外置RGB-D，不代表我们的三路RGB加crop已复现全部方法。
+
+`scripts.tomato_interaction_preview`仅实现离线数据预览。固定episode89（原始B/1106_750_791_normal的episode4），pickup `[0,168)`与第一次采摘接触 `[225,315)`，总258帧/8.6秒；后者不含完整harvest运输回篮流程。选框由编码助手目视指定近似关键帧组件框，帧间线性插值，再按组件并集生成交互框。**没有自动检测/跟踪器，没有学会预测框，标注未经独立人工复核，插值使用前后关键帧，不能用于声称在线定位能力。** 抓取保留右手和串，首次采摘保留双手及串/摘下果实；整段harvest若要预处理，还需单独标注接近、摘取、搬运、投放的目标区域，不可套用此短片框。
+
+在28通过CPU完成提取（未使用27或启动GPU训练）。按同一源帧保存原三视图的224预览和第四张独立crop，另存原生裁剪、逐帧索引、原视频SHA、对照图及30 FPS视频。视频黄色框是交互框，青色框是含上下文的裁剪框；框和标题仅用于展示，不烧录进独立crop。正常三图与局部图为不同视图，未把图拼成长条后整体缩回224。此224全图仅为等比例补黑的预览，尚未接入训练增强。源全局图仅640×400，增加的是局部像素预算，无法补回遮挡或录制已丢失的细节。
+
+28最小复现（`--videos`目录的cam0/1/2.mp4分别链接至该episode对应原视频；哈希不符立即拒绝）：
+
+```bash
+JAX_PLATFORMS=cpu CUDA_VISIBLE_DEVICES= bash scripts/python.sh \
+  -m scripts.tomato_interaction_preview \
+  --videos outputs/normal93_interaction_source_20261110 \
+  --annotations training_configs/experiments/tomato_sharpa/subtasks/records/normal93_20261110_interaction_preview_annotations.json \
+  --output outputs/normal93_interaction_preview_new
+PYTHONPATH=src bash scripts/python.sh -m pytest -q tests/test_tomato_interaction_preview.py
+```
+
+实际输出为28共享工程的`outputs/normal93_interaction_preview_28_20261110_v2/`；源帧与三路时间戳、独立crop像素、导出视频帧数/帧率均已校验，结果见`subtasks/records/normal93_20261110_interaction_preview.json`。新增9项裁剪测试和既有10项prompt探针测试通过。抓取的局部图明显放大接触区；双手采摘框更宽，放大收益较小。与224等比例全图比较，线性放大约1.66～4.48倍，**不是清晰度测量或策略成功率提升**；原腕部图有时更清楚。保留B不变，不开新训练。下一步先复核短片框随动作移动的覆盖质量，再决定组件标注/自动定位方案和独立图像输入适配；部署不能依赖预先知道真实阶段或录制时间的选框表。
