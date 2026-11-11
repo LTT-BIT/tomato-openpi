@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from openpi.subtasks.rgb100 import freeze_selection, full_text, sequence_slots, write_new, audit_tokens
+from openpi.subtasks.rgb100 import freeze_selection, full_text, sequence_slots, write_new, audit_tokens, resolve_saved_labels, digest
 from openpi.subtasks.tomato import COARSE_SEQUENCE, SOURCE_ACTION_NAMES, SOURCE_STATE_NAMES
 
 
@@ -107,3 +107,47 @@ def test_receipts_cannot_overwrite_existing_files(tmp_path):
     p=tmp_path/'receipt.json';write_new(p,{'original':True})
     with pytest.raises(FileExistsError):write_new(p,{'replacement':True})
     assert json.loads(p.read_text())=={'original':True}
+
+
+def resolution_fixture(tmp_path):
+    s=freeze(tmp_path,manifest(tmp_path));s['source_files_verified']=True
+    for row in s['episodes']:
+        row['length']=21
+        saved=[dict(label=c,start_frame=j*3,end_frame=(j+1)*3,reviewed=True) for j,c in enumerate(COARSE_SEQUENCE)]
+        p=Path(row['annotation']);p.parent.mkdir()
+        p.write_text(json.dumps(dict(segments=saved,source=dict(source_recording_id=row['recording_group'],
+            episode_index=row['source_episode_index'],length=21,fps=30))))
+        row['annotation_sha256']=digest(p);row['phase_differences']=[]
+    row=s['episodes'][0];saved=json.loads(Path(row['annotation']).read_text())['segments']
+    effective=copy.deepcopy(saved);effective[0]['end_frame']=4;effective[1]['start_frame']=4
+    row['phase_differences']=[dict(phase_index=i,saved=saved[i],agent_effective=effective[i]) for i in (0,1)]
+    proposals=dict(status='provisional_user_review_not_source_labels',truth_proposals={'0':[
+        dict(original_boundary_frame=3,boundary_frame_reconstructed_from_visible_time=4,
+            source_annotation_sha256=row['annotation_sha256'],transition='pickup->harvest',captured_status='pending_human_review')]})
+    sp,pp=tmp_path/'selection.json',tmp_path/'proposals.json'
+    sp.write_text(json.dumps(s));pp.write_text(json.dumps(proposals))
+    return sp,pp
+
+
+def test_resolution_uses_saved_boundaries_and_retains_proposals_without_source_edits(tmp_path):
+    sp,pp=resolution_fixture(tmp_path);before=digest(sp)
+    r,plan=resolve_saved_labels(sp,pp)
+    assert r['phase_label_resolution_required']==0
+    assert r['boundary_resolution']['recordings']==r['boundary_resolution']['boundaries']==1
+    assert r['episodes'][0]['training_segments'][0]['end_frame']==3
+    assert r['episodes'][0]['phase_differences'][0]['agent_effective']['end_frame']==4
+    assert not r['training_ready'] and plan['data_policy']=='all_sources'
+    assert len(plan['episodes'])==100 and digest(sp)==before
+    assert plan['episodes'][0]['episode_index']==r['episodes'][0]['source_episode_index']
+
+
+@pytest.mark.parametrize('damage',['missing_proposal','changed_source','content_change','unverified','duplicate'])
+def test_resolution_refuses_unknown_differences_and_changed_source(tmp_path,damage):
+    sp,pp=resolution_fixture(tmp_path);s=json.loads(sp.read_text());p=json.loads(pp.read_text())
+    if damage=='missing_proposal':p['truth_proposals']={}
+    if damage=='changed_source':Path(s['episodes'][0]['annotation']).write_text('{}')
+    if damage=='content_change':s['episodes'][0]['phase_differences'][0]['agent_effective']['reviewed']=False
+    if damage=='unverified':s['source_files_verified']=False
+    if damage=='duplicate':s['episodes'][1]['agent_episode_id']='0'
+    sp.write_text(json.dumps(s));pp.write_text(json.dumps(p))
+    with pytest.raises(ValueError):resolve_saved_labels(sp,pp)

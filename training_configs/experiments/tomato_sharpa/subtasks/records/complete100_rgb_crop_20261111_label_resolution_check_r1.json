@@ -1,0 +1,47 @@
+{
+  "version": "tomato-complete100-label-resolution-check-v1",
+  "policy": "saved_reviewed_subtask",
+  "recordings": 100,
+  "frames": 425556,
+  "all_action_training": true,
+  "unresolved_recordings": 0,
+  "differing_recordings": 8,
+  "provisional_boundaries_retained": 14,
+  "source_annotations_changed": false,
+  "agent_manifest_changed": false,
+  "old_selection_preserved": true,
+  "episode4_final_return": [
+    2908,
+    2990
+  ],
+  "materializer_inspect_plan": {
+    "passed": true,
+    "recordings": 100,
+    "frames": 425556,
+    "scope": "real source schemas, annotation binding and hashes, Parquet rows/frame indices; no bundle written"
+  },
+  "tests": {
+    "rgb100_passed": 18,
+    "available_related_passed": 42,
+    "old_config_cases_not_run": 4,
+    "reason": "same previously documented local training dependencies unavailable"
+  },
+  "source_sha256": {
+    "src/openpi/subtasks/rgb100.py": "c27dd45682e6486d37a20cf4f6816ed1e4f9e5e4bffa6377c550459d86b5a43a",
+    "scripts/prepare_tomato100_rgb.py": "0de52b01057774f16ea5f582d7d94fc57fa2be5bfd1d28fe56caaf80b81daea7",
+    "tests/test_tomato_rgb100.py": "0a8029336eda26df5d17208cb78ce7c9585826c384840278596f3f8b04e4f6ea",
+    "training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+    "training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_source_plan_r1.json": "00ab2289fdec0d7aedf6a94209c871404f2a58a4410d544ef76d0909edfe53f5",
+    "training_configs/experiments/tomato_sharpa/subtasks/complete100_rgb_crop_preparation.json": "ac77a3e0dc5d331c7d15c60279aabd1dde1a910fbb1f0d9990cbd2c016467d5d"
+  },
+  "training_started": false,
+  "normalization_fitted": false,
+  "four_view_adapter_implemented": false,
+  "full_roi_coverage": false,
+  "pending": [
+    "full ROI coverage",
+    "all100 normalization and token distribution",
+    "four-view model/data integration",
+    "training environment and GPU preflight"
+  ]
+}

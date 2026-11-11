@@ -5,6 +5,7 @@ construct a model or start training. Legacy normal93 recipes are untouched.
 """
 import hashlib
 import json
+from copy import deepcopy
 from pathlib import Path
 import random
 
@@ -122,6 +123,95 @@ def freeze_selection(manifest_path, *, verify_sources=True):
         normalization='pending: recompute on all100 with new action/data identity',
         roi='pending: full per-frame coverage/provenance; existing preview is partial',
         agent_split_changed=False, deployment_modified=False)
+
+
+def resolve_saved_labels(selection_path, proposal_path):
+    """Resolve action labels to hash-verified saved annotations, NOT proposals.
+
+    Every differing boundary must match the explicit offline proposal record.
+    Unknown differences stop resolution. Original selection and sources stay
+    untouched; all proposal status/reviewer fields remain only audit evidence.
+    """
+    selection_path, proposal_path = Path(selection_path), Path(proposal_path)
+    selection=json.loads(selection_path.read_text())
+    proposals=json.loads(proposal_path.read_text())
+    if (selection.get('version')!=VERSION or not selection.get('source_files_verified')
+            or len(selection['episodes'])!=100
+            or selection['splits']!={'train':list(range(100))}):
+        raise ValueError('Verified all100 preparation selection required')
+    if proposals.get('status')!='provisional_user_review_not_source_labels':
+        raise ValueError('Expected explicitly provisional proposal provenance')
+    resolved=deepcopy(selection); changes=[]; seen=set(); plan=[]
+    for row in resolved['episodes']:
+        eid=row['agent_episode_id']
+        if eid in seen:
+            raise ValueError('Duplicate episode identity')
+        seen.add(eid)
+        path=Path(row['annotation'])
+        if digest(path)!=row['annotation_sha256']:
+            raise ValueError('Saved annotation changed; re-freeze before resolving')
+        doc=json.loads(path.read_text()); saved=doc['segments']
+        source=doc.get('source',{})
+        if (source.get('source_recording_id')!=row['recording_group']
+                or source.get('episode_index')!=row['source_episode_index']
+                or source.get('length')!=row['length'] or source.get('fps')!=30):
+            raise ValueError('Saved annotation source identity mismatch')
+        if tuple(r['label'] for r in saved)!=COARSE_SEQUENCE:
+            raise ValueError('Seven saved phases required')
+        end=0
+        for r in saved:
+            if (r.get('reviewed') is not True or type(r['start_frame']) is not int
+                    or type(r['end_frame']) is not int or r['start_frame']!=end or r['end_frame']<=end):
+                raise ValueError('Saved phases must be reviewed and cover the recording')
+            end=r['end_frame']
+        if end!=row['length']:
+            raise ValueError('Saved phases must cover the recording')
+        effective=deepcopy(saved)
+        for diff in row['phase_differences'] or []:
+            j=diff['phase_index']
+            if not 0<=j<7 or saved[j]!=diff['saved']:
+                raise ValueError('Difference no longer matches saved annotation')
+            effective[j]=diff['agent_effective']
+        # Content changes beyond frame/time boundaries must not be explained
+        # away using a boundary proposal (e.g. new class or reviewer status).
+        boundary_fields={'start_frame','end_frame','start_seconds','end_seconds'}
+        for a,b in zip(saved,effective):
+            if {k:v for k,v in a.items() if k not in boundary_fields}!={k:v for k,v in b.items() if k not in boundary_fields}:
+                raise ValueError('Non-boundary label difference needs separate resolution')
+        if (effective[0]['start_frame']!=0 or effective[-1]['end_frame']!=row['length']
+                or any(a['end_frame']!=b['start_frame'] for a,b in zip(effective,effective[1:]))):
+            raise ValueError('Invalid effective boundary coverage')
+        per_episode=[]
+        for j in range(1,7):
+            a,b=saved[j]['start_frame'],effective[j]['start_frame']
+            if a==b:continue
+            matches=[p for p in proposals.get('truth_proposals',{}).get(eid,[])
+                if p['original_boundary_frame']==a and p['boundary_frame_reconstructed_from_visible_time']==b
+                and p['source_annotation_sha256']==row['annotation_sha256']
+                and p['transition']==f"{saved[j-1]['label']}->{saved[j]['label']}"]
+            if len(matches)!=1:
+                raise ValueError('Unexplained or ambiguous boundary difference')
+            per_episode.append(dict(boundary_index=j,saved_frame=a,agent_provisional_frame=b,
+                action_training_frame=a,proposal=matches[0]))
+        if row['phase_differences'] and not per_episode:
+            raise ValueError('Label difference is not explained by changed boundary frames')
+        if per_episode:
+            changes.append(dict(episode_id=eid,annotation_sha256=row['annotation_sha256'],boundaries=per_episode))
+        row['training_segments']=saved
+        row['phase_label_status']='resolved_use_saved_annotation'
+        row['label_source']='saved_reviewed_subtask'
+        plan.append(dict(dataset=row['dataset'],episode_index=row['source_episode_index'],
+            annotation=row['annotation'],recording_group=row['recording_group']))
+    resolved.update(name=selection['name']+'_saved_labels_r1',
+        parent_selection_sha256=digest(selection_path),phase_label_resolution_required=0,
+        phase_label_policy='saved_reviewed_subtask; offline Agent proposals retained only as provenance',
+        boundary_resolution=dict(proposal_sha256=digest(proposal_path),source_labels_changed=False,
+            agent_manifest_changed=False,recordings=len(changes),boundaries=sum(len(e['boundaries']) for e in changes),
+            decisions=changes))
+    plan=dict(review_complete=True,data_policy='all_sources',episodes=plan,
+        selection_sha256=None,label_policy='saved_reviewed_subtask',
+        scope='Existing three-camera A/B materializer input; not a four-view training-ready bundle')
+    return resolved,plan
 
 
 def full_text(prompt, bins, memory_text=''):

@@ -4,7 +4,11 @@
 
 2026-11-11起，后续动作策略使用Agent冻结的100条完整七阶段录制，**全部100条参与π₀.₅训练**。Agent原84/8/8只保留为来源信息，不据此给动作训练留出验证/测试；不把这些训练录制称为动作模型盲测。旧normal93配置、归一化、checkpoint及以下历史说明保留。
 
-本轮只准备独立清单与token预算，**没有完成四视图训练接入，没有启动训练**。`subtasks/records/complete100_rgb_crop_20261111_selection.json`绑定100条原始身份、媒体/Parquet/标注SHA、实际源metadata以及train=0..99。逐条核验原始文件，阶段标签保留“磁盘已保存版本”与“Agent有效边界”差异，不自动把实验边界提案变成动作监督。当前8条存在阶段记录差异，需在生成训练Prompt前解决；本轮不改原始标注。
+本轮只准备独立清单与token预算，**没有完成四视图训练接入，没有启动训练**。`subtasks/records/complete100_rgb_crop_20261111_selection.json`绑定100条原始身份、媒体/Parquet/标注SHA、实际源metadata以及train=0..99。逐条核验原始文件，阶段标签保留“磁盘已保存版本”与“Agent有效边界”差异，不自动把实验边界提案变成动作监督。
+
+8条差异已解析：逐一匹配`vjepa2_training/docs/validation/tomato_reviewed_boundaries_20261109/proposals.json`中的14个临时边界提案，状态为`provisional_user_review_not_source_labels`。动作训练统一采用磁盘正式保存且哈希核验的Subtask；这些提案仍保留为Agent离线实验的对照，**不代表提案被判错或被正式批准**。新有效清单为`records/complete100_rgb_crop_20261111_saved_labels_r1.json`，每条保存选定training_segments与来源；旧未解析清单和原始文件不改。已正式修订的`B/1106_750_791_normal/episode_000004`最终return仍为`[2908,2990)`，未被恢复为旧标签。
+
+`records/complete100_rgb_crop_20261111_source_plan_r1.json`给出兼容现有A/B准备器的100条来源计划，已经通过`openpi.subtasks.prepare.inspect_plan`只读实检：100条、425556帧、逐帧索引、实际Parquet、媒体和标注绑定均通过。它仍是**三路原图的来源计划**，不能当成四图数据已准备或执行正式训练。最新解析验收为`records/complete100_rgb_crop_20261111_label_resolution_check_r1.json`；原preparation_check保留为上一步的历史回执。
 
 `subtasks/complete100_rgb_crop_preparation.json`是**设计/准备契约，不是可运行训练recipe**。原三路模型键为base、left_wrist、right_wrist（原始cam0/cam2/cam1），新增interaction来自原分辨率RGB。π₀.₅图像尺寸224，Agent尺寸256，禁止从已有224预览放大成Agent原图。RGB-only，不接深度。ROI需要原图坐标、相机、时间、可用时间、有效性及人工/因果生成方式；人工插值预览不等于在线ROI能力，当前完整100条ROI尚未准备。
 
@@ -21,11 +25,16 @@ PYTHONPATH=src python -m scripts.prepare_tomato100_rgb selection \
 PYTHONPATH=src python -m scripts.prepare_tomato100_rgb tokens \
   --tokenizer /path/paligemma_tokenizer.model \
   --out /new/path/token_budget.json
+PYTHONPATH=src python -m scripts.prepare_tomato100_rgb resolve-labels \
+  --selection /path/frozen_selection.json \
+  --proposals /home/user/vjepa2_training/docs/validation/tomato_reviewed_boundaries_20261109/proposals.json \
+  --out /new/path/resolved_selection.json \
+  --plan-out /new/path/source_plan.json
 ```
 
 将来可向tokens子命令传`--state-bins-jsonl`，每行明确提供action、observation_id（应含录制与帧身份）、normalization_sha256和新归一化后实际使用的58个state_bins；工具统计完整输入长度与超限数，不截断文本。拒绝混用归一化和重复观测。该输入必须由真实标准化/离散化管线导出，不能直接用原始关节角或合成bins充数。
 
-后续仍需：解决标签差异、补齐ROI、生成新100条训练数据与统计、贯通四图adapter/input spec/预处理与mask、检查增强和权重加载、真实batch前反向及显存验收，再建立独立可运行训练recipe。旧三图模型默认行为不变。
+后续仍需：补齐ROI、生成新100条训练数据与统计、贯通四图adapter/input spec/预处理与mask、检查增强和权重加载、真实batch前反向及显存验收，再建立独立可运行训练recipe。旧三图模型默认行为不变。
 
 ## normal93 无 Agent 训练准备
 
