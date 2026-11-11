@@ -1,6 +1,6 @@
 {
   "version": "tomato-complete100-rgb-crop-preparation-v1",
-  "status": "four_view_interfaces_ready_full_roi_and_normalization_pending",
+  "status": "all100_four_view_candidate_materialized_norm_bound_semantic_quality_pending",
   "training_recipe": "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop",
   "derived_base_bundle": "/home/user/datasets/derived/tomato_complete100_saved_labels_r1_base_ab",
   "roi_worklist": "/home/user/datasets/derived/tomato_complete100_roi_worklist_r2/worklist.json",
@@ -60,11 +60,11 @@
     ],
     "text_memory_capacity_candidate": 320
   },
-  "normalization": "pending_recompute_all100_no_old93_reuse",
-  "training_hyperparameters": "retain existing defaults as starting point; four-view GPU memory not yet accepted",
+  "normalization": "recomputed_all100_delta14_absolute44_forward50_and_bound_to_actual_four_view_AB",
+  "training_hyperparameters": "batch512 steps8000 FSDP8 and original LR retained; target batch memory acceptance pending",
   "training_started": false,
   "four_view_model_adapter_implemented": true,
-  "automatic_roi_implemented": false,
+  "automatic_roi_implemented": true,
   "deployment_modified": false,
   "roi_annotation_policy": {
     "first_version_method": "manual_offline_keyframes_with_interpolation",
@@ -97,23 +97,87 @@
     "reviewed_keyframes_and_midpoints": 248,
     "independent_human_review": false,
     "full_temporal_review_completed": false,
-    "training_bundle_materialized": false
+    "training_bundle_materialized": false,
+    "role": "Single-recording manual supervision/reference for experimental detector; not a full100 manual annotation claim"
   },
   "roi_automation_development": {
-    "status": "seeded_causal_prototype_not_robust",
-    "next_work": "target acquisition, robust tracking, loss detection, reacquisition and active-role switching",
-    "manual_annotations_role": "offline reference, not input of causal tracker after frame-zero seed",
-    "tracking_probe": "/home/user/datasets/derived/tomato_complete100_episode86_causal_track_probe_r2",
-    "automatic_target_acquisition": false,
-    "automatic_role_switching": false,
-    "automatic_reacquisition": false,
-    "first_invalid_frame": 93,
-    "invalid_box": null,
-    "sticky_invalid": true,
-    "bulk100_generation_enabled": false,
-    "training_ready": false
+    "status": "experimental_all100_causal_candidates_generated_quality_pending",
+    "locator": "/home/user/datasets/derived/tomato_roi_locator_experiment_r2",
+    "manual_supervision": {
+      "selection_episode_index": 86,
+      "native_source_episode_index": 4,
+      "keyframes": 134
+    },
+    "current_inputs": [
+      "current_native_RGB_cam0",
+      "current_measured_state116",
+      "past_measured_state"
+    ],
+    "inference_phase_labels": false,
+    "inference_future_frames": false,
+    "automatic_target_acquisition": true,
+    "automatic_reacquisition": true,
+    "automatic_role_switching": "motion heuristic with confirmed semantic errors",
+    "bulk100_generation_enabled": true,
+    "training_ready": false,
+    "earlier_failed_LK_probe": "/home/user/datasets/derived/tomato_complete100_episode86_causal_track_probe_r2"
   },
   "default_annotated_crop_exporter": "scripts.export_tomato_manual_crops",
   "review_export_policy": "sample and failure diagnosis; not mandatory for every bulk export",
-  "timing_result": "records/complete100_roi_timing_and_tracking_20261111_r1.json"
+  "timing_result": "records/complete100_roi_timing_and_tracking_20261111_r1.json",
+  "training_recipes": [
+    "training_configs.experiments.tomato_sharpa.subtasks.complete100_a_crop",
+    "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop"
+  ],
+  "derived_four_view_bundle": "/home/user/datasets/derived/tomato_complete100_four_view_candidate_r1",
+  "roi_candidates": "/home/user/datasets/derived/tomato_complete100_causal_candidates_r3",
+  "normalization_assets": {
+    "a": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_delta_30hz",
+    "b": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_delta_30hz"
+  },
+  "normalization_statistics_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+  "actual_token_distribution": {
+    "a_goal": {
+      "rows": 425556,
+      "p50": 211,
+      "p95": 220,
+      "maximum": 233,
+      "exceeds_256": 0
+    },
+    "b_coarse": {
+      "rows": 425556,
+      "p50": 209,
+      "p95": 219,
+      "maximum": 231,
+      "exceeds_256": 0
+    }
+  },
+  "actual_token_audit_paths": [
+    "/home/user/datasets/derived/tomato_complete100_vector_stats_r1/receipt.json",
+    "/home/user/datasets/derived/tomato_complete100_goal_token_audit_r1/receipt.json"
+  ],
+  "automatic_roi_status": "experimental_current_RGB_detector_and_past_measured_state_role_selector_not_quality_accepted",
+  "candidate_coverage": {
+    "episodes": 100,
+    "frames": 425556,
+    "algorithm_valid_frames": 370399,
+    "algorithm_invalid_frames": 55157,
+    "all_frames_enumerated": true,
+    "full_roi_coverage": false,
+    "training_ready": false,
+    "invalid_policy": "black224_RGB_and_false_boolean_mask_null_coordinates_no_frame_drop"
+  },
+  "quality_diagnostics": {
+    "path": "/home/user/datasets/derived/tomato_complete100_causal_candidate_audit_r1/audit.json",
+    "targeted_review": "/home/user/datasets/derived/tomato_complete100_causal_candidate_audit_r1/targeted_role_review.json",
+    "potential_role_mismatch_frames": 619,
+    "within_30_frames_of_saved_phase_boundary": 461,
+    "confirmed_wrong_focus_examples": true,
+    "independent_accuracy_evaluated": false,
+    "phase_labels_not_used_for_generation": true
+  },
+  "full_model_gpu_benchmark": "/home/user/datasets/derived/tomato_complete100_four_view_gpu_benchmark_r3/receipt.json",
+  "roi_single_frame_benchmark": "/home/user/datasets/derived/tomato_complete100_roi_b1_benchmark_r1/receipt.json",
+  "actual_loader_verification": "/home/user/datasets/derived/tomato_complete100_four_view_candidate_check_r2.json",
+  "agent_history_reader_trained": false
 }

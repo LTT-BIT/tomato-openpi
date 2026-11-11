@@ -2,87 +2,82 @@
 
 ## complete100 RGB＋局部crop：训练准备
 
-2026-11-11起，后续动作策略使用Agent冻结的100条完整七阶段录制，**全部100条参与π₀.₅训练**。Agent原84/8/8只保留为来源信息，不据此给动作训练留出验证/测试；不把这些训练录制称为动作模型盲测。旧normal93配置、归一化、checkpoint及以下历史说明保留。
+2026-11-11，冻结100条完整七阶段录制，425556帧、30Hz，**全部100条参加后续π₀.₅动作训练**，不留动作val/test。Agent的84/8/8不改，旧normal93数据、配置、统计、checkpoint保留。本轮完成100条四视图候选数据、A/B新归一化绑定、真实token审计和GPU前反向检查；**ROI语义质量未通过，未启动正式π₀.₅训练、未改部署端**。
 
-当前已实现独立四视图输入接口，**尚未准备完整四视图训练数据或启动训练**。`subtasks/records/complete100_rgb_crop_20261111_selection.json`绑定100条原始身份、媒体/Parquet/标注SHA、实际源metadata以及train=0..99。逐条核验原始文件，阶段标签保留“磁盘已保存版本”与“Agent有效边界”差异，不自动把实验边界提案变成动作监督。
+有效清单为`subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json`，SHA256为`15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000`。90条来自`/home/user/datasets/tomato_subtasks_normal_20261107`，10条来自`/home/user/datasets/tomato_independent10_20261109`。训练使用磁盘正式保存且哈希核验的Subtask；8条与Agent临时边界提案的差异已在旧解析记录中保留，不自动改成动作监督。索引86（源B/1106_750_791_normal/episode_000004）的末段return仍为[2908,2990)。原视频、Parquet、metadata和标注只读，派生媒体独立复制，无可写硬链接。
 
-8条差异已解析：逐一匹配`vjepa2_training/docs/validation/tomato_reviewed_boundaries_20261109/proposals.json`中的14个临时边界提案，状态为`provisional_user_review_not_source_labels`。动作训练统一采用磁盘正式保存且哈希核验的Subtask；这些提案仍保留为Agent离线实验的对照，**不代表提案被判错或被正式批准**。新有效清单为`records/complete100_rgb_crop_20261111_saved_labels_r1.json`，每条保存选定training_segments与来源；旧未解析清单和原始文件不改。已正式修订的`B/1106_750_791_normal/episode_000004`最终return仍为`[2908,2990)`，未被恢复为旧标签。
+### 输入与ROI规则
 
-`records/complete100_rgb_crop_20261111_source_plan_r1.json`给出兼容现有A/B准备器的100条来源计划，已经通过`openpi.subtasks.prepare.inspect_plan`只读实检：100条、425556帧、逐帧索引、实际Parquet、媒体和标注绑定均通过。它仍是**三路原图的来源计划**，不能当成四图数据已准备或执行正式训练。最新解析验收为`records/complete100_rgb_crop_20261111_label_resolution_check_r1.json`；原preparation_check保留为上一步的历史回执。
+保留三路RGB：global=cam0、left_wrist=cam2、right_wrist=cam1，新增从原分辨率cam0裁剪的interaction RGB。π₀.₅四图均224；Agent需要256原图时须重新从native裁剪，不能放大224训练图。实测state转58D，动作窗口50×58，手臂14D Delta、手44D Absolute；RGB-only，无深度，π₀.₅不读Memory历史。
 
-`subtasks/complete100_rgb_crop_preparation.json`是准备契约。原三路模型键为base、left_wrist、right_wrist（原始cam0/cam2/cam1），新增interaction来自原分辨率RGB。π₀.₅图像尺寸224，Agent尺寸256，禁止从已有224预览放大成Agent原图。RGB-only，不接深度。ROI需要原图坐标、相机、时间、可用时间、有效性及人工/因果生成方式；人工插值预览不等于在线ROI能力，当前完整100条ROI尚未准备。
+黄色框为参与交互的手、所持物及必要接触区域的紧致并集；青色框为1.5倍上下文正方形，实际输入取青色裁剪。机械臂连杆、无关手及篮内无关果实不应主动加入紧致框。当前自动候选仍有选错手/关联篮中果实的问题，不将几何检查通过当作语义正确。
 
-已对索引86的2990帧做耗时实测：干净crop视频导出5.88秒、完整检查视频/检查图15.40秒、压缩NPZ导出9.95秒。轻量与完整流程的干净视频SHA完全相同；NPZ抽查64帧像素一致。320次单帧计时中，离线插值＋正方形计算P95为0.148毫秒，裁剪缩放P95为0.395毫秒。**离线插值不是因果定位；此前每条15～30分钟只是估算，没有人工选框耗时记录，不能作为实测占比。** 单机单条结果不能外推所有录制或部署硬件。记录为`records/complete100_roi_timing_and_tracking_20261111_r1.json`。
+离线参考`records/complete100_episode86_manual_roi_20261111_r3.json`覆盖索引86的2990帧，134人工目视关键帧、20子段；此前检查248个关键帧/中间帧，不是逐帧独立认证。以这134帧训练了隔离的小型ROI定位器：torchvision FasterRCNN MobileNet320，右手/左手/所持物三类，COCO初始化，1200步batch4，只有颜色增强。**这是实验ROI模型训练，不是π₀.₅正式训练**，未获得独立定位精度或闭环成功率。
 
-新增`scripts.export_tomato_manual_crops --selection ... --annotations ... --out /new/path`直接导出干净224视频和逐帧坐标，不生成检查视频或JPEG；仍绑定原图哈希、拒绝写入原始目录、完整解码核验输出帧数。仅用于已有完整标注的录制，不会为其他99条猜框，也尚未发布完整LeRobot四图训练包。`scripts.benchmark_tomato_roi`可重做三种导出与单帧计时。
+`scripts.tomato_roi_locator`逐帧以当前RGB检测手与物体，用当前/过去实测关节变化选择活动手，近距离双手可合并，并用附近红色区域补充候选。推理不读取阶段、prompt、未来帧或动作命令；每帧重新检测，可在丢失后恢复。原始116D实测state、源帧时间、坐标、来源和有效性均可追溯。缺失必要手部时输出`valid=false`、坐标null，视频为黑色224图，布尔mask=false；不删除时间点、不延用过期框。`available_at`表示最新输入时间戳，实际计算延迟另行计量。
 
-下一步优先开发可复用的因果定位/跟踪，不继续用逐条手工标注硬铺100条。新增`scripts.tomato_causal_roi.CausalBoxTrack`和真实回放入口`scripts.probe_tomato_causal_track`：只由第0帧目视框初始化，之后仅读当前与过去帧；运动/特征/尺度检查失败即输出`valid=false, box=null`，无明确新种子不恢复。保存持久四角多边形，避免反复旋转轴对齐框引起虚假膨胀。真实探针中双目标有效93帧，3.1秒处番茄区域漂移被拒绝；有效期间跟踪P95为2.19毫秒（CPU单线程，含灰度转换/两目标），并不表示目标身份经过语义验证。与旧近似人工预览的有效帧并集IoU均值0.774，仅为已选录制内参考，不是独立精度。该原型**没有自动初始定位、丢失恢复或双手/运送角色切换，不能用于批量ROI或在线能力声明**；跟踪失败结果没有替代现有离线裁剪。
+该定位器仅由一条录制监督，实测state尺度使用全部100条动作训练统计。未来若用于Agent独立评估，需要另行审计train-only标定和数据划分，不能直接把这里的结果当作84/8/8测试表现。该方法不等于FoveaVLA自动注意方法或性能复现。早期GroundingDINO整臂误检诊断和第93帧失败的LK探针均保留，未作为最终训练ROI。
 
-四视图完整π₀.₅推理尚未计时，不能用适配器或轻量假编码器耗时代替。速度测试本身不要求训练结束，但需完整可加载权重与可用GPU环境。本地base权重缓存为partial；本轮只读检查28服务器8张GPU均100%利用率、每卡空闲约6.5GiB，未启动推理或排队任务。30FPS数据采样率不能直接当作策略更新频率，实时验收仍为未完成。
+### 派生数据与实际验收
 
-当前局部标注已实际推进到**1条完整录制、2990帧（净新增2732帧）**：`B/1106_750_791_normal/episode_000004`，冻结清单索引86。有效标注为`records/complete100_episode86_manual_roi_20261111_r3.json`：覆盖七阶段，按双手接触、左手运送/入篮、右手放回等操作划分20段，134个关键帧。目视检查248张关键帧及中间帧；不等于逐帧人工认证或独立质量评估。运输阶段只用左手/所持果实及放置接触区域，避免被动持串右手把局部图拉宽；原258帧几何和裁剪像素保持一致。离线子段边界有视野切换，仍需完整时序复查，不能认为框已连续平滑或在线可用。
+以下均在`/home/user/datasets/derived/`，原始数据不改：
 
-新增本地派生输出：`/home/user/datasets/derived/tomato_complete100_episode86_manual_roi_r3`保存2990帧224 RGB数组与原图坐标，`tomato_complete100_episode86_manual_review_r3`保存完整检查视频、干净局部视频、逐帧索引和248张QA图，`tomato_complete100_roi_worklist_r2/worklist.json`更新100条工作清单，尚余422566帧没有标注。**这是1条完整几何标注候选，不是完整100条训练数据**，未合入A/B训练包。原r1工作清单及258帧预览保留为历史对照。插值产生的子段边界关键帧保留父关键帧的未来依赖，`available_at`不会因为切段而错误变成当前时刻。
+|目录或文件|内容与状态|
+|---|---|
+|`tomato_complete100_saved_labels_r1_base_ab`|原三图A/B独立基础副本，100条train=0..99|
+|`tomato_roi_locator_experiment_r2`|实验ROI权重、来源和训练回执；native源episode4，冻结清单episode86|
+|`tomato_complete100_causal_candidates_r3`|4个shard，全部100条425556帧；224视频、逐帧坐标/有效性、SHA和QA图|
+|`tomato_complete100_four_view_candidate_r1`|完整A goal/B coarse四路LeRobot候选包、splits、ROI sidecars，约8.9GB|
+|`tomato_complete100_vector_stats_r1`|100条state/50步Delta动作窗口新统计、逐帧真实B文本长度及状态bins|
+|`tomato_complete100_goal_token_audit_r1`|同一真实state及统计下的A goal全部425556条文本长度|
+|`tomato_complete100_four_view_candidate_check_r2.json`|真实LeRobot四视频解码、300样本、独立原始向量窗口和token核对|
+|`tomato_complete100_causal_candidate_audit_r1`|100条300张代表crop、逐条丢失段与角色诊断、2张针对性原图核查|
+|`tomato_complete100_four_view_gpu_benchmark_r3`|真实完整模型3/4视图延迟、全参数梯度与crop输入梯度|
+|`tomato_complete100_roi_b1_benchmark_r1`|B1定位＋选手＋裁剪P50/P95=4.54/5.90ms，解码编码不计入|
 
-可用`scripts.review_tomato_manual_roi --selection ... --annotations ... --out /new/derived/path`重新生成完整录制QA视频，输出新目录，解码核验两份视频均为2990帧并再次核验原RGB哈希。最新回执为`records/complete100_episode86_manual_roi_20261111_validation_r3.json`。下面列出的r1目录仍保留，不被覆盖。
+全部425556个帧索引、时间因果性、native紧致框范围、正方形包含关系通过。算法有效370399帧（87.04%）、无效55157帧（12.96%）；**87.04%是启发式有效比例，不是准确率**。4个shard均发布结束，源cam0与Parquet前后SHA一致。
 
-已在本地生成以下独立派生目录，**原始视频、Parquet和Subtask只读，不覆写、不与原始媒体建立可写硬链接**：
+质量审计目视检查300张代表crop，并复核原图：619个非harvest阶段的算法有效帧只选择左手，461帧距离阶段边界不超过30帧；剩余158帧不在该范围。索引70/f3116及15/f4988确认存在左手空手移动、焦点偏向左篮而右侧操作区被遗漏的情况。阶段仅用于离线QA抽样/比较，**未用阶段标签修改ROI**。尚未解决这些错误及丢失段，`crop_manifest.json`保留`full_roi_coverage=false`、`training_ready=false`、模式`causal_prediction_candidate`，正式A/B入口会拒绝。
 
-|路径（均在`/home/user/datasets/derived/`下）|内容|边界|
-|---|---|---|
-|`tomato_complete100_saved_labels_r1_base_ab`|完整100条A/B基础副本、来源快照、train=0..99；425556帧|原三路图，未加入完整crop；副本仅重排索引/task映射，原物理列保持一致|
-|`tomato_complete100_roi_worklist_r1/worklist.json`|100条ROI工作清单、选定阶段、原视频SHA、已有框|只包含已有258帧预览框，425298帧明确缺失|
-|`tomato_complete100_roi_preview_r1`|258帧原分辨率裁剪后224干净RGB、逐帧坐标/可用时间和回执|离线插值，未独立审核，不能用于在线ROI声明|
-|`tomato_complete100_base_adapter_check_r1.json`|全部基础副本及真实四图输入适配检查|无权重加载、无训练或归一化模型查询|
+全100条A/B原物理列保持一致，600份原三路视频副本SHA及原始媒体/标注再次核验通过。真实LeRobot每条取首/中/尾共300个样本，确认四图、224crop、布尔mask、58D state、50×58动作及实际tokenizer一致；62个采样点正确保留无效mask。动作窗口独立从原始Parquet重建，尾部复制末动作，不跨episode，不在阶段边界插入hold。
 
-`scripts.prepare_tomato100_rgb materialize-base`读取已解析清单和绑定的source plan，调用现有原子发布A/B准备器。输出不能位于原始数据目录内或成为原始目录的祖先，必须是新目录；媒体使用独立复制，源文件哈希在发布前再次检查。`scripts.check_tomato100_derived`比较全部100条A/B物理列、阶段/task索引、600份视频副本SHA，并再次检查原始媒体、Parquet、metadata和标注SHA。A/B包内的`meta/stats.json`只是数据存储统计，**不是π₀.₅的Delta动作窗口归一化资产**。
+### 新归一化与token
 
-第一版离线ROI沿用已经确认的示例方法：在原分辨率关键帧中目视标出当前参与交互的手部、所持/操作物及必要接触区域，部件框的紧致并集是黄色框，实际裁剪采用1.5倍上下文正方形（青色框）。机械臂连杆、无关的另一只手与篮中无关番茄不加入紧致框。逐段检查关键帧及中间帧，在运动/接触变化处补关键帧；不把原示例的坐标直接复制到其他录制。最初两个片段由14个目视关键帧插值得到258帧；当前已扩展一条完整录制，尚无完整100条标注；此方法属于人工式离线标注，不能声明具备在线自动定位能力。准备契约已记录该规则，下面的通用检测仅是诊断旁支，不替代示例标注方法。
+重新统计全部425556个state和21277800个50步动作窗口向量，使用原有RunningStats（float64/5000直方图bins），q01/q99归一化、不裁剪。新`norm_stats.json` SHA256：`cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83`，均值/标准差另用独立累加核对。先通过图像无关向量管线求统计，再绑定真实四图数据契约；不存在复用旧93统计的情况。
 
-新增稀疏检测诊断入口`scripts.probe_tomato100_roi`：使用本地Grounding DINO tiny权重，在冻结100条录制的每个已保存阶段选一个中间帧，共700帧。阶段标签只用于QA抽样，不输入检测器；检测提示固定，模型文件SHA、原视频SHA、坐标、置信度与检查图一并保存。输出目录为`/home/user/datasets/derived/tomato_complete100_roi_detector_probe_r1`。**这是物体候选框诊断，approved_roi_frames=0，不是700帧合格交互ROI，也不是425556帧已覆盖**。实际目视抽查发现整臂被识别为手、篮中番茄干扰、未单独定位放回时的杆部；不按置信度自动拼框生成训练crop，不把它声明为FoveaVLA自动注意方法复现。完整训练入口拒绝`detector_probe`来源。补齐仍需可靠的手部/交互定位与逐段质量检查，当前未启动完整四图物化或训练。诊断只用本地图片推理，不上传源图；派生目录可迁移到服务器继续处理，本地不是硬性要求。
+已生成并通过schema2 provenance校验的独立资产：`/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_delta_30hz`及同名`_b_`目录。A/B数值统计相同，dataset/task-view绑定分别生成；统计绑定通过不代表ROI语义质量通过。数据包`meta/stats.json`只是存储统计，不代替这些模型归一化资产。
 
-复现诊断（需独立环境中的PyTorch CUDA、Transformers 4.56.2、PyAV/Pillow；权重提前下载，本命令不联网）：
+|完整真实输入文本（含58D离散state）|P50|P95|最大|超过256|
+|---|---:|---:|---:|---:|
+|A goal，425556帧|211|220|233|0|
+|B coarse，425556帧|209|219|231|0|
 
-```bash
-PYTHONPATH=src:packages/openpi-client/src python -m scripts.probe_tomato100_roi \
-  --selection training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json \
-  --model-dir /path/to/local/grounding-dino-tiny \
-  --out /new/derived/detector_probe
-```
+保留`max_token_len=256`。三图视觉768→四图1024，新增crop增加256视觉token；文本槽256保持，动作50位置各投影58个连续值。四图prefix共1280槽，加50动作位置共1330；不是把58×50当作文本token。早期合成预算记录保留为历史，不代替本次真实分布。方案一Memory只给Agent；方案二32/64历史token或320文本槽仍仅为待设计候选，未实现/训练。
 
-模型端新增`Pi0Config.image_keys`显式开关；默认三路不变，四路配置才能保留interaction。`LeRobotFr3SharpaCropDataConfig`贯通第四路repack和`Fr3SharpaCropInputs`；缺失crop/布尔有效性时拒绝。ROI无效时该路mask为false，仍可依靠原三图，不会把旧crop当新观测。模型使用固定配置的图像顺序，避免JAX PyTree对字典键排序导致局部图位置漂移。JAX与PyTorch前处理都支持显式四键；interaction保留颜色增强，但不做会裁去接触边缘的随机裁剪或旋转。旧三图路径和RTC算法未改变。
+### GPU检查与正式训练边界
 
-候选训练入口为`training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop`，由`PI05_TOMATO100_CROP_BUNDLE`显式指定未来完整四图包。它要求`crop_manifest.json`绑定选定100条清单、完整覆盖和ROI来源，还要求四路视频、有效性列及train=0..99；当前基础三图包会被拒绝。保留batch512/8000步/FSDP8与原学习率计划作为起点，显存尚未验收。这个入口不训练历史token，方案一的Memory仍只给Agent。旧normal93入口不替换。
+本地RTX5090加载完整公开π₀.₅ base（SigLIP、PaliGemma2B、动作专家）；原32D动作与58D不匹配，仅重新初始化3个输入/输出投影参数，其余加载预训练权重。使用真实三路RGB、人工参考crop与新归一化，B1、10次去噪，预热后各30次：三图P50/P95=54.96/56.22ms，四图=61.58/63.80ms，P50增加12.04%。该结果衡量完整架构延迟，不代表已训练四图58D策略的动作能力，不含相机、ROI、传输或动作队列延迟。
 
-原三图视觉768＋文本槽位256＋动作位置50；四图基线视觉1024＋文本槽位256＋动作位置50。新增crop增加256个视觉token，不占256文本上限。方案一历史只给Agent，π₀.₅不追加历史。方案二仅预留设计候选：额外32/64个学习型历史token，或文本上限320；这些接口尚未实现、未训练，不能把配置数字当作模型已经接入。动作50个位置各投影58维连续向量，不是2900个文本token。
+真实归一化50步目标下全参数前反向通过：loss1.8181、全部参数梯度有限；第四图输入梯度非零且有限。参数梯度使用训练增强，图像输入梯度单独关闭HSV增强求导。无optimizer step，未进行正式训练；本地B1 JAX峰值分配约14.23GiB，**不代表batch512/FSDP8显存验收**。r3是有效梯度回执，早期r2的HSV像素梯度诊断失败不作为通过依据。
 
-实际PaliGemma分词器的预算回执在`subtasks/records/complete100_rgb_crop_20261111_token_budget.json`。包含每类257个统一状态值＋200组混合状态，共1828个合成状态组合；最大完整文本长度pickup254、harvest255、return253、adjust252。合成预算不代表真实100条的长度分布。新100条归一化尚未拟合，真实P50/P95/最大值保持null，不能套旧93条统计。
+28目标GPU只读检查时8卡均忙，未停止其他任务或启动远端测试。30Hz是数据/动作采样率；约62ms单次推理已超过33.3ms，不能宣称完整在线链路满足30Hz重规划。50步动作块约1.67秒，动作执行频率、策略重规划频率和ROI更新频率需要部署阶段分别确定。
 
-准备工具默认不创建训练数据或调度训练，输出必须为新文件：
+单帧ROI在RTX5090预热后连续300帧实测：定位P50/P95=3.32/3.92ms，选手与RGB关联=1.14/2.10ms，裁剪=0.05/0.40ms，总计=4.54/5.90ms；263帧有效、37帧输出黑图。输入已预解码，不包含视频导出、相机或网络；与上述策略计时分开测量，不是端到端时延保证。
 
-```bash
-PYTHONPATH=src python -m scripts.prepare_tomato100_rgb selection \
-  --manifest /home/user/vjepa2_training/runs/tomato/complete100_20261111/dataset_manifest.json \
-  --out /new/path/selection.json
-PYTHONPATH=src python -m scripts.prepare_tomato100_rgb tokens \
-  --tokenizer /path/paligemma_tokenizer.model \
-  --out /new/path/token_budget.json
-PYTHONPATH=src python -m scripts.prepare_tomato100_rgb resolve-labels \
-  --selection /path/frozen_selection.json \
-  --proposals /home/user/vjepa2_training/docs/validation/tomato_reviewed_boundaries_20261109/proposals.json \
-  --out /new/path/resolved_selection.json \
-  --plan-out /new/path/source_plan.json
-PYTHONPATH=src python -m scripts.prepare_tomato100_rgb materialize-base \
-  --selection /path/resolved_selection.json --plan /path/source_plan.json \
-  --tokenizer /path/paligemma_tokenizer.model --out /new/derived/base_bundle
-PYTHONPATH=src python -m scripts.prepare_tomato100_roi \
-  --selection /path/resolved_selection.json --preview /path/preview_annotations.json \
-  --out /new/derived/roi_worklist
-```
+独立入口`subtasks.complete100_a_crop`与`subtasks.complete100_b_crop`分别使用A全程goal和B四类prompt；默认batch512、8000步、FSDP8、warmup1000/decay30000保持。环境变量分别为`PI05_TOMATO100_CROP_A_BUNDLE`、`PI05_TOMATO100_CROP_BUNDLE`。候选包目前被入口拒绝，不自动排队或开训。Agent联合历史读出、完整16×58历史接入和部署仍是后续工作。
 
-将来可向tokens子命令传`--state-bins-jsonl`，每行明确提供action、observation_id（应含录制与帧身份）、normalization_sha256和新归一化后实际使用的58个state_bins；工具统计完整输入长度与超限数，不截断文本。拒绝混用归一化和重复观测。该输入必须由真实标准化/离散化管线导出，不能直接用原始关节角或合成bins充数。
+### 重做准备
 
-后续仍需：补齐ROI并物化完整四图包、生成新100条模型归一化统计和真实token分布、检查预训练权重加载及真实归一化batch前反向、在目标训练GPU验收显存。独立CPU环境的接口/梯度测试不代表完整π₀.₅训练或GPU验收。旧三图模型默认行为不变。
+脚本以`PYTHONPATH=src python -m scripts.<名称>`运行，均显式提供源清单和新派生输出目录，不覆盖原始数据：
+
+- `prepare_tomato100_vectors --selection ... --tokenizer ... --out ...`：全部100条新向量统计与真实B tokens；`audit_tomato100_goal_tokens --help`给出A审计参数。
+- `train_tomato_roi_locator --selection ... --annotations ... --out ...`：隔离实验定位器训练，默认1200步，不调用π₀.₅。
+- `prepare_tomato100_causal_crops --help`：按明确episodes/shard生成当前帧因果候选，resume必须签名一致；模型/统计/生成器/selector SHA冻结。
+- `materialize_tomato100_four_view --selection ... --base ... --candidates ... --out ...`：完整四视图A/B候选；`check_tomato100_four_view_candidate --help`执行真实读取核对。
+- `bind_tomato100_vector_norm --bundle ... --source-norm ... --verification ... --assets ...`：通过真实读取核验后绑定独立A/B归一化资产，不审批ROI质量。
+- `audit_tomato100_roi_candidates --selection ... --candidates ... --out ...`：阶段只用于QA；`benchmark_tomato_roi_locator`与`benchmark_tomato_four_view_gpu`分别检查单帧ROI和完整模型。
+
+准备契约见`subtasks/complete100_rgb_crop_preparation.json`；可核对汇总见`subtasks/records/complete100_causal_four_view_20261111_validation_r1.json`。之前的人工预览、source plan、合成预算及LK失败回执均保留，未覆盖或改写为自动方法成功。
 
 ## normal93 无 Agent 训练准备
 
