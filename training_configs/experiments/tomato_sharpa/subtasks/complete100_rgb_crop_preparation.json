@@ -12,23 +12,76 @@
   "unresolved_phase_label_recordings": 0,
   "token_audit": "records/complete100_rgb_crop_20261111_token_budget.json",
   "rgb_only": true,
-  "image_keys": ["base_0_rgb", "left_wrist_0_rgb", "right_wrist_0_rgb", "interaction_0_rgb"],
-  "source_camera_mapping": {"base_0_rgb": "cam0", "left_wrist_0_rgb": "cam2", "right_wrist_0_rgb": "cam1"},
+  "image_keys": [
+    "base_0_rgb",
+    "left_wrist_0_rgb",
+    "right_wrist_0_rgb",
+    "interaction_0_rgb"
+  ],
+  "source_camera_mapping": {
+    "base_0_rgb": "cam0",
+    "left_wrist_0_rgb": "cam2",
+    "right_wrist_0_rgb": "cam1"
+  },
   "interaction_source": "explicit per-frame source_camera; native RGB crop with context",
-  "roi_metadata_required": ["source_camera", "source_size", "interaction_box", "crop_box", "timestamp", "available_at", "valid", "generation_mode", "generator_signature"],
+  "roi_metadata_required": [
+    "source_camera",
+    "source_size",
+    "interaction_box",
+    "crop_box",
+    "timestamp",
+    "available_at",
+    "valid",
+    "generation_mode",
+    "generator_signature"
+  ],
   "roi_context_scale": 1.5,
-  "image_resolution": [224, 224],
+  "image_resolution": [
+    224,
+    224
+  ],
   "state_dimension": 58,
   "action_dimension": 58,
   "action_horizon": 50,
   "action_semantics": "delta_14_arm_absolute_44_hand",
   "max_token_len": 256,
-  "scheme1": {"memory_to_agent": true, "memory_to_pi05": false, "visual_tokens": 1024, "text_slots": 256, "prefix_slots": 1280},
-  "scheme2": {"status": "unimplemented_design_candidates", "learned_history_token_candidates": [32, 64], "text_memory_capacity_candidate": 320},
+  "scheme1": {
+    "memory_to_agent": true,
+    "memory_to_pi05": false,
+    "visual_tokens": 1024,
+    "text_slots": 256,
+    "prefix_slots": 1280
+  },
+  "scheme2": {
+    "status": "unimplemented_design_candidates",
+    "learned_history_token_candidates": [
+      32,
+      64
+    ],
+    "text_memory_capacity_candidate": 320
+  },
   "normalization": "pending_recompute_all100_no_old93_reuse",
   "training_hyperparameters": "retain existing defaults as starting point; four-view GPU memory not yet accepted",
   "training_started": false,
   "four_view_model_adapter_implemented": true,
   "automatic_roi_implemented": false,
-  "deployment_modified": false
+  "deployment_modified": false,
+  "roi_annotation_policy": {
+    "first_version_method": "manual_offline_keyframes_with_interpolation",
+    "reference_annotations": "records/normal93_20261110_interaction_preview_annotations.json",
+    "annotation_target": "task-relevant hands and held/manipulated object or immediate contact region",
+    "exclude_from_tight_box": [
+      "robot arm links",
+      "unrelated hand",
+      "unrelated fruit in collection tray"
+    ],
+    "include_context_when_relevant": [
+      "local support or placement contact region"
+    ],
+    "geometry": "tight union of component boxes; 1.5x square context crop using existing square_box",
+    "detector_probe_is_training_roi": false,
+    "review_policy": "inspect native keyframes and intervening frames; add keys at motion/contact changes; do not extrapolate uncovered intervals",
+    "full_coverage_completed": false,
+    "online_roi_capability_claimed": false
+  }
 }
