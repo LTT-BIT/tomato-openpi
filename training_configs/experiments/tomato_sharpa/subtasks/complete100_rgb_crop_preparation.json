@@ -98,5 +98,22 @@
     "independent_human_review": false,
     "full_temporal_review_completed": false,
     "training_bundle_materialized": false
-  }
+  },
+  "roi_automation_development": {
+    "status": "seeded_causal_prototype_not_robust",
+    "next_work": "target acquisition, robust tracking, loss detection, reacquisition and active-role switching",
+    "manual_annotations_role": "offline reference, not input of causal tracker after frame-zero seed",
+    "tracking_probe": "/home/user/datasets/derived/tomato_complete100_episode86_causal_track_probe_r2",
+    "automatic_target_acquisition": false,
+    "automatic_role_switching": false,
+    "automatic_reacquisition": false,
+    "first_invalid_frame": 93,
+    "invalid_box": null,
+    "sticky_invalid": true,
+    "bulk100_generation_enabled": false,
+    "training_ready": false
+  },
+  "default_annotated_crop_exporter": "scripts.export_tomato_manual_crops",
+  "review_export_policy": "sample and failure diagnosis; not mandatory for every bulk export",
+  "timing_result": "records/complete100_roi_timing_and_tracking_20261111_r1.json"
 }

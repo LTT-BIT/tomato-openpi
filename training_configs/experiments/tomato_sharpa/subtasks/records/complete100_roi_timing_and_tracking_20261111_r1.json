@@ -1,0 +1,224 @@
+{
+  "status": "machine_stages_profiled_seeded_tracker_not_robust_four_view_latency_pending",
+  "benchmark": {
+    "path": "/home/user/datasets/derived/tomato_complete100_episode86_roi_benchmark_r1/benchmark.json",
+    "sha256": "a3c8547f430d97429b1263fd5876da51aced528120a9a9019a19a93806123bf3",
+    "result": {
+      "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+      "annotation_sha256": "e9e9aac3c215fcc5cbd233f58a6f22a92bfac0b6cec1290e691f1af99d1d3e97",
+      "machine": {
+        "platform": "Linux-6.8.1-1059-realtime-x86_64-with-glibc2.39",
+        "python": "3.11.16",
+        "opencv": "4.11.0",
+        "pyav": "17.0.0",
+        "opencv_threads": 1
+      },
+      "frames": 2990,
+      "source_duration_seconds": 99.66666666666667,
+      "single_frame": {
+        "offline_interpolation_and_square": {
+          "samples": 320,
+          "p50_ms": 0.047716021072119474,
+          "p95_ms": 0.14795703464187682,
+          "p99_ms": 0.1546958915423602,
+          "max_ms": 0.1625180011615157
+        },
+        "crop_resize224": {
+          "samples": 320,
+          "p50_ms": 0.05246899672783911,
+          "p95_ms": 0.3952820581616834,
+          "p99_ms": 0.42571598663926125,
+          "max_ms": 0.4408530076034367
+        },
+        "warning": "Offline interpolation reads future keyframes. This is NOT automatic/causal ROI selection latency."
+      },
+      "exports": {
+        "clean_only": {
+          "frames": 2990,
+          "stage_wall_seconds": {
+            "decode_rgb": 2.607745230430737,
+            "offline_geometry": 0.3161932230577804,
+            "crop_resize": 0.6078342124819756,
+            "encode_mux": 2.0249421729822643
+          },
+          "stage_latency": {
+            "decode_rgb": {
+              "samples": 2990,
+              "p50_ms": 0.817405991256237,
+              "p95_ms": 1.193362596677616,
+              "p99_ms": 1.8966959236422556,
+              "max_ms": 4.049870010931045
+            },
+            "offline_geometry": {
+              "samples": 2990,
+              "p50_ms": 0.0814039958640933,
+              "p95_ms": 0.19458853057585654,
+              "p99_ms": 0.26376432157121604,
+              "max_ms": 5.09307294851169
+            },
+            "crop_resize": {
+              "samples": 2990,
+              "p50_ms": 0.07136448402889073,
+              "p95_ms": 0.4231780563713981,
+              "p99_ms": 0.4935571819078177,
+              "max_ms": 0.7605589926242828
+            },
+            "encode_mux": {
+              "samples": 2990,
+              "p50_ms": 0.559959007659927,
+              "p95_ms": 1.4632054982939733,
+              "p99_ms": 1.6772299754666167,
+              "max_ms": 3.7226509884931147
+            }
+          },
+          "encoder_flush_seconds": 0.015275201993063092,
+          "note": "Encode calls may use worker threads; per-stage wall times are not CPU utilization.",
+          "total_wall_seconds": 5.880942895018961
+        },
+        "full_review_total_seconds": 15.397605463047512,
+        "compressed_npz_total_seconds": 9.951644958986435,
+        "clean_video_identical": true,
+        "npz_sample_pixels_verified": 64
+      },
+      "annotation_authoring": {
+        "measured": false,
+        "reason": "Previous visual selection/rule editing was not instrumented; 15-30 min was an estimate, not a measured benchmark."
+      },
+      "four_view_policy_inference": {
+        "measured": false,
+        "p50_ms": null,
+        "p95_ms": null,
+        "reason": "No complete runnable four-view checkpoint/model environment in this local benchmark; local pi05_base cache is a partial download. Adapter timing is not model inference."
+      },
+      "realtime_acceptance": false,
+      "training_started": false,
+      "source_writes": false,
+      "total_wall_seconds": 32.45405451499391
+    }
+  },
+  "cpu": "AMD Ryzen 9 9950X3D 16-Core Processor",
+  "lightweight_export": {
+    "path": "/home/user/datasets/derived/tomato_complete100_episode86_clean_export_r1/receipt.json",
+    "sha256": "944b3a26f700cda5e0d3f9ff301779414acc2fe7d9765aff110c722a624f88ac",
+    "video_identical_to_full_review": true
+  },
+  "tracker": {
+    "path": "/home/user/datasets/derived/tomato_complete100_episode86_causal_track_probe_r2/receipt.json",
+    "sha256": "4f7c41ae53e2201e470e15c3375ed027bd3d9f98456019ff8790d4a1293c14ea",
+    "result": {
+      "episode_index": 86,
+      "frames": 2990,
+      "seed_frame": 0,
+      "seed_roles": [
+        "right_hand",
+        "truss"
+      ],
+      "seed_annotation_sha256": "e9e9aac3c215fcc5cbd233f58a6f22a92bfac0b6cec1290e691f1af99d1d3e97",
+      "source_sha256": "af8135884c997058b644dacba78b3a8111f93a1ac7f9b6dfde35157010595f33",
+      "source_hash_unchanged": true,
+      "initial_seed": "manual frame0 boxes only",
+      "future_annotations_read_by_tracker": false,
+      "automatic_target_acquisition": false,
+      "automatic_role_switching": false,
+      "automatic_reacquisition": false,
+      "invalid_is_sticky": true,
+      "valid_frames": 93,
+      "first_invalid_frame": 93,
+      "track_latency_active": {
+        "samples": 93,
+        "p50_ms": 2.0113950013183057,
+        "p95_ms": 2.1937073790468276,
+        "p99_ms": 2.46755249565467,
+        "max_ms": 3.6103479797020555
+      },
+      "track_latency_all_including_invalid_fast_path": {
+        "samples": 2990,
+        "p50_ms": 0.04648801404982805,
+        "p95_ms": 0.0705286191077899,
+        "p99_ms": 2.0713037112727766,
+        "max_ms": 3.6103479797020555
+      },
+      "crop_latency_active": {
+        "samples": 93,
+        "p50_ms": 0.052449002396315336,
+        "p95_ms": 0.06354459328576921,
+        "p99_ms": 0.07148971781134601,
+        "max_ms": 0.095510040409863
+      },
+      "validity": "Heuristic feature/motion checks only; not semantic identity verification.",
+      "full_roi_coverage": false,
+      "training_ready": false,
+      "realtime_acceptance": false,
+      "source_writes": false
+    },
+    "approximate_manual_reference_comparison": {
+      "reference": "Existing approximate manual preview, not independent ground truth",
+      "scope": "First pickup only, valid tracker frames only",
+      "valid_frames": 93,
+      "total_first_pickup_frames": 168,
+      "mean_union_iou": 0.7742557587174347,
+      "min_union_iou": 0.6145076464156778,
+      "first_invalid": {
+        "frame": 93,
+        "available_at": 3.1,
+        "valid": false,
+        "crop_box": null,
+        "tracks": {
+          "right_hand": {
+            "valid": true,
+            "box": [
+              421.5960267719514,
+              224.07946926731083,
+              484.62392008300577,
+              290.9706944920645
+            ],
+            "reason": null,
+            "retained_features": 64,
+            "inlier_fraction": 0.9014084507042254
+          },
+          "truss": {
+            "valid": false,
+            "box": null,
+            "reason": "outside_image_or_area_drift"
+          }
+        }
+      }
+    }
+  },
+  "four_view_policy_inference": {
+    "measured": false,
+    "requires_trained_weights": false,
+    "local_blocker": "Only partial base weights cached, no complete loadable local weights",
+    "server28_snapshot": {
+      "gpus": 8,
+      "model": "NVIDIA RTX PRO 5000 72GB Blackwell",
+      "utilization_percent_each": 100,
+      "free_memory_MiB_each": [
+        6649,
+        6653,
+        6653,
+        6653,
+        6653,
+        6653,
+        6653,
+        6653
+      ]
+    },
+    "job_started": false,
+    "realtime_acceptance": false
+  },
+  "interpretation": {
+    "annotation_authoring_not_measured": true,
+    "prior_15_30_minutes_was_estimate": true,
+    "clean_export_vs_full_review_speedup": 2.6182205367253215,
+    "main_next_work": "Reliable causal target acquisition, tracking, loss handling, reacquisition and active-role switching; not more manual annotation of all100.",
+    "source30fps_is_not_verified_policy_update_rate": true
+  },
+  "tests": {
+    "passed": 19,
+    "command": "pytest -q tests/test_tomato_causal_roi.py tests/test_tomato_manual_episode_roi.py tests/test_tomato_roi_preparation.py tests/test_tomato_four_view.py"
+  },
+  "source_writes": false,
+  "training_started": false,
+  "full_roi_coverage": false
+}
