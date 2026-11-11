@@ -1,0 +1,100 @@
+{
+  "version": "tomato-complete100-rgb-crop-preparation-v1",
+  "tokenizer_sha256": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+  "synthetic_cases_per_action": 457,
+  "base_prompt_audit": [
+    {
+      "action": "pickup",
+      "prompt_alone": 11,
+      "full_text_upper_bound": 254,
+      "tested_max": 254,
+      "spare_at_bound": 2,
+      "within_256": true
+    },
+    {
+      "action": "harvest",
+      "prompt_alone": 12,
+      "full_text_upper_bound": 255,
+      "tested_max": 255,
+      "spare_at_bound": 1,
+      "within_256": true
+    },
+    {
+      "action": "return",
+      "prompt_alone": 10,
+      "full_text_upper_bound": 253,
+      "tested_max": 253,
+      "spare_at_bound": 3,
+      "within_256": true
+    },
+    {
+      "action": "adjust",
+      "prompt_alone": 9,
+      "full_text_upper_bound": 252,
+      "tested_max": 252,
+      "spare_at_bound": 4,
+      "within_256": true
+    }
+  ],
+  "real_normalized_state_rows": [],
+  "real_distribution_available": false,
+  "real_distribution": {
+    "rows": 0,
+    "p50": null,
+    "p95": null,
+    "maximum": null,
+    "exceeds_256": 0
+  },
+  "old_three_view": {
+    "visual_tokens": 768,
+    "text_slots": 256,
+    "history_tokens": 0,
+    "prefix_slots": 1024,
+    "action_positions": 50,
+    "prefix_plus_action_slots": 1074,
+    "count_scope": "token positions only; prefix/action experts and masks differ"
+  },
+  "scheme1_four_view": {
+    "visual_tokens": 1024,
+    "text_slots": 256,
+    "history_tokens": 0,
+    "prefix_slots": 1280,
+    "action_positions": 50,
+    "prefix_plus_action_slots": 1330,
+    "count_scope": "token positions only; prefix/action experts and masks differ"
+  },
+  "scheme2_candidates": [
+    {
+      "kind": "learned_history_unimplemented",
+      "visual_tokens": 1024,
+      "text_slots": 256,
+      "history_tokens": 32,
+      "prefix_slots": 1312,
+      "action_positions": 50,
+      "prefix_plus_action_slots": 1362,
+      "count_scope": "token positions only; prefix/action experts and masks differ"
+    },
+    {
+      "kind": "learned_history_unimplemented",
+      "visual_tokens": 1024,
+      "text_slots": 256,
+      "history_tokens": 64,
+      "prefix_slots": 1344,
+      "action_positions": 50,
+      "prefix_plus_action_slots": 1394,
+      "count_scope": "token positions only; prefix/action experts and masks differ"
+    }
+  ],
+  "text_memory_candidate": {
+    "status": "unimplemented; requires reliable facts",
+    "visual_tokens": 1024,
+    "text_slots": 320,
+    "history_tokens": 0,
+    "prefix_slots": 1344,
+    "action_positions": 50,
+    "prefix_plus_action_slots": 1394,
+    "count_scope": "token positions only; prefix/action experts and masks differ"
+  },
+  "truncation_performed": false,
+  "training_started": false
+}

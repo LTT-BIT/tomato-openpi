@@ -1,0 +1,40 @@
+{
+  "version": "tomato-complete100-rgb-crop-preparation-check-v1",
+  "selected_recordings": 100,
+  "frames": 425556,
+  "all_action_training": true,
+  "agent_split_changed": false,
+  "source_files_verified": true,
+  "phase_conflict_recordings": 8,
+  "source_sha256": {
+    "src/openpi/subtasks/rgb100.py": "d348c4726822eeedd12cd5527977cde48a69e0a9f960eab4281308955db2666f",
+    "scripts/prepare_tomato100_rgb.py": "0162ad418f992ae5b54052c42bcd8eb4bc7249cc590f8021ecfc6240d1236b3a",
+    "tests/test_tomato_rgb100.py": "e00064d1c234cde7cc1d1edf7f9b4e4afa303dc90a0ac06dc0eda4db098a56c7",
+    "training_configs/experiments/tomato_sharpa/subtasks/complete100_rgb_crop_preparation.json": "d3d52090125dcbf9817340328171500936336b4e6554343b3c69bfa8eaafa964",
+    "training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_selection.json": "7e5e0ff27ce5d79d9afd713d58b25228e0a85c0459a5de44756d60ea247f3858",
+    "training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_token_budget.json": "643f50a1d9838214d6b8250608e7f02e3c11714fb95a0567d08e26faf54a3593"
+  },
+  "tests": {
+    "new_tests_passed": 12,
+    "available_preparation_regression_tests_passed": 36,
+    "excluded_old_config_cases": 4,
+    "excluded_reason": "Local available Python lacks datasets/etils/flax for existing model/config tests",
+    "broader_probe_attempt": "43 passed,4 deselected,3 failures due to absent augmax/matplotlib; no model/probe code changed"
+  },
+  "real_tokenizer_audit": true,
+  "actual100_normalized_token_distribution_available": false,
+  "four_view_adapter_implemented": false,
+  "normalization_fitted": false,
+  "full_roi_coverage": false,
+  "training_started": false,
+  "weights_loaded": false,
+  "gpu_training_memory_accepted": false,
+  "deployment_modified": false,
+  "pending": [
+    "resolve8 saved-vs-Agent phase differences",
+    "complete ROI dataset/provenance",
+    "all100 normalization and real token distribution",
+    "four-view adapter and model specs/preprocessing",
+    "target training environment and GPU preflight"
+  ]
+}

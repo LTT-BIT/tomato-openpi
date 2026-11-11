@@ -1,5 +1,32 @@
 # FR3 + Sharpa 番茄训练
 
+## complete100 RGB＋局部crop：训练准备
+
+2026-11-11起，后续动作策略使用Agent冻结的100条完整七阶段录制，**全部100条参与π₀.₅训练**。Agent原84/8/8只保留为来源信息，不据此给动作训练留出验证/测试；不把这些训练录制称为动作模型盲测。旧normal93配置、归一化、checkpoint及以下历史说明保留。
+
+本轮只准备独立清单与token预算，**没有完成四视图训练接入，没有启动训练**。`subtasks/records/complete100_rgb_crop_20261111_selection.json`绑定100条原始身份、媒体/Parquet/标注SHA、实际源metadata以及train=0..99。逐条核验原始文件，阶段标签保留“磁盘已保存版本”与“Agent有效边界”差异，不自动把实验边界提案变成动作监督。当前8条存在阶段记录差异，需在生成训练Prompt前解决；本轮不改原始标注。
+
+`subtasks/complete100_rgb_crop_preparation.json`是**设计/准备契约，不是可运行训练recipe**。原三路模型键为base、left_wrist、right_wrist（原始cam0/cam2/cam1），新增interaction来自原分辨率RGB。π₀.₅图像尺寸224，Agent尺寸256，禁止从已有224预览放大成Agent原图。RGB-only，不接深度。ROI需要原图坐标、相机、时间、可用时间、有效性及人工/因果生成方式；人工插值预览不等于在线ROI能力，当前完整100条ROI尚未准备。
+
+原三图视觉768＋文本槽位256＋动作位置50；四图基线视觉1024＋文本槽位256＋动作位置50。新增crop增加256个视觉token，不占256文本上限。方案一历史只给Agent，π₀.₅不追加历史。方案二仅预留设计候选：额外32/64个学习型历史token，或文本上限320；这些接口尚未实现、未训练，不能把配置数字当作模型已经接入。动作50个位置各投影58维连续向量，不是2900个文本token。
+
+实际PaliGemma分词器的预算回执在`subtasks/records/complete100_rgb_crop_20261111_token_budget.json`。包含每类257个统一状态值＋200组混合状态，共1828个合成状态组合；最大完整文本长度pickup254、harvest255、return253、adjust252。合成预算不代表真实100条的长度分布。新100条归一化尚未拟合，真实P50/P95/最大值保持null，不能套旧93条统计。
+
+准备工具默认不创建训练数据或调度训练，输出必须为新文件：
+
+```bash
+PYTHONPATH=src python -m scripts.prepare_tomato100_rgb selection \
+  --manifest /home/user/vjepa2_training/runs/tomato/complete100_20261111/dataset_manifest.json \
+  --out /new/path/selection.json
+PYTHONPATH=src python -m scripts.prepare_tomato100_rgb tokens \
+  --tokenizer /path/paligemma_tokenizer.model \
+  --out /new/path/token_budget.json
+```
+
+将来可向tokens子命令传`--state-bins-jsonl`，每行明确提供action、observation_id（应含录制与帧身份）、normalization_sha256和新归一化后实际使用的58个state_bins；工具统计完整输入长度与超限数，不截断文本。拒绝混用归一化和重复观测。该输入必须由真实标准化/离散化管线导出，不能直接用原始关节角或合成bins充数。
+
+后续仍需：解决标签差异、补齐ROI、生成新100条训练数据与统计、贯通四图adapter/input spec/预处理与mask、检查增强和权重加载、真实batch前反向及显存验收，再建立独立可运行训练recipe。旧三图模型默认行为不变。
+
 ## normal93 无 Agent 训练准备
 
 分支 `tomato-subtasks-ab-train`，从四类指令统一后的 `56ca763` 建立。此实验不调用任何阶段 Agent；B 训练使用人工审核的阶段文本，未来部署由人观察并点击阶段，在线 prompt 与动作队列切换属于后续部署任务。
