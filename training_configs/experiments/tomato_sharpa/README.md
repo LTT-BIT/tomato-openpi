@@ -23,6 +23,17 @@
 
 `scripts.prepare_tomato100_rgb materialize-base`读取已解析清单和绑定的source plan，调用现有原子发布A/B准备器。输出不能位于原始数据目录内或成为原始目录的祖先，必须是新目录；媒体使用独立复制，源文件哈希在发布前再次检查。`scripts.check_tomato100_derived`比较全部100条A/B物理列、阶段/task索引、600份视频副本SHA，并再次检查原始媒体、Parquet、metadata和标注SHA。A/B包内的`meta/stats.json`只是数据存储统计，**不是π₀.₅的Delta动作窗口归一化资产**。
 
+新增稀疏检测诊断入口`scripts.probe_tomato100_roi`：使用本地Grounding DINO tiny权重，在冻结100条录制的每个已保存阶段选一个中间帧，共700帧。阶段标签只用于QA抽样，不输入检测器；检测提示固定，模型文件SHA、原视频SHA、坐标、置信度与检查图一并保存。输出目录为`/home/user/datasets/derived/tomato_complete100_roi_detector_probe_r1`。**这是物体候选框诊断，approved_roi_frames=0，不是700帧合格交互ROI，也不是425556帧已覆盖**。实际目视抽查发现整臂被识别为手、篮中番茄干扰、未单独定位放回时的杆部；不按置信度自动拼框生成训练crop，不把它声明为FoveaVLA自动注意方法复现。完整训练入口拒绝`detector_probe`来源。补齐仍需可靠的手部/交互定位与逐段质量检查，当前未启动完整四图物化或训练。诊断只用本地图片推理，不上传源图；派生目录可迁移到服务器继续处理，本地不是硬性要求。
+
+复现诊断（需独立环境中的PyTorch CUDA、Transformers 4.56.2、PyAV/Pillow；权重提前下载，本命令不联网）：
+
+```bash
+PYTHONPATH=src:packages/openpi-client/src python -m scripts.probe_tomato100_roi \
+  --selection training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json \
+  --model-dir /path/to/local/grounding-dino-tiny \
+  --out /new/derived/detector_probe
+```
+
 模型端新增`Pi0Config.image_keys`显式开关；默认三路不变，四路配置才能保留interaction。`LeRobotFr3SharpaCropDataConfig`贯通第四路repack和`Fr3SharpaCropInputs`；缺失crop/布尔有效性时拒绝。ROI无效时该路mask为false，仍可依靠原三图，不会把旧crop当新观测。模型使用固定配置的图像顺序，避免JAX PyTree对字典键排序导致局部图位置漂移。JAX与PyTorch前处理都支持显式四键；interaction保留颜色增强，但不做会裁去接触边缘的随机裁剪或旋转。旧三图路径和RTC算法未改变。
 
 候选训练入口为`training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop`，由`PI05_TOMATO100_CROP_BUNDLE`显式指定未来完整四图包。它要求`crop_manifest.json`绑定选定100条清单、完整覆盖和ROI来源，还要求四路视频、有效性列及train=0..99；当前基础三图包会被拒绝。保留batch512/8000步/FSDP8与原学习率计划作为起点，显存尚未验收。这个入口不训练历史token，方案一的Memory仍只给Agent。旧normal93入口不替换。

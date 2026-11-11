@@ -1,0 +1,60 @@
+{
+  "status": "sparse_detector_probe_complete_not_approved_for_bulk_crops",
+  "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+  "episodes": 100,
+  "sampled_frames": 700,
+  "total_source_frames": 425556,
+  "source_writes": false,
+  "source_hashes_unchanged": true,
+  "approved_roi_frames": 0,
+  "full_roi_coverage": false,
+  "training_ready": false,
+  "training_started": false,
+  "model": {
+    "id": "IDEA-Research/grounding-dino-tiny",
+    "revision": "a2bb814dd30d776dcf7e30523b00659f4f141c71",
+    "weights_sha256": "1a2412ef99bd74bcd3c2a246fa1e48581f8889a1300c9051974741314fc042f3"
+  },
+  "detector_query": "robotic fingers. gripper. red tomatoes.",
+  "threshold": 0.2,
+  "text_threshold": 0.2,
+  "outputs": {
+    "directory": "/home/user/datasets/derived/tomato_complete100_roi_detector_probe_r1",
+    "receipt_sha256": "a8861e84e5fda88e690df0f6f797a0a15b7c77a2d9f6530e7313e3959535da39",
+    "contact_sheets": 100
+  },
+  "original_data_recheck": {
+    "path": "/home/user/datasets/derived/tomato_complete100_base_adapter_check_r2.json",
+    "sha256": "7712b630f28faca49140aac01bc3bff4d1276147a0be68411ceba2608caa26cd",
+    "result": {
+      "recordings": 100,
+      "frames": 425556,
+      "derived_video_hashes_checked": 600,
+      "original_sources_hash_unchanged": true,
+      "physical_columns_equal": true,
+      "phase_prompt_indices_verified": true,
+      "four_view_dataset_ready": false
+    }
+  },
+  "visual_spot_checks": {
+    "episode_indices": [
+      0,
+      86,
+      99
+    ],
+    "reviewer": "coding_agent_visual_inspection",
+    "independent_human_quality_review": false,
+    "findings": [
+      "whole arms frequently detected as hands/grippers",
+      "tomatoes in collection tray compete with held tomatoes",
+      "no explicit stem localization for final return",
+      "object boxes insufficient to define precise interaction region"
+    ]
+  },
+  "decision": "Do not materialize full training crops from these candidates. Improve interaction localization and temporal QA first.",
+  "verification": {
+    "command": "pytest -q tests/test_tomato_roi_probe.py tests/test_tomato_roi_preparation.py tests/test_tomato_rgb100.py",
+    "passed": 26
+  },
+  "source_images_uploaded": false
+}
