@@ -67,6 +67,10 @@ def transform_vectors(
         "prompt": "",
         **dict.fromkeys(camera_keys, image),
     }
+    if "observation.images.interaction" in camera_keys:
+        # Image-independent statistics use an explicitly invalid dummy crop;
+        # only state/actions are compared with real loaded samples below.
+        raw["observation.interaction_valid"] = np.bool_(False)
     return transform(raw)
 
 

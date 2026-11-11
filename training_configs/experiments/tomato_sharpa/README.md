@@ -4,13 +4,28 @@
 
 2026-11-11起，后续动作策略使用Agent冻结的100条完整七阶段录制，**全部100条参与π₀.₅训练**。Agent原84/8/8只保留为来源信息，不据此给动作训练留出验证/测试；不把这些训练录制称为动作模型盲测。旧normal93配置、归一化、checkpoint及以下历史说明保留。
 
-本轮只准备独立清单与token预算，**没有完成四视图训练接入，没有启动训练**。`subtasks/records/complete100_rgb_crop_20261111_selection.json`绑定100条原始身份、媒体/Parquet/标注SHA、实际源metadata以及train=0..99。逐条核验原始文件，阶段标签保留“磁盘已保存版本”与“Agent有效边界”差异，不自动把实验边界提案变成动作监督。
+当前已实现独立四视图输入接口，**尚未准备完整四视图训练数据或启动训练**。`subtasks/records/complete100_rgb_crop_20261111_selection.json`绑定100条原始身份、媒体/Parquet/标注SHA、实际源metadata以及train=0..99。逐条核验原始文件，阶段标签保留“磁盘已保存版本”与“Agent有效边界”差异，不自动把实验边界提案变成动作监督。
 
 8条差异已解析：逐一匹配`vjepa2_training/docs/validation/tomato_reviewed_boundaries_20261109/proposals.json`中的14个临时边界提案，状态为`provisional_user_review_not_source_labels`。动作训练统一采用磁盘正式保存且哈希核验的Subtask；这些提案仍保留为Agent离线实验的对照，**不代表提案被判错或被正式批准**。新有效清单为`records/complete100_rgb_crop_20261111_saved_labels_r1.json`，每条保存选定training_segments与来源；旧未解析清单和原始文件不改。已正式修订的`B/1106_750_791_normal/episode_000004`最终return仍为`[2908,2990)`，未被恢复为旧标签。
 
 `records/complete100_rgb_crop_20261111_source_plan_r1.json`给出兼容现有A/B准备器的100条来源计划，已经通过`openpi.subtasks.prepare.inspect_plan`只读实检：100条、425556帧、逐帧索引、实际Parquet、媒体和标注绑定均通过。它仍是**三路原图的来源计划**，不能当成四图数据已准备或执行正式训练。最新解析验收为`records/complete100_rgb_crop_20261111_label_resolution_check_r1.json`；原preparation_check保留为上一步的历史回执。
 
-`subtasks/complete100_rgb_crop_preparation.json`是**设计/准备契约，不是可运行训练recipe**。原三路模型键为base、left_wrist、right_wrist（原始cam0/cam2/cam1），新增interaction来自原分辨率RGB。π₀.₅图像尺寸224，Agent尺寸256，禁止从已有224预览放大成Agent原图。RGB-only，不接深度。ROI需要原图坐标、相机、时间、可用时间、有效性及人工/因果生成方式；人工插值预览不等于在线ROI能力，当前完整100条ROI尚未准备。
+`subtasks/complete100_rgb_crop_preparation.json`是准备契约。原三路模型键为base、left_wrist、right_wrist（原始cam0/cam2/cam1），新增interaction来自原分辨率RGB。π₀.₅图像尺寸224，Agent尺寸256，禁止从已有224预览放大成Agent原图。RGB-only，不接深度。ROI需要原图坐标、相机、时间、可用时间、有效性及人工/因果生成方式；人工插值预览不等于在线ROI能力，当前完整100条ROI尚未准备。
+
+已在本地生成以下独立派生目录，**原始视频、Parquet和Subtask只读，不覆写、不与原始媒体建立可写硬链接**：
+
+|路径（均在`/home/user/datasets/derived/`下）|内容|边界|
+|---|---|---|
+|`tomato_complete100_saved_labels_r1_base_ab`|完整100条A/B基础副本、来源快照、train=0..99；425556帧|原三路图，未加入完整crop；副本仅重排索引/task映射，原物理列保持一致|
+|`tomato_complete100_roi_worklist_r1/worklist.json`|100条ROI工作清单、选定阶段、原视频SHA、已有框|只包含已有258帧预览框，425298帧明确缺失|
+|`tomato_complete100_roi_preview_r1`|258帧原分辨率裁剪后224干净RGB、逐帧坐标/可用时间和回执|离线插值，未独立审核，不能用于在线ROI声明|
+|`tomato_complete100_base_adapter_check_r1.json`|全部基础副本及真实四图输入适配检查|无权重加载、无训练或归一化模型查询|
+
+`scripts.prepare_tomato100_rgb materialize-base`读取已解析清单和绑定的source plan，调用现有原子发布A/B准备器。输出不能位于原始数据目录内或成为原始目录的祖先，必须是新目录；媒体使用独立复制，源文件哈希在发布前再次检查。`scripts.check_tomato100_derived`比较全部100条A/B物理列、阶段/task索引、600份视频副本SHA，并再次检查原始媒体、Parquet、metadata和标注SHA。A/B包内的`meta/stats.json`只是数据存储统计，**不是π₀.₅的Delta动作窗口归一化资产**。
+
+模型端新增`Pi0Config.image_keys`显式开关；默认三路不变，四路配置才能保留interaction。`LeRobotFr3SharpaCropDataConfig`贯通第四路repack和`Fr3SharpaCropInputs`；缺失crop/布尔有效性时拒绝。ROI无效时该路mask为false，仍可依靠原三图，不会把旧crop当新观测。模型使用固定配置的图像顺序，避免JAX PyTree对字典键排序导致局部图位置漂移。JAX与PyTorch前处理都支持显式四键；interaction保留颜色增强，但不做会裁去接触边缘的随机裁剪或旋转。旧三图路径和RTC算法未改变。
+
+候选训练入口为`training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop`，由`PI05_TOMATO100_CROP_BUNDLE`显式指定未来完整四图包。它要求`crop_manifest.json`绑定选定100条清单、完整覆盖和ROI来源，还要求四路视频、有效性列及train=0..99；当前基础三图包会被拒绝。保留batch512/8000步/FSDP8与原学习率计划作为起点，显存尚未验收。这个入口不训练历史token，方案一的Memory仍只给Agent。旧normal93入口不替换。
 
 原三图视觉768＋文本槽位256＋动作位置50；四图基线视觉1024＋文本槽位256＋动作位置50。新增crop增加256个视觉token，不占256文本上限。方案一历史只给Agent，π₀.₅不追加历史。方案二仅预留设计候选：额外32/64个学习型历史token，或文本上限320；这些接口尚未实现、未训练，不能把配置数字当作模型已经接入。动作50个位置各投影58维连续向量，不是2900个文本token。
 
@@ -30,11 +45,17 @@ PYTHONPATH=src python -m scripts.prepare_tomato100_rgb resolve-labels \
   --proposals /home/user/vjepa2_training/docs/validation/tomato_reviewed_boundaries_20261109/proposals.json \
   --out /new/path/resolved_selection.json \
   --plan-out /new/path/source_plan.json
+PYTHONPATH=src python -m scripts.prepare_tomato100_rgb materialize-base \
+  --selection /path/resolved_selection.json --plan /path/source_plan.json \
+  --tokenizer /path/paligemma_tokenizer.model --out /new/derived/base_bundle
+PYTHONPATH=src python -m scripts.prepare_tomato100_roi \
+  --selection /path/resolved_selection.json --preview /path/preview_annotations.json \
+  --out /new/derived/roi_worklist
 ```
 
 将来可向tokens子命令传`--state-bins-jsonl`，每行明确提供action、observation_id（应含录制与帧身份）、normalization_sha256和新归一化后实际使用的58个state_bins；工具统计完整输入长度与超限数，不截断文本。拒绝混用归一化和重复观测。该输入必须由真实标准化/离散化管线导出，不能直接用原始关节角或合成bins充数。
 
-后续仍需：补齐ROI、生成新100条训练数据与统计、贯通四图adapter/input spec/预处理与mask、检查增强和权重加载、真实batch前反向及显存验收，再建立独立可运行训练recipe。旧三图模型默认行为不变。
+后续仍需：补齐ROI并物化完整四图包、生成新100条模型归一化统计和真实token分布、检查预训练权重加载及真实归一化batch前反向、在目标训练GPU验收显存。独立CPU环境的接口/梯度测试不代表完整π₀.₅训练或GPU验收。旧三图模型默认行为不变。
 
 ## normal93 无 Agent 训练准备
 

@@ -222,6 +222,35 @@ def full_text(prompt, bins, memory_text=''):
     return f"Task: {cleaned}, State: {' '.join(map(str,bins))};\nAction: "
 
 
+def derived_output_path(selection, output):
+    """Derived media must not be inside or an ancestor of ANY original dataset."""
+    out=Path(output).expanduser().resolve()
+    for row in selection['episodes']:
+        source=Path(row['dataset']).resolve()
+        # Protect the entire A/B acquisition collection, not just selected leaves.
+        protected=source.parent.parent if source.parent.name in ('A','B','C') else source
+        if out.is_relative_to(protected) or protected.is_relative_to(out):
+            raise ValueError('Derived output must be separate from original datasets')
+    if out.exists():
+        raise FileExistsError('Use a new derived-data directory')
+    return out
+
+
+def validate_source_plan(selection, plan, *, selection_sha256):
+    if (selection.get('phase_label_resolution_required')!=0
+            or len(selection['episodes'])!=100 or selection['splits']!={'train':list(range(100))}
+            or plan.get('selection_sha256')!=selection_sha256
+            or plan.get('data_policy')!='all_sources' or plan.get('review_complete') is not True):
+        raise ValueError('Resolved and hash-bound all100 plan required')
+    expected=[dict(dataset=r['dataset'],episode_index=r['source_episode_index'],
+        annotation=r['annotation'],recording_group=r['recording_group']) for r in selection['episodes']]
+    if plan['episodes']!=expected:
+        raise ValueError('Plan source mapping differs from resolved selection')
+    for row in selection['episodes']:
+        if digest(row['annotation'])!=row['annotation_sha256']:
+            raise ValueError('Source annotation changed since label resolution')
+
+
 def sequence_slots(*, text_capacity=256, history_tokens=0, views=4, action_horizon=50):
     """Architectural lengths, not compute/FLOP or active-mask estimates."""
     if any(type(v) is not int or v < 0 for v in (text_capacity, history_tokens, views, action_horizon)):

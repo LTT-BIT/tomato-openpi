@@ -1,0 +1,128 @@
+{
+  "version": "tomato-complete100-four-view-input-validation-r1",
+  "source_sha256": {
+    "examples/fr3_wuji/compute_norm_stats.py": "15f4352c18db7b3909122809f3dd703c82fdb5fde78cb13f473714259ef11833",
+    "scripts/prepare_tomato100_rgb.py": "8b9d6787d1aabdf3b025deffb28394db417cfa4185fb964d29fe028d044804d8",
+    "src/openpi/models/model.py": "6a2b9aeb6bcabd6f4558453e958247dc35b3da04967e9e7cd5b5465eb0fbf7c7",
+    "src/openpi/models/pi0.py": "08b089fe9a54eb6d0a3fbf17b6665f226457d6d1dae7cf113cccf10a393bfd9b",
+    "src/openpi/models/pi0_config.py": "a1b5c03494e3122c1b04fd9a464cbfdb51ce70a51a8d27d16343012fa59aa605",
+    "src/openpi/models_pytorch/pi0_pytorch.py": "145b74f09f519609883c665d929d46e16d8882ba274e87527f7e0ddd8f854088",
+    "src/openpi/models_pytorch/preprocessing_pytorch.py": "6c6be8b638b3c942071b9cbcb2e3a99775c86963ba99c4de379cfb6cac207ea5",
+    "src/openpi/subtasks/rgb100.py": "286021188410c9d67326671d76274d7f44ac7963a10ae0a97eb95c08be5c5522",
+    "src/openpi/training/config.py": "ac1c398df932dcf39cb1eae06dfcbb0c0873233b7f4f785930010b0c5a55304e",
+    "src/openpi/training/task_view_norm.py": "b1e8c8773b1f6e6f177143c6b53cb5f4755c2653ce7ee46290392493de7cd7e2",
+    "training_configs/experiments/tomato_sharpa/README.md": "e7cf71b0ad48dde7cd7db875641f4d539c0f7015693002601009fe99158f9653",
+    "training_configs/experiments/tomato_sharpa/subtasks/complete100_rgb_crop_preparation.json": "83917453f415fa777280ff96e70c1eb700791fd53964aeda205a7a5876173307",
+    "scripts/check_tomato100_derived.py": "1c163294f28be64aa32b44ec21e06c9a7adf03b7d27b91a30653a37106cd69b5",
+    "scripts/prepare_tomato100_roi.py": "f418a58de9d39e288e95635dd71beef4b4887833d038c4ddcd11b9162b234495",
+    "src/openpi/policies/fr3_sharpa_crop_policy.py": "4ed69d286dfb396bcad12573e52414af4fb27fd28620e6efb8e7a996947df4d2",
+    "tests/test_tomato_four_view.py": "70699eff59fe436e8911bc282c6482f1483bbb4dc3e4007483588f6b47533790",
+    "tests/test_tomato_roi_preparation.py": "b15e5880f6c88302e4b0f69b50988834ee2269bd974b6a7f696bd6e10a55b6c5",
+    "training_configs/embodiments/fr3_sharpa_crop.py": "f4eb97dc9d7842adff183e8fa3be4a13c2d6314222fbf78293cfa32692b334a2",
+    "training_configs/experiments/tomato_sharpa/subtasks/complete100_b_crop.py": "73cbe6e9f4133d37500809bb0a1e0a7b2d14d7c2c63c03d7b21b562245c45be5"
+  },
+  "preparation_scope": "read-only originals; independent all100 A/B base copies, sparse ROI export and four-view input interface",
+  "base_bundle": "/home/user/datasets/derived/tomato_complete100_saved_labels_r1_base_ab",
+  "base_bundle_manifest_sha256": "0feb6030b309ba38a9c95c029840e22159bf928255f6e344729980b172c8e51f",
+  "base_validation": {
+    "recordings": 100,
+    "frames": 425556,
+    "derived_video_hashes_checked": 600,
+    "original_sources_hash_unchanged": true,
+    "physical_columns_equal": true,
+    "phase_prompt_indices_verified": true,
+    "four_view_dataset_ready": false
+  },
+  "real_adapter_validation": {
+    "samples": [
+      {
+        "source_frame": 83,
+        "state_shape": [
+          58
+        ],
+        "action_shape": [
+          50,
+          58
+        ],
+        "images": [
+          "base_0_rgb",
+          "left_wrist_0_rgb",
+          "right_wrist_0_rgb",
+          "interaction_0_rgb"
+        ]
+      },
+      {
+        "source_frame": 270,
+        "state_shape": [
+          58
+        ],
+        "action_shape": [
+          50,
+          58
+        ],
+        "images": [
+          "base_0_rgb",
+          "left_wrist_0_rgb",
+          "right_wrist_0_rgb",
+          "interaction_0_rgb"
+        ]
+      }
+    ],
+    "scope": "real pixels and measured/commanded vector adapter only; no normalized model query",
+    "weights_loaded": false,
+    "training_started": false
+  },
+  "derived_validation_receipt": "/home/user/datasets/derived/tomato_complete100_base_adapter_check_r1.json",
+  "derived_validation_sha256": "7712b630f28faca49140aac01bc3bff4d1276147a0be68411ceba2608caa26cd",
+  "roi_worklist": "/home/user/datasets/derived/tomato_complete100_roi_worklist_r1/worklist.json",
+  "roi_worklist_sha256": "238e36046ef8e6c62c8f73ba14e0d9bb1efeaa317c1aa230ac8167a7d8e09d8e",
+  "existing_preview": {
+    "directory": "/home/user/datasets/derived/tomato_complete100_roi_preview_r1",
+    "frames": 258,
+    "mode": "manual_offline_interpolated",
+    "review_status": "unreviewed_preview",
+    "full_coverage": false
+  },
+  "missing_roi_frames": 425298,
+  "full_four_view_dataset_ready": false,
+  "tests": {
+    "passed": 109,
+    "scope": "CPU four-view/spec/mask/prefix-gradient + Sharpa/source-preparation/prompt/ROI/RTC regression",
+    "excludes": "no pretrained full pi05 forward/backward, no target GPU training memory acceptance"
+  },
+  "environment": {
+    "path": "/tmp/tomato-rgb-test-env",
+    "scope": "isolated CPU validation only; existing training environments unchanged",
+    "packages": {
+      "jax": "0.5.3",
+      "jaxlib": "0.5.3",
+      "flax": "0.10.2",
+      "torch": "2.7.1+cpu",
+      "torchvision": "0.22.1+cpu",
+      "numpy": "1.26.4",
+      "pyarrow": "19.0.1",
+      "transformers": "4.53.2",
+      "sentencepiece": "0.2.3",
+      "lerobot": "0.1.0"
+    }
+  },
+  "four_view_adapter_implemented": true,
+  "prefix_visual_tokens": 1024,
+  "text_slots": 256,
+  "action_positions": 50,
+  "prefix_order_fixed": true,
+  "local_geometric_augmentation": false,
+  "invalid_roi_mask": false,
+  "candidate_recipe": "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop",
+  "normalizer_fitted": false,
+  "training_started": false,
+  "weights_loaded": false,
+  "deployment_modified": false,
+  "original_source_files_changed": false,
+  "pending": [
+    "full ROI generation/annotation and provenance",
+    "materialize complete fourth-view dataset",
+    "all100 model normalization and real token distribution",
+    "pretrained full-model forward/backward and target GPU preflight"
+  ]
+}

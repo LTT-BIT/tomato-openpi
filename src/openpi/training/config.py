@@ -528,6 +528,26 @@ class LeRobotFr3SharpaMultimodalDataConfig(LeRobotFr3SharpaDataConfig):
 
 
 @dataclasses.dataclass(frozen=True)
+class LeRobotFr3SharpaCropDataConfig(LeRobotFr3SharpaMultimodalDataConfig):
+    """Opt-in four-view converter data. Existing recipes remain three-view."""
+
+    def create_vector_transforms(self, model_config):
+        from openpi.policies.fr3_sharpa_crop_policy import Fr3SharpaCropInputs
+        from openpi.subtasks.rgb100 import IMAGE_KEYS
+
+        if model_config.image_keys != IMAGE_KEYS:
+            raise ValueError("Crop data requires matching explicit four-view model image_keys")
+        repack, vectors = super().create_vector_transforms(model_config)
+        original = repack.inputs[0]
+        mapping = {**original.structure,
+                   "observation/interaction_image": "observation.images.interaction",
+                   "observation/interaction_valid": "observation.interaction_valid"}
+        return dataclasses.replace(repack, inputs=[_transforms.RepackTransform(mapping), *repack.inputs[1:]]), dataclasses.replace(
+            vectors, inputs=[Fr3SharpaCropInputs(model_config.model_type), *vectors.inputs[1:]]
+        )
+
+
+@dataclasses.dataclass(frozen=True)
 class LeRobotSingleFrankaDataConfig(DataConfigFactory):
     """Seven physical joints and two cameras, normalized before padding to model width."""
 

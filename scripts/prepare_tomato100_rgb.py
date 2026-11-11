@@ -1,4 +1,4 @@
-"""Prepare all100 selection/token receipts only; never launches training.
+"""Prepare all100 receipts and isolated base A/B copies; never launches training.
 
 Run with PYTHONPATH=src python -m scripts.prepare_tomato100_rgb selection ...
 or tokens ... . Every output must be new. No source datasets are rewritten.
@@ -25,9 +25,26 @@ def main():
     resolution.add_argument('--proposals',type=Path,required=True)
     resolution.add_argument('--out',type=Path,required=True)
     resolution.add_argument('--plan-out',type=Path,required=True)
+    materialize=sub.add_parser('materialize-base')
+    materialize.add_argument('--selection',type=Path,required=True)
+    materialize.add_argument('--plan',type=Path,required=True)
+    materialize.add_argument('--tokenizer',type=Path,required=True)
+    materialize.add_argument('--out',type=Path,required=True)
     args=parser.parse_args()
     if args.out.exists():
         raise FileExistsError('Choose a new output file')
+    if args.command=='materialize-base':
+        from openpi.subtasks.rgb100 import validate_source_plan, derived_output_path
+        from openpi.subtasks.prepare import prepare
+        import sentencepiece as spm
+        selection=json.loads(args.selection.read_text());plan=json.loads(args.plan.read_text())
+        validate_source_plan(selection,plan,selection_sha256=digest(args.selection))
+        plan={**plan,'tokenizer_sha256':digest(args.tokenizer)}
+        out=derived_output_path(selection,args.out)
+        tokenizer=spm.SentencePieceProcessor(model_file=str(args.tokenizer))
+        prepare(plan,out,tokenizer)
+        print('New all100 A/B base copies published; three original RGB only, crop not yet complete')
+        return
     if args.command=='selection':
         result=freeze_selection(args.manifest)
         print('Verified100 recordings selected for action training; ROI/normalization still pending')

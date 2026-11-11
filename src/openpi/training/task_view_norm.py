@@ -30,6 +30,8 @@ def compute(config, *, batch_size, output):
         batch = {key: [] for key in stats}
         for index in range(start, min(start + batch_size, len(source))):
             raw = {**source.vectors(index), **dict.fromkeys(cameras, image)}
+            if "observation.images.interaction" in cameras:
+                raw["observation.interaction_valid"] = np.bool_(False)
             vectors = transform(raw)
             if index in checked:
                 actual = transform(source[index])

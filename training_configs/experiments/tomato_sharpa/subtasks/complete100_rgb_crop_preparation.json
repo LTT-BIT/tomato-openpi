@@ -1,6 +1,10 @@
 {
   "version": "tomato-complete100-rgb-crop-preparation-v1",
-  "status": "preparation_only_not_a_runnable_training_recipe",
+  "status": "four_view_interfaces_ready_full_roi_and_normalization_pending",
+  "training_recipe": "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop",
+  "derived_base_bundle": "/home/user/datasets/derived/tomato_complete100_saved_labels_r1_base_ab",
+  "roi_worklist": "/home/user/datasets/derived/tomato_complete100_roi_worklist_r1/worklist.json",
+  "existing_roi_preview": "/home/user/datasets/derived/tomato_complete100_roi_preview_r1",
   "data_policy": "all100_action_training",
   "selection": "records/complete100_rgb_crop_20261111_saved_labels_r1.json",
   "source_plan": "records/complete100_rgb_crop_20261111_source_plan_r1.json",
@@ -24,7 +28,7 @@
   "normalization": "pending_recompute_all100_no_old93_reuse",
   "training_hyperparameters": "retain existing defaults as starting point; four-view GPU memory not yet accepted",
   "training_started": false,
-  "four_view_model_adapter_implemented": false,
+  "four_view_model_adapter_implemented": true,
   "automatic_roi_implemented": false,
   "deployment_modified": false
 }
