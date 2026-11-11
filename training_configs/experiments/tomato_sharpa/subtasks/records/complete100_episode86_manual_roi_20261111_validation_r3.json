@@ -1,0 +1,99 @@
+{
+  "status": "one_complete_recording_manual_geometry_candidate_exported",
+  "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+  "annotation": "training_configs/experiments/tomato_sharpa/subtasks/records/complete100_episode86_manual_roi_20261111_r3.json",
+  "annotation_sha256": "e9e9aac3c215fcc5cbd233f58a6f22a92bfac0b6cec1290e691f1af99d1d3e97",
+  "episode_index": 86,
+  "source_recording": "B/1106_750_791_normal/episode_000004",
+  "geometry_covered_recordings": 1,
+  "total_recordings": 100,
+  "total_frames": 425556,
+  "geometry_covered_frames": 2990,
+  "new_frames": 2732,
+  "remaining_unannotated_frames": 422566,
+  "keyframes": 134,
+  "qa_frames": 248,
+  "original_258_preview_pixels_preserved": true,
+  "interpolated_boundary_future_provenance_verified": true,
+  "crop_array_shape": [
+    2990,
+    224,
+    224,
+    3
+  ],
+  "crop_and_video_index_agree": true,
+  "crop_export": {
+    "path": "/home/user/datasets/derived/tomato_complete100_episode86_manual_roi_r3",
+    "receipt_sha256": "4a5cd60a51b2568760c6dfc9ffa14cd81bebe57f2ecbebaadf9a2ec6c363a4ce"
+  },
+  "video_export": {
+    "path": "/home/user/datasets/derived/tomato_complete100_episode86_manual_review_r3",
+    "receipt_sha256": "b8c489dc8d6017700a15656b40f834e9d0d6f080c49016fb9fe2931fe2143668",
+    "receipt": {
+      "episode_index": 86,
+      "source_recording": "B/1106_750_791_normal/episode_000004",
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal/videos/chunk-000/observation.images.cam0/episode_000004.mp4",
+      "source_sha256": "af8135884c997058b644dacba78b3a8111f93a1ac7f9b6dfde35157010595f33",
+      "source_hash_unchanged": true,
+      "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+      "annotation_sha256": "e9e9aac3c215fcc5cbd233f58a6f22a92bfac0b6cec1290e691f1af99d1d3e97",
+      "frames": 2990,
+      "qa_frames": 248,
+      "keyframes": 134,
+      "full_recording_geometry_coverage": true,
+      "full_roi_coverage": false,
+      "independent_human_review": false,
+      "training_ready": false,
+      "source_writes": false,
+      "training_started": false,
+      "videos": {
+        "review.mp4": "2bed6d4fa47070c277ec437e97b24e848f9ca5274b0e297aa00a3069e6f9dfe2",
+        "interaction224.mp4": "bdbd975ca1e53c80f21332a2a094b22084beffde1de6d7b7ca39583ab9061754"
+      }
+    }
+  },
+  "worklist": {
+    "path": "/home/user/datasets/derived/tomato_complete100_roi_worklist_r2/worklist.json",
+    "sha256": "1c274b097c59227020e651a1fd13d1b2871d0829794fd839175ef15c3ad05d2a"
+  },
+  "original_recheck": {
+    "path": "/home/user/datasets/derived/tomato_complete100_base_adapter_check_r3.json",
+    "sha256": "7712b630f28faca49140aac01bc3bff4d1276147a0be68411ceba2608caa26cd",
+    "result": {
+      "recordings": 100,
+      "frames": 425556,
+      "derived_video_hashes_checked": 600,
+      "original_sources_hash_unchanged": true,
+      "physical_columns_equal": true,
+      "phase_prompt_indices_verified": true,
+      "four_view_dataset_ready": false
+    }
+  },
+  "temporal_diagnostics": {
+    "max_center_step": {
+      "frame": 1129,
+      "step": 210.4661492972207,
+      "boundary": true
+    },
+    "max_within_clip_center_step": {
+      "frame": 221,
+      "step": 3.605551275463989,
+      "boundary": false
+    },
+    "note": "Manual activity scope switches create crop jumps; retained explicitly, no claim of full temporal acceptance."
+  },
+  "visual_review": {
+    "reviewer": "coding_agent",
+    "reviewed_keyframes_and_midpoints": 248,
+    "full_frame_by_frame_review": false,
+    "independent_human_review": false
+  },
+  "full_roi_coverage": false,
+  "training_ready": false,
+  "training_started": false,
+  "source_writes": false,
+  "tests": {
+    "passed": 34,
+    "command": "pytest -q tests/test_tomato_manual_episode_roi.py tests/test_tomato_interaction_preview.py tests/test_tomato_roi_preparation.py tests/test_tomato_rgb100.py"
+  }
+}

@@ -59,7 +59,7 @@ def export_preview(selection, preview, out):
     import av
     import cv2
     import numpy as np
-    from scripts.tomato_interaction_preview import interaction_at, native_crop, square_box
+    from scripts.tomato_interaction_preview import annotation_available_frame, interaction_at, native_crop, square_box
     out=derived_output_path(selection,out)
     listing=worklist(selection,preview,preview_sha256='provided_by_caller')
     row=next(r for r in listing['episodes'] if r['roi_clips'])
@@ -77,7 +77,7 @@ def export_preview(selection, preview, out):
                     raise ValueError('Native source dimensions changed')
                 clip=wanted[i];tight=interaction_at(clip,i,w,h);box=square_box(tight,w,h)
                 arrays.append(cv2.resize(native_crop(image,box),(224,224),interpolation=cv2.INTER_AREA))
-                future_key=next(k['frame'] for k in clip['keyframes'] if k['frame']>=i)
+                future_key=annotation_available_frame(clip,i)
                 index.append(dict(source_frame=i,timestamp=i/preview['fps'],interaction_box=tight,
                     crop_box=box,source_camera='cam0',valid=True,available_at=future_key/preview['fps'],
                     generation_mode='manual_offline_interpolated',review_status='unreviewed_preview'))

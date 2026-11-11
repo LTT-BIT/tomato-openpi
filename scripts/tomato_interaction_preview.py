@@ -46,6 +46,28 @@ def interaction_at(clip, frame, width, height):
     return [*boxes[:, :2].min(axis=0), *boxes[:, 2:].max(axis=0)]
 
 
+
+def annotation_available_frame(clip, frame):
+    """Latest source frame used by the two keys, including interpolated key provenance."""
+    import bisect
+
+    keys = clip["keyframes"]
+    indices = [key["frame"] for key in keys]
+    if not indices or any(b <= a for a, b in itertools.pairwise(indices)):
+        raise ValueError("Need strictly ordered annotation keyframes")
+    if not indices[0] <= frame <= indices[-1]:
+        raise ValueError("Frame outside annotation keyframes")
+    right = bisect.bisect_left(indices, frame)
+    used = [keys[right]] if indices[right] == frame else [keys[right - 1], keys[right]]
+    available = []
+    for key in used:
+        value = key.get("available_at_frame", key["frame"])
+        if not isinstance(value, int) or isinstance(value, bool) or value < key["frame"]:
+            raise ValueError("Invalid keyframe availability provenance")
+        available.append(value)
+    return max(available)
+
+
 def square_box(box, width, height, scale=1.5):
     x1, y1, x2, y2 = valid_box(box, width, height)
     if not math.isfinite(scale) or scale < 1:

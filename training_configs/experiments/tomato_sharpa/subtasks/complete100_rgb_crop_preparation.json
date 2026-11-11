@@ -3,7 +3,7 @@
   "status": "four_view_interfaces_ready_full_roi_and_normalization_pending",
   "training_recipe": "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop",
   "derived_base_bundle": "/home/user/datasets/derived/tomato_complete100_saved_labels_r1_base_ab",
-  "roi_worklist": "/home/user/datasets/derived/tomato_complete100_roi_worklist_r1/worklist.json",
+  "roi_worklist": "/home/user/datasets/derived/tomato_complete100_roi_worklist_r2/worklist.json",
   "existing_roi_preview": "/home/user/datasets/derived/tomato_complete100_roi_preview_r1",
   "data_policy": "all100_action_training",
   "selection": "records/complete100_rgb_crop_20261111_saved_labels_r1.json",
@@ -83,5 +83,20 @@
     "review_policy": "inspect native keyframes and intervening frames; add keys at motion/contact changes; do not extrapolate uncovered intervals",
     "full_coverage_completed": false,
     "online_roi_capability_claimed": false
+  },
+  "manual_roi_progress": {
+    "annotation": "records/complete100_episode86_manual_roi_20261111_r3.json",
+    "full_recording_geometry_candidates": 1,
+    "total_recordings": 100,
+    "geometry_covered_frames": 2990,
+    "remaining_unannotated_frames": 422566,
+    "new_frames_since_original_preview": 2732,
+    "review_export": "/home/user/datasets/derived/tomato_complete100_episode86_manual_review_r3",
+    "crop_export": "/home/user/datasets/derived/tomato_complete100_episode86_manual_roi_r3",
+    "keyframes": 134,
+    "reviewed_keyframes_and_midpoints": 248,
+    "independent_human_review": false,
+    "full_temporal_review_completed": false,
+    "training_bundle_materialized": false
   }
 }
