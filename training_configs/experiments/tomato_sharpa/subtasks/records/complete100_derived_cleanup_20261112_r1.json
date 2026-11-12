@@ -1,0 +1,430 @@
+{
+  "schema": "complete100_derived_cleanup_v1",
+  "date": "2026-11-12T04:52:34.194458+00:00",
+  "operation": "gio trash; recoverable; does not release filesystem space",
+  "root": "/home/user/datasets/derived",
+  "raw_sources_touched": false,
+  "normal93_touched": false,
+  "protected_documents": [
+    "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/complete100_rgb_crop_preparation.json",
+    "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_state_guarded_roi_20261112_validation_r1.json"
+  ],
+  "retained": [
+    "/home/user/datasets/derived/.norm-locks",
+    "/home/user/datasets/derived/tomato_complete100_base_adapter_check_r3.json",
+    "/home/user/datasets/derived/tomato_complete100_causal_candidate_audit_r1",
+    "/home/user/datasets/derived/tomato_complete100_causal_candidates_r3",
+    "/home/user/datasets/derived/tomato_complete100_episode86_causal_track_probe_r2",
+    "/home/user/datasets/derived/tomato_complete100_episode86_manual_review_r3",
+    "/home/user/datasets/derived/tomato_complete100_episode86_manual_roi_r3",
+    "/home/user/datasets/derived/tomato_complete100_four_view_gpu_benchmark_r3",
+    "/home/user/datasets/derived/tomato_complete100_four_view_state_guarded_candidate_check_r1.json",
+    "/home/user/datasets/derived/tomato_complete100_four_view_state_guarded_candidate_r1",
+    "/home/user/datasets/derived/tomato_complete100_goal_token_audit_r1",
+    "/home/user/datasets/derived/tomato_complete100_masked_crop_full_model_check_r1",
+    "/home/user/datasets/derived/tomato_complete100_roi_preview_r1",
+    "/home/user/datasets/derived/tomato_complete100_roi_worklist_r2",
+    "/home/user/datasets/derived/tomato_complete100_saved_labels_r1_base_ab",
+    "/home/user/datasets/derived/tomato_complete100_state_guarded_audit_r1",
+    "/home/user/datasets/derived/tomato_complete100_state_guarded_b1_benchmark_r1",
+    "/home/user/datasets/derived/tomato_complete100_state_guarded_candidates_r1",
+    "/home/user/datasets/derived/tomato_complete100_state_guarded_comparison_r1",
+    "/home/user/datasets/derived/tomato_complete100_state_guarded_visual_review_r1",
+    "/home/user/datasets/derived/tomato_complete100_vector_stats_r1",
+    "/home/user/datasets/derived/tomato_roi_locator_experiment_r2"
+  ],
+  "retained_before": {
+    "files": 4802,
+    "path_size_mtime_sha256": "67dec0c5298e09e6c51f10f4628af51a342f5b1795ba937d0a7d269e728fc146"
+  },
+  "verified_validation_references": [
+    {
+      "path": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json",
+      "sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000"
+    },
+    {
+      "path": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_roi_grasp_state_calibration_20261112_r1.json",
+      "sha256": "4dd34d428c0c1db682363dc442a64f109503331cfea96ee1d7e1df915cf145de"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_state_guarded_candidates_r1/shard0/candidate_manifest.json",
+      "sha256": "158e7bd715911fa06ce7185d60be2e143a9145641eba0bc2dafccd7fcc21b102"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_state_guarded_candidates_r1/shard1/candidate_manifest.json",
+      "sha256": "4e72c4b0255ef4df70d77889b2f0de0a48067ddb0b9ebdaeb95f22d130c78a75"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_state_guarded_candidates_r1/shard2/candidate_manifest.json",
+      "sha256": "31cdf46cd6058a526884ed1697b2e35b233c8c391014889dc1fb86626fa5bb8f"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_state_guarded_candidates_r1/shard3/candidate_manifest.json",
+      "sha256": "5e744a9aa53eda41fdaa510d7e53cc421309199e10004424fea8dc07866ee531"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_four_view_state_guarded_candidate_r1/crop_manifest.json",
+      "sha256": "733a169462b8a2a0d029a575e59570e39e52aa01a935ce2f6a0b5c45c66e2ce7"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_state_guarded_audit_r1/audit.json",
+      "sha256": "09c3bf0aa62a40617598e48fa861d1b67164474a8fd9bf9f094378198903415b"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_state_guarded_audit_r1/semantic_review.json",
+      "sha256": "173d7a48ebf0bab4d0467c3363863da7607cc0b76c089aa2f1835ae14a9c4246"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_state_guarded_visual_review_r1/samples.json",
+      "sha256": "67b474c6f81546d098e9107ce3359bb838f43da9eea5e50fec0b8da4997ac773"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_state_guarded_comparison_r1/receipt.json",
+      "sha256": "4997a68aec1e15adcf0be6d2b52b85a17519acbe3065bae290479fe8e9220671"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_four_view_state_guarded_candidate_check_r1.json",
+      "sha256": "3b0e8146ce8c3464398e53bbd83830a16477bcc6c0c75832ee262eb4a80a061c"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_state_guarded_r1_delta_30hz/norm_stats.json",
+      "sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_state_guarded_r1_delta_30hz/norm_metadata.json",
+      "sha256": "1b6d0b1cc561200a78b064e2f22f6a30494cc96c9c320f3f4e16222bdceb3e4c"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_state_guarded_r1_delta_30hz/norm_stats.json",
+      "sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_state_guarded_r1_delta_30hz/norm_metadata.json",
+      "sha256": "174f922c672dc71e0cbbeb8ea9f0f335cc27ff930137f61f480f9eb856d298ca"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_state_guarded_b1_benchmark_r1/receipt.json",
+      "sha256": "0d4de23dc7cdcaeb64b61b9ef76da97f889bacb4d2c2d53bfc73f1ed653e2edb"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_masked_crop_full_model_check_r1/receipt.json",
+      "sha256": "a65832700ea7165f8bbca6ec4b8219174d6e3b58a6b2dd30c1220d69b90ce442"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/tomato_stable_roi.py",
+      "sha256": "497007bc40735a8f9b04aefc8e5fc3fa6944582b124f8225d7a72ce2bc6414ac"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/tomato_state_guarded_roi.py",
+      "sha256": "5875b0c0c7ea44ee4e450561417221da8737e4688eda423c196e787bbcc1163e"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/prepare_tomato100_state_guarded_crops.py",
+      "sha256": "f108a9581b0b48aebcd0e46f0abf870456beee5864f8b5df8a93cabd6e9de3f4"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/audit_tomato_stable_roi.py",
+      "sha256": "0858ce6639c134ff841babb00c6683245953bbc2755ce9abef19e808488bcfb1"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/audit_tomato_roi_semantics.py",
+      "sha256": "0109641ff66fe3bdfb0e546e16a67202a3c07ecba68df4e27e68451753eff80a"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/calibrate_tomato_grasp_state.py",
+      "sha256": "71dbc4a092176b2e637e5c3eca2b6b9bb7ec08be47a8a88852d1f1df8e09ca04"
+    }
+  ],
+  "moved": [
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_base_adapter_check_r1.json",
+      "allocated_bytes": 4096,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_base_adapter_check_r1.json.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_base_adapter_check_r1.json"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_base_adapter_check_r2.json",
+      "allocated_bytes": 4096,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_base_adapter_check_r2.json.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_base_adapter_check_r2.json"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_causal_pilot_r1",
+      "allocated_bytes": 47329280,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_causal_pilot_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_causal_pilot_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_causal_pilot_r2",
+      "allocated_bytes": 45281280,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_causal_pilot_r2.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_causal_pilot_r2"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_dino_probe_r1",
+      "allocated_bytes": 339968,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_dino_probe_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_dino_probe_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_dino_probe_r2",
+      "allocated_bytes": 344064,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_dino_probe_r2.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_dino_probe_r2"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_episode86_causal_track_probe_r1",
+      "allocated_bytes": 1142784,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_episode86_causal_track_probe_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_episode86_causal_track_probe_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_episode86_clean_export_r1",
+      "allocated_bytes": 7581696,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_episode86_clean_export_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_episode86_clean_export_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_episode86_manual_review_r1",
+      "allocated_bytes": 42405888,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_episode86_manual_review_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_episode86_manual_review_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_episode86_manual_review_r2",
+      "allocated_bytes": 46100480,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_episode86_manual_review_r2.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_episode86_manual_review_r2"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_episode86_manual_roi_r1",
+      "allocated_bytes": 235188224,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_episode86_manual_roi_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_episode86_manual_roi_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_episode86_roi_benchmark_r1",
+      "allocated_bytes": 295030784,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_episode86_roi_benchmark_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_episode86_roi_benchmark_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_four_view_candidate_check_r1.json",
+      "allocated_bytes": 4096,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_candidate_check_r1.json.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_candidate_check_r1.json"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_four_view_candidate_check_r2.json",
+      "allocated_bytes": 4096,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_candidate_check_r2.json.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_candidate_check_r2.json"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_four_view_candidate_r1",
+      "allocated_bytes": 9511677952,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_candidate_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_candidate_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_four_view_gpu_benchmark_r1",
+      "allocated_bytes": 8192,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_gpu_benchmark_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_gpu_benchmark_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_four_view_gpu_benchmark_r2",
+      "allocated_bytes": 8192,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_gpu_benchmark_r2.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_gpu_benchmark_r2"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_four_view_stable_candidate_check_r1.json",
+      "allocated_bytes": 4096,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_stable_candidate_check_r1.json.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_stable_candidate_check_r1.json"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_four_view_stable_candidate_r1",
+      "allocated_bytes": 8947793920,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_stable_candidate_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_stable_candidate_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_manual_episode86_qa_r1",
+      "allocated_bytes": 13750272,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_manual_episode86_qa_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_manual_episode86_qa_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_roi_b1_benchmark_r1",
+      "allocated_bytes": 8192,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_roi_b1_benchmark_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_roi_b1_benchmark_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_roi_detector_probe_r1",
+      "allocated_bytes": 31465472,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_roi_detector_probe_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_roi_detector_probe_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_roi_worklist_r1",
+      "allocated_bytes": 360448,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_roi_worklist_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_roi_worklist_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_stable_audit_r1",
+      "allocated_bytes": 335872,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_stable_audit_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_stable_audit_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_stable_b1_benchmark_r1",
+      "allocated_bytes": 8192,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_stable_b1_benchmark_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_stable_b1_benchmark_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_stable_b1_benchmark_r2",
+      "allocated_bytes": 8192,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_stable_b1_benchmark_r2.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_stable_b1_benchmark_r2"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_stable_candidates_r1",
+      "allocated_bytes": 825896960,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_stable_candidates_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_stable_candidates_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_stable_comparison_r1",
+      "allocated_bytes": 5693440,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_stable_comparison_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_stable_comparison_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_stable_comparison_r2",
+      "allocated_bytes": 6434816,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_stable_comparison_r2.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_stable_comparison_r2"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_stable_pilot_audit_r1",
+      "allocated_bytes": 12288,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_stable_pilot_audit_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_stable_pilot_audit_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_stable_pilot_r1",
+      "allocated_bytes": 59215872,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_stable_pilot_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_stable_pilot_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_stable_pilot_r2",
+      "allocated_bytes": 58548224,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_stable_pilot_r2.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_stable_pilot_r2"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_stable_pilot_r3",
+      "allocated_bytes": 58691584,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_stable_pilot_r3.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_stable_pilot_r3"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_stable_visual_review_r1",
+      "allocated_bytes": 7647232,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_stable_visual_review_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_stable_visual_review_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_state_guarded_pilot_r1",
+      "allocated_bytes": 21544960,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_state_guarded_pilot_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_state_guarded_pilot_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_state_guarded_pilot_r2",
+      "allocated_bytes": 6959104,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_state_guarded_pilot_r2.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_state_guarded_pilot_r2"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_state_guarded_pilot_r3",
+      "allocated_bytes": 6860800,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_state_guarded_pilot_r3.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_state_guarded_pilot_r3"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_hand_locator_experiment_r1",
+      "allocated_bytes": 76042240,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_hand_locator_experiment_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_hand_locator_experiment_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_hand_locator_probe_r1",
+      "allocated_bytes": 2207744,
+      "recovery": "system Trash; restore by original path",
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_hand_locator_probe_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_hand_locator_probe_r1"
+    }
+  ],
+  "status": "passed",
+  "retained_after": {
+    "files": 4802,
+    "path_size_mtime_sha256": "67dec0c5298e09e6c51f10f4628af51a342f5b1795ba937d0a7d269e728fc146"
+  },
+  "moved_items": 39,
+  "moved_allocated_bytes": 20361945088,
+  "remaining_allocated_bytes": 18986848256,
+  "disk_space_released_bytes": 0,
+  "current_training_ready": false,
+  "retained_media_counts": {
+    "candidate_videos": 100,
+    "candidate_indices": 100,
+    "a_goal_videos": 400,
+    "b_coarse_videos": 400
+  },
+  "trash_destinations_verified": true
+}
