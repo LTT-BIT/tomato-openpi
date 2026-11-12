@@ -1,0 +1,74 @@
+{
+  "date": "2026-11-12",
+  "scope": "Own failed offline prototypes and superseded r5/r6 four-view bundles only",
+  "items": [
+    {
+      "original": "/home/user/datasets/derived/tomato_complete100_offline_annotation_probe_r7",
+      "files": 5,
+      "bytes": 166013,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_offline_annotation_probe_r7.trashinfo",
+      "trash_path": "/home/user/.local/share/Trash/files/tomato_complete100_offline_annotation_probe_r7",
+      "recoverable": true
+    },
+    {
+      "original": "/home/user/datasets/derived/tomato_complete100_offline_annotations_r8",
+      "files": 130,
+      "bytes": 9931582,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_offline_annotations_r8.trashinfo",
+      "trash_path": "/home/user/.local/share/Trash/files/tomato_complete100_offline_annotations_r8",
+      "recoverable": true
+    },
+    {
+      "original": "/home/user/datasets/derived/tomato_complete100_offline_geometry_diagnostic_r9",
+      "files": 2,
+      "bytes": 559460,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_offline_geometry_diagnostic_r9.trashinfo",
+      "trash_path": "/home/user/.local/share/Trash/files/tomato_complete100_offline_geometry_diagnostic_r9",
+      "recoverable": true
+    },
+    {
+      "original": "/home/user/datasets/derived/tomato_complete100_four_view_transport_candidate_r5",
+      "files": 1513,
+      "bytes": 9018293837,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_transport_candidate_r5.trashinfo",
+      "trash_path": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_transport_candidate_r5",
+      "recoverable": true
+    },
+    {
+      "original": "/home/user/datasets/derived/tomato_complete100_four_view_transport_candidate_check_r5.json",
+      "files": 1,
+      "bytes": 1149,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_transport_candidate_check_r5.json.trashinfo",
+      "trash_path": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_transport_candidate_check_r5.json",
+      "recoverable": true
+    },
+    {
+      "original": "/home/user/datasets/derived/tomato_complete100_four_view_available_candidate_r6",
+      "files": 1513,
+      "bytes": 9003660367,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_available_candidate_r6.trashinfo",
+      "trash_path": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_available_candidate_r6",
+      "recoverable": true
+    },
+    {
+      "original": "/home/user/datasets/derived/tomato_complete100_four_view_available_candidate_check_r6.json",
+      "files": 1,
+      "bytes": 1256,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_available_candidate_check_r6.json.trashinfo",
+      "trash_path": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_available_candidate_check_r6.json",
+      "recoverable": true
+    }
+  ],
+  "bytes_moved": 18032613664,
+  "permanently_deleted": false,
+  "disk_space_freed": false,
+  "original_datasets_modified": false,
+  "retained": [
+    "r11 local crops and four-view bundle",
+    "r10 annotations and exception review",
+    "r5 causal ROI indices/detector caches/model dependencies",
+    "r6 crop-only comparison baseline",
+    "base three-view bundle and vector statistics",
+    "all historical validation records and assets"
+  ]
+}

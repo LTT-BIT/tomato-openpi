@@ -1,0 +1,2863 @@
+{
+  "schema_version": 1,
+  "reviewer": "coding_agent",
+  "independent_human_review": false,
+  "annotation_manifest": "/home/user/datasets/derived/tomato_complete100_offline_annotations_r10/annotation_manifest.json",
+  "annotation_manifest_sha256": "b78107463c1301330be0d75be91ed174674e537ea17e64bb4ffda573bb1ad1a9",
+  "samples_sha256": "35d10fcbefed694d1fac5e6f229cb65899a064dd77d5701ca3aa037cddf00151",
+  "all266_current_frame_tiles_viewed": true,
+  "galleries": [
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_00.jpg",
+      "sha256": "7b54608572378b5ac81cb2015fdf3681dc5fdd99d45759f19f722514f070e61f"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_01.jpg",
+      "sha256": "1eced0241ecd954500419557995cfbae111ab11a4326b4e5f06298f851eaf0a5"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_02.jpg",
+      "sha256": "66c2e1262d592a238981bd404dcf578b3540cc28be26d369330804093d8954ae"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_03.jpg",
+      "sha256": "9befb59231b30b8a6acd84badfa79bf2ef480aba57d272656f73f8ef073e5ce5"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_04.jpg",
+      "sha256": "3f68a9db28915ec4e4630c175e1125e12a3e636b26992e712e1b07800a492b3f"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_05.jpg",
+      "sha256": "e53ee2375e2d51743b178392cf52710a2adceae531c35e2332d64e9152b83e0d"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_06.jpg",
+      "sha256": "1f395a8b73450a0e9d5f7651af55596fcce7abea652a75ec538a0172cbe442cf"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_07.jpg",
+      "sha256": "d406b8518294b716c2d3f21dda8d250cc143ebcad35ecfff9a4f941e3739d5ca"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_08.jpg",
+      "sha256": "252924bfee2939ada33785c463faff569e2075586fa3c3ef6ecbf06f50a71356"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_09.jpg",
+      "sha256": "56b81a480b5a3a45f49c6b1d0da94e01b7298182b6898c45f71f86de750ba17f"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_10.jpg",
+      "sha256": "c107ea8b8d75ac2fff28c7e165f0cd531656a3db2641b5e914513c35a59a3181"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_11.jpg",
+      "sha256": "9319d8129c93b6b81d7f69387d3869885dfac51a87403a833433311109d554d0"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_12.jpg",
+      "sha256": "74238a7181623f46a6d6752169ad52eb2d45a12e6e61b56d208577d2b4205e4d"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_13.jpg",
+      "sha256": "8dfda46b2addd09d68d5b3fc4026fd730d625ea935f9154ebbeada94471d0f73"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_14.jpg",
+      "sha256": "eabceeae232bec3e0b8396bc60c31df09c7f49affc3d7c301935cbace9b7ab1e"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_15.jpg",
+      "sha256": "b587036028cfecee48b8825ec374059deabc0a555fba42ca48ad8523e842e668"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_16.jpg",
+      "sha256": "7be16e26ba9265ba7e41dfa147677af0c8100939b8d8a84daf2772fdac21d216"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_17.jpg",
+      "sha256": "82c5fa4860c7a40863bc938771923cad8ca337f47faf96a8c54b2661a1d067e7"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_18.jpg",
+      "sha256": "d10c612b3f88e33863ec562aa3213265e0a1ebabddc3b2d54b44fef4bd9e7390"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_19.jpg",
+      "sha256": "453422e9f2548981fdad398339f58ee97818c1a670cd0127bfb2ca1b2cf0867f"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_20.jpg",
+      "sha256": "15587c27839ea9be5e39214448095be1c45547eee3132f713a6c50bf42a07476"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_21.jpg",
+      "sha256": "c907e5b5d61174fa9bcf3975f7cdd5fc246865fd64f7a19f6bd7a965dc33dfe9"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/gallery_22.jpg",
+      "sha256": "54d6020a8bac2f303bdb87f70122bbc50351c99dba17ed22bf8e11059a667a43"
+    }
+  ],
+  "additional_native_review": {
+    "path": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10/ep85_f1112_grid.jpg",
+    "sha256": "6e459e0236db60989a69eb23ee5fd24928f85d539b41b0ef2bc24db1f1dcf010"
+  },
+  "reviews": [
+    {
+      "episode": 0,
+      "frame": 2286,
+      "reviewed_sample_index": 0,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 0,
+      "frame": 2287,
+      "reviewed_sample_index": 1,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 0,
+      "frame": 2288,
+      "reviewed_sample_index": 2,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 0,
+      "frame": 2289,
+      "reviewed_sample_index": 3,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 0,
+      "frame": 2290,
+      "reviewed_sample_index": 4,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 0,
+      "frame": 6240,
+      "reviewed_sample_index": 5,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 0,
+      "frame": 6241,
+      "reviewed_sample_index": 6,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 0,
+      "frame": 6242,
+      "reviewed_sample_index": 7,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 0,
+      "frame": 6243,
+      "reviewed_sample_index": 8,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 4,
+      "frame": 2148,
+      "reviewed_sample_index": 9,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 4,
+      "frame": 2149,
+      "reviewed_sample_index": 10,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 4,
+      "frame": 2150,
+      "reviewed_sample_index": 11,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 16,
+      "frame": 3792,
+      "reviewed_sample_index": 12,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 16,
+      "frame": 3793,
+      "reviewed_sample_index": 13,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 40,
+      "frame": 4282,
+      "reviewed_sample_index": 14,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        331.14288330078125,
+        184.3144989013672,
+        428.73541259765625,
+        266.33929443359375
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "4eb609e07f7a68edeef89e5949cc949b954fe0da61fc316acfc5274a61d30b42",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 40,
+      "frame": 4283,
+      "reviewed_sample_index": 15,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        331.3238830566406,
+        184.2261505126953,
+        428.6986083984375,
+        266.3024597167969
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "4eb609e07f7a68edeef89e5949cc949b954fe0da61fc316acfc5274a61d30b42",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 40,
+      "frame": 4284,
+      "reviewed_sample_index": 16,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        331.373046875,
+        184.18365478515625,
+        428.68743896484375,
+        266.1878967285156
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "4eb609e07f7a68edeef89e5949cc949b954fe0da61fc316acfc5274a61d30b42",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 40,
+      "frame": 4285,
+      "reviewed_sample_index": 17,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        331.385986328125,
+        184.25323486328125,
+        428.6147766113281,
+        266.0958557128906
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "4eb609e07f7a68edeef89e5949cc949b954fe0da61fc316acfc5274a61d30b42",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 40,
+      "frame": 4286,
+      "reviewed_sample_index": 18,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        331.31005859375,
+        184.22621154785156,
+        428.397216796875,
+        266.0937194824219
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "4eb609e07f7a68edeef89e5949cc949b954fe0da61fc316acfc5274a61d30b42",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 44,
+      "frame": 401,
+      "reviewed_sample_index": 19,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 44,
+      "frame": 402,
+      "reviewed_sample_index": 20,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 44,
+      "frame": 403,
+      "reviewed_sample_index": 21,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 44,
+      "frame": 404,
+      "reviewed_sample_index": 22,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 44,
+      "frame": 405,
+      "reviewed_sample_index": 23,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 44,
+      "frame": 448,
+      "reviewed_sample_index": 24,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        330.193359375,
+        194.2178192138672,
+        432.3907775878906,
+        273.6573181152344
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "0b36d74be080b3185a9a59a771ce06f3db1e0c89e6b327ed8e8b2c59d07eb523",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 44,
+      "frame": 449,
+      "reviewed_sample_index": 25,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        330.1505126953125,
+        194.20986938476562,
+        432.39715576171875,
+        273.5887145996094
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "0b36d74be080b3185a9a59a771ce06f3db1e0c89e6b327ed8e8b2c59d07eb523",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 44,
+      "frame": 450,
+      "reviewed_sample_index": 26,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        330.3509826660156,
+        193.9292755126953,
+        433.41290283203125,
+        274.5136413574219
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "0b36d74be080b3185a9a59a771ce06f3db1e0c89e6b327ed8e8b2c59d07eb523",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 52,
+      "frame": 2642,
+      "reviewed_sample_index": 27,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        372.8900146484375,
+        181.190185546875,
+        459.5755615234375,
+        252.57049560546875
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "ca41be0f69e74881bca0cc051a4a4630fc006757fd42de59f4d0691cdc9892fe",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 52,
+      "frame": 2643,
+      "reviewed_sample_index": 28,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        373.0791931152344,
+        181.0841522216797,
+        459.5913391113281,
+        252.5730743408203
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "ca41be0f69e74881bca0cc051a4a4630fc006757fd42de59f4d0691cdc9892fe",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 52,
+      "frame": 2644,
+      "reviewed_sample_index": 29,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        373.270751953125,
+        180.84234619140625,
+        459.6739501953125,
+        252.45095825195312
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "ca41be0f69e74881bca0cc051a4a4630fc006757fd42de59f4d0691cdc9892fe",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 52,
+      "frame": 2645,
+      "reviewed_sample_index": 30,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        372.8779602050781,
+        181.08274841308594,
+        459.53118896484375,
+        252.5466766357422
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "ca41be0f69e74881bca0cc051a4a4630fc006757fd42de59f4d0691cdc9892fe",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 52,
+      "frame": 2646,
+      "reviewed_sample_index": 31,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        372.7418518066406,
+        181.28964233398438,
+        459.469970703125,
+        252.57972717285156
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "ca41be0f69e74881bca0cc051a4a4630fc006757fd42de59f4d0691cdc9892fe",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 52,
+      "frame": 3154,
+      "reviewed_sample_index": 32,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 52,
+      "frame": 3155,
+      "reviewed_sample_index": 33,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 52,
+      "frame": 3156,
+      "reviewed_sample_index": 34,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 52,
+      "frame": 3157,
+      "reviewed_sample_index": 35,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 52,
+      "frame": 3158,
+      "reviewed_sample_index": 36,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 52,
+      "frame": 3159,
+      "reviewed_sample_index": 37,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 52,
+      "frame": 3160,
+      "reviewed_sample_index": 38,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 52,
+      "frame": 3161,
+      "reviewed_sample_index": 39,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 52,
+      "frame": 3162,
+      "reviewed_sample_index": 40,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 52,
+      "frame": 3163,
+      "reviewed_sample_index": 41,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 64,
+      "frame": 1294,
+      "reviewed_sample_index": 42,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 64,
+      "frame": 1301,
+      "reviewed_sample_index": 43,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 64,
+      "frame": 1302,
+      "reviewed_sample_index": 44,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 64,
+      "frame": 1303,
+      "reviewed_sample_index": 45,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 76,
+      "frame": 5335,
+      "reviewed_sample_index": 46,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 92,
+      "frame": 2698,
+      "reviewed_sample_index": 47,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 96,
+      "frame": 2727,
+      "reviewed_sample_index": 48,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 96,
+      "frame": 2728,
+      "reviewed_sample_index": 49,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 96,
+      "frame": 3080,
+      "reviewed_sample_index": 50,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 96,
+      "frame": 3081,
+      "reviewed_sample_index": 51,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 96,
+      "frame": 3646,
+      "reviewed_sample_index": 52,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 5,
+      "frame": 1734,
+      "reviewed_sample_index": 53,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 5,
+      "frame": 1735,
+      "reviewed_sample_index": 54,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 5,
+      "frame": 1736,
+      "reviewed_sample_index": 55,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 5,
+      "frame": 1737,
+      "reviewed_sample_index": 56,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 5,
+      "frame": 1738,
+      "reviewed_sample_index": 57,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 25,
+      "frame": 440,
+      "reviewed_sample_index": 58,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        342.42291259765625,
+        190.61180114746094,
+        430.4617004394531,
+        258.8868713378906
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "d16d699bb9fd14df4e64aee6b280c212a4b891edfbea2e82c7872c7875a2666d",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 25,
+      "frame": 441,
+      "reviewed_sample_index": 59,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        341.96966552734375,
+        189.99032592773438,
+        430.7374572753906,
+        258.74188232421875
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "d16d699bb9fd14df4e64aee6b280c212a4b891edfbea2e82c7872c7875a2666d",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 25,
+      "frame": 442,
+      "reviewed_sample_index": 60,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        341.1534423828125,
+        189.31060791015625,
+        431.1864929199219,
+        259.3920593261719
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "d16d699bb9fd14df4e64aee6b280c212a4b891edfbea2e82c7872c7875a2666d",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 25,
+      "frame": 2547,
+      "reviewed_sample_index": 61,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 25,
+      "frame": 2548,
+      "reviewed_sample_index": 62,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 25,
+      "frame": 2549,
+      "reviewed_sample_index": 63,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 25,
+      "frame": 2550,
+      "reviewed_sample_index": 64,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 25,
+      "frame": 3201,
+      "reviewed_sample_index": 65,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 25,
+      "frame": 3202,
+      "reviewed_sample_index": 66,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 25,
+      "frame": 3203,
+      "reviewed_sample_index": 67,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 25,
+      "frame": 3204,
+      "reviewed_sample_index": 68,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 25,
+      "frame": 3205,
+      "reviewed_sample_index": 69,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 33,
+      "frame": 1822,
+      "reviewed_sample_index": 70,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 33,
+      "frame": 3794,
+      "reviewed_sample_index": 71,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 33,
+      "frame": 3795,
+      "reviewed_sample_index": 72,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 33,
+      "frame": 3938,
+      "reviewed_sample_index": 73,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        332.97515869140625,
+        192.72950744628906,
+        435.317138671875,
+        279.152099609375
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "3104457cc05568e069d5ae701d7e2b0d6132899ce3fb4c5040520645b36e698d",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 33,
+      "frame": 3939,
+      "reviewed_sample_index": 74,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        333.00482177734375,
+        192.81088256835938,
+        435.3999328613281,
+        279.2030944824219
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "3104457cc05568e069d5ae701d7e2b0d6132899ce3fb4c5040520645b36e698d",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 33,
+      "frame": 3940,
+      "reviewed_sample_index": 75,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        333.2593994140625,
+        192.72518920898438,
+        435.4126281738281,
+        279.105224609375
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "3104457cc05568e069d5ae701d7e2b0d6132899ce3fb4c5040520645b36e698d",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 33,
+      "frame": 3941,
+      "reviewed_sample_index": 76,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        333.2286071777344,
+        192.74375915527344,
+        435.45318603515625,
+        279.1047668457031
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "3104457cc05568e069d5ae701d7e2b0d6132899ce3fb4c5040520645b36e698d",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 33,
+      "frame": 3942,
+      "reviewed_sample_index": 77,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        333.244873046875,
+        192.60873413085938,
+        435.5594482421875,
+        278.88555908203125
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "3104457cc05568e069d5ae701d7e2b0d6132899ce3fb4c5040520645b36e698d",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 33,
+      "frame": 4779,
+      "reviewed_sample_index": 78,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        332.41455078125,
+        189.59854125976562,
+        436.3719177246094,
+        277.85400390625
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "3104457cc05568e069d5ae701d7e2b0d6132899ce3fb4c5040520645b36e698d",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 33,
+      "frame": 4780,
+      "reviewed_sample_index": 79,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        332.212158203125,
+        189.4690704345703,
+        436.19390869140625,
+        278.01751708984375
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "3104457cc05568e069d5ae701d7e2b0d6132899ce3fb4c5040520645b36e698d",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 33,
+      "frame": 4781,
+      "reviewed_sample_index": 80,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        332.2401123046875,
+        189.49575805664062,
+        436.27178955078125,
+        278.0218200683594
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "3104457cc05568e069d5ae701d7e2b0d6132899ce3fb4c5040520645b36e698d",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 37,
+      "frame": 1265,
+      "reviewed_sample_index": 81,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1266,
+      "reviewed_sample_index": 82,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1267,
+      "reviewed_sample_index": 83,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1268,
+      "reviewed_sample_index": 84,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1269,
+      "reviewed_sample_index": 85,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1270,
+      "reviewed_sample_index": 86,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1600,
+      "reviewed_sample_index": 87,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1601,
+      "reviewed_sample_index": 88,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1602,
+      "reviewed_sample_index": 89,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1603,
+      "reviewed_sample_index": 90,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1604,
+      "reviewed_sample_index": 91,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1705,
+      "reviewed_sample_index": 92,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 1706,
+      "reviewed_sample_index": 93,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 4674,
+      "reviewed_sample_index": 94,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 4940,
+      "reviewed_sample_index": 95,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 4941,
+      "reviewed_sample_index": 96,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 4942,
+      "reviewed_sample_index": 97,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 4943,
+      "reviewed_sample_index": 98,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        336.2078857421875,
+        167.28494262695312,
+        430.25946044921875,
+        250.77871704101562
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "d14475020a4af22f15959ed14177f521e6cc025ebe28dea30466f02d88cec1a4",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 37,
+      "frame": 4944,
+      "reviewed_sample_index": 99,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        335.99029541015625,
+        167.34539794921875,
+        430.3172302246094,
+        250.853759765625
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "d14475020a4af22f15959ed14177f521e6cc025ebe28dea30466f02d88cec1a4",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 37,
+      "frame": 5198,
+      "reviewed_sample_index": 100,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 37,
+      "frame": 5199,
+      "reviewed_sample_index": 101,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 2769,
+      "reviewed_sample_index": 102,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 2770,
+      "reviewed_sample_index": 103,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 2771,
+      "reviewed_sample_index": 104,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 2772,
+      "reviewed_sample_index": 105,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 3123,
+      "reviewed_sample_index": 106,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        335.8786315917969,
+        181.6266632080078,
+        436.989013671875,
+        268.7275695800781
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "0864e4ae27b69689d5e44f8c3f9705f3515be18ddfd0ecf88a6f56966af5037c",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 41,
+      "frame": 3124,
+      "reviewed_sample_index": 107,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        335.85479736328125,
+        181.55877685546875,
+        436.84149169921875,
+        268.9609375
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "0864e4ae27b69689d5e44f8c3f9705f3515be18ddfd0ecf88a6f56966af5037c",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 41,
+      "frame": 3125,
+      "reviewed_sample_index": 108,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        335.87872314453125,
+        181.65093994140625,
+        436.8820495605469,
+        268.9275207519531
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "0864e4ae27b69689d5e44f8c3f9705f3515be18ddfd0ecf88a6f56966af5037c",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 41,
+      "frame": 3126,
+      "reviewed_sample_index": 109,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        335.968505859375,
+        181.82435607910156,
+        437.02252197265625,
+        268.9122314453125
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "0864e4ae27b69689d5e44f8c3f9705f3515be18ddfd0ecf88a6f56966af5037c",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 41,
+      "frame": 3127,
+      "reviewed_sample_index": 110,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        335.98150634765625,
+        181.70025634765625,
+        436.95611572265625,
+        268.9508056640625
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "0864e4ae27b69689d5e44f8c3f9705f3515be18ddfd0ecf88a6f56966af5037c",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 41,
+      "frame": 3468,
+      "reviewed_sample_index": 111,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 3469,
+      "reviewed_sample_index": 112,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 3470,
+      "reviewed_sample_index": 113,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 3471,
+      "reviewed_sample_index": 114,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 3472,
+      "reviewed_sample_index": 115,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 3473,
+      "reviewed_sample_index": 116,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 3474,
+      "reviewed_sample_index": 117,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 3475,
+      "reviewed_sample_index": 118,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 3476,
+      "reviewed_sample_index": 119,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 41,
+      "frame": 3477,
+      "reviewed_sample_index": 120,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 45,
+      "frame": 405,
+      "reviewed_sample_index": 121,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 45,
+      "frame": 406,
+      "reviewed_sample_index": 122,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 45,
+      "frame": 491,
+      "reviewed_sample_index": 123,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        335.04095458984375,
+        204.1053009033203,
+        438.9652099609375,
+        285.4078369140625
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "5fa406e6ce063ebaf14bca87f3f18314f894da0d33b4d2e3f83bed216f8622d0",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 45,
+      "frame": 492,
+      "reviewed_sample_index": 124,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        334.9488830566406,
+        204.17617797851562,
+        439.1171875,
+        285.43597412109375
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "5fa406e6ce063ebaf14bca87f3f18314f894da0d33b4d2e3f83bed216f8622d0",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 45,
+      "frame": 493,
+      "reviewed_sample_index": 125,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        334.9493408203125,
+        204.18304443359375,
+        439.10211181640625,
+        285.4333190917969
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "5fa406e6ce063ebaf14bca87f3f18314f894da0d33b4d2e3f83bed216f8622d0",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 45,
+      "frame": 494,
+      "reviewed_sample_index": 126,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        335.0072937011719,
+        204.18626403808594,
+        439.4463806152344,
+        285.40106201171875
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "5fa406e6ce063ebaf14bca87f3f18314f894da0d33b4d2e3f83bed216f8622d0",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 45,
+      "frame": 495,
+      "reviewed_sample_index": 127,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        335.1956787109375,
+        204.13943481445312,
+        439.38421630859375,
+        285.1414794921875
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "5fa406e6ce063ebaf14bca87f3f18314f894da0d33b4d2e3f83bed216f8622d0",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 81,
+      "frame": 4421,
+      "reviewed_sample_index": 128,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        377.34130859375,
+        154.91273498535156,
+        460.08453369140625,
+        236.26260375976562
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "988e7710d15c70a02ba7ccfe525f3702e850ffba38aebbb467dc00f9a290fba6",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 85,
+      "frame": 1111,
+      "reviewed_sample_index": 129,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 85,
+      "frame": 1112,
+      "reviewed_sample_index": 130,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 85,
+      "frame": 1113,
+      "reviewed_sample_index": 131,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 89,
+      "frame": 2010,
+      "reviewed_sample_index": 132,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 89,
+      "frame": 2011,
+      "reviewed_sample_index": 133,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 89,
+      "frame": 2012,
+      "reviewed_sample_index": 134,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 89,
+      "frame": 2013,
+      "reviewed_sample_index": 135,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 89,
+      "frame": 2014,
+      "reviewed_sample_index": 136,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 26,
+      "frame": 927,
+      "reviewed_sample_index": 137,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        332.7610778808594,
+        202.578125,
+        440.18524169921875,
+        283.9303894042969
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "a756ca35c25b031388bf8e8157ab954cc5ce7ecb94ef0eff6af6662f8bf6fbda",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 26,
+      "frame": 928,
+      "reviewed_sample_index": 138,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        332.75335693359375,
+        202.5749969482422,
+        440.3262939453125,
+        283.933349609375
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "a756ca35c25b031388bf8e8157ab954cc5ce7ecb94ef0eff6af6662f8bf6fbda",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 26,
+      "frame": 929,
+      "reviewed_sample_index": 139,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        332.46868896484375,
+        202.69635009765625,
+        439.2322082519531,
+        283.61968994140625
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "a756ca35c25b031388bf8e8157ab954cc5ce7ecb94ef0eff6af6662f8bf6fbda",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 26,
+      "frame": 2643,
+      "reviewed_sample_index": 140,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        328.0447998046875,
+        186.8318328857422,
+        412.29736328125,
+        256.0455627441406
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "a756ca35c25b031388bf8e8157ab954cc5ce7ecb94ef0eff6af6662f8bf6fbda",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 26,
+      "frame": 2644,
+      "reviewed_sample_index": 141,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        327.8570861816406,
+        186.1767578125,
+        413.10870361328125,
+        255.8911895751953
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "a756ca35c25b031388bf8e8157ab954cc5ce7ecb94ef0eff6af6662f8bf6fbda",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 26,
+      "frame": 3756,
+      "reviewed_sample_index": 142,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        333.2198791503906,
+        183.43563842773438,
+        415.1233215332031,
+        255.468017578125
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "a756ca35c25b031388bf8e8157ab954cc5ce7ecb94ef0eff6af6662f8bf6fbda",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 26,
+      "frame": 3757,
+      "reviewed_sample_index": 143,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        333.1356506347656,
+        183.48995971679688,
+        414.9346618652344,
+        255.54351806640625
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "a756ca35c25b031388bf8e8157ab954cc5ce7ecb94ef0eff6af6662f8bf6fbda",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 26,
+      "frame": 3758,
+      "reviewed_sample_index": 144,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        333.16363525390625,
+        183.3512725830078,
+        414.8630065917969,
+        255.57760620117188
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "a756ca35c25b031388bf8e8157ab954cc5ce7ecb94ef0eff6af6662f8bf6fbda",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 26,
+      "frame": 3759,
+      "reviewed_sample_index": 145,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        332.99066162109375,
+        183.70733642578125,
+        414.37200927734375,
+        255.80819702148438
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "a756ca35c25b031388bf8e8157ab954cc5ce7ecb94ef0eff6af6662f8bf6fbda",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 30,
+      "frame": 3213,
+      "reviewed_sample_index": 146,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 30,
+      "frame": 3214,
+      "reviewed_sample_index": 147,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 30,
+      "frame": 3215,
+      "reviewed_sample_index": 148,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 30,
+      "frame": 3216,
+      "reviewed_sample_index": 149,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 30,
+      "frame": 3217,
+      "reviewed_sample_index": 150,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 42,
+      "frame": 721,
+      "reviewed_sample_index": 151,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 62,
+      "frame": 1281,
+      "reviewed_sample_index": 152,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        330.1800231933594,
+        201.30795288085938,
+        435.4873352050781,
+        283.887451171875
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "6ec94d300beb47cc296585d0f61261fa76d7a95642ebf0baffa065a2a3df8989",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 62,
+      "frame": 1282,
+      "reviewed_sample_index": 153,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        330.5236511230469,
+        201.3589630126953,
+        435.5453186035156,
+        284.1146240234375
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "6ec94d300beb47cc296585d0f61261fa76d7a95642ebf0baffa065a2a3df8989",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 62,
+      "frame": 1283,
+      "reviewed_sample_index": 154,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        330.4958801269531,
+        201.38893127441406,
+        435.5429382324219,
+        284.12646484375
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "6ec94d300beb47cc296585d0f61261fa76d7a95642ebf0baffa065a2a3df8989",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 62,
+      "frame": 1284,
+      "reviewed_sample_index": 155,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        330.4947509765625,
+        201.22720336914062,
+        435.55810546875,
+        284.18682861328125
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "6ec94d300beb47cc296585d0f61261fa76d7a95642ebf0baffa065a2a3df8989",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 62,
+      "frame": 2878,
+      "reviewed_sample_index": 156,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 62,
+      "frame": 3071,
+      "reviewed_sample_index": 157,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 62,
+      "frame": 3072,
+      "reviewed_sample_index": 158,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 62,
+      "frame": 3073,
+      "reviewed_sample_index": 159,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 62,
+      "frame": 3074,
+      "reviewed_sample_index": 160,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 62,
+      "frame": 3075,
+      "reviewed_sample_index": 161,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3755,
+      "reviewed_sample_index": 162,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3756,
+      "reviewed_sample_index": 163,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3757,
+      "reviewed_sample_index": 164,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3758,
+      "reviewed_sample_index": 165,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3759,
+      "reviewed_sample_index": 166,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3760,
+      "reviewed_sample_index": 167,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3761,
+      "reviewed_sample_index": 168,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3762,
+      "reviewed_sample_index": 169,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3763,
+      "reviewed_sample_index": 170,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3764,
+      "reviewed_sample_index": 171,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3765,
+      "reviewed_sample_index": 172,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3766,
+      "reviewed_sample_index": 173,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3767,
+      "reviewed_sample_index": 174,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 78,
+      "frame": 3768,
+      "reviewed_sample_index": 175,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 82,
+      "frame": 2040,
+      "reviewed_sample_index": 176,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 82,
+      "frame": 2041,
+      "reviewed_sample_index": 177,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 82,
+      "frame": 2042,
+      "reviewed_sample_index": 178,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 82,
+      "frame": 2043,
+      "reviewed_sample_index": 179,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 90,
+      "frame": 4140,
+      "reviewed_sample_index": 180,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 90,
+      "frame": 4141,
+      "reviewed_sample_index": 181,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 90,
+      "frame": 4142,
+      "reviewed_sample_index": 182,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 98,
+      "frame": 1471,
+      "reviewed_sample_index": 183,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 98,
+      "frame": 1472,
+      "reviewed_sample_index": 184,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 98,
+      "frame": 1473,
+      "reviewed_sample_index": 185,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 98,
+      "frame": 1474,
+      "reviewed_sample_index": 186,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 98,
+      "frame": 1475,
+      "reviewed_sample_index": 187,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 98,
+      "frame": 1476,
+      "reviewed_sample_index": 188,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 98,
+      "frame": 1477,
+      "reviewed_sample_index": 189,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 98,
+      "frame": 1478,
+      "reviewed_sample_index": 190,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 98,
+      "frame": 2355,
+      "reviewed_sample_index": 191,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 11,
+      "frame": 3488,
+      "reviewed_sample_index": 192,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 11,
+      "frame": 3489,
+      "reviewed_sample_index": 193,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 3559,
+      "reviewed_sample_index": 194,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 3560,
+      "reviewed_sample_index": 195,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 3561,
+      "reviewed_sample_index": 196,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 3562,
+      "reviewed_sample_index": 197,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 3563,
+      "reviewed_sample_index": 198,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 3856,
+      "reviewed_sample_index": 199,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 3857,
+      "reviewed_sample_index": 200,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 3858,
+      "reviewed_sample_index": 201,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 3859,
+      "reviewed_sample_index": 202,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 3860,
+      "reviewed_sample_index": 203,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 4691,
+      "reviewed_sample_index": 204,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 4692,
+      "reviewed_sample_index": 205,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 4693,
+      "reviewed_sample_index": 206,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 4694,
+      "reviewed_sample_index": 207,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 4695,
+      "reviewed_sample_index": 208,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 5335,
+      "reviewed_sample_index": 209,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 5336,
+      "reviewed_sample_index": 210,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 5337,
+      "reviewed_sample_index": 211,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 5338,
+      "reviewed_sample_index": 212,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 27,
+      "frame": 5339,
+      "reviewed_sample_index": 213,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 31,
+      "frame": 5459,
+      "reviewed_sample_index": 214,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 31,
+      "frame": 6418,
+      "reviewed_sample_index": 215,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 31,
+      "frame": 6419,
+      "reviewed_sample_index": 216,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 31,
+      "frame": 6420,
+      "reviewed_sample_index": 217,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 31,
+      "frame": 6421,
+      "reviewed_sample_index": 218,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 31,
+      "frame": 6422,
+      "reviewed_sample_index": 219,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 31,
+      "frame": 6423,
+      "reviewed_sample_index": 220,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 31,
+      "frame": 6424,
+      "reviewed_sample_index": 221,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 31,
+      "frame": 6425,
+      "reviewed_sample_index": 222,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 39,
+      "frame": 1449,
+      "reviewed_sample_index": 223,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 39,
+      "frame": 1450,
+      "reviewed_sample_index": 224,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 39,
+      "frame": 1451,
+      "reviewed_sample_index": 225,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 39,
+      "frame": 1452,
+      "reviewed_sample_index": 226,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 39,
+      "frame": 1453,
+      "reviewed_sample_index": 227,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 39,
+      "frame": 1454,
+      "reviewed_sample_index": 228,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 47,
+      "frame": 901,
+      "reviewed_sample_index": 229,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 47,
+      "frame": 902,
+      "reviewed_sample_index": 230,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 51,
+      "frame": 634,
+      "reviewed_sample_index": 231,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 51,
+      "frame": 635,
+      "reviewed_sample_index": 232,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 51,
+      "frame": 636,
+      "reviewed_sample_index": 233,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 51,
+      "frame": 2570,
+      "reviewed_sample_index": 234,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 51,
+      "frame": 2571,
+      "reviewed_sample_index": 235,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 51,
+      "frame": 2572,
+      "reviewed_sample_index": 236,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 51,
+      "frame": 2576,
+      "reviewed_sample_index": 237,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 51,
+      "frame": 2577,
+      "reviewed_sample_index": 238,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 59,
+      "frame": 2473,
+      "reviewed_sample_index": 239,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 63,
+      "frame": 630,
+      "reviewed_sample_index": 240,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 63,
+      "frame": 631,
+      "reviewed_sample_index": 241,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 63,
+      "frame": 1102,
+      "reviewed_sample_index": 242,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 63,
+      "frame": 1103,
+      "reviewed_sample_index": 243,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 63,
+      "frame": 1104,
+      "reviewed_sample_index": 244,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 63,
+      "frame": 1105,
+      "reviewed_sample_index": 245,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 63,
+      "frame": 1106,
+      "reviewed_sample_index": 246,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 83,
+      "frame": 2584,
+      "reviewed_sample_index": 247,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 83,
+      "frame": 2585,
+      "reviewed_sample_index": 248,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 83,
+      "frame": 2586,
+      "reviewed_sample_index": 249,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 83,
+      "frame": 3608,
+      "reviewed_sample_index": 250,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 83,
+      "frame": 3609,
+      "reviewed_sample_index": 251,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 83,
+      "frame": 3610,
+      "reviewed_sample_index": 252,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 83,
+      "frame": 3611,
+      "reviewed_sample_index": 253,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 83,
+      "frame": 3612,
+      "reviewed_sample_index": 254,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 91,
+      "frame": 2627,
+      "reviewed_sample_index": 255,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        316.9738464355469,
+        172.0447540283203,
+        412.5655822753906,
+        253.4735107421875
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "dbc98cca4fadabb693e8c96e52bd2a26ce35149f1ef7444aac7354d93fcce8f1",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 91,
+      "frame": 2628,
+      "reviewed_sample_index": 256,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "include_visible_right_hand_alongside_left_context",
+      "additional_hand_box": [
+        316.98687744140625,
+        171.99118041992188,
+        412.5899658203125,
+        253.37510681152344
+      ],
+      "roles": [
+        1,
+        2
+      ],
+      "current_detection_file_sha256": "dbc98cca4fadabb693e8c96e52bd2a26ce35149f1ef7444aac7354d93fcce8f1",
+      "reason": "Left-only candidate omitted right-hand task context visible in current native RGB"
+    },
+    {
+      "episode": 95,
+      "frame": 2440,
+      "reviewed_sample_index": 257,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 95,
+      "frame": 2441,
+      "reviewed_sample_index": 258,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 95,
+      "frame": 2442,
+      "reviewed_sample_index": 259,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 95,
+      "frame": 2443,
+      "reviewed_sample_index": 260,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 95,
+      "frame": 2444,
+      "reviewed_sample_index": 261,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 95,
+      "frame": 3359,
+      "reviewed_sample_index": 262,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 99,
+      "frame": 2577,
+      "reviewed_sample_index": 263,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 99,
+      "frame": 3207,
+      "reviewed_sample_index": 264,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    },
+    {
+      "episode": 99,
+      "frame": 3208,
+      "reviewed_sample_index": 265,
+      "decision": "crop_content_reviewed",
+      "scope": "Current native frame and actual planned crop visually checked; not independent semantic ground truth",
+      "annotation_action": "retain_candidate_box"
+    }
+  ],
+  "role_context_corrections": 52,
+  "limitation": "Only these266 candidate exception frames received this complete visual review; no independent all-frame semantic accuracy measurement"
+}

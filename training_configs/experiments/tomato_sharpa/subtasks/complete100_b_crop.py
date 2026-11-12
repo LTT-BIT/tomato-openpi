@@ -31,7 +31,7 @@ def build_config(*,variant='b_coarse'):
     selection_path=records/'complete100_rgb_crop_20261111_saved_labels_r1.json'
     selection=json.loads(selection_path.read_text())
     stream_contract=manifest.get('stream_contract','black_crop_false_mask_on_loss_v1')
-    full_input=stream_contract=='current_rgb_local_or_full_fallback_v5'
+    full_input=stream_contract in ('current_rgb_local_or_full_fallback_v5','offline_bidirectional_local_rgb_v6')
     coverage_ok=(manifest.get('full_image_coverage') is True
                  and manifest.get('image_available_frames')==425556
                  and manifest.get('interaction_mask_key')=='observation.interaction_available') if full_input else manifest.get('full_roi_coverage') is True
@@ -39,12 +39,16 @@ def build_config(*,variant='b_coarse'):
             or not coverage_ok
             or manifest.get('training_ready') is not True
             or manifest.get('episodes')!=100 or manifest.get('frames')!=425556
-            or manifest.get('roi_generation_mode') not in ('manual_offline_interpolated','causal_prediction')
+            or manifest.get('roi_generation_mode') not in ('manual_offline_interpolated','causal_prediction','offline_bidirectional_annotation')
             or not manifest.get('roi_generator_signature')):
         raise ValueError('Complete hash-bound100 ROI coverage/provenance required')
-    if stream_contract not in ('black_crop_false_mask_on_loss_v1','continuous_current_pixels_false_mask_on_loss_v1','continuous_current_pixels_state_guarded_v2','continuous_current_pixels_coverage_v3','continuous_current_pixels_transport_v4','current_rgb_local_or_full_fallback_v5'):
+    if stream_contract=='offline_bidirectional_local_rgb_v6' and (
+        manifest.get('roi_generation_mode')!='offline_bidirectional_annotation'
+        or manifest['roi_generator_signature'].get('offline_annotation_only') is not True):
+        raise ValueError('Explicit offline future annotation provenance required')
+    if stream_contract not in ('black_crop_false_mask_on_loss_v1','continuous_current_pixels_false_mask_on_loss_v1','continuous_current_pixels_state_guarded_v2','continuous_current_pixels_coverage_v3','continuous_current_pixels_transport_v4','current_rgb_local_or_full_fallback_v5','offline_bidirectional_local_rgb_v6'):
         raise ValueError('Unknown crop stream contract')
-    suffix={'continuous_current_pixels_false_mask_on_loss_v1':'_stable_r1','continuous_current_pixels_state_guarded_v2':'_state_guarded_r1','continuous_current_pixels_coverage_v3':'_coverage_r4','continuous_current_pixels_transport_v4':'_transport_r5','current_rgb_local_or_full_fallback_v5':'_available_r6'}.get(stream_contract,'')
+    suffix={'continuous_current_pixels_false_mask_on_loss_v1':'_stable_r1','continuous_current_pixels_state_guarded_v2':'_state_guarded_r1','continuous_current_pixels_coverage_v3':'_coverage_r4','continuous_current_pixels_transport_v4':'_transport_r5','current_rgb_local_or_full_fallback_v5':'_available_r6','offline_bidirectional_local_rgb_v6':'_offline_r11'}.get(stream_contract,'')
     splits=json.loads((root/'splits.json').read_text())
     if splits['splits']!={'train':list(range(100))}:raise ValueError('All100 action training required')
     info=json.loads((root/variant/'meta/info.json').read_text())
@@ -74,6 +78,7 @@ def build_config(*,variant='b_coarse'):
             'roi_generation_mode':manifest['roi_generation_mode'],'model_image_keys':list(IMAGE_KEYS),
             'crop_stream_contract':stream_contract,
             'interaction_mask_key':'observation.interaction_available' if full_input else 'observation.interaction_valid',
+            'offline_roi_uses_future_annotation':stream_contract=='offline_bidirectional_local_rgb_v6',
             'max_token_len':256,'visual_tokens':1024,'memory_to_pi05':False,
             'phases':list(PHASES),'goal':GOAL,'data_policy':'all_sources',
             'gpu_memory_preflight_required':True,'agent_enabled':False})

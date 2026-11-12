@@ -37,7 +37,8 @@ def test_partial_shards_and_both_training_entries_reject_candidate(tmp_path,monk
 @pytest.mark.parametrize('stream,suffix',[
     ('continuous_current_pixels_false_mask_on_loss_v1','_stable_r1'),
     ('continuous_current_pixels_state_guarded_v2','_state_guarded_r1'),
-    ('current_rgb_local_or_full_fallback_v5','_available_r6')])
+    ('current_rgb_local_or_full_fallback_v5','_available_r6'),
+    ('offline_bidirectional_local_rgb_v6','_offline_r11')])
 def test_stable_stream_selects_new_assets_and_explicit_training_ready_gate(tmp_path,monkeypatch,stream,suffix):
     from pathlib import Path
     from openpi.subtasks.rgb100 import digest
@@ -48,15 +49,17 @@ def test_stable_stream_selects_new_assets_and_explicit_training_ready_gate(tmp_p
     manifest=dict(selection_sha256=digest(selection),full_roi_coverage=True,training_ready=True,
                   episodes=100,frames=425556,roi_generation_mode='causal_prediction',roi_generator_signature={'test':'metadata-only fixture'},
                   stream_contract=stream)
-    if suffix=='_available_r6':
+    if suffix in ('_available_r6','_offline_r11'):
         manifest.update(full_roi_coverage=False,full_image_coverage=True,image_available_frames=425556,
                         interaction_mask_key='observation.interaction_available')
+    if suffix=='_offline_r11':
+        manifest.update(roi_generation_mode='offline_bidirectional_annotation',roi_generator_signature={'offline_annotation_only':True})
     (tmp_path/'crop_manifest.json').write_text(json.dumps(manifest))
     (tmp_path/'splits.json').write_text(json.dumps(dict(splits={'train':list(range(100))})))
     meta=tmp_path/'b_coarse/meta';meta.mkdir(parents=True)
     features={key:dict(dtype='video') for key in FR3_SHARPA_CROP.camera_keys}
     features['observation.interaction_valid']=dict(dtype='bool')
-    if suffix=='_available_r6':features['observation.interaction_available']=dict(dtype='bool')
+    if suffix in ('_available_r6','_offline_r11'):features['observation.interaction_available']=dict(dtype='bool')
     (meta/'info.json').write_text(json.dumps(dict(total_episodes=100,total_frames=425556,features=features)))
     (meta/'tasks.jsonl').write_text(''.join(json.dumps({'task':prompt})+'\n' for prompt in dict.fromkeys(PROMPTS)))
     monkeypatch.setenv('PI05_TOMATO100_CROP_BUNDLE',str(tmp_path))
@@ -64,7 +67,7 @@ def test_stable_stream_selects_new_assets_and_explicit_training_ready_gate(tmp_p
     assert config.data.assets.asset_id.endswith(suffix+'_delta_30hz')
     assert config.data.repo_id.endswith(suffix)
     assert config.name.endswith(suffix)
-    if suffix=='_available_r6':
+    if suffix in ('_available_r6','_offline_r11'):
         assert config.data.interaction_mask_key=='observation.interaction_available'
         manifest['image_available_frames']=425555
         (tmp_path/'crop_manifest.json').write_text(json.dumps(manifest))

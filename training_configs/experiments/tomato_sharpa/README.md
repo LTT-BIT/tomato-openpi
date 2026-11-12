@@ -2,7 +2,25 @@
 
 ## complete100 RGB＋局部crop：训练准备
 
-### 当前要求：每个训练时间步都有第四路当前RGB（2026-11-12）
+### 当前版本：前后帧辅助修框，全部帧保持局部RGB（2026-11-12）
+
+当前候选为`/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11`，A/B四视图包为`tomato_complete100_four_view_offline_local_candidate_r11`。100条全部425556帧均从**各自对应时刻的native cam0 RGB**裁剪局部图：全图回退0、黑帧0、缺图0。原三路RGB、实测state、动作、标签和100条成员不改，无深度、无π₀.₅历史token。
+
+这次修复坐标而非替换画面：复用r5当前检测交互框；2625个缺失框通过前后语义手框锚点、相邻RGB双向光流及高相关局部模板跟踪补充。双向轨迹明显不一致或无足够图像证据时不自动认可；剩余266帧的native RGB和候选crop已逐帧查看，记录为编码Agent视觉复核，**不是独立人工真值**。其中52帧补入当前画面可见的右手交互上下文；全部52张修正后的实际解码图再次查看。短缺口两端角色一致时修正丢失期间的短暂选手抖动。没有用阶段标签、prompt或动作命令生成框。
+
+离线窗口提前考虑角色变化：中心可行区间前后传播，限制每轴3px/帧；裁剪边长用对称0.8%衰减包络提前扩大、缓慢收紧，保持220–380px正方形。全帧检查相邻中心位移不超过上一框边长3%、边长变化不超过2%，超限均为0；所有准备交互框完整包含，最大中心单步3.81px。425556帧全部解码并检查时间戳，11691个编码像素核对包含全部原无效帧；没有沿用旧像素或把全图改名局部图。
+
+**这里100%通过的范围是全帧完整性、相对于准备标注的覆盖、裁剪连续性及当前像素来源，不是独立逐帧语义准确率100%。** 这些坐标使用未来帧与整段离线窗口规划，`generation_mode=offline_bidirectional_annotation`、`available_at`标为录制末尾，索引保留原始角色/失败原因、跟踪锚点、复核来源与未来信息使用范围。默认因果索引读取会拒绝它，只有显式离线数据契约允许读取。不能用于宣称在线自动ROI性能或Agent无未来信息的阶段预测；实时部署仍需当前/过去帧定位器并另行验证训练与在线输入差异。
+
+已实际查看跨全部100条的400张视频解码样本、266张异常图和52张修正图，导出第48条原23–32秒的三列对照：native／r6全图回退／r11连续局部。A/B实际LeRobot300样本、全部物理列及600份原三路视频哈希检查通过，A/B共851112个availability和local-valid均true。训练资产后缀`_offline_r11`，归一化数值不变且重新绑定数据身份。167项回归通过。证据见`subtasks/records/complete100_offline_local_20261112_validation_r11.json`。
+
+`training_ready=false`仍表示正式训练尚未放行：独立语义准确率未测、目标batch512的GPU显存预检待做；本轮只做离线数据准备，不启动正式π₀.₅训练或修改部署。视觉1024、文本256、58D state、50×58动作、batch512/8000步/FSDP8和原学习率计划保持。
+
+复做先运行`scripts.prepare_tomato100_offline_roi`生成离线标注，再核对`records/complete100_offline_roi_exception_review_20261112_r10.json`中的真实逐帧复核及其哈希，运行`scripts.export_tomato100_offline_crops`导出局部视频，随后使用`scripts.materialize_tomato100_four_view`和实际加载检查。新的标注版本不能直接套用旧复核记录；导出器必须验证原标注manifest身份、每个未自动通过帧有且仅有一次明确复核，并重新验收全部窗口。
+
+本轮3个失败探针及被替代的r5/r6四视图包和检查记录共7项已移入系统回收站（18032613664字节），可恢复，未永久删除也未释放磁盘空间。当前r11候选及其r10标注、原始三视图基础包、r5定位依赖和r6仅裁剪对照保留。恢复位置见`records/complete100_derived_cleanup_20261112_r3.json`；下文旧四视图路径为历史记录，恢复后才能复做。
+
+### r6对照：每步有图，但局部与全图切换过大（2026-11-12）
 
 用户要求100条全部425556个时间步都有可用图像。新版本将图像可用性和局部定位可靠性分开：`observation.interaction_available`决定第四路image mask，`observation.interaction_valid`仅记录原局部ROI证据。正常帧从当前native RGB按原可靠框裁剪；局部证据不足或窗口尚未覆盖目标时，第四路改为**同一时刻cam0全图**，保持宽高比补边到224。索引记录`image_available`、`local_roi_valid`、`input_mode`、`input_box`及`fallback_reason`。不复用旧画面，不把回退当局部成功，不删时间点，不改原数据。
 
