@@ -199,6 +199,8 @@ def preview(request, *, check_data=False):
 
 
 def launch_worker(state):
+    from scripts.run_training import ui_semantic_contract
+
     directory = job_directory(state["id"])
     directory.mkdir(parents=True, exist_ok=True)
     atomic_json(directory / "state.json", state)
@@ -209,6 +211,11 @@ def launch_worker(state):
                 "module": state["module"],
                 "config_sha256": state["config_sha256"],
                 "values": state["values"],
+                **(
+                    {"semantic_contract": ui_semantic_contract(state["resolved_config"])}
+                    if "resolved_config" in state
+                    else {}
+                ),
             },
         )
     env = os.environ.copy()
@@ -303,9 +310,6 @@ def resume_job(request):
             raise ValueError("请在原训练服务器的 UI 中恢复任务")
         if original["status"] not in TERMINAL or original["status"] == "completed":
             raise ValueError("只能重试失败、停止或中断的任务")
-        path = Path(original["config_path"])
-        if hashlib.sha256(path.read_bytes()).hexdigest() != original["config_sha256"]:
-            raise ValueError("配置文件已修改，不能直接续训；请新建实验")
         config = job_config(original)
         if any(job["status"] not in TERMINAL and job["checkpoint_dir"] == original["checkpoint_dir"] for job in jobs()):
             raise ValueError("同一实验已有任务正在运行")
@@ -392,8 +396,12 @@ def job_overrides(state):
 
 def job_config(state):
     from scripts.run_training import resolve_experiment
+    from scripts.run_training import ui_semantic_contract
 
-    return resolve_experiment(state["module"], job_overrides(state))
+    config = resolve_experiment(state["module"], job_overrides(state))
+    if "resolved_config" in state and ui_semantic_contract(config) != ui_semantic_contract(state["resolved_config"]):
+        raise ValueError("UI semantic model/data/optimizer contract differs")
+    return config
 
 
 def worker(job_id):
@@ -413,9 +421,6 @@ def worker(job_id):
     signal.signal(signal.SIGTERM, stop_signal)
     signal.signal(signal.SIGINT, stop_signal)
     try:
-        path = Path(state["config_path"])
-        if hashlib.sha256(path.read_bytes()).hexdigest() != state["config_sha256"]:
-            raise ValueError("保存后配置被修改，请新建实验")
         config = job_config(state)
         overrides = job_overrides(state)
         python = ["bash", str(common.repository_root() / "scripts/python.sh"), "-u", "-m"]
@@ -476,8 +481,7 @@ def worker(job_id):
             )
         }
         print("Training environment: " + json.dumps(state["training_environment"], sort_keys=True), flush=True)
-        if hashlib.sha256(path.read_bytes()).hexdigest() != state["config_sha256"]:
-            raise ValueError("准备过程中配置被修改，请新建实验")
+        job_config(state)  # Recheck semantic configuration after preparing assets.
         command = [*python, "scripts.run_training", state["module"], *overrides, "--wandb-mode", state["wandb_mode"]]
         if state["resume"]:
             command.append("--resume")

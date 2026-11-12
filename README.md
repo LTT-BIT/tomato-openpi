@@ -346,8 +346,36 @@ normal 数据快捷按钮会识别并直接应用真实 LeRobot 成员目录；�
 
 只读基准入口：`JAX_PLATFORMS=cpu CUDA_VISIBLE_DEVICES= bash scripts/python.sh -m scripts.benchmark_flash_loader --output .cache/new_loader_benchmark.json --batch-size 256 --workers 8 --batches 3 --start-step 2800`。先比较相同窗口的新旧整批字节 Hash，再报告启动与后续批次耗时；并发训练会影响基准数值，不能直接当作端到端训练加速比。
 
-后续从完整 Checkpoint 切换需显式设置 `FLASH_INPUT_PIPELINE=multiprocess`。旧 e64c9a41 代码写出的 Checkpoint 还需 `FLASH_ALLOW_INPUT_MIGRATION=1`：只接受该已审计版本的旧代码 Hash，要求模型/优化器/数据/种子/Batch 合同不变，并逐函数检查更新、Loss、评估数学定义未变。原始合同不覆盖，新增迁移记录保留来源和目标指纹、已完成步数与下一样本位置；预读位置不写成训练进度。新增 `data_wait_seconds` 与 `seconds` 分别观测取批等待和更新耗时。CPU 一致性通过不等于新链路完整 GPU 续训验收通过；未切换前不宣称当前任务已提速。
+后续切换预读链路设置 `FLASH_INPUT_PIPELINE=multiprocess`。恢复时忽略历史 `training_code_sha256`，不再需要 `FLASH_ALLOW_INPUT_MIGRATION` 白名单；仍严格比较模型、算法资产、数据、随机种子、batch、优化器与调度合同。预读位置不替代已完成训练步数。CPU 一致性不代表多卡吞吐或真实训练验收完成。
 
 2026-11-05 真实 normal480 / Batch256、8 worker 连续 8 批只读对比：旧链路平均取批 20.30 秒；新链路启动首批 50.55 秒，后 7 批平均等待 2.41 秒。含启动的 8 批等待合计 162.38 → 67.42 秒。全部图像/Token/历史/目标叶子的字节 Hash 相同，两轮共 11 批通过；结果 `training_configs/experiments/tomato_sharpa/flash/validation/prefetch_benchmark_20261105.json`。基准与原训练并发、固定旧链路先跑，不能把取批等待比当作 GPU 训练提速比。当前训练进程未切换；完整 GPU 续训还需在新保存点做实际验收，保留 Batch256 和 8000 步，不从 Step2000 回退重算当前未保存进度。
 
 2026-11-05 经用户明确授权停止旧任务于已记录 Step2791，从只读 Step2000 恢复新版输入链路。791 次已执行但未保存的更新单独登记为重算，目标仍为 Step8000；原完整日志归档，活动曲线保留到 Step2000 后接续。UI 新任务 `ea7b2cecabbf48a69404cc02640c5a02` 已实际恢复模型与 Adam 并运行到 Step2023；取样起点为 2000×256，下一更新为2001。稳态更新约 4.42 秒、取批等待 0.43 秒，短区间实测端到端 4.88 秒/步；与原任务相同 Step2001～2023 的 Loss、FM、Consistency、Gradient Norm 日志最大差0，不等于逐参数bitwise复现。结果见 `training_configs/experiments/tomato_sharpa/flash/validation/prefetch_resume_step2000_20261105.json`。
+
+## FLASH Delta / T3（不含 Train RTC）
+
+`pi05-flash` 新增独立 F1–F4 实验；原 F0 Absolute FLASH 模型与统计路径不变。
+
+| 实验模块尾名 | 双臂 / 双手 | 时域 z-score | 系数相关扰动 |
+| --- | --- | --- | --- |
+| `tomato_fr3_sharpa_flash_f1_v1` | Delta / Absolute | 关闭 | 关闭 |
+| `tomato_fr3_sharpa_flash_f2_v1` | Delta / Absolute | 开启 | 关闭 |
+| `tomato_fr3_sharpa_flash_f3_v1` | Delta / Absolute | 关闭 | β=0.5 |
+| `tomato_fr3_sharpa_flash_f4_v1` | Delta / Absolute | 开启 | β=0.5 |
+
+Delta 是每个窗口所有历史与目标双臂关节减同一当前物理 state，不是帧间差分；重建后加回同一 state。时域统计覆盖目标 ticks -2..51，先归一化再拟合 K6；真实历史 -7..0 对齐原 FLASH history fit 的虚拟 ticks -1..6。双手始终使用全局 quantile。相关矩阵从训练集历史系数估计，维度 406×406；训练 source 加扰动，推理无高斯采样，保持 stride=1、NFE=1。此方法是 FLASH 系数空间适配，不宣称等价于标准 T3 的动作空间高斯先验。
+
+每个实验均有独立 asset_id、实验名与 checkpoint；数据来源、英文 prompt 与 F0 一致，默认 normal480 七源 all_sources、batch512、8000 步、每2000步保存。all_sources 的评估是训练内监测。可明确选 source_holdout，统计仅使用训练源完整窗口；54点均值/方差遍历全部训练窗口，quantile 和历史系数相关性使用种子固定、最多20000个均匀无放回训练窗口。新资产包含原 FLASH 三份合同文件、norm_stats.json，以及 flash_t3.npz / flash_t3.json，并绑定模式、分割、归一化与摘要。不能复用原 T3 的50×58矩阵或旧 FLASH optimizer state，不能用旧 absolute checkpoint 跨语义 resume。
+
+```bash
+export MODULE=training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_flash_f4_v1
+bash scripts/python.sh -m scripts.run_training "$MODULE" --dry-run
+bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE"
+bash scripts/python.sh -m scripts.run_training "$MODULE" --check
+# 核对实际 GPU、数据、统计与预算后启动；不联网时显式 offline，之后 wandb sync。
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 bash scripts/python.sh -m scripts.run_training "$MODULE" --wandb-mode online
+```
+
+UI 可以选择命名 F1–F4 实验，算法由实验模块固定；来源动作仍必须为 Absolute，不要在原数据适配器再减一次 state。物理推理必须提供未经归一化的8帧实测 history（最后一帧为当前 state），不得传入已归一化 state。RTC>0 显式拒绝。源码格式/注释变化不再单独阻断 FLASH resume；模型、算法资产、数据、随机种子、batch、优化器和调度合同仍必须一致。
+
+当前为软件适配及合成数据验证；尚未完成真实数据 FullFT、多卡 batch512 容量/吞吐、F0–F4 延迟对照及实机验证，不宣称获得质量或加速收益。

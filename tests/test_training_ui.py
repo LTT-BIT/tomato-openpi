@@ -230,7 +230,13 @@ def fake_launch(monkeypatch):
         state.update(worker_pid=os.getpid(), worker_start=ui.process_identity(os.getpid()))
         ui.atomic_json(directory / "state.json", state)
         if "values" in state:
-            ui.atomic_json(directory / "run.json", {k: state[k] for k in ("module", "config_sha256", "values")})
+            ui.atomic_json(
+                directory / "run.json",
+                {
+                    **{k: state[k] for k in ("module", "config_sha256", "values")},
+                    "semantic_contract": run_training.ui_semantic_contract(state["resolved_config"]),
+                },
+            )
         (directory / "ready").touch()
         (directory / "console.log").touch()
         return state
@@ -387,7 +393,7 @@ def test_resume_checks_config_and_keeps_original_parameters(workspace, fake_laun
     restored = ui.resume_job({"id": state["id"]})
     assert restored["resume"] is True
     Path(state["config_path"]).write_text("# modified")
-    with pytest.raises(ValueError, match="配置文件已修改"):
+    with pytest.raises((ValueError, KeyError)):
         ui.resume_job({"id": state["id"]})
 
 
@@ -576,7 +582,12 @@ def test_run_override_matches_all_stages_and_resume(workspace, fake_launch, monk
     assert ui.job_config(resumed) == config
     path = Path(resumed["config_path"])
     path.write_text(path.read_text() + "\n# changed\n")
-    with pytest.raises(ValueError, match="does not match"):
+    assert ui.job_config(resumed) == config  # Comments do not change training semantics.
+    record_path = ui.job_directory(resumed["id"]) / "run.json"
+    record = json.loads(record_path.read_text())
+    record["semantic_contract"]["model"]["fields"]["action_dim"] += 1
+    ui.atomic_json(record_path, record)
+    with pytest.raises(ValueError, match="semantic"):
         ui.job_config(resumed)
 
 

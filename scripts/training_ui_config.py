@@ -70,7 +70,7 @@ def baseline_catalog() -> list[dict]:
         entries.append(
             {
                 "id": ".".join(path.relative_to(root).with_suffix("").parts),
-                "label": f"{TASK_LABELS.get(task, task)} / {'π05 对照（同 FLASH 数据）' if 'reference' in path.stem else 'FLASH 全参' if 'flash' in path.stem else 'LoRA' if 'lora' in path.stem else '全参'}",
+                "label": f"{path.stem.rsplit('_', 2)[-2].upper() + ' / ' if re.search(r'_flash_f[1-4]_', path.stem) else ''}{TASK_LABELS.get(task, task)} / {'π05 对照（同 FLASH 数据）' if 'reference' in path.stem else 'FLASH 全参' if 'flash' in path.stem else 'LoRA' if 'lora' in path.stem else '全参'}",
                 "task": task,
                 "kind": "experiment" if path.parent.name == "flash" else "baseline",
                 "file": str(path.relative_to(root)),
@@ -275,6 +275,7 @@ def defaults(module: str) -> dict:
             if getattr(config.data.base_config, "task_view", None)
             else None,
             "flash": config.policy_metadata.get("algorithm") in ("flash", "flash_reference"),
+            "flash_trial": config.policy_metadata.get("flash_trial", "f0"),
             "flash_reference": config.policy_metadata.get("algorithm") == "flash_reference",
             "data_policy": config.policy_metadata.get("data_policy"),
             "actions": values["action_semantics"],
@@ -492,6 +493,11 @@ def apply_overrides(config, values: dict):
         from openpi.training.flash_native import bind_stats
 
         result = bind_stats(result)
+        if hasattr(result.model, "t3_assets"):
+            result = replace(
+                result,
+                policy_metadata={**result.policy_metadata, "training_action_semantics": "delta_arms_absolute_hands"},
+            )
     return result
 
 

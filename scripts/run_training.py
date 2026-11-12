@@ -42,6 +42,34 @@ def load_experiment(module_name: str) -> cfg.TrainConfig:
     return replace(config, policy_metadata={**(config.policy_metadata or {}), "experiment_module": module_name})
 
 
+def ui_semantic_contract(config):
+    serialized = config if isinstance(config, dict) else json.loads(reproducibility.serialize_config(config))
+    values = serialized["fields"]
+    keys = (
+        "model",
+        "data",
+        "optimizer",
+        "lr_schedule",
+        "batch_size",
+        "num_train_steps",
+        "seed",
+        "model_seed",
+        "data_seed",
+        "augmentation_seed",
+        "sampling_mode",
+        "sampling_groups",
+    )
+    contract = {key: values[key] for key in keys}
+    # Values populated by the checked normalization bundle after preparation.
+    contract["model"] = {
+        **contract["model"],
+        "fields": {
+            k: v for k, v in contract["model"]["fields"].items() if k not in ("action_q01", "action_q99", "t3_sha256")
+        },
+    }
+    return contract
+
+
 def resolve_experiment(module_name: str, overrides: list[str]) -> cfg.TrainConfig:
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--ui-run", type=Path)
@@ -49,13 +77,13 @@ def resolve_experiment(module_name: str, overrides: list[str]) -> cfg.TrainConfi
     config = load_experiment(module_name)
     if args.ui_run is not None:
         from scripts.training_ui_config import apply_overrides
-        from scripts.training_ui_config import source_path
 
         record = json.loads(args.ui_run.read_text())
-        path = source_path(module_name)
-        if record["module"] != module_name or reproducibility.file_sha256(path) != record["config_sha256"]:
-            raise ValueError("Run record does not match the configuration source")
+        if record["module"] != module_name:
+            raise ValueError("UI run record refers to a different experiment")
         config = apply_overrides(config, record["values"])
+        if "semantic_contract" in record and ui_semantic_contract(config) != record["semantic_contract"]:
+            raise ValueError("UI run semantic model/data/optimizer contract differs")
     resolved = tyro.cli(type(config), default=config, args=overrides)
     # A new model recipe must also regenerate its freeze filter and adapter contract.
     for field in ("paligemma_variant", "action_expert_variant", "pi05", "discrete_state_input"):

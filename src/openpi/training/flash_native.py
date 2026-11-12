@@ -119,6 +119,11 @@ def data_policy(config):
 
 
 def prepare(config, *, batch_size=512):
+    from openpi.training import flash_delta_t3_data as t3
+
+    if t3.enabled(config):
+        return t3.prepare(config, batch_size=batch_size)
+
     del batch_size
     records = inventory(config)
     groups = sorted({r["source_recording_id"] for r in records})
@@ -185,6 +190,11 @@ def prepare(config, *, batch_size=512):
 
 
 def preflight(config, *, require_norm=True):
+    from openpi.training import flash_delta_t3_data as t3
+
+    if t3.enabled(config):
+        return t3.preflight(config, require_norm=require_norm)
+
     if config.model.rtc_max_delay or getattr(config.model, "freeze_vlm", False) or config.data.extra_delta_transform:
         raise ValueError("Standard FLASH requires FullFT Absolute without RTC")
     if config.sampling_mode != "epoch_shuffle" or config.sampling_groups:
@@ -205,6 +215,8 @@ def preflight(config, *, require_norm=True):
     if not require_norm:
         return result
     directory = asset_directory(config)
+    if (directory / "flash_t3.json").exists() and not config.policy_metadata.get("_flash_t3_base_view"):
+        raise ValueError("Delta/T3 assets cannot be used by Absolute FLASH")
     manifest = json.loads((directory / "flash_manifest.json").read_text())
     seal = json.loads((directory / "flash_seal.json").read_text())
     unsigned = {k: v for k, v in manifest.items() if k != "sha256"}
@@ -249,6 +261,11 @@ def preflight(config, *, require_norm=True):
 
 
 def bind_stats(config):
+    from openpi.training import flash_delta_t3_data as t3
+
+    if t3.enabled(config):
+        return t3.bind(config)
+
     directory = asset_directory(config)
     if not (directory / "norm_stats.json").exists():
         return config
@@ -376,7 +393,10 @@ class NativeDataset:
         from types import SimpleNamespace
 
         def extra(destination):
-            for name in ("flash_manifest.json", "flash_validation.json", "flash_seal.json"):
+            names = ["flash_manifest.json", "flash_validation.json", "flash_seal.json"]
+            if hasattr(self.config.model, "t3_assets"):
+                names += ["flash_t3.npz", "flash_t3.json"]
+            for name in names:
                 shutil.copyfile(self.directory / name, Path(destination) / name)
 
         return SimpleNamespace(

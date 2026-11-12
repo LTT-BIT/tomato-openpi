@@ -109,11 +109,18 @@ def evaluate_batch(model_def, params, batch, rng, *, reference=False, q01=None, 
     else:
         values = model.loss_components(rng, obs, history=history, target_ext=target, train=False)
         prediction = model.sample_actions(rng, obs, history=history)
-        oracle = model.denormalize(
-            model.polynomial.reconstruct(
-                model.polynomial.fit_target(model.normalize(target), boundary_constraint=model.boundary_constraint)
+        if hasattr(model, "codec"):
+            anchor = history[:, -1]
+            coeff = model.polynomial.fit_target(
+                model.codec(target, anchor, slice(None)), boundary_constraint=model.boundary_constraint
             )
-        )
+            oracle = model.codec(model.polynomial.reconstruct(coeff), anchor, slice(2, 52), inverse=True)
+        else:
+            oracle = model.denormalize(
+                model.polynomial.reconstruct(
+                    model.polynomial.fit_target(model.normalize(target), boundary_constraint=model.boundary_constraint)
+                )
+            )
     truth = target[:, 2:52]
     return {**values, "prediction": prediction, "truth": truth, "oracle": oracle}
 
@@ -150,6 +157,13 @@ def validation(config, state, dataset, data_sharding, evaluator):
     return result
 
 
+def validate_resume_contract(saved, current):
+    saved = {k: v for k, v in saved.items() if k != "training_code_sha256"}
+    current = {k: v for k, v in current.items() if k != "training_code_sha256"}
+    if saved != current:
+        raise ValueError("FLASH resume model, data, seeds or optimizer differs")
+
+
 def main(config):
     config = bind_stats(config)
     inputs = preflight(config)
@@ -167,7 +181,6 @@ def main(config):
     if pipeline not in ("legacy", "multiprocess"):
         manager.close()
         raise ValueError("FLASH_INPUT_PIPELINE must be legacy or multiprocess")
-    migration = None
     try:
         state, layout = init_train_state(config, jax.random.key(config.model_seed), mesh, resume=resuming)
         contract = {
@@ -183,32 +196,13 @@ def main(config):
             "rng_policy": "fold_in(seed, completed_update); independent augmentation_seed",
             "sampler": "epoch_shuffle; cursor=completed_update*global_batch_size",
         }
-        from openpi.training.flash_native import digest
 
-        source_files = (
-            "scripts/train_flash.py",
-            "src/openpi/training/flash_native.py",
-            "src/openpi/models/pi0_flash.py",
-            "src/openpi/shared/flash_polynomial.py",
-            "src/openpi/training/optimizer.py",
-            "src/openpi/models/pi0.py",
-            "src/openpi/models/gemma.py",
-            "src/openpi/models/siglip.py",
-            "scripts/train.py",
-        )
-        root = Path(__file__).resolve().parents[1]
-        contract["training_code_sha256"] = digest({name: (root / name).read_text() for name in source_files})
+        # Source-file digests are informational, never resume blockers.
         seal_path = Path(config.checkpoint_dir) / "flash_training_contract.json"
         if resuming:
             saved_contract = json.loads(seal_path.read_text())
-            if saved_contract != contract:
-                if pipeline != "multiprocess" or os.environ.get("FLASH_ALLOW_INPUT_MIGRATION") != "1":
-                    raise ValueError(
-                        "FLASH resume contract changed; audited CPU prefetch upgrade requires explicit opt-in"
-                    )
-                from openpi.training.flash_loader import verify_input_migration
-
-                migration = verify_input_migration(saved_contract, contract, root)
+            # Historical checkpoints may carry an audit-only training_code_sha256.
+            validate_resume_contract(saved_contract, contract)
             state = checkpoints.restore_state(manager, state, dataset)
         else:
             seal_path.write_text(json.dumps(contract, indent=2, ensure_ascii=False))
@@ -235,16 +229,6 @@ def main(config):
             from openpi.training.flash_loader import PrefetchedBatches
 
             batches = loader_scope.enter_context(PrefetchedBatches(dataset, start, config.num_train_steps))
-        if migration is not None:
-            from time import time_ns
-
-            transition = {
-                **migration,
-                "completed_step": start,
-                "next_sample_position": start * config.batch_size,
-                "loader_code_sha256": digest((root / "src/openpi/training/flash_loader.py").read_text()),
-            }
-            (output / f"input_migration_{start}_{time_ns()}.json").write_text(json.dumps(transition, indent=2))
         with tracking.session(config, resuming=resuming, start_step=start):
             for completed in range(start, config.num_train_steps):
                 # This cursor also determines the next window exactly after checkpoint restore.

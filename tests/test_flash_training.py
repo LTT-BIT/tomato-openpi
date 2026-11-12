@@ -315,29 +315,12 @@ def test_prefetch_real_video_order_resume_and_cpu_workers(prepared, tmp_path):
         cached.close()
 
 
-def test_prefetch_migration_preserves_math_and_rejects_contract_changes():
-    import subprocess
+def test_resume_ignores_source_text_but_preserves_semantic_contract():
+    from scripts.train_flash import validate_resume_contract
 
-    from openpi.training.flash_loader import verify_input_migration
-    from openpi.training.flash_native import digest
-
-    root = Path(__file__).resolve().parents[1]
-    names = (
-        "scripts/train_flash.py",
-        "src/openpi/training/flash_native.py",
-        "src/openpi/models/pi0_flash.py",
-        "src/openpi/shared/flash_polynomial.py",
-        "src/openpi/training/optimizer.py",
-        "src/openpi/models/pi0.py",
-        "src/openpi/models/gemma.py",
-        "src/openpi/models/siglip.py",
-        "scripts/train.py",
-    )
-    before = {name: subprocess.check_output(["git", "show", "e64c9a41:" + name], cwd=root, text=True) for name in names}
-    saved = {"batch_size": 256, "training_code_sha256": digest(before)}
-    current = {**saved, "training_code_sha256": "new-input-only-version"}
-    assert verify_input_migration(saved, current, root)["kind"] == "cpu_prefetch_only"
-    with pytest.raises(ValueError, match="RNG/batch"):
-        verify_input_migration(saved, {**current, "batch_size": 512}, root)
-    with pytest.raises(ValueError, match="audited"):
-        verify_input_migration({**saved, "training_code_sha256": "unrecognized"}, current, root)
+    saved = {"model": "F0", "dataset": {"digest": "original"}, "optimizer": "adam", "training_code_sha256": "old"}
+    current = {k: v for k, v in saved.items() if k != "training_code_sha256"}
+    validate_resume_contract(saved, current)
+    for key in ("model", "dataset", "optimizer"):
+        with pytest.raises(ValueError, match="differs"):
+            validate_resume_contract(saved, {**current, key: "different"})

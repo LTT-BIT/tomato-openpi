@@ -18,6 +18,7 @@ uv lock --check --offline
 CHECK_PATHS=(
   training_configs tests
   scripts/train_flash.py scripts/verify_flash_backend.py
+  src/openpi/models/pi0_flash_delta_t3.py src/openpi/shared/flash_delta_t3.py src/openpi/training/flash_delta_t3_data.py
   src/openpi/models/pi0_flash.py src/openpi/shared/flash_polynomial.py
   src/openpi/training/flash_native.py src/openpi/training/flash_checkpoint.py
   scripts/training_ui.py scripts/training_ui_config.py

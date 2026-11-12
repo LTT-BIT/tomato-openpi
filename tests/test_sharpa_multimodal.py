@@ -67,7 +67,7 @@ def test_only_official_sharpa_baselines_are_published_and_share_statistics():
     experiments = [
         entry for entry in baseline_catalog() if entry["task"] == "tomato_sharpa" and entry["kind"] == "experiment"
     ]
-    assert len(experiments) == 2
+    assert len(experiments) == 6
     assert all(".flash." in entry["id"] for entry in experiments)
 
 
