@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const {test} = require('node:test');
 
 class Element {
-  constructor(tag) { this.tag=tag; this.children=[]; this.dataset={}; this.value=''; this.classList={add(){},remove(){}}; }
+  constructor(tag) { this.tag=tag; this.children=[]; this.dataset={}; this.value=''; this.classList={add(){},remove(){},toggle(){}}; }
   append(...children) { this.children.push(...children); }
   replaceChildren(...children) { this.children=children; }
   addEventListener() {}
@@ -14,7 +14,7 @@ class Element {
   querySelectorAll(tag) { return this.children.flatMap(el=>[...((el.tag===tag||(tag==='input:checked'&&el.tag==='input'&&el.checked))?[el]:[]),...el.querySelectorAll(tag)]); }
 }
 function setup() {
-  const elements=new Map(['groups','groups-result','sampling-mode','dataset-candidates','apply-datasets','wandb-mode','auto-norm','allow-busy'].map(id=>[id,new Element('div')]));
+  const elements=new Map(['groups-panel','flash-features','flash-timestamp','flash-correlated','flash-features-help','protocol','groups','groups-result','sampling-mode','dataset-candidates','apply-datasets','wandb-mode','auto-norm','allow-busy'].map(id=>[id,new Element('div')]));
   elements.get('sampling-mode').value='weighted_replacement';
   const context=vm.createContext({URLSearchParams,Event:class {},location:{hash:''},document:{
     getElementById:id=>elements.get(id), createElement:tag=>new Element(tag), querySelectorAll:()=>[],
@@ -147,4 +147,40 @@ test('pending discovered choices cannot be submitted before applying',()=>{
   const {run,elements}=setup();
   elements.get('dataset-candidates').append(new Element('label'));
   assert.throws(()=>run('request()'),/应用选中数据集/);
+});
+
+test('FLASH checkboxes select independent modes and restore original assets',()=>{
+  const {run,elements}=setup();
+  run(`initial={flash_trial:'f0',action_horizon:50,asset_id:'original',dataset_root:'/data'};
+    protocol={flash:true,flash_features_available:true,action_dim:58,model_action_dim:58,action_hz:30,actions:'absolute',prompt:'Pick tomato.'};
+    flashChoice='f0';
+    for(const [key,value] of Object.entries({owner:'user',exp_name:'run01',asset_id:'original',action_horizon:'50',action_semantics:'absolute'}))fields.set(key,{input:{value,dispatchEvent(){}},type:'text'});
+    syncFlashFeatures();`);
+  assert.equal(elements.get('flash-timestamp').checked,false);
+  elements.get('flash-timestamp').checked=true;run('changeFlashFeatures()');
+  assert.equal(run('flashChoice'),'f2');
+  assert.notEqual(run("fields.get('asset_id').input.value"),'original');
+  assert.equal(run('request().values.flash_trial'),'f2');
+  elements.get('flash-correlated').checked=true;run('changeFlashFeatures()');
+  assert.equal(run('flashChoice'),'f4');
+  elements.get('flash-timestamp').checked=false;run('changeFlashFeatures()');
+  assert.equal(run('flashChoice'),'f3');
+  elements.get('flash-correlated').checked=false;run('changeFlashFeatures()');
+  assert.equal(run('flashChoice'),'f0');
+  assert.equal(run("fields.get('asset_id').input.value"),'original');
+  run("initial.flash_trial='f4';flashChoice='f4';syncFlashFeatures()");
+  assert.equal(elements.get('flash-timestamp').checked,true);
+  assert.equal(elements.get('flash-correlated').checked,true);
+  elements.get('flash-timestamp').checked=false;elements.get('flash-correlated').checked=false;run('changeFlashFeatures()');
+  assert.equal(run('flashChoice'),'f1');
+});
+
+test('FLASH feature controls reject unsupported recipes and custom beta',()=>{
+  const {run,elements}=setup();
+  run("initial={flash_trial:'none'};protocol={flash:false,flash_features_available:false};flashChoice='none';syncFlashFeatures()");
+  assert.equal(elements.get('flash-timestamp').disabled,true);
+  assert.throws(()=>run('changeFlashFeatures()'),/不支持/);
+  run("protocol={flash:true,flash_features_available:true};flashChoice='custom';syncFlashFeatures()");
+  assert.equal(elements.get('flash-correlated').disabled,true);
+  assert.throws(()=>run('changeFlashFeatures()'),/不支持/);
 });

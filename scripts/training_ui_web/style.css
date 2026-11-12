@@ -3,3 +3,5 @@
 .job-row{border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}.job-row>.danger{display:block;width:100%;border-color:#efc3b7;background:#fff0ed}#stop-active{width:100%;margin-bottom:4px}
 
 .config-description{display:block;font-size:11px;font-weight:400;line-height:1.6;color:var(--muted);margin-top:5px}.baseline{overflow-wrap:anywhere}.baseline:disabled{opacity:.8;cursor:not-allowed;background:#f5f7f7}
+
+#flash-features{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:16px 0}#flash-features legend{font-weight:650;color:var(--accent);padding:0 5px}#flash-features label{display:inline-flex;align-items:center;gap:8px;margin-right:24px;cursor:pointer}#flash-features input{width:auto;margin:0;accent-color:var(--accent)}

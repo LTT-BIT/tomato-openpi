@@ -16,6 +16,7 @@ import re
 from zoneinfo import ZoneInfo
 
 from openpi.training import config as train_config
+from openpi.training import flash_delta_t3_ui as flash_ui
 from openpi.training.sampling import SamplingGroup
 from scripts.run_training import load_experiment
 from scripts.run_training import validate_config
@@ -244,6 +245,7 @@ def config_values(config) -> dict:
         action_horizon=config.model.action_horizon,
         rtc_max_delay=config.model.rtc_max_delay,
         action_semantics="delta" if getattr(config.data, "extra_delta_transform", False) else "absolute",
+        flash_trial=flash_ui.selected(config),
         sampling_mode=config.sampling_mode,
         sampling_groups=[asdict(group) for group in config.sampling_groups],
     )
@@ -275,7 +277,8 @@ def defaults(module: str) -> dict:
             if getattr(config.data.base_config, "task_view", None)
             else None,
             "flash": config.policy_metadata.get("algorithm") in ("flash", "flash_reference"),
-            "flash_trial": config.policy_metadata.get("flash_trial", "f0"),
+            "flash_trial": flash_ui.selected(config),
+            "flash_features_available": flash_ui.available(config),
             "flash_reference": config.policy_metadata.get("algorithm") == "flash_reference",
             "data_policy": config.policy_metadata.get("data_policy"),
             "actions": values["action_semantics"],
@@ -293,6 +296,7 @@ def identifier(value: str, label: str) -> str:
 def apply_overrides(config, values: dict):
     """Only allow presentation fields; preserve embodiment, task view and freeze filter."""
     allowed = set(TRAIN_INTS + LR_FIELDS + OPT_FIELDS + TEXT_FIELDS + SCHEDULE_FIELDS) | {
+        "flash_trial",
         "action_horizon",
         "rtc_max_delay",
         "action_semantics",
@@ -312,6 +316,7 @@ def apply_overrides(config, values: dict):
     }
     if missing := required - set(values):
         raise ValueError(f"缺少参数: {sorted(missing)}")
+    config = flash_ui.select(config, values.get("flash_trial", flash_ui.selected(config)), values["asset_id"])
     source_semantics = "delta" if getattr(config.data, "extra_delta_transform", False) else "absolute"
     action_semantics = values.get("action_semantics", source_semantics)
     if config.policy_metadata.get("algorithm") in ("flash", "flash_reference") and (

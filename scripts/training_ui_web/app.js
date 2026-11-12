@@ -3,6 +3,7 @@ const $ = id => document.getElementById(id);
 const fragment = new URLSearchParams(location.hash.slice(1));
 if (fragment.get('token')) { sessionStorage.setItem('training-token', fragment.get('token')); history.replaceState(null, '', location.pathname); }
 let sourceHash = null;
+let flashChoice = "none";
 let baseline = null, initial = null, protocol = null, currentJob = null, gpuData = [], browseTarget = null, browseState = null, loadingVersion = 0;
 const fields = new Map();
 const terminal = new Set(['completed', 'failed', 'stopped', 'interrupted']);
@@ -65,20 +66,41 @@ function addField(container, definition, value, original) {
 function fillForm(result) {
   $('dataset-candidates').replaceChildren();$('apply-datasets').classList.add('hidden');
   $('groups-result').textContent='';
-  initial=result.values;sourceHash=result.source_sha256;protocol=result.protocol;fields.clear();
+  initial=result.values;flashChoice=initial.flash_trial||result.protocol.flash_trial||"none";sourceHash=result.source_sha256;protocol=result.protocol;fields.clear();
   for(const [section,defs] of Object.entries(definitions)){
     const container=$(section+'-fields');container.replaceChildren();
     for(const definition of defs){const key=definition[0];if(section==='advanced'&&!(key in initial))continue;let value=initial[key];if(key==='dataset_root')value=(initial.dataset_roots||[initial.dataset_root]).join('\n');if(key==='owner')value=result.owner;if(key==='exp_name')value=result.suggested_exp_name;if(key==='stats_batch_size')value=512;addField(container,definition,value,initial[key]);}
   }
-  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · ${protocol.flash_reference?'π05 对照 · 同 FLASH 数据':protocol.flash?'FLASH · K=6 / stride=1 / 全参':'普通 π0.5'} · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
-  if(protocol.flash_trial&&protocol.flash_trial!=='f0')$('protocol').append(node('div',`FLASH ${protocol.flash_trial.toUpperCase()} · 内部双臂 Delta / 双手 Absolute；时域统计与系数噪声由所选实验固定。来源仍为物理 Absolute。`));
-  if(protocol.flash)$('protocol').append(node('div',protocol.data_policy==='all_sources'?'全部来源参与训练 · 窗口等权 · 不留独立验证源 · 评估为训练内监测':'来源级训练 / 验证划分'));
-  if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
+  syncFlashFeatures();renderProtocol();
   if(result.shared_weights){const button=node('button','使用服务器公共权重','text-button');button.addEventListener('click',()=>{fields.get('weight_path').input.value=result.shared_weights;fields.get('weight_path').input.dispatchEvent(new Event('input'));});$('runtime-fields').append(button);}
   $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);
   $('groups-panel').classList.toggle('hidden',initial.sampling_mode!=='weighted_replacement');
   if(protocol.flash){fields.get('rtc_max_delay').input.disabled=true;$('sampling-mode').querySelector('[value=weighted_replacement]').disabled=true;}
   fields.get('exp_name').input.dispatchEvent(new Event('input'));updatePath();
+}
+function renderProtocol(){
+  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · ${protocol.flash_reference?'π05 对照 · 同 FLASH 数据':protocol.flash?'FLASH · K=6 / stride=1 / 全参':'普通 π0.5'} · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
+  if(protocol.flash&&!protocol.flash_reference&&flashChoice!=='f0')$('protocol').append(node('div',`FLASH ${flashChoice.toUpperCase()} · 内部双臂 Delta / 双手 Absolute；时域统计与系数噪声由下方勾选项决定。来源仍为物理 Absolute。`));
+  if(protocol.flash)$('protocol').append(node('div',protocol.data_policy==='all_sources'?'全部来源参与训练 · 窗口等权 · 不留独立验证源 · 评估为训练内监测':'来源级训练 / 验证划分'));
+  if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
+}
+function syncFlashFeatures(){
+  const enabled=protocol.flash_features_available&&flashChoice!=='custom';
+  $('flash-features').classList.toggle('hidden',!protocol.flash);
+  $('flash-timestamp').checked=['f2','f4'].includes(flashChoice);
+  $('flash-correlated').checked=['f3','f4'].includes(flashChoice);
+  $('flash-timestamp').disabled=!enabled;$('flash-correlated').disabled=!enabled;
+  $('flash-features-help').textContent=enabled?`当前 ${flashChoice.toUpperCase()}：逐时间步归一化在54点时域执行；相关高斯仅作用于训练时的系数扰动（β=0.5）。开启任一项使用双臂 Delta / 双手 Absolute，RTC=0。两项关闭回到${initial.flash_trial==='f0'?'原始 Absolute FLASH（F0）':'仅 Delta（F1）'}。切换算法使用独立统计与新实验名。`:'仅支持30Hz FLASH全参；普通π0.5、同数据对照及自定义β不使用此开关。';
+}
+function changeFlashFeatures(){
+  if(!protocol.flash_features_available||flashChoice==='custom')throw Error('当前配置不支持FLASH论文勾选');
+  flashChoice=$('flash-timestamp').checked?($('flash-correlated').checked?'f4':'f2'):($('flash-correlated').checked?'f3':(initial.flash_trial==='f0'?'f0':'f1'));
+  const name=fields.get('exp_name').input;
+  name.value=name.value.replace(/_ui_f[0-4]$/,'')+'_ui_'+flashChoice;
+  if(flashChoice===initial.flash_trial&&Number(fields.get('action_horizon').input.value)===initial.action_horizon&&fields.get('dataset_root').input.value===(initial.dataset_roots||[initial.dataset_root]).join('\n')){fields.get('asset_id').input.value=initial.asset_id;}
+  else{independentStats();}
+  $('sampling-mode').value='epoch_shuffle';$('groups').replaceChildren();$('groups-panel').classList.add('hidden');
+  syncFlashFeatures();renderProtocol();updatePath();
 }
 async function chooseBaseline(module){
   const version=++loadingVersion;$('start').disabled=true;
@@ -162,6 +184,7 @@ function request(){
   const values={};let owner,statsBatch;
   for(const [key,{input,type}] of fields){let value=input.value.trim();if(type==='int'||type==='float')value=value===''?NaN:Number(value);if(type==='optional-int')value=value===''?null:Number(value);if(type==='lines')value=value.split('\n').map(v=>v.trim()).filter(Boolean);if(type==='ints')value=parseIds(value);if(typeof value==='number'&&!Number.isFinite(value))throw Error(key+' 请输入有效数值');if(key==='owner')owner=value;else if(key==='stats_batch_size')statsBatch=value;else values[key]=value;}
   const roots=datasetPaths(values.dataset_root);values.dataset_root=roots[0]||'';if(roots.length>1)values.dataset_roots=roots;
+  values.flash_trial=flashChoice;
   values.sampling_mode=$('sampling-mode').value;values.sampling_groups=[];
   if(values.sampling_mode==='weighted_replacement')for(const row of $('groups').children){values.sampling_groups.push({name:row.querySelector('[data-key=name]').value.trim(),weight:Number(row.querySelector('[data-key=weight]').value),episodes:parseIds(row.querySelector('[data-key=episodes]').value)});}
   return {baseline,source_sha256:sourceHash,owner,values,gpus:selectedGPUs(),wandb_mode:$('wandb-mode').value,auto_norm:$('auto-norm').checked,allow_busy:$('allow-busy').checked,stats_batch_size:statsBatch};
@@ -208,6 +231,8 @@ async function showPreview(check){
 }
 async function openBrowser(input){browseTarget=input;try{await browse(input.value.includes('://')?'':input.value.split('\n').filter(Boolean).at(-1));}catch{await browse('');}$('browser').showModal();}
 async function browse(path){browseState=await api('/api/browse?path='+encodeURIComponent(path));$('browse-path').value=browseState.path;$('browse-list').replaceChildren();for(const entry of browseState.entries){const button=node('button','▸ '+entry.name);button.addEventListener('click',()=>perform(()=>browse(entry.path)));$('browse-list').append(button);}if(browseState.truncated)$('browse-list').append(node('p','仅显示前 500 个目录，请直接输入路径'));}
+$('flash-timestamp').addEventListener('change',()=>perform(changeFlashFeatures));
+$('flash-correlated').addEventListener('change',()=>perform(changeFlashFeatures));
 $('preview').addEventListener('click',()=>perform(()=>showPreview(false),$('preview')));
 $('check').addEventListener('click',()=>perform(()=>showPreview(true),$('check')));
 $('start').addEventListener('click',()=>perform(async()=>{const job=await api('/api/start',request());notice((job.creates_config?'已保存新配置':'已复用原配置')+'，本次实验已记录；数据检查通过后进入训练。');await refreshCatalog();await refreshJobs();await showJob(job.id);$('output-section').scrollIntoView({behavior:'smooth'});},$('start')));

@@ -376,6 +376,6 @@ bash scripts/python.sh -m scripts.run_training "$MODULE" --check
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 bash scripts/python.sh -m scripts.run_training "$MODULE" --wandb-mode online
 ```
 
-UI 可以选择命名 F1–F4 实验，算法由实验模块固定；来源动作仍必须为 Absolute，不要在原数据适配器再减一次 state。物理推理必须提供未经归一化的8帧实测 history（最后一帧为当前 state），不得传入已归一化 state。RTC>0 显式拒绝。源码格式/注释变化不再单独阻断 FLASH resume；模型、算法资产、数据、随机种子、batch、优化器和调度合同仍必须一致。
+UI 可选择原 FLASH 或命名 F1–F4 实验，在「03 训练参数 → FLASH 论文功能」自由勾选「逐时间步归一化」和「相关高斯噪声」：单选分别为 F2 / F3，两项同时为 F4。两项关闭时，来源 F0 恢复原 Absolute，来源 F1–F4 恢复仅 Delta（F1）。恢复来源参数会还原原选择。切换算法自动生成独立统计名称及新实验名，保存/重载保留实际模型类型和功能；不同算法拒绝复用同一 asset_id。普通 π0.5、同数据对照和自定义 β 不开放这两个控件。来源动作仍必须为 Absolute，不要在原数据适配器再减一次 state。物理推理必须提供未经归一化的8帧实测 history（最后一帧为当前 state），不得传入已归一化 state。RTC>0 显式拒绝。源码格式/注释变化不再单独阻断 FLASH resume；模型、算法资产、数据、随机种子、batch、优化器和调度合同仍必须一致。
 
 当前为软件适配及合成数据验证；尚未完成真实数据 FullFT、多卡 batch512 容量/吞吐、F0–F4 延迟对照及实机验证，不宣称获得质量或加速收益。
