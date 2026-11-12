@@ -105,6 +105,7 @@ def run(selection_path,base,candidates,out):
         manifest=dict(selection_sha256=digest(selection_path),episodes=100,frames=count,algorithm_valid_frames=valid_total,
             algorithm_invalid_frames=count-valid_total,all_frames_enumerated=True,full_roi_coverage=False,
             roi_generation_mode='causal_prediction_candidate',roi_generator_signature=contract,
+            stream_contract=contract.get('stream_contract','black_crop_false_mask_on_loss_v1'),
             training_ready=False,quality_review='pending_sampled_semantic_and_temporal_acceptance',
             source_writes=False,training_started=False,
             scope='Complete candidate input plumbing; current training recipe must reject until explicit quality acceptance.')

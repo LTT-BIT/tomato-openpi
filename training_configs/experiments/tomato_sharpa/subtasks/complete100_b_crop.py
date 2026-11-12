@@ -32,10 +32,15 @@ def build_config(*,variant='b_coarse'):
     selection=json.loads(selection_path.read_text())
     if (manifest.get('selection_sha256')!=digest(selection_path)
             or manifest.get('full_roi_coverage') is not True
+            or manifest.get('training_ready') is not True
             or manifest.get('episodes')!=100 or manifest.get('frames')!=425556
             or manifest.get('roi_generation_mode') not in ('manual_offline_interpolated','causal_prediction')
             or not manifest.get('roi_generator_signature')):
         raise ValueError('Complete hash-bound100 ROI coverage/provenance required')
+    stream_contract=manifest.get('stream_contract','black_crop_false_mask_on_loss_v1')
+    if stream_contract not in ('black_crop_false_mask_on_loss_v1','continuous_current_pixels_false_mask_on_loss_v1','continuous_current_pixels_state_guarded_v2'):
+        raise ValueError('Unknown crop stream contract')
+    suffix={'continuous_current_pixels_false_mask_on_loss_v1':'_stable_r1','continuous_current_pixels_state_guarded_v2':'_state_guarded_r1'}.get(stream_contract,'')
     splits=json.loads((root/'splits.json').read_text())
     if splits['splits']!={'train':list(range(100))}:raise ValueError('All100 action training required')
     info=json.loads((root/variant/'meta/info.json').read_text())
@@ -46,12 +51,12 @@ def build_config(*,variant='b_coarse'):
             or set(k for k,v in info['features'].items() if v.get('dtype')=='video')!=set(FR3_SHARPA_CROP.camera_keys)
             or info['features'].get('observation.interaction_valid',{}).get('dtype')!='bool'):
         raise ValueError('Four-view metadata/mask/tasks mismatch')
-    dataset=common.Dataset(version='tomato_complete100_rgb_crop_saved_labels_r1',
-        repo_id=f'fr3_sharpa/tomato_complete100_rgb_crop_{short}_saved_labels_r1',root=str(root/variant),
-        assets_dir=str(common.repository_root()/'assets'),asset_id=f'tomato_complete100_rgb_crop_{short}_saved_labels_r1_delta_30hz',
+    dataset=common.Dataset(version=f'tomato_complete100_rgb_crop_saved_labels_r1{suffix}',
+        repo_id=f'fr3_sharpa/tomato_complete100_rgb_crop_{short}_saved_labels_r1{suffix}',root=str(root/variant),
+        assets_dir=str(common.repository_root()/'assets'),asset_id=f'tomato_complete100_rgb_crop_{short}_saved_labels_r1{suffix}_delta_30hz',
         sources=(str(crop),str(selection_path)),prompt_example=GOAL if short=='a' else PROMPTS[1])
-    config=recipe(name=f'pi05_sharpa_tomato_complete100_{short}_crop_fullft_delta_r1',
-        exp_name=f'tomato_complete100_{short}_crop_delta_r1_s42',embodiment=FR3_SHARPA_CROP,dataset=dataset)
+    config=recipe(name=f'pi05_sharpa_tomato_complete100_{short}_crop_fullft_delta_r1{suffix}',
+        exp_name=f'tomato_complete100_{short}_crop_delta_r1{suffix}_s42',embodiment=FR3_SHARPA_CROP,dataset=dataset)
     return replace(config,model=replace(config.model,image_keys=IMAGE_KEYS,max_token_len=256),
         data=replace(config.data,extra_delta_transform=True,
             base_config=TaskDataConfig(prompt_from_task=True,task_view=TaskView(split_path=str(root/'splits.json'),split='train'))),
@@ -60,6 +65,7 @@ def build_config(*,variant='b_coarse'):
             'training_action_semantics':'delta_arm_joint_target_absolute_hand',
             'selection_sha256':digest(selection_path),'crop_manifest_sha256':digest(crop),
             'roi_generation_mode':manifest['roi_generation_mode'],'model_image_keys':list(IMAGE_KEYS),
+            'crop_stream_contract':stream_contract,
             'max_token_len':256,'visual_tokens':1024,'memory_to_pi05':False,
             'phases':list(PHASES),'goal':GOAL,'data_policy':'all_sources',
             'gpu_memory_preflight_required':True,'agent_enabled':False})

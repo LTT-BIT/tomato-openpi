@@ -22,6 +22,8 @@ def main():
     parser.add_argument('--locator', type=Path, required=True)
     parser.add_argument('--norm', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
+    parser.add_argument('--stable', action='store_true', help='Measure the bounded-motion stable selector')
+    parser.add_argument('--state-guarded', action='store_true', help='Measure stable selection with measured grasp and past RGB background')
     args = parser.parse_args()
     torch.set_num_threads(4)
     cv2.setNumThreads(1)
@@ -41,7 +43,14 @@ def main():
     if len(images) != row['length']:
         raise ValueError('Frame mismatch')
     norm = json.loads((args.norm / 'norm_stats.json').read_text())['norm_stats']['state']
-    selector = CausalRoleSelector(np.asarray(norm['q99']) - np.asarray(norm['q01']))
+    if args.state_guarded:
+        from scripts.tomato_state_guarded_roi import StableRoi
+        selector = StableRoi()
+    elif args.stable:
+        from scripts.tomato_stable_roi import StableRoi
+        selector = StableRoi()
+    else:
+        selector = CausalRoleSelector(np.asarray(norm['q99']) - np.asarray(norm['q01']))
     locator = RgbLocator(args.locator)
     for _ in range(5):
         locator.predict([images[0]])
@@ -61,6 +70,8 @@ def main():
         if roi['valid']:
             valid_count += 1
             crop = cv2.resize(native_crop(image, roi['crop_box']), (224, 224), interpolation=cv2.INTER_AREA)
+        elif args.stable or args.state_guarded:
+            crop = cv2.resize(native_crop(image, roi['display_crop_box']), (224, 224), interpolation=cv2.INTER_AREA)
         if crop.shape != (224, 224, 3):
             raise ValueError('Crop shape changed')
         finished = time.perf_counter()
@@ -71,9 +82,10 @@ def main():
         if digest(path) != row['source_sha256'][rel]:
             raise ValueError('Original source changed during benchmark')
     result = dict(device=torch.cuda.get_device_name(), batch_size=1, samples=300,
+                  selector_mode='state_guarded' if args.state_guarded else ('stable' if args.stable else 'baseline'),
                   warmup_calls=5, episode_index=86, consecutive_source_frames=[0,300],
                   selection_sha256=digest(args.selection), locator_sha256=digest(args.locator/'model.pt'),
-                  selector_sha256=digest(Path(CausalRoleSelector.select.__code__.co_filename)),
+                  selector_sha256=digest(Path(selector.select.__code__.co_filename)),
                   normalization_sha256=digest(args.norm/'norm_stats.json'),
                   measurements={key: dict(p50=float(np.percentile(values,50)),
                                          p95=float(np.percentile(values,95)), maximum=max(values))

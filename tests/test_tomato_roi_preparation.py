@@ -61,7 +61,7 @@ def test_metadata_only_recipe_uses_four_keys_all100_and_original_hyperparameters
     # Synthetic metadata tests configuration wiring, never real dataset readiness.
     (tmp_path/'crop_manifest.json').write_text(json.dumps(dict(
         selection_sha256=digest(RECORDS/'complete100_rgb_crop_20261111_saved_labels_r1.json'),
-        full_roi_coverage=True,episodes=100,frames=425556,
+        full_roi_coverage=True,training_ready=True,episodes=100,frames=425556,
         roi_generation_mode='manual_offline_interpolated',roi_generator_signature='synthetic-test')))
     (tmp_path/'splits.json').write_text(json.dumps({'splits':{'train':list(range(100))}}))
     meta=tmp_path/'b_coarse/meta';meta.mkdir(parents=True)

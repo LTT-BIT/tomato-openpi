@@ -2,6 +2,46 @@
 
 ## complete100 RGB＋局部crop：训练准备
 
+### 当前版本：实测手指状态＋连续局部视频（2026-11-12）
+
+100条、425556帧已重做为`/home/user/datasets/derived/tomato_complete100_state_guarded_candidates_r1`，四视图A/B包为`tomato_complete100_four_view_state_guarded_candidate_r1`。原始视频、Parquet、标注不改；旧候选版本保留。**本次通过全量视频流畅性/像素来源检查，未独立认证逐帧语义准确率，未开训或改部署。**
+
+当前ROI链路：当前native RGB检测手部 → 当前帧可验证光流短桥接 → 实测四指MCP屈曲与局部RGB证据共同选择交互对象 → 有速度/加速度约束的裁剪窗口 → 当前帧224 RGB及有效性mask。禁止单凭哪只机械臂动得快就切手。左手单独运送需要测得的抓握姿态和视觉物体证据同时成立；手指弯曲本身不证明持物。两手接近时保留双手交互，已静止的篮内红色背景不能作为新的持物证据。背景仅由当前/过去帧更新，允许短暂到达/放置缓冲；阶段、prompt、未来图、动作命令均不进入ROI推理。
+
+手部原始state列33/37/41/46分别是左index/middle/ring/pinky MCP_FE.position，逐条核对源metadata名称。原始值均值进入阈值0.70、退出0.58，连续3帧确认；只作为姿态约束。校准来自索引86的664帧人工运送区间与901帧左手未参与区间，是弱参考，不是物体持有真值。校准数据、名称、SHA与阈值记录于`subtasks/records/complete100_roi_grasp_state_calibration_20261112_r1.json`。ROI元数据里的`carry_evidence`不能作为Memory的独立抓取成功/任务完成标签。Agent的84/8/8不改；这些动作训练用的ROI标定不能直接作为Agent独立测试结果。
+
+窗口保留当前帧像素，中心有死区与平移/加速度限制，尺寸采用扩大容差、延迟收紧；最小边长为原图高的55%，给快动作留缓冲。1.5倍是目标上下文比例，实际平滑窗口不保证逐帧精确1.5倍，且不保证与人工框逐帧相同。当前观察区域超出窗口时必须标无效，不能为了平滑裁掉操作区域后仍标有效。光流桥接最多5帧且必须通过当前图像前后向/几何检查。
+
+**显示与训练有效性分开**：漏检或窗口未追上时，`display_crop_box`继续采当前RGB，避免黑闪；`valid=false`、训练`crop_box/interaction_box=null`，LeRobot布尔mask=false。没有重复旧图片、伪造成功或删除时间点。当前四视图模型仍是原三路RGB＋一路局部RGB、58D state、50×58动作；无深度，无π₀.₅历史token。
+
+|全100条同口径指标|旧候选|当前版本|
+|---|---:|---:|
+|相邻框中心跳变超过前框边长25%|3041|0|
+|相邻框边长倍率超过1.25|11787|0|
+|有效性切换|8918|4724|
+|算法有效帧|370399|384351|
+
+425556帧全部真实解码，当前输出黑帧0、30Hz时间戳完整；2825帧与native裁剪像素抽查通过，包含无效mask帧。当前算法有效比例90.32%，不是准确率；无效41205帧继续mask，不自动提升训练质量状态。400张跨100条真实解码图及8段原图/旧/新对照复查，手、果实和接触细节均作为检查对象；仍有514个与非harvest阶段的潜在选手差异，不能直接当作标注错误数或已解决的精度问题。`full_roi_coverage=false`、`training_ready=false`保留，正式入口额外要求显式ready标志。
+
+完整π₀.₅模型额外通过无效crop像素不变性检查：相同state/prompt/noise，mask=false时切换真实图/黑图/随机图，动作最大绝对差0；只证明mask隔离，不是训练效果。
+
+当前单帧ROI（RTX5090，300帧B1）总P50/P95为8.91/11.66ms，不含解码/编码/策略。30Hz离线连续视频不等于完整机器人在线30Hz重规划验收。
+
+|本地派生结果（均在`/home/user/datasets/derived/`）|用途|
+|---|---|
+|`tomato_complete100_state_guarded_candidates_r1`|全部100条连续视频、mask/坐标、检测缓存、来源回执|
+|`tomato_complete100_four_view_state_guarded_candidate_r1`|新A/B四视图候选，原三路媒体独立复制|
+|`tomato_complete100_state_guarded_audit_r1`|全量时序/像素与离线语义诊断|
+|`tomato_complete100_state_guarded_visual_review_r1`|400张真实解码抽查图及来源索引|
+|`tomato_complete100_state_guarded_comparison_r1/comparison30hz.mp4`|原图、旧版、新版并排；仅片段边界有编辑切换|
+|`tomato_complete100_four_view_state_guarded_candidate_check_r1.json`|实际LeRobot四视频300样本、原始向量窗口/token核对|
+
+数值统计继续使用同一批100条的图像无关向量统计（非旧93统计），重新生成schema2 A/B绑定，资产为`assets/tomato_complete100_rgb_crop_{a,b}_saved_labels_r1_state_guarded_r1_delta_30hz`。正式A/B入口按stream contract选择独立asset和实验名，不能误用旧裁剪契约。文本256、视觉1024、动作50位置及训练默认batch512/8000步/FSDP8/原学习率保持；新四图数据的训练显存与Agent历史读出仍未验收/训练。
+
+复做入口：`scripts.prepare_tomato100_state_guarded_crops`可使用已核验的`--cached-detections`，每条复核源video/Parquet和缓存SHA；`scripts.consolidate_tomato_stable_shards`核验四个logical shard的25条成员；`scripts.audit_tomato_stable_roi --wait-all`逐条解码验收；`scripts.audit_tomato_roi_semantics`只做QA不改框；`scripts.review_tomato_stable_roi`与`scripts.render_tomato_roi_comparison`导出真实图/视频。汇总为`subtasks/records/complete100_state_guarded_roi_20261112_validation_r1.json`，143项回归通过。
+
+### 2026-11-11原始候选基线（保留作对照）
+
 2026-11-11，冻结100条完整七阶段录制，425556帧、30Hz，**全部100条参加后续π₀.₅动作训练**，不留动作val/test。Agent的84/8/8不改，旧normal93数据、配置、统计、checkpoint保留。本轮完成100条四视图候选数据、A/B新归一化绑定、真实token审计和GPU前反向检查；**ROI语义质量未通过，未启动正式π₀.₅训练、未改部署端**。
 
 有效清单为`subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json`，SHA256为`15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000`。90条来自`/home/user/datasets/tomato_subtasks_normal_20261107`，10条来自`/home/user/datasets/tomato_independent10_20261109`。训练使用磁盘正式保存且哈希核验的Subtask；8条与Agent临时边界提案的差异已在旧解析记录中保留，不自动改成动作监督。索引86（源B/1106_750_791_normal/episode_000004）的末段return仍为[2908,2990)。原视频、Parquet、metadata和标注只读，派生媒体独立复制，无可写硬链接。

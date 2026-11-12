@@ -30,7 +30,8 @@ def main():
     p.add_argument('--selection',type=Path,required=True);p.add_argument('--annotations',type=Path,required=True)
     p.add_argument('--params',type=Path,required=True);p.add_argument('--norm',type=Path,required=True)
     p.add_argument('--tokenizer',type=Path,required=True);p.add_argument('--out',type=Path,required=True)
-    p.add_argument('--samples',type=int,default=30);p.add_argument('--check-gradients',action='store_true');a=p.parse_args()
+    p.add_argument('--samples',type=int,default=30);p.add_argument('--check-gradients',action='store_true')
+    p.add_argument('--check-masked-image',action='store_true');a=p.parse_args()
     if jax.default_backend()!='gpu':raise RuntimeError('Real CUDA backend required')
     selection=json.loads(a.selection.read_text());row=selection['episodes'][86];spec=json.loads(a.annotations.read_text())
     out=derived_output_path(selection,a.out);frame_id=83;images={}
@@ -70,6 +71,7 @@ def main():
     params=jax.tree.map(jnp.asarray,unflatten_dict(merged));jax.block_until_ready(params)
     print('Full model parameters ready; profiling3 then4 views',flush=True)
     gradient_check=None
+    masked_image_check=None
     results={};noise=jnp.asarray(rng.normal(size=(1,50,58)).astype(np.float32));key=jax.random.key(42)
     with new_artifact_directory(out) as staging:
         for n,config in configs.items():
@@ -88,6 +90,23 @@ def main():
                 p50_ms=float(np.percentile(times,50))*1000,p95_ms=float(np.percentile(times,95))*1000,
                 p99_ms=float(np.percentile(times,99))*1000,max_ms=float(max(times))*1000)
             print(json.dumps(results[n]),flush=True)
+            if n=='4' and a.check_masked_image:
+                masked=observation.replace(image_masks={**observation.image_masks,'interaction_0_rgb':jnp.array([False])})
+                reference_action=predict(key,masked,noise=noise)
+                reference_action.block_until_ready()
+                differences=[]
+                for crop in [jnp.full_like(masked.images['interaction_0_rgb'],-1),
+                             jnp.asarray(rng.uniform(-1,1,masked.images['interaction_0_rgb'].shape),jnp.float32)]:
+                    changed=masked.replace(images={**masked.images,'interaction_0_rgb':crop})
+                    output=predict(key,changed,noise=noise)
+                    output.block_until_ready()
+                    differences.append(float(np.max(np.abs(np.asarray(output)-np.asarray(reference_action)))))
+                if not all(np.isfinite(value) and value<1e-5 for value in differences):
+                    raise ValueError('Masked crop pixels influenced actions')
+                masked_image_check=dict(passed=True,maximum_absolute_action_difference=max(differences),
+                    variants=['actual RGB','black RGB','random RGB'],same_state_prompt_noise_and_weights=True,
+                    scope='Full architecture mask invariance only; not trained policy quality.')
+                print(json.dumps(masked_image_check),flush=True)
             if n=='4' and a.check_gradients:
                 table=pq.read_table(Path(row['dataset'])/rel,columns=['action'])
                 raw_actions=np.array(table['action'].to_pylist(),np.float32)[np.minimum(frame_id+np.arange(50),row['length']-1)]
@@ -131,7 +150,8 @@ def main():
             selection_sha256=digest(a.selection),annotation_sha256=digest(a.annotations),normalization_sha256=digest(a.norm/'norm_stats.json'),
             tokenizer_sha256=digest(a.tokenizer),weights=str(a.params),actual_text_tokens=token_count,frame_id=frame_id,episode_index=86,
             adapted_projection_parameters=adapted,scope='Full architecture latency only.58D projections initialized; no claim of trained four-view behavior.',
-            measurements=results,gradient_check=gradient_check,four_vs_three_p50_ratio=results['4']['p50_ms']/results['3']['p50_ms'],
+            measurements=results,gradient_check=gradient_check,masked_image_check=masked_image_check,
+            four_vs_three_p50_ratio=results['4']['p50_ms']/results['3']['p50_ms'],
             memory_stats={k:int(v) for k,v in jax.devices()[0].memory_stats().items()},
             includes_decode_or_roi=False,training_started=False,optimizer_step_performed=False,source_writes=False,
             deployment_cadence_accepted=False)

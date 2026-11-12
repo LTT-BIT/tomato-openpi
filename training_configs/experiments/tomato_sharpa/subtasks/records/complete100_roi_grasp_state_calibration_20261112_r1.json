@@ -1,0 +1,111 @@
+{
+  "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+  "annotation_sha256": "e9e9aac3c215fcc5cbd233f58a6f22a92bfac0b6cec1290e691f1af99d1d3e97",
+  "source_parquet_sha256": "25951ac24698d5682e47666808cb5a161be95784870a7f833ddd80c89c57e2b3",
+  "episode_index": 86,
+  "native_source_episode_index": 4,
+  "measured_state_columns": [
+    33,
+    37,
+    41,
+    46
+  ],
+  "joint_names": [
+    "left_index_MCP_FE.position",
+    "left_middle_MCP_FE.position",
+    "left_ring_MCP_FE.position",
+    "left_pinky_MCP_FE.position"
+  ],
+  "score": "mean of four raw measured MCP flexion positions; no command targets or pi05 normalization",
+  "enter": 0.7,
+  "exit": 0.58,
+  "consecutive_frames": 3,
+  "positive_intervals": [
+    {
+      "start": 315,
+      "end": 405
+    },
+    {
+      "start": 525,
+      "end": 630
+    },
+    {
+      "start": 735,
+      "end": 870
+    },
+    {
+      "start": 1005,
+      "end": 1129
+    },
+    {
+      "start": 2370,
+      "end": 2520
+    },
+    {
+      "start": 2760,
+      "end": 2820
+    }
+  ],
+  "negative_intervals": [
+    {
+      "start": 0,
+      "end": 168
+    },
+    {
+      "start": 168,
+      "end": 210
+    },
+    {
+      "start": 1129,
+      "end": 1243
+    },
+    {
+      "start": 1243,
+      "end": 1395
+    },
+    {
+      "start": 1395,
+      "end": 1603
+    },
+    {
+      "start": 1603,
+      "end": 1650
+    },
+    {
+      "start": 2820,
+      "end": 2908
+    },
+    {
+      "start": 2908,
+      "end": 2990
+    }
+  ],
+  "positive": {
+    "frames": 664,
+    "percentiles": {
+      "1": 0.5919569104909896,
+      "5": 0.6137809418141842,
+      "25": 0.7211352474987507,
+      "50": 0.7473782151937485,
+      "95": 0.8775048658251763,
+      "99": 0.88836942628026
+    }
+  },
+  "negative": {
+    "frames": 901,
+    "percentiles": {
+      "1": -0.008194720838218927,
+      "5": -0.0030458825640380383,
+      "25": 0.5648074746131897,
+      "50": 0.5788713544607162,
+      "95": 0.6849919408559799,
+      "99": 0.7664526104927063
+    }
+  },
+  "labels": "Manual ROI transport intervals and left-inactive intervals; these are weak pose references, not possession ground truth.",
+  "threshold_policy": "Conservative fixed hand-shape hysteresis informed by reference distributions; independent accuracy not measured.",
+  "requires_current_visual_evidence": true,
+  "inference_uses_phase_labels": false,
+  "source_writes": false,
+  "training_started": false
+}
