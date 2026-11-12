@@ -1,0 +1,311 @@
+{
+  "schema": "native_current_rgb_hard_case_annotations_v1",
+  "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+  "coordinate_system": "native640x400_xyxy",
+  "annotation_author": "coding agent inspecting actual native RGB with coordinate grid",
+  "independent_human_review": false,
+  "phase_labels_used": false,
+  "full_dataset_quality_approved": false,
+  "frames": [
+    {
+      "episode_index": 0,
+      "source_episode_index": 0,
+      "source_frame": 4292,
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1102_588_616_normal_lerobot/videos/chunk-000/observation.images.cam0/episode_000000.mp4",
+      "source_sha256": "a35f1413826632dbed29f38100f197005563527e96e7fda5e3837c397bd932b6",
+      "boxes": {
+        "right_hand": [
+          412,
+          250,
+          522,
+          324
+        ],
+        "left_hand": [
+          158,
+          200,
+          225,
+          242
+        ]
+      }
+    },
+    {
+      "episode_index": 70,
+      "source_episode_index": 1,
+      "source_frame": 2258,
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/videos/chunk-000/observation.images.cam0/episode_000001.mp4",
+      "source_sha256": "fc17b880603734cc78e387c5927de03b3b4851b84a2c06d20feead869b3ce6f6",
+      "boxes": {
+        "right_hand": [
+          370,
+          218,
+          473,
+          306
+        ],
+        "left_hand": [
+          206,
+          199,
+          281,
+          236
+        ]
+      }
+    },
+    {
+      "episode_index": 77,
+      "source_episode_index": 8,
+      "source_frame": 2737,
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/videos/chunk-000/observation.images.cam0/episode_000008.mp4",
+      "source_sha256": "8935410321d9ac7a8a4ec1199ad8880cf652c6a8d537ff9d03d50cbdae2f6008",
+      "boxes": {
+        "right_hand": [
+          374,
+          181,
+          486,
+          226
+        ],
+        "left_hand": [
+          154,
+          209,
+          220,
+          258
+        ]
+      }
+    },
+    {
+      "episode_index": 8,
+      "source_episode_index": 6,
+      "source_frame": 1882,
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/videos/chunk-000/observation.images.cam0/episode_000006.mp4",
+      "source_sha256": "446549438305a5bd7cf729a9f56a3462a92e28bd555fa592e3640bc94f542426",
+      "boxes": {
+        "right_hand": [
+          338,
+          204,
+          487,
+          290
+        ],
+        "left_hand": [
+          166,
+          216,
+          229,
+          262
+        ],
+        "held_object": [
+          365,
+          274,
+          395,
+          296
+        ]
+      }
+    },
+    {
+      "episode_index": 8,
+      "source_episode_index": 6,
+      "source_frame": 4618,
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/videos/chunk-000/observation.images.cam0/episode_000006.mp4",
+      "source_sha256": "446549438305a5bd7cf729a9f56a3462a92e28bd555fa592e3640bc94f542426",
+      "boxes": {
+        "right_hand": [
+          336,
+          179,
+          482,
+          282
+        ],
+        "left_hand": [
+          140,
+          190,
+          218,
+          232
+        ],
+        "held_object": [
+          335,
+          258,
+          375,
+          311
+        ]
+      }
+    },
+    {
+      "episode_index": 8,
+      "source_episode_index": 6,
+      "source_frame": 5123,
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/videos/chunk-000/observation.images.cam0/episode_000006.mp4",
+      "source_sha256": "446549438305a5bd7cf729a9f56a3462a92e28bd555fa592e3640bc94f542426",
+      "boxes": {
+        "right_hand": [
+          336,
+          179,
+          482,
+          282
+        ],
+        "left_hand": [
+          142,
+          243,
+          200,
+          290
+        ],
+        "held_object": [
+          338,
+          259,
+          374,
+          300
+        ]
+      }
+    },
+    {
+      "episode_index": 8,
+      "source_episode_index": 6,
+      "source_frame": 5663,
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/videos/chunk-000/observation.images.cam0/episode_000006.mp4",
+      "source_sha256": "446549438305a5bd7cf729a9f56a3462a92e28bd555fa592e3640bc94f542426",
+      "boxes": {
+        "right_hand": [
+          336,
+          179,
+          482,
+          282
+        ],
+        "left_hand": [
+          173,
+          238,
+          223,
+          266
+        ],
+        "held_object": [
+          337,
+          270,
+          374,
+          301
+        ]
+      }
+    },
+    {
+      "episode_index": 8,
+      "source_episode_index": 6,
+      "source_frame": 6454,
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/videos/chunk-000/observation.images.cam0/episode_000006.mp4",
+      "source_sha256": "446549438305a5bd7cf729a9f56a3462a92e28bd555fa592e3640bc94f542426",
+      "boxes": {
+        "right_hand": [
+          336,
+          179,
+          482,
+          282
+        ],
+        "left_hand": [
+          150,
+          242,
+          215,
+          287
+        ],
+        "held_object": [
+          334,
+          275,
+          362,
+          320
+        ]
+      }
+    },
+    {
+      "episode_index": 27,
+      "source_episode_index": 2,
+      "source_frame": 4354,
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/videos/chunk-000/observation.images.cam0/episode_000002.mp4",
+      "source_sha256": "6d619c4eee643b7c833ab31b941c04e9062819c2dc0fd8c31ecf55b8d1700672",
+      "boxes": {
+        "right_hand": [
+          343,
+          157,
+          498,
+          243
+        ],
+        "left_hand": [
+          154,
+          152,
+          259,
+          195
+        ],
+        "held_object": [
+          349,
+          247,
+          376,
+          288
+        ]
+      }
+    },
+    {
+      "episode_index": 66,
+      "source_episode_index": 2,
+      "source_frame": 2701,
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1103_604_632_normal_lerobot/videos/chunk-000/observation.images.cam0/episode_000002.mp4",
+      "source_sha256": "05e52fcefa176d977240fd77bcd0f4d02c516641c18a0cf672e1dfb547ab5847",
+      "boxes": {
+        "right_hand": [
+          332,
+          211,
+          476,
+          284
+        ],
+        "left_hand": [
+          151,
+          219,
+          219,
+          266
+        ],
+        "held_object": [
+          342,
+          260,
+          366,
+          279
+        ]
+      }
+    },
+    {
+      "episode_index": 95,
+      "source_episode_index": 6,
+      "source_frame": 3351,
+      "source_video": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal/videos/chunk-000/observation.images.cam0/episode_000006.mp4",
+      "source_sha256": "bccae77c05ec69ba02344a6387224ce069b97f36358a45b01151f19577b5a171",
+      "boxes": {
+        "right_hand": [
+          304,
+          136,
+          439,
+          245
+        ],
+        "left_hand": [
+          190,
+          215,
+          240,
+          254
+        ],
+        "held_object": [
+          310,
+          227,
+          378,
+          256
+        ]
+      }
+    },
+    {
+      "episode_index": 32,
+      "source_episode_index": 7,
+      "source_frame": 2443,
+      "source_video": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/videos/chunk-000/observation.images.cam0/episode_000007.mp4",
+      "source_sha256": "f6eb4f6f1f18ff24db15ab37355c40da00d58374b0ed5f67e300d9c3946502a2",
+      "boxes": {
+        "right_hand": [
+          389,
+          186,
+          493,
+          247
+        ],
+        "left_hand": [
+          163,
+          198,
+          241,
+          232
+        ]
+      }
+    }
+  ]
+}

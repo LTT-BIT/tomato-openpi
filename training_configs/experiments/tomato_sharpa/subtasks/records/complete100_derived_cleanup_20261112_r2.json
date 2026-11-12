@@ -1,0 +1,94 @@
+{
+  "schema": "complete100_derived_cleanup_v1",
+  "date": "2026-11-12",
+  "scope": "Superseded complete100 four-view bundles and new repair prototypes; current transport_r5, ROI baselines, source base copies, detector dependencies and failure evidence retained",
+  "operation": "gio trash; recoverable; filesystem space not released",
+  "raw_sources_touched": false,
+  "normal93_touched": false,
+  "moved": [
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_coverage_candidates_r1",
+      "allocated_bytes": 81047552,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_coverage_candidates_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_coverage_candidates_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_coverage_candidates_r2",
+      "allocated_bytes": 54804480,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_coverage_candidates_r2.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_coverage_candidates_r2"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_coverage_candidates_r3",
+      "allocated_bytes": 49856512,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_coverage_candidates_r3.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_coverage_candidates_r3"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_coverage_candidates_r4",
+      "allocated_bytes": 883429376,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_coverage_candidates_r4.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_coverage_candidates_r4"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_four_view_coverage_candidate_r4",
+      "allocated_bytes": 9053622272,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_coverage_candidate_r4.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_coverage_candidate_r4"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_coverage_visual_review_r4",
+      "allocated_bytes": 7659520,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_coverage_visual_review_r4.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_coverage_visual_review_r4"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_coverage_comparison_r4",
+      "allocated_bytes": 4755456,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_coverage_comparison_r4.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_coverage_comparison_r4"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_four_view_coverage_candidate_check_r4.json",
+      "allocated_bytes": 4096,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_coverage_candidate_check_r4.json.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_coverage_candidate_check_r4.json"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_coverage_b1_benchmark_r4",
+      "allocated_bytes": 8192,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_coverage_b1_benchmark_r4.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_coverage_b1_benchmark_r4"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_transport_b1_benchmark_r5",
+      "allocated_bytes": 8192,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_transport_b1_benchmark_r5.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_transport_b1_benchmark_r5"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_roi_locator_hard_case_repair_r1",
+      "allocated_bytes": 76075008,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_roi_locator_hard_case_repair_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_roi_locator_hard_case_repair_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_four_view_state_guarded_candidate_r1",
+      "allocated_bytes": 9008676864,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_state_guarded_candidate_r1.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_state_guarded_candidate_r1"
+    },
+    {
+      "original_path": "/home/user/datasets/derived/tomato_complete100_four_view_state_guarded_candidate_check_r1.json",
+      "allocated_bytes": 4096,
+      "trash_info": "/home/user/.local/share/Trash/info/tomato_complete100_four_view_state_guarded_candidate_check_r1.json.trashinfo",
+      "trash_destination": "/home/user/.local/share/Trash/files/tomato_complete100_four_view_state_guarded_candidate_check_r1.json"
+    }
+  ],
+  "status": "passed",
+  "moved_items": 13,
+  "moved_allocated_bytes": 19219951616,
+  "latest_validation_references_rechecked": 37,
+  "disk_space_released_bytes": 0,
+  "remaining_derived_allocated_bytes": 19998908416
+}

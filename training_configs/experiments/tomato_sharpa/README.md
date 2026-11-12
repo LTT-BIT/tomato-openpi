@@ -2,7 +2,34 @@
 
 ## complete100 RGB＋局部crop：训练准备
 
-### 当前版本：实测手指状态＋连续局部视频（2026-11-12）
+### 当前版本：修复漏手、窗口跟随和篮内红色误判（2026-11-12）
+
+最新100条、425556帧为`/home/user/datasets/derived/tomato_complete100_transport_candidates_r5`，A/B四视图包为`tomato_complete100_four_view_transport_candidate_r5`。原始数据、100条成员和动作监督均不改；无深度、无π₀.₅历史token，未启动正式策略训练或修改部署。
+
+|全100条、同一初版对照|修复前|当前版本|
+|---|---:|---:|
+|无效局部crop帧|41205|9569（2.25%）|
+|所需手部丢失|21116|2625|
+|窗口未完整覆盖当前交互区域|20089|6944|
+|非harvest阶段只选左手的离线差异提示|514|0|
+
+无效crop减少76.8%；恢复34058个原无效帧，同时2422个原有效帧改为无效，逐帧增退及最长剩余无效段均保存在`tomato_complete100_transport_audit_r5/repair_accounting.json`。最长无效段107帧（约3.57秒），没有把这些帧伪造成有效。差异提示不是人工标注错误数，归零也不等于独立准确率100%。
+
+检测保留原定位器的强结果；补充12个真实失败姿态关键帧（8条录制，编码Agent查看native RGB标注，非独立人工标注），混合原134帧参考训练500步修复定位器。原模型某只手置信度不足0.75时才查询修复模型，补充结果至少0.85，不降低阈值。高置信当前检测可直接确认同一手，减少无必要的光流计算；弱证据仍使用原光流检查和过期机制。
+
+覆盖窗口根据当前/过去运动提前留边，受中心速度/加速度及每帧扩大2%、缩小0.8%的约束，并缓慢回中、延迟收紧。最小/最大窗口仍为原图高55%和短边95%，当前全帧边长中位数326。只提高覆盖率的中间版会把篮内红色误当成左手所持番茄，未通过内容检查；最终版增加手/果共同位移证据（果12px、手8px、至少4帧），平滑手框中心的姿态抖动，禁止用旧位移反复重新确认已建立的持物轨迹。当前附着证据失配6帧会过期。阶段标签、未来图和动作命令均不参与ROI生成。
+
+最终425556帧全部解码、30Hz时间戳及当前像素来源检查通过，黑帧0、大幅中心/缩放跳变0；查看400张跨全部录制的图、49张残余失败/历史误判图和6段对照中点图。19个旧空手误判参考时刻均恢复为有效右手ROI；索引86的31个“左手＋所持果实”参考框仍全部覆盖100%。参考帧参与过方法开发，不能作为独立精度或泛化评估。证据汇总为`subtasks/records/complete100_transport_roi_20261112_validation_r5.json`，151项回归通过。
+
+**训练保留所有100条、全部425556个观测和动作样本**。剩余9569帧只把第四路`interaction_0_rgb`的image mask置false，原三路RGB、58D state和50×58动作监督照常保留；没有删录制、删帧、重复旧像素或关闭这些样本的动作loss。实际LeRobot300样本读取、原始物理向量/600份三路视频哈希及token核对通过；归一化绑定为`assets/tomato_complete100_rgb_crop_{a,b}_saved_labels_r1_transport_r5_delta_30hz`。视觉1024、文本256、batch512/8000步/FSDP8及原学习率计划保持。`training_ready=false`、独立语义质量未认证和目标batch显存待验收的状态继续保留。
+
+新增定位器标注包括Agent原test成员27和66，符合本轮π₀.₅全部100条动作训练的范围，但不能将该定位器作为Agent独立holdout评测的前处理。Agent的84/8/8成员未改，后续Agent对比需使用仅由其train成员训练的定位器。Agent完整历史读出仍未训练。
+
+复做可用`scripts.cache_tomato_coverage_detections`生成已绑定原/修复模型的缓存，`scripts.prepare_tomato100_coverage_crops --cached-detections`导出连续视频，`scripts.consolidate_tomato_stable_shards`汇总；`scripts.audit_tomato_roi_parallel`复用原完整视频/像素检查并按录制并行执行，`scripts.profile_tomato_roi_repair`记录逐帧增退，`scripts.review_tomato_roi_failures`复查剩余失败及历史案例。原图/初版/最终版对照在`tomato_complete100_transport_comparison_r5/comparison30hz.mp4`。
+
+验收新包后，被替代的四视图包及本轮试验版本共13项移入回收站，避免派生目录堆积；当前训练候选、原三视图基础包、旧ROI对照、模型/缓存依赖和误判复查证据保留。逐项恢复位置见`subtasks/records/complete100_derived_cleanup_20261112_r2.json`。下文旧四视图包路径仅是历史记录，需恢复后才能复做；当前入口以本节及准备配置为准。
+
+### 初版对照：实测手指状态＋连续局部视频（2026-11-12）
 
 100条、425556帧已重做为`/home/user/datasets/derived/tomato_complete100_state_guarded_candidates_r1`，四视图A/B包为`tomato_complete100_four_view_state_guarded_candidate_r1`。原始视频、Parquet、标注不改。**本次通过全量视频流畅性/像素来源检查，未独立认证逐帧语义准确率，未开训或改部署。**
 

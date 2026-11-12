@@ -38,9 +38,9 @@ def build_config(*,variant='b_coarse'):
             or not manifest.get('roi_generator_signature')):
         raise ValueError('Complete hash-bound100 ROI coverage/provenance required')
     stream_contract=manifest.get('stream_contract','black_crop_false_mask_on_loss_v1')
-    if stream_contract not in ('black_crop_false_mask_on_loss_v1','continuous_current_pixels_false_mask_on_loss_v1','continuous_current_pixels_state_guarded_v2'):
+    if stream_contract not in ('black_crop_false_mask_on_loss_v1','continuous_current_pixels_false_mask_on_loss_v1','continuous_current_pixels_state_guarded_v2','continuous_current_pixels_coverage_v3','continuous_current_pixels_transport_v4'):
         raise ValueError('Unknown crop stream contract')
-    suffix={'continuous_current_pixels_false_mask_on_loss_v1':'_stable_r1','continuous_current_pixels_state_guarded_v2':'_state_guarded_r1'}.get(stream_contract,'')
+    suffix={'continuous_current_pixels_false_mask_on_loss_v1':'_stable_r1','continuous_current_pixels_state_guarded_v2':'_state_guarded_r1','continuous_current_pixels_coverage_v3':'_coverage_r4','continuous_current_pixels_transport_v4':'_transport_r5'}.get(stream_contract,'')
     splits=json.loads((root/'splits.json').read_text())
     if splits['splits']!={'train':list(range(100))}:raise ValueError('All100 action training required')
     info=json.loads((root/variant/'meta/info.json').read_text())

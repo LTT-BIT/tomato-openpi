@@ -1,6 +1,6 @@
 {
-  "version": "tomato-complete100-rgb-crop-preparation-v2-state-guarded",
-  "status": "all100_temporal_stream_checks_passed_semantic_accuracy_not_independently_certified",
+  "version": "tomato-complete100-rgb-crop-preparation-v3-transport",
+  "status": "all100_transport_repair_temporal_and_input_checks_passed_independent_semantic_accuracy_not_certified",
   "training_recipe": "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop",
   "derived_base_bundle": "/home/user/datasets/derived/tomato_complete100_saved_labels_r1_base_ab",
   "roi_worklist": "/home/user/datasets/derived/tomato_complete100_roi_worklist_r2/worklist.json",
@@ -53,7 +53,8 @@
     "memory_to_pi05": false,
     "visual_tokens": 1024,
     "text_slots": 256,
-    "prefix_slots": 1280
+    "prefix_slots": 1280,
+    "implementation_scope": "Four current images/state/prompt for pi05; Agent learned history reader remains unimplemented"
   },
   "scheme2": {
     "status": "unimplemented_design_candidates",
@@ -104,8 +105,8 @@
     "role": "Single-recording manual supervision/reference for experimental detector; not a full100 manual annotation claim"
   },
   "roi_automation_development": {
-    "status": "all100_state_guarded_continuous_candidates_verified_temporally",
-    "locator": "/home/user/datasets/derived/tomato_roi_locator_experiment_r2",
+    "status": "all100_transport_repair_temporal_and_input_checks_passed",
+    "locator": "/home/user/datasets/derived/tomato_roi_locator_hard_case_repair_r2",
     "manual_supervision": {
       "selection_episode_index": 86,
       "native_source_episode_index": 4,
@@ -114,17 +115,26 @@
     "current_inputs": [
       "current native cam0 RGB",
       "current measured116 state",
-      "past RGB/flow/background and past measured hand-shape confirmations"
+      "past/current hand-fruit motion, RGB/flow/background and grasp confirmations"
     ],
     "inference_phase_labels": false,
     "inference_future_frames": false,
     "automatic_target_acquisition": true,
     "automatic_reacquisition": true,
-    "automatic_role_switching": "measured four-finger grasp-shape hysteresis plus current RGB/flow and past red-background evidence",
+    "automatic_role_switching": "current measured grasp plus past/current coherent hand-fruit motion; no stationary-color acquisition or stale foreground re-seeding",
     "bulk100_generation_enabled": true,
     "training_ready": false,
     "earlier_failed_LK_probe": "/home/user/datasets/derived/tomato_complete100_episode86_causal_track_probe_r2",
-    "grasp_calibration": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_roi_grasp_state_calibration_20261112_r1.json"
+    "grasp_calibration": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_roi_grasp_state_calibration_20261112_r1.json",
+    "original_locator": "/home/user/datasets/derived/tomato_roi_locator_experiment_r2",
+    "hard_case_annotations": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_roi_hard_cases_20261112_r1.json",
+    "hard_case_frames": 12,
+    "hard_case_recordings": 8,
+    "roi_supervision_agent_test_overlap": [
+      27,
+      66
+    ],
+    "scope": "All100 pi05 action data; do not use this all100 ROI locator as an independent Agent holdout preprocessing model"
   },
   "default_annotated_crop_exporter": "scripts.export_tomato_manual_crops",
   "review_export_policy": "sample and failure diagnosis; not mandatory for every bulk export",
@@ -133,11 +143,11 @@
     "training_configs.experiments.tomato_sharpa.subtasks.complete100_a_crop",
     "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop"
   ],
-  "derived_four_view_bundle": "/home/user/datasets/derived/tomato_complete100_four_view_state_guarded_candidate_r1",
-  "roi_candidates": "/home/user/datasets/derived/tomato_complete100_state_guarded_candidates_r1",
+  "derived_four_view_bundle": "/home/user/datasets/derived/tomato_complete100_four_view_transport_candidate_r5",
+  "roi_candidates": "/home/user/datasets/derived/tomato_complete100_transport_candidates_r5",
   "normalization_assets": {
-    "a": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_state_guarded_r1_delta_30hz",
-    "b": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_state_guarded_r1_delta_30hz"
+    "a": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_transport_r5_delta_30hz",
+    "b": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_transport_r5_delta_30hz"
   },
   "normalization_statistics_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
   "actual_token_distribution": {
@@ -160,34 +170,36 @@
     "/home/user/datasets/derived/tomato_complete100_vector_stats_r1/receipt.json",
     "/home/user/datasets/derived/tomato_complete100_goal_token_audit_r1/receipt.json"
   ],
-  "automatic_roi_status": "causal measured-state and RGB candidates; temporal flow verified, independent semantic accuracy not certified",
+  "automatic_roi_status": "Conservative current-RGB detector repair, bounded coverage-aware crop and coherent hand/object transport evidence; no independent accuracy claim",
   "candidate_coverage": {
     "episodes": 100,
     "frames": 425556,
-    "algorithm_valid_frames": 384351,
-    "algorithm_invalid_frames": 41205,
+    "algorithm_valid_frames": 415987,
+    "algorithm_invalid_frames": 9569,
     "all_frames_enumerated": true,
     "full_roi_coverage": false,
     "training_ready": false,
-    "invalid_policy": "current-frame display crop continues; false training mask and null training ROI"
+    "invalid_policy": "current-frame display crop continues; false training mask and null training ROI",
+    "algorithm_valid_fraction": 0.9775141227006552
   },
   "quality_diagnostics": {
-    "temporal_audit": "/home/user/datasets/derived/tomato_complete100_state_guarded_audit_r1/audit.json",
-    "semantic_audit": "/home/user/datasets/derived/tomato_complete100_state_guarded_audit_r1/semantic_review.json",
-    "sampled_visual_review": "/home/user/datasets/derived/tomato_complete100_state_guarded_visual_review_r1",
-    "potential_role_mismatch_frames": 514,
+    "temporal_audit": "/home/user/datasets/derived/tomato_complete100_transport_audit_r5/audit.json",
+    "semantic_audit": "/home/user/datasets/derived/tomato_complete100_transport_audit_r5/semantic_review.json",
+    "sampled_visual_review": "/home/user/datasets/derived/tomato_complete100_transport_visual_review_r5",
+    "potential_role_mismatch_frames": 0,
     "independent_accuracy_evaluated": false,
-    "phase_labels_not_used_for_generation": true
+    "phase_labels_not_used_for_generation": true,
+    "failure_and_regression_review": "/home/user/datasets/derived/tomato_complete100_transport_failure_review_r5"
   },
   "full_model_gpu_benchmark": "/home/user/datasets/derived/tomato_complete100_four_view_gpu_benchmark_r3/receipt.json",
-  "roi_single_frame_benchmark": "/home/user/datasets/derived/tomato_complete100_state_guarded_b1_benchmark_r1/receipt.json",
-  "actual_loader_verification": "/home/user/datasets/derived/tomato_complete100_four_view_state_guarded_candidate_check_r1.json",
+  "roi_single_frame_benchmark": "/home/user/datasets/derived/tomato_complete100_transport_b1_benchmark_r5_isolated/receipt.json",
+  "actual_loader_verification": "/home/user/datasets/derived/tomato_complete100_four_view_transport_candidate_check_r5.json",
   "agent_history_reader_trained": false,
   "roi_context_scale_semantics": "1.5 is desired context, not an exact per-frame crop ratio: bounded center/scale and minimum field retain full observed region or mask invalid.",
   "temporal_stream_quality_accepted": true,
   "semantic_quality_accepted": false,
   "training_ready": false,
-  "latest_validation": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_state_guarded_roi_20261112_validation_r1.json",
+  "latest_validation": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_transport_roi_20261112_validation_r5.json",
   "roi_provenance_binding": "Per-frame gzip index is SHA-bound to the episode receipt, whose contract includes generator/selector/geometry/weights/calibration identities; signature is not duplicated on every frame.",
   "candidate_training_bundle_materialized": true,
   "roi_temporal_cache_is_agent_memory": false,
