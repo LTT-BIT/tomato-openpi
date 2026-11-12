@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-12",
+  "server": "28",
+  "branch": "tomato-subtask-policy",
+  "verified_code_commit": "14cc4863f0a38dabffa85808ffb1ed36050fb463",
+  "server_repository": "/home/mengxiang/workspace/code/tomato-openpi-sharpa",
+  "sync_method": "SSH Git bundle verified; server HTTPS GitHub fetch blocked by proxy403; GitHub push completed locally",
+  "variants": {
+    "a": {
+      "snapshot": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/logs/complete100_preflight/20261112_175534_412907_a.json",
+      "snapshot_sha256": "a682f8b0a768bfcf4d6c43d41b7187d8cf8cb4560ba1c284f403bd44d29092c3",
+      "inputs": {
+        "dataset_root": "/mnt/data/users/mengxiang/workspace/data/sharpa/no-block-more/complete100_rgb_crop_offline_r11/a_goal",
+        "dataset_repo_id": "fr3_sharpa/tomato_complete100_rgb_crop_a_saved_labels_r1_offline_r11",
+        "source_datasets": [
+          "/mnt/data/users/mengxiang/workspace/data/sharpa/no-block-more/complete100_rgb_crop_offline_r11/crop_manifest.json",
+          "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json"
+        ],
+        "frames": 425556,
+        "episodes": 100,
+        "prompts": [
+          "Harvest all tomatoes into the left basket and return stem to right plate."
+        ],
+        "norm_stats_path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_offline_r11_delta_30hz/norm_stats.json",
+        "training_frames": 425556,
+        "training_episodes": 100,
+        "task_view": {
+          "split": "train",
+          "task_indices": [],
+          "prompt_overrides": [],
+          "phase_prompts": [],
+          "phase_arm_hold": false,
+          "task_boundary_hold": false,
+          "allow_unannotated": false,
+          "split_path_sha256": "c7c72028b05069eea727e1f4534bcf0b14fb7cd97f471ba304332ed1906f5ccf",
+          "phase_annotations_path_sha256": null
+        },
+        "effective_prompt_examples": [
+          "Harvest all tomatoes into the left basket and return stem to right plate.",
+          "Harvest all tomatoes into the left basket and return stem to right plate."
+        ],
+        "norm_provenance": "verified",
+        "norm_stats_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+        "norm_audit_sha256": "7e52dc86598b901a8a500a002161d77d3225740d4fd683c8a43ab2ea7e3c2e73"
+      },
+      "gpu_status": "GPU 0,1,2,3,4,5,6,7 occupied; training was not started. Existing processes were not changed.",
+      "training_started": false,
+      "checkpoint_dir": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/checkpoints/pi05_sharpa_tomato_complete100_a_crop_fullft_delta_r1_offline_r11/tomato_complete100_a_crop_delta_r1_offline_r11_s42"
+    },
+    "b": {
+      "snapshot": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/logs/complete100_preflight/20261112_175502_573643_b.json",
+      "snapshot_sha256": "754b9afa3f11dde6baf6bd9933fb0dea0b336ece6815edc0c415cf625a175d21",
+      "inputs": {
+        "dataset_root": "/mnt/data/users/mengxiang/workspace/data/sharpa/no-block-more/complete100_rgb_crop_offline_r11/b_coarse",
+        "dataset_repo_id": "fr3_sharpa/tomato_complete100_rgb_crop_b_saved_labels_r1_offline_r11",
+        "source_datasets": [
+          "/mnt/data/users/mengxiang/workspace/data/sharpa/no-block-more/complete100_rgb_crop_offline_r11/crop_manifest.json",
+          "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json"
+        ],
+        "frames": 425556,
+        "episodes": 100,
+        "prompts": [
+          "Right hand grasps and lifts the truss to the center",
+          "Right hand holds truss while left hand picks tomatoes into left basket",
+          "Right hand returns the held object to the right plate",
+          "Right fingers reposition the truss on the right plate"
+        ],
+        "norm_stats_path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_offline_r11_delta_30hz/norm_stats.json",
+        "training_frames": 425556,
+        "training_episodes": 100,
+        "task_view": {
+          "split": "train",
+          "task_indices": [],
+          "prompt_overrides": [],
+          "phase_prompts": [],
+          "phase_arm_hold": false,
+          "task_boundary_hold": false,
+          "allow_unannotated": false,
+          "split_path_sha256": "c7c72028b05069eea727e1f4534bcf0b14fb7cd97f471ba304332ed1906f5ccf",
+          "phase_annotations_path_sha256": null
+        },
+        "effective_prompt_examples": [
+          "Right hand grasps and lifts the truss to the center",
+          "Right hand returns the held object to the right plate"
+        ],
+        "norm_provenance": "verified",
+        "norm_stats_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+        "norm_audit_sha256": "7e52dc86598b901a8a500a002161d77d3225740d4fd683c8a43ab2ea7e3c2e73"
+      },
+      "gpu_status": "GPU 0,1,2,3,4,5,6,7 occupied; training was not started. Existing processes were not changed.",
+      "training_started": false,
+      "checkpoint_dir": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/checkpoints/pi05_sharpa_tomato_complete100_b_crop_fullft_delta_r1_offline_r11/tomato_complete100_b_crop_delta_r1_offline_r11_s42"
+    }
+  },
+  "actual_input_check": {
+    "checked_at": "2026-11-12T09:56:27+0000",
+    "variants": {
+      "b": {
+        "episodes": 100,
+        "frames": 425556,
+        "actual_training_pipeline": true,
+        "decoded_samples": 12,
+        "model_image_keys": [
+          "base_0_rgb",
+          "left_wrist_0_rgb",
+          "right_wrist_0_rgb",
+          "interaction_0_rgb"
+        ],
+        "image_shape": [
+          224,
+          224,
+          3
+        ],
+        "state_shape": [
+          58
+        ],
+        "action_shape": [
+          50,
+          58
+        ],
+        "all_sampled_image_masks_true": true,
+        "all_sampled_vectors_finite": true,
+        "token_limit": 256,
+        "samples": [
+          {
+            "episode": 0,
+            "frame": 0,
+            "text_tokens": 201
+          },
+          {
+            "episode": 0,
+            "frame": 3829,
+            "text_tokens": 205
+          },
+          {
+            "episode": 0,
+            "frame": 7657,
+            "text_tokens": 202
+          },
+          {
+            "episode": 32,
+            "frame": 0,
+            "text_tokens": 201
+          },
+          {
+            "episode": 32,
+            "frame": 2098,
+            "text_tokens": 195
+          },
+          {
+            "episode": 32,
+            "frame": 4196,
+            "text_tokens": 197
+          },
+          {
+            "episode": 65,
+            "frame": 0,
+            "text_tokens": 201
+          },
+          {
+            "episode": 65,
+            "frame": 3714,
+            "text_tokens": 211
+          },
+          {
+            "episode": 65,
+            "frame": 7427,
+            "text_tokens": 209
+          },
+          {
+            "episode": 99,
+            "frame": 0,
+            "text_tokens": 201
+          },
+          {
+            "episode": 99,
+            "frame": 1615,
+            "text_tokens": 204
+          },
+          {
+            "episode": 99,
+            "frame": 3229,
+            "text_tokens": 198
+          }
+        ]
+      },
+      "a": {
+        "episodes": 100,
+        "frames": 425556,
+        "actual_training_pipeline": true,
+        "decoded_samples": 12,
+        "model_image_keys": [
+          "base_0_rgb",
+          "left_wrist_0_rgb",
+          "right_wrist_0_rgb",
+          "interaction_0_rgb"
+        ],
+        "image_shape": [
+          224,
+          224,
+          3
+        ],
+        "state_shape": [
+          58
+        ],
+        "action_shape": [
+          50,
+          58
+        ],
+        "all_sampled_image_masks_true": true,
+        "all_sampled_vectors_finite": true,
+        "token_limit": 256,
+        "samples": [
+          {
+            "episode": 0,
+            "frame": 0,
+            "text_tokens": 203
+          },
+          {
+            "episode": 0,
+            "frame": 3829,
+            "text_tokens": 209
+          },
+          {
+            "episode": 0,
+            "frame": 7657,
+            "text_tokens": 205
+          },
+          {
+            "episode": 32,
+            "frame": 0,
+            "text_tokens": 203
+          },
+          {
+            "episode": 32,
+            "frame": 2098,
+            "text_tokens": 199
+          },
+          {
+            "episode": 32,
+            "frame": 4196,
+            "text_tokens": 200
+          },
+          {
+            "episode": 65,
+            "frame": 0,
+            "text_tokens": 203
+          },
+          {
+            "episode": 65,
+            "frame": 3714,
+            "text_tokens": 213
+          },
+          {
+            "episode": 65,
+            "frame": 7427,
+            "text_tokens": 212
+          },
+          {
+            "episode": 99,
+            "frame": 0,
+            "text_tokens": 203
+          },
+          {
+            "episode": 99,
+            "frame": 1615,
+            "text_tokens": 208
+          },
+          {
+            "episode": 99,
+            "frame": 3229,
+            "text_tokens": 201
+          }
+        ]
+      }
+    },
+    "training_started": false,
+    "gpu_capacity_verified": false
+  },
+  "actual_input_check_sha256": "db26d00c57f1d1fc26d462edfba2d15532ff719f3c716907c6ca71c3f98eeb91",
+  "actual_input_check_script_sha256": "f274910019e2b6c8076ebb2a4fe95b99f62e9a56a5bf1d366f5518db99acb148",
+  "full_transfer_verified": true,
+  "local_regression_passed": 133,
+  "local_wandb_tracking_tests_passed": 6,
+  "wandb_versions_checked": {
+    "local": "0.31.0",
+    "server": "0.28.0"
+  },
+  "gpu_capacity_verified": false,
+  "training_started": false,
+  "deployment_modified": false,
+  "normal93_modified": false
+}

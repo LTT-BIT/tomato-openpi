@@ -23,6 +23,8 @@ bash scripts/python.sh -m scripts.tomato100_run start --variant b
 
 默认数据路径已固定，可用`--bundle`指定同一哈希数据的其他挂载位置；A/B资产分别为`assets/tomato_complete100_rgb_crop_{a,b}_saved_labels_r1_offline_r11_delta_30hz`。新实验名为`tomato_complete100_{a,b}_crop_delta_r1_offline_r11_s42`，拒绝覆盖或恢复已有checkpoint。W&B默认offline、本地日志保留；`logs/complete100_preflight/`记录最终配置。check可在GPU占用时完成CPU数据和统计验证，显式报告未启动与显存未验收；start在GPU占用时立即拒绝，不排队或停止他人任务。目标batch512的显存不能沿用三视图实验结论，8卡目前被占用，需空闲后实测。
 
+服务器A/B实际预检均通过全部100条、425556帧和归一化哈希；实际训练数据路径各抽查12个样本（共24），四路解码并预处理为224×224、mask全true、state58D、动作50×58及文本256上限均通过。133项回归与6项W&B日志测试通过。服务器GitHub拉取遇代理403，改用SSH传输经验证的Git bundle同步同一已推送提交；没有更改代理。服务器结果及完整快照路径见`subtasks/records/complete100_server28_training_20261112_r11.json`。正式训练未启动，8卡仍占用，GPU容量未验收。
+
 ### 当前版本：前后帧辅助修框，全部帧保持局部RGB（2026-11-12）
 
 当前候选为`/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11`，A/B四视图包为`tomato_complete100_four_view_offline_local_candidate_r11`。100条全部425556帧均从**各自对应时刻的native cam0 RGB**裁剪局部图：全图回退0、黑帧0、缺图0。原三路RGB、实测state、动作、标签和100条成员不改，无深度、无π₀.₅历史token。
