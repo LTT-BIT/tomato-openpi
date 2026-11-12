@@ -28,6 +28,8 @@ class FlowProbe:
         self.prediction = prediction
         self.PaliGemma = types.SimpleNamespace(llm=lambda tokens, **kwargs: (tokens, None))
 
+    noise = pi0.Pi0.noise
+
     def embed_prefix(self, observation):
         b = observation.state.shape[0]
         return jnp.zeros((b, 1, 2)), jnp.ones((b, 1), bool), jnp.zeros(1, bool)
@@ -159,7 +161,8 @@ def test_tokenwise_adarms_uses_the_same_weights_and_broadcast_semantics():
     np.testing.assert_allclose(repeated_gate, jnp.broadcast_to(gate, repeated_gate.shape), rtol=1e-6)
     varied, _ = norm.apply(params, x, jnp.repeat(cond[:, None], 3, axis=1).at[:, 0].set(0))
     assert not np.allclose(varied[:, 0], shared[:, 0])
-    np.testing.assert_array_equal(varied[:, 1:], shared[:, 1:])
+    # Broadcasting versus token-wise Dense can differ by one float32 ULP on CPU.
+    np.testing.assert_allclose(varied[:, 1:], shared[:, 1:], rtol=1e-6)
 
 
 def test_real_pi05_rtc_forward_backward_and_checkpoint_shapes(monkeypatch):

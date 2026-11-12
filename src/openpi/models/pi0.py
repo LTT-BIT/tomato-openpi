@@ -191,6 +191,10 @@ class Pi0(_model.BaseModel):
         ar_mask = jnp.array(ar_mask)
         return tokens, input_mask, ar_mask, adarms_cond
 
+    def noise(self, rng, shape):
+        """Return standard-normal action noise. Subclasses may customize the prior."""
+        return jax.random.normal(rng, shape)
+
     @override
     def compute_loss(
         self,
@@ -211,7 +215,7 @@ class Pi0(_model.BaseModel):
         observation = _model.preprocess_observation(preprocess_rng, observation, train=train)
 
         batch_shape = actions.shape[:-2]
-        noise = jax.random.normal(noise_rng, actions.shape)
+        noise = self.noise(noise_rng, actions.shape)
         time = jax.random.beta(time_rng, 1.5, 1, batch_shape) * 0.999 + 0.001
         if self.rtc_max_delay:
             delay = jax.random.randint(delay_rng, batch_shape, 0, self.rtc_max_delay + 1)
@@ -278,7 +282,7 @@ class Pi0(_model.BaseModel):
         dt = -1.0 / num_steps
         batch_size = observation.state.shape[0]
         if noise is None:
-            noise = jax.random.normal(rng, (batch_size, self.action_horizon, self.action_dim))
+            noise = self.noise(rng, (batch_size, self.action_horizon, self.action_dim))
         action_prefix_mask = jnp.arange(self.action_horizon)[None, :] < prefix_length
         if prefix_length:
             noise = jnp.where(action_prefix_mask[..., None], prefix_actions, noise)

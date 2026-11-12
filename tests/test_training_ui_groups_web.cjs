@@ -11,6 +11,7 @@ class Element {
   replaceChildren(...children) { this.children=children; }
   addEventListener() {}
   dispatchEvent() {}
+  querySelector(selector) { const value=selector.match(/^\[value=(.*)\]$/)?.[1]; return this.children.find(el=>el.value===value); }
   querySelectorAll(tag) { return this.children.flatMap(el=>[...((el.tag===tag||(tag==='input:checked'&&el.tag==='input'&&el.checked))?[el]:[]),...el.querySelectorAll(tag)]); }
 }
 function setup() {
@@ -122,4 +123,61 @@ test('launch request carries every selected root in order while one root keeps l
   assert.equal(run('request().values.dataset_root'),'/a');
   run("fields.get('dataset_root').input.value='/a'");
   assert.equal(run('request().values.dataset_roots'),undefined);
+});
+
+test('four-mode summary shows effective RTC and Paper details only for Paper',()=>{
+  const {run,elements}=setup();
+  elements.set('protocol',new Element('div'));
+  run(`initial={rtc_max_delay:0,action_semantics:'absolute',assets_dir:'/assets',asset_id:'ordinary'};
+    protocol={action_dim:58,model_action_dim:58,action_hz:30,model_family:'pi05',prompt:'Pick tomato.'};
+    fields.set('rtc_max_delay',{input:{value:10}});renderProtocol();`);
+  let text=elements.get('protocol').children.map(el=>el.textContent).join('\n');
+  assert.match(text,/普通 π0.5.*RTC 最大延迟 10/);
+  assert.doesNotMatch(text,/beta=/);
+  assert.match(text,/\/assets\/ordinary/);
+  run(`protocol.model_family='Paper';protocol.paper_algorithm={mode:'timestamp_zscore_arms',beta:.5,asset_sha256:'fixture-hash'};renderProtocol();`);
+  text=elements.get('protocol').children.map(el=>el.textContent).join('\n');
+  assert.match(text,/Paper 专用配置.*RTC 最大延迟 10/);
+  assert.match(text,/timestamp_zscore_arms.*beta=0.5.*fixture-hash/);
+});
+
+test('Paper action selector disables absolute without affecting ordinary baseline',()=>{
+  const {run,context}=setup();
+  context.container=new Element('div');
+  run(`initial={action_semantics:'delta'};protocol={delta_available:true,paper_algorithm:{mode:'timestamp_zscore_arms'}};
+    addField(container,['action_semantics','监督','action-semantics'],'delta','delta');`);
+  assert.equal(run("fields.get('action_semantics').input.querySelector('[value=absolute]').disabled"),true);
+  run(`protocol={delta_available:true};addField(container,['action_semantics','监督','action-semantics'],'absolute','absolute');`);
+  assert.notEqual(run("fields.get('action_semantics').input.querySelector('[value=absolute]').disabled"),true);
+});
+
+test('GUI checkboxes select T1/T2/T3, lock sampling, rotate assets and restore native mode',()=>{
+  const {run,elements,context}=setup();
+  for(const id of ['paper-timestamp','paper-correlated','paper-help','protocol','groups-panel'])elements.set(id,new Element('div'));
+  elements.get('sampling-mode').append(Object.assign(new Element('option'),{value:'weighted_replacement'}));
+  run(`initial={paper_trial:'none',asset_id:'ordinary',assets_dir:'/assets'};
+    protocol={paper_available:true,action_dim:58,model_action_dim:58,action_hz:30,prompt:'Pick tomato.'};
+    for(const [key,value] of Object.entries({exp_name:'run01',asset_id:'ordinary',assets_dir:'/assets',rtc_max_delay:'10'}))fields.set(key,{input:{value}});
+    `);
+  const input=new Element('select');input.value='absolute';input.append(Object.assign(new Element('option'),{value:'absolute'}));
+  context.inputForTest=input;
+  run("fields.set('action_semantics',{input:inputForTest});independentStats=()=>{fields.get('asset_id').input.value='independent_paper_'+paperChoice};");
+  elements.get('paper-timestamp').checked=true;
+  run('changePaperFeatures()');
+  assert.equal(run('paperChoice'),'t1');
+  assert.equal(input.value,'delta');
+  assert.equal(input.querySelector('[value=absolute]').disabled,true);
+  assert.equal(elements.get('sampling-mode').value,'epoch_shuffle');
+  assert.equal(run('groupInputs().length'),0);
+  assert.equal(run('paperAlgorithm().beta'),0);
+  assert.match(run("fields.get('asset_id').input.value"),/paper_t1$/);
+  elements.get('paper-correlated').checked=true;run('changePaperFeatures()');
+  assert.equal(run('paperChoice'),'t3');assert.equal(run('paperAlgorithm().beta'),.5);
+  elements.get('paper-timestamp').checked=false;run('changePaperFeatures()');
+  assert.equal(run('paperChoice'),'t2');assert.equal(run('paperAlgorithm().mode'),'global_quantile');
+  elements.get('paper-correlated').checked=false;run('changePaperFeatures()');
+  assert.equal(run('paperChoice'),'none');assert.equal(run('paperAlgorithm()'),null);
+  assert.equal(input.querySelector('[value=absolute]').disabled,false);
+  assert.equal(run("fields.get('asset_id').input.value"),'ordinary');
+  assert.equal(run('request().values.paper_trial'),'none');
 });

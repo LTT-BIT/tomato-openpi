@@ -4,6 +4,7 @@ const fragment = new URLSearchParams(location.hash.slice(1));
 if (fragment.get('token')) { sessionStorage.setItem('training-token', fragment.get('token')); history.replaceState(null, '', location.pathname); }
 let sourceHash = null;
 let baseline = null, initial = null, protocol = null, currentJob = null, gpuData = [], browseTarget = null, browseState = null, loadingVersion = 0;
+let paperChoice = null;
 const fields = new Map();
 const terminal = new Set(['completed', 'failed', 'stopped', 'interrupted']);
 const statusNames = {queued:'等待中', running:'运行中', completed:'训练完成', failed:'失败', stopped:'已停止', interrupted:'已中断', orphaned:'管理进程中断，子进程仍运行'};
@@ -40,6 +41,7 @@ function addField(container, definition, value, original) {
   const input=document.createElement(['lines','paths'].includes(type)?'textarea':type==='action-semantics'?'select':'input');input.id='field-'+key;input.name=key;
   if(type==='action-semantics'){
     for(const [mode,text] of [['absolute','absolute · 原始绝对目标'],['delta','delta · 关节目标减当前状态']]){const option=node('option',text);option.value=mode;input.append(option);}
+    if(protocol.paper_algorithm){input.querySelector('[value=absolute]').disabled=true;wrapper.append(node('small','论文配置固定为双臂 delta、双手 absolute；算法由论文功能选择，来源随配置保存。','default'));}
     if(!protocol.delta_available){input.querySelector('[value=delta]').disabled=true;wrapper.append(node('small','当前仅番茄 Wuji / Sharpa 支持 delta。','default'));}
   }
   if(['int','float','optional-int'].includes(type)){input.type='number';input.step=type==='float'?'any':'1';}
@@ -60,6 +62,7 @@ function addField(container, definition, value, original) {
     else if(name.value.endsWith('_'+old))name.value=name.value.slice(0,-old.length)+input.value;
     name.dispatchEvent(new Event('input'));input.dataset.previous=input.value;input.dispatchEvent(new Event('input'));independentStats();
   });
+  if(['rtc_max_delay','action_semantics','assets_dir','asset_id'].includes(key))input.addEventListener('input',renderProtocol);
   fields.set(key,{input,type});container.append(wrapper);
 }
 function fillForm(result) {
@@ -70,12 +73,50 @@ function fillForm(result) {
     const container=$(section+'-fields');container.replaceChildren();
     for(const definition of defs){const key=definition[0];if(section==='advanced'&&!(key in initial))continue;let value=initial[key];if(key==='dataset_root')value=(initial.dataset_roots||[initial.dataset_root]).join('\n');if(key==='owner')value=result.owner;if(key==='exp_name')value=result.suggested_exp_name;if(key==='stats_batch_size')value=512;addField(container,definition,value,initial[key]);}
   }
-  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
-  if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
+  paperChoice=initial.paper_trial||'none';
   if(result.shared_weights){const button=node('button','使用服务器公共权重','text-button');button.addEventListener('click',()=>{fields.get('weight_path').input.value=result.shared_weights;fields.get('weight_path').input.dispatchEvent(new Event('input'));});$('runtime-fields').append(button);}
   $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);
   $('groups-panel').classList.toggle('hidden',initial.sampling_mode!=='weighted_replacement');
+  syncPaperControls();renderProtocol();
   fields.get('exp_name').input.dispatchEvent(new Event('input'));updatePath();
+}
+function paperAlgorithm(){
+  if(paperChoice===null)return protocol.paper_algorithm;
+  if(paperChoice==='none')return null;
+  const modes={t0:['global_quantile',0],t1:['timestamp_zscore_arms',0],t2:['global_quantile',.5],t3:['timestamp_zscore_arms',.5],tg:['global_zscore_arms',0]};
+  const pair=modes[paperChoice];if(!pair)return protocol.paper_algorithm;
+  const same=paperChoice===initial.paper_trial&&fields.get('asset_id')?.input.value===initial.asset_id&&fields.get('assets_dir')?.input.value===initial.assets_dir;
+  return {mode:pair[0],beta:pair[1],asset_sha256:same?protocol.paper_algorithm?.asset_sha256:null};
+}
+function syncPaperControls(){
+  const active=paperChoice!=='none', available=protocol.paper_available&&paperChoice!=='custom';
+  $('paper-timestamp').checked=['t1','t3'].includes(paperChoice);
+  $('paper-correlated').checked=['t2','t3'].includes(paperChoice);
+  $('paper-timestamp').disabled=!available;$('paper-correlated').disabled=!available;
+  $('paper-help').textContent=available?'两项同时勾选为 T3；可与 Train RTC 组合。论文功能使用双臂 delta、双手 absolute、完整动作窗口及无放回采样。切换功能自动分配独立统计。':'论文勾选仅支持 30 Hz Sharpa multimodal π0.5 全参；已有自定义论文配置保留原算法。';
+  fields.get('action_semantics').input.querySelector('[value=absolute]').disabled=active;
+  $('sampling-mode').querySelector('[value=weighted_replacement]').disabled=active;
+  if(active){
+    fields.get('action_semantics').input.value='delta';
+    $('sampling-mode').value='epoch_shuffle';$('groups').replaceChildren();$('groups-panel').classList.add('hidden');
+  }
+}
+function changePaperFeatures(){
+  if(!protocol.paper_available)throw Error('当前配置不支持论文功能');
+  paperChoice=$('paper-timestamp').checked?($('paper-correlated').checked?'t3':'t1'):($('paper-correlated').checked?'t2':'none');
+  syncPaperControls();
+  const name=fields.get('exp_name').input;
+  if(paperChoice!=='none')name.value=name.value.replace(/_absolute(?=_|$)/,'_delta');
+  name.value=name.value.replace(/_paper_(t[0123g]|none)$/,'')+'_paper_'+paperChoice;
+  if(paperChoice===initial.paper_trial){fields.get('asset_id').input.value=initial.asset_id;}
+  else{independentStats();}
+  renderProtocol();updatePath();
+}
+function renderProtocol(){
+  const current=key=>fields.get(key)?.input.value??initial[key], p=paperAlgorithm();
+  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · ${p?'Paper 专用配置':'普通 π0.5'} · RTC 最大延迟 ${current('rtc_max_delay')} 步 · 动作监督 ${current('action_semantics')}`),node('div','统计资产：'+current('assets_dir')+'/'+current('asset_id')),node('div','英文 prompt 示例：'+protocol.prompt));
+  if(p)$('protocol').append(node('div',`Paper mode=${p.mode} · beta=${p.beta} · bundle SHA256=${p.asset_sha256||'待计算'}`));
+  if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。柠檬数据沿用已记录的 209 条筛选。'));
 }
 async function chooseBaseline(module){
   const version=++loadingVersion;$('start').disabled=true;
@@ -145,6 +186,7 @@ function request(){
   if(!baseline)throw Error('请先选择配置');const values={};let owner,statsBatch;
   for(const [key,{input,type}] of fields){let value=input.value.trim();if(type==='int'||type==='float')value=value===''?NaN:Number(value);if(type==='optional-int')value=value===''?null:Number(value);if(type==='lines')value=value.split('\n').map(v=>v.trim()).filter(Boolean);if(type==='ints')value=parseIds(value);if(typeof value==='number'&&!Number.isFinite(value))throw Error(key+' 请输入有效数值');if(key==='owner')owner=value;else if(key==='stats_batch_size')statsBatch=value;else values[key]=value;}
   const roots=datasetPaths(values.dataset_root);values.dataset_root=roots[0]||'';if(roots.length>1)values.dataset_roots=roots;
+  if(paperChoice!==null)values.paper_trial=paperChoice;
   values.sampling_mode=$('sampling-mode').value;values.sampling_groups=[];
   if(values.sampling_mode==='weighted_replacement')for(const row of $('groups').children){values.sampling_groups.push({name:row.querySelector('[data-key=name]').value.trim(),weight:Number(row.querySelector('[data-key=weight]').value),episodes:parseIds(row.querySelector('[data-key=episodes]').value)});}
   return {baseline,source_sha256:sourceHash,owner,values,gpus:selectedGPUs(),wandb_mode:$('wandb-mode').value,auto_norm:$('auto-norm').checked,allow_busy:$('allow-busy').checked,stats_batch_size:statsBatch};
@@ -192,6 +234,7 @@ async function showPreview(check){
 async function openBrowser(input){browseTarget=input;try{await browse(input.value.includes('://')?'':input.value.split('\n').filter(Boolean).at(-1));}catch{await browse('');}$('browser').showModal();}
 async function browse(path){browseState=await api('/api/browse?path='+encodeURIComponent(path));$('browse-path').value=browseState.path;$('browse-list').replaceChildren();for(const entry of browseState.entries){const button=node('button','▸ '+entry.name);button.addEventListener('click',()=>perform(()=>browse(entry.path)));$('browse-list').append(button);}if(browseState.truncated)$('browse-list').append(node('p','仅显示前 500 个目录，请直接输入路径'));}
 $('preview').addEventListener('click',()=>perform(()=>showPreview(false),$('preview')));
+for(const id of ['paper-timestamp','paper-correlated'])$(id).addEventListener('change',()=>perform(changePaperFeatures));
 $('check').addEventListener('click',()=>perform(()=>showPreview(true),$('check')));
 $('start').addEventListener('click',()=>perform(async()=>{const job=await api('/api/start',request());notice((job.creates_config?'已保存新配置':'已复用原配置')+'，本次实验已记录；数据检查通过后进入训练。');await refreshCatalog();await refreshJobs();await showJob(job.id);$('output-section').scrollIntoView({behavior:'smooth'});},$('start')));
 $('reset').addEventListener('click',()=>perform(()=>chooseBaseline(baseline),$('reset')));
