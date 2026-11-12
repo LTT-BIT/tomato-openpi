@@ -1,7 +1,7 @@
 # 本仓库开发约定
 
-- 本分支 `tomato-subtasks-ab-train` 用于无 Agent 的整串番茄 A/B 训练；用户明确要求分支不使用 codex 前缀。在现有 `/home/user/tomato-openpi` 开发，27/28 共用 `/home/mengxiang/workspace/code/tomato-openpi-sharpa`，不另建 clone/worktree。本轮只准备、校验和同步，不启动正式训练，不改部署端。
-- 用户已授权验证通过后自动中文提交并推送 GitHub 对应分支；本分支推送 `github/tomato-subtasks-ab-train`，不强推。数据和权重不纳入 Git。
+- 本分支 `tomato-subtask-policy` 用于无 Agent 的整串番茄 A/B 训练；用户明确要求分支不使用 codex 前缀。在现有 `/home/user/tomato-openpi` 开发，27/28 共用 `/home/mengxiang/workspace/code/tomato-openpi-sharpa`，不另建 clone/worktree。本轮只准备、校验和同步，不启动正式训练，不改部署端。
+- 用户已授权验证通过后自动中文提交并推送 GitHub 对应分支；本分支推送 `github/tomato-subtask-policy`，不强推。数据和权重不纳入 Git。
 - 历史normal93实验固定 `records/normal93_20261109_selection.json`，已有配置、统计、数据和权重保留，不按目录扫描悄悄改变成员。
 - 2026-11-11用户新规定：后续π₀.₅训练使用Agent冻结清单中的100条完整七阶段录制，全部100条参加动作训练，不留val/test，归一化重新覆盖全部100条。新增独立complete100 RGB+crop版本，不覆盖旧normal93，不复用93条统计；Agent的84/8/8划分不改。当前只做准备，不启动正式训练，不改部署。
 - 本轮默认B主方案、A对照；使用scripts.tomato_ab_run显式check/start，默认只检查，不自动排队或开训。28 GPU被占用时继续完成CPU准备，不停止他人进程，不把CPU权重/图检查声称GPU显存验收。W&B默认offline并保留本地日志。
@@ -21,3 +21,5 @@
 - 用户已要求部分对齐既有训练：normal93 A/B均为batch512、8000总步数、FSDP8；保留原学习率计划（warmup1000/decay_steps30000）、普通Delta与其统计，不迁移T3额外归一化或噪声。本轮只同步配置和UI，不开训。
 
 - 2026-11-10用户授权阶段指令可控性与局部图充分离线测试，并明确GPU用28、不用27。B训练已完成，checkpoint7999只读。当前仅诊断，不改默认模型/部署、不连接机器人；93条全为训练数据，不能把本次探针结果称为独立泛化或闭环成功率。
+
+- 2026-11-12：100条r11离线四视图通过全量传输哈希核验，使用独立 `scripts.tomato100_run` 配置28服务器；默认check、B主方案。保留不可变candidate数据manifest，通过哈希绑定的训练准备记录显式接纳已复核离线输入，不宣称独立语义100%或在线ROI验证。GPU目标batch容量仍待实测；不自动开训，不覆盖normal93。

@@ -43,6 +43,9 @@ def test_composition_preserves_baseline_training_semantics(module):
     snapshot["config_fields"]["data"]["fields"]["extra_delta_transform"] = False
     # New opt-in behavior must leave every published baseline disabled.
     snapshot["config_fields"]["model"]["fields"]["rtc_max_delay"] = 0
+    snapshot["config_fields"]["model"]["fields"]["image_keys"] = [
+        "base_0_rgb", "left_wrist_0_rgb", "right_wrist_0_rgb"
+    ]
     # Keep the historical snapshot intact; baseline weights now default to shared server storage.
     snapshot["config_fields"]["weight_loader"]["fields"]["params_path"] = "/mnt/data/public_ckpt/pi05/pi05_base/params"
     old_assets = snapshot["config_fields"]["data"]["fields"]["assets"]["fields"]

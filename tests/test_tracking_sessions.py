@@ -22,7 +22,7 @@ def test_resume_uses_new_segment_with_same_group_and_checkpoint_step(tmp_path, m
     Path(config.checkpoint_dir).mkdir(parents=True)
     calls, finishes = [], []
     ids = iter(["first", "second"])
-    monkeypatch.setattr(tracking.wandb.util, "generate_id", lambda: next(ids))
+    monkeypatch.setattr(tracking, "generate_id", lambda: next(ids))
 
     def init(**kwargs):
         calls.append(kwargs)

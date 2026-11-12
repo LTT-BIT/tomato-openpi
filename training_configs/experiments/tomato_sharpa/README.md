@@ -2,6 +2,27 @@
 
 ## complete100 RGB＋局部crop：训练准备
 
+### 28服务器100条四视图训练入口（2026-11-12）
+
+当前分支`tomato-subtask-policy`。数据已同步至`/home/mengxiang/workspace/data/sharpa/no-block-more/complete100_rgb_crop_offline_r11`：100条、425556帧，A/B各四路视频，全包1513文件9126087596字节，逐文件SHA256一致。服务器现有normal源视频也与本地300份源视频逐一核对一致；原始数据只读，没有硬链接。传输、来源差异和哈希接纳记录为`subtasks/records/complete100_server28_preparation_20261112_r11.json`。
+
+100条均为normal，不使用speedup或C；90条来自`tomato_subtasks_normal_20261107`，10条来自`tomato_independent10_20261109`。对比前次normal93：共同90条的长度与保存标注哈希一致；移出B/1101_572_601_normal_lerobot的0/1/2，加入11月9日10条。训练帧数410456→425556，统计覆盖全部100条。因此数据成员、统计与第四路视觉均有变化；严格crop消融需另用相同100条的三视图对照。
+
+默认B四阶段英文prompt，A总体目标prompt不变。原三路顺序为cam0全局、cam2左腕、cam1右腕，第四路来自cam0局部。物理输入state58D、动作50×58、手臂14维Delta/手部44维Absolute、30Hz、Gemma2B/300M、全参数微调、base初始化、epoch_shuffle、三个独立seed42/42001/42002、batch512/8000步/FSDP8、warmup1000/decay30000、peak_lr2.5e-5/decay_lr2.5e-6均保留。视觉token768→1024、文本256不变，前缀总预算1024→1280；crop增强不做破坏交互区域的随机几何裁切。没有深度或π₀.₅历史输入。
+
+不可变数据manifest仍记录生成时的`candidate/training_ready=false`。新入口显式加载哈希绑定的准备记录，接纳已完成全帧连续性/像素/几何检查及编码Agent视觉复核的r11离线输入，不更改冻结文件或旧验证结论。直接导入配置仍需显式`PI05_TOMATO100_PREPARATION_REPORT`；缺失、数据哈希变化、传输不完整都会拒绝。接纳范围不包含独立语义准确率100%、在线因果ROI或GPU目标batch容量。r11坐标使用前后帧，像素来自当前帧，部署后续单独处理。
+
+在服务器现有仓库`/home/mengxiang/workspace/code/tomato-openpi-sharpa`运行：
+
+```bash
+# 默认只检查；A对照改为 --variant a
+bash scripts/python.sh -m scripts.tomato100_run check --variant b
+# GPU空闲且容量确认后，显式启动新实验；本次未执行
+bash scripts/python.sh -m scripts.tomato100_run start --variant b
+```
+
+默认数据路径已固定，可用`--bundle`指定同一哈希数据的其他挂载位置；A/B资产分别为`assets/tomato_complete100_rgb_crop_{a,b}_saved_labels_r1_offline_r11_delta_30hz`。新实验名为`tomato_complete100_{a,b}_crop_delta_r1_offline_r11_s42`，拒绝覆盖或恢复已有checkpoint。W&B默认offline、本地日志保留；`logs/complete100_preflight/`记录最终配置。check可在GPU占用时完成CPU数据和统计验证，显式报告未启动与显存未验收；start在GPU占用时立即拒绝，不排队或停止他人任务。目标batch512的显存不能沿用三视图实验结论，8卡目前被占用，需空闲后实测。
+
 ### 当前版本：前后帧辅助修框，全部帧保持局部RGB（2026-11-12）
 
 当前候选为`/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11`，A/B四视图包为`tomato_complete100_four_view_offline_local_candidate_r11`。100条全部425556帧均从**各自对应时刻的native cam0 RGB**裁剪局部图：全图回退0、黑帧0、缺图0。原三路RGB、实测state、动作、标签和100条成员不改，无深度、无π₀.₅历史token。
@@ -14,7 +35,7 @@
 
 已实际查看跨全部100条的400张视频解码样本、266张异常图和52张修正图，导出第48条原23–32秒的三列对照：native／r6全图回退／r11连续局部。A/B实际LeRobot300样本、全部物理列及600份原三路视频哈希检查通过，A/B共851112个availability和local-valid均true。训练资产后缀`_offline_r11`，归一化数值不变且重新绑定数据身份。167项回归通过。证据见`subtasks/records/complete100_offline_local_20261112_validation_r11.json`。
 
-`training_ready=false`仍表示正式训练尚未放行：独立语义准确率未测、目标batch512的GPU显存预检待做；本轮只做离线数据准备，不启动正式π₀.₅训练或修改部署。视觉1024、文本256、58D state、50×58动作、batch512/8000步/FSDP8和原学习率计划保持。
+本节为生成时的候选状态：冻结manifest保留`training_ready=false`。当前训练输入接纳由上节独立哈希准备记录管理；独立语义准确率未测、目标batch512的GPU显存预检待做，本次未启动正式π₀.₅训练或修改部署。视觉1024、文本256、58D state、50×58动作、batch512/8000步/FSDP8和原学习率计划保持。
 
 复做先运行`scripts.prepare_tomato100_offline_roi`生成离线标注，再核对`records/complete100_offline_roi_exception_review_20261112_r10.json`中的真实逐帧复核及其哈希，运行`scripts.export_tomato100_offline_crops`导出局部视频，随后使用`scripts.materialize_tomato100_four_view`和实际加载检查。新的标注版本不能直接套用旧复核记录；导出器必须验证原标注manifest身份、每个未自动通过帧有且仅有一次明确复核，并重新验收全部窗口。
 
