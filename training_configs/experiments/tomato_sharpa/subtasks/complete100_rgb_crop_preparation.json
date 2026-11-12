@@ -1,6 +1,6 @@
 {
-  "version": "tomato-complete100-rgb-crop-preparation-v3-transport",
-  "status": "all100_transport_repair_temporal_and_input_checks_passed_independent_semantic_accuracy_not_certified",
+  "version": "tomato-complete100-rgb-crop-preparation-v4-available",
+  "status": "all100_current_image_coverage_completed_local_quality_and_transition_acceptance_pending",
   "training_recipe": "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop",
   "derived_base_bundle": "/home/user/datasets/derived/tomato_complete100_saved_labels_r1_base_ab",
   "roi_worklist": "/home/user/datasets/derived/tomato_complete100_roi_worklist_r2/worklist.json",
@@ -36,7 +36,12 @@
     "display_crop_box",
     "left_hand_mcp_fe_mean",
     "left_grasp_state_confirmed",
-    "carry_evidence"
+    "carry_evidence",
+    "image_available",
+    "local_roi_valid",
+    "input_mode",
+    "input_box",
+    "fallback_reason"
   ],
   "roi_context_scale": 1.5,
   "image_resolution": [
@@ -143,11 +148,11 @@
     "training_configs.experiments.tomato_sharpa.subtasks.complete100_a_crop",
     "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop"
   ],
-  "derived_four_view_bundle": "/home/user/datasets/derived/tomato_complete100_four_view_transport_candidate_r5",
-  "roi_candidates": "/home/user/datasets/derived/tomato_complete100_transport_candidates_r5",
+  "derived_four_view_bundle": "/home/user/datasets/derived/tomato_complete100_four_view_available_candidate_r6",
+  "roi_candidates": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6",
   "normalization_assets": {
-    "a": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_transport_r5_delta_30hz",
-    "b": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_transport_r5_delta_30hz"
+    "a": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_available_r6_delta_30hz",
+    "b": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_available_r6_delta_30hz"
   },
   "normalization_statistics_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
   "actual_token_distribution": {
@@ -179,8 +184,11 @@
     "all_frames_enumerated": true,
     "full_roi_coverage": false,
     "training_ready": false,
-    "invalid_policy": "current-frame display crop continues; false training mask and null training ROI",
-    "algorithm_valid_fraction": 0.9775141227006552
+    "invalid_policy": "Current full-view fallback remains visible to training; local ROI validity remains false for these frames",
+    "algorithm_valid_fraction": 0.9775141227006552,
+    "full_image_coverage": true,
+    "image_available_frames": 425556,
+    "full_view_fallback_frames": 9569
   },
   "quality_diagnostics": {
     "temporal_audit": "/home/user/datasets/derived/tomato_complete100_transport_audit_r5/audit.json",
@@ -189,19 +197,29 @@
     "potential_role_mismatch_frames": 0,
     "independent_accuracy_evaluated": false,
     "phase_labels_not_used_for_generation": true,
-    "failure_and_regression_review": "/home/user/datasets/derived/tomato_complete100_transport_failure_review_r5"
+    "failure_and_regression_review": "/home/user/datasets/derived/tomato_complete100_transport_failure_review_r5",
+    "scope": "r5 local-selection quality diagnostics retained; do not certify new local/full transition smoothness"
   },
   "full_model_gpu_benchmark": "/home/user/datasets/derived/tomato_complete100_four_view_gpu_benchmark_r3/receipt.json",
   "roi_single_frame_benchmark": "/home/user/datasets/derived/tomato_complete100_transport_b1_benchmark_r5_isolated/receipt.json",
-  "actual_loader_verification": "/home/user/datasets/derived/tomato_complete100_four_view_transport_candidate_check_r5.json",
+  "actual_loader_verification": "/home/user/datasets/derived/tomato_complete100_four_view_available_candidate_check_r6.json",
   "agent_history_reader_trained": false,
-  "roi_context_scale_semantics": "1.5 is desired context, not an exact per-frame crop ratio: bounded center/scale and minimum field retain full observed region or mask invalid.",
-  "temporal_stream_quality_accepted": true,
+  "roi_context_scale_semantics": "Unchanged r5 reliable local crops; unreliable local frames use explicit current full-view fallback, not a successful local ROI",
+  "temporal_stream_quality_accepted": false,
   "semantic_quality_accepted": false,
   "training_ready": false,
-  "latest_validation": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_transport_roi_20261112_validation_r5.json",
+  "latest_validation": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_available_images_20261112_validation_r6.json",
   "roi_provenance_binding": "Per-frame gzip index is SHA-bound to the episode receipt, whose contract includes generator/selector/geometry/weights/calibration identities; signature is not duplicated on every frame.",
   "candidate_training_bundle_materialized": true,
   "roi_temporal_cache_is_agent_memory": false,
-  "pi05_explicit_memory_tokens": false
+  "pi05_explicit_memory_tokens": false,
+  "training_image_requirement": {
+    "every_step_required": true,
+    "expected_frames": 425556,
+    "mask_source": "observation.interaction_available",
+    "local_quality_source": "observation.interaction_valid",
+    "fallback_policy": "Current cam0 full view letterboxed to224, never previous pixels",
+    "full_roi_coverage_required_for_image_availability": false,
+    "local_or_full_transition_quality_accepted": false
+  }
 }

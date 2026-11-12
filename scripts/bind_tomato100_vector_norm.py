@@ -35,6 +35,7 @@ def main():
         repo=f'fr3_sharpa/tomato_complete100_rgb_crop_{short}_saved_labels_r1{a.variant_suffix}'
         asset=f'tomato_complete100_rgb_crop_{short}_saved_labels_r1{a.variant_suffix}_delta_30hz'
         data=LeRobotFr3SharpaCropDataConfig(repo_id=repo,assets=AssetsConfig(assets_dir=str(a.assets),asset_id=asset),
+            interaction_mask_key=crop.get('interaction_mask_key','observation.interaction_valid'),
             extra_delta_transform=True,action_sequence_keys=('action',),action_hz=30,video_backend='pyav',
             lerobot_datasets=(LeRobotDatasetSpec(repo_id=repo,root=str(a.bundle/mode),weight=1.),),
             base_config=TaskDataConfig(prompt_from_task=True,task_view=TaskView(split_path=str(a.bundle/'splits.json'),split='train')))

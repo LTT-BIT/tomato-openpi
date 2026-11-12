@@ -26,7 +26,8 @@ def run(selection_path,bundle,norm_root,tokenizer_path):
     dataset=LeRobotDataset(repo_id='fr3_sharpa/tomato_complete100_fourview_candidate_b',root=root,
         delta_timestamps={'action':[i/30 for i in range(50)]},video_backend='pyav')
     source=TaskViewDataset(dataset,TaskView(split_path=str(bundle/'splits.json'),split='train'),50)
-    repack,vectors=LeRobotFr3SharpaCropDataConfig(extra_delta_transform=True).create_vector_transforms(
+    mask_key=crop.get('interaction_mask_key','observation.interaction_valid')
+    repack,vectors=LeRobotFr3SharpaCropDataConfig(extra_delta_transform=True,interaction_mask_key=mask_key).create_vector_transforms(
         Pi0Config(pi05=True,action_dim=58,image_keys=IMAGE_KEYS,max_token_len=256))
     transform=transforms.compose([*repack.inputs,*vectors.inputs])
     stats=normalize.load(norm_root);normalizer=transforms.Normalize(stats,use_quantiles=True)
@@ -36,6 +37,10 @@ def run(selection_path,bundle,norm_root,tokenizer_path):
         lengths=cache['token_lengths'];ids=cache['observation_ids']
     offset=0;checked=0;invalid_checked=0;observed=[]
     for row in selection['episodes']:
+        if mask_key=='observation.interaction_available':
+            availability=pq.read_table(root/f"data/chunk-000/episode_{row['episode_index']:06d}.parquet",columns=[mask_key])[mask_key].to_numpy()
+            if len(availability)!=row['length'] or not availability.all():
+                raise ValueError('Every step must have an unmasked fourth image')
         source_path=Path(row['dataset'])/f"data/chunk-{row['source_episode_index']//1000:03d}/episode_{row['source_episode_index']:06d}.parquet"
         physical=pq.read_table(source_path,columns=['observation.state','action'])
         measured=np.array(physical['observation.state'].to_pylist(),np.float32)
@@ -52,7 +57,7 @@ def run(selection_path,bundle,norm_root,tokenizer_path):
             np.testing.assert_array_equal(value['state'],canonical)
             np.testing.assert_array_equal(value['actions'],target)
             if tuple(value['image'])!=IMAGE_KEYS or value['state'].shape!=(58,) or value['actions'].shape!=(50,58):raise ValueError('Actual four-view vector shape mismatch')
-            valid=bool(raw['observation.interaction_valid'])
+            valid=bool(raw[mask_key])
             if bool(value['image_mask']['interaction_0_rgb'])!=valid:raise ValueError('Validity mask lost')
             if not valid:invalid_checked+=1
             if value['image']['interaction_0_rgb'].shape!=(224,224,3):raise ValueError('Crop decode shape mismatch')
@@ -64,6 +69,7 @@ def run(selection_path,bundle,norm_root,tokenizer_path):
     if offset!=425556 or len(source)!=425556:raise ValueError('Incomplete selected frame set')
     return dict(selection_sha256=digest(selection_path),crop_manifest_sha256=digest(bundle/'crop_manifest.json'),
         base=checked_base,real_four_view_loader=dict(episodes=100,samples=checked,invalid_mask_samples=invalid_checked,
+            interaction_mask_key=mask_key,full_image_coverage_verified=mask_key=='observation.interaction_available',
             actual_crop_size=[224,224,3],state_size=58,action_window=[50,58],model_keys=list(IMAGE_KEYS),
             normalized_token_lengths_match=True,independent_original_vector_window_reference=True,sampled_text_maximum=max(observed),all100_action_training=True),
         final_normalization_contract_bound=False,roi_quality_accepted=False,training_ready=False,training_started=False,

@@ -2,7 +2,26 @@
 
 ## complete100 RGB＋局部crop：训练准备
 
-### 当前版本：修复漏手、窗口跟随和篮内红色误判（2026-11-12）
+### 当前要求：每个训练时间步都有第四路当前RGB（2026-11-12）
+
+用户要求100条全部425556个时间步都有可用图像。新版本将图像可用性和局部定位可靠性分开：`observation.interaction_available`决定第四路image mask，`observation.interaction_valid`仅记录原局部ROI证据。正常帧从当前native RGB按原可靠框裁剪；局部证据不足或窗口尚未覆盖目标时，第四路改为**同一时刻cam0全图**，保持宽高比补边到224。索引记录`image_available`、`local_roi_valid`、`input_mode`、`input_box`及`fallback_reason`。不复用旧画面，不把回退当局部成功，不删时间点，不改原数据。
+
+已完成100条、425556帧全部解码，黑帧0；局部裁剪415987帧，全图回退9569帧。11691个编码像素核对包含全部回退帧；A/B共851112个availability值全true，200份局部视频复制哈希一致，实际LeRobot300样本及600份原三路视频/全部物理列核对通过。155项回归和5项归一化测试通过，准备配置最终10项检查通过。A/B新归一化绑定已验证；具体证据在`subtasks/records/complete100_available_images_20261112_validation_r6.json`。共有2678次局部/全图切换，最长全图回退107帧，不能作为流畅性通过的证据。
+
+新数据位于`/home/user/datasets/derived/tomato_complete100_available_candidates_r6`，A/B包为`tomato_complete100_four_view_available_candidate_r6`；只适用于`current_rgb_local_or_full_fallback_v5`，统计版本后缀为`_available_r6`。准备脚本`scripts.prepare_tomato100_available_crops`复用r5已核验的逐帧定位索引，重新从原始当前RGB渲染全部视频；每帧核验解码、时间戳和非黑图，所有回退帧及每200帧局部图核对重编码像素。原三路视频和物理列由实际LeRobot检查再次核对。
+
+训练入口对新版本要求`full_image_coverage=true`、`image_available_frames=425556`及独立availability列；旧候选继续使用原mask规则，不自动把旧mask置true。`full_roi_coverage=false`可以和100%图像输入同时成立。**全图兜底解决输入缺失，不解决定位失败；局部/全图切换可能产生明显缩放变化，尚未通过连续平滑性与独立语义质量验收。** 因此仍保留`training_ready=false`，不启动正式训练。不能将r5的流畅性结论沿用到r6；后续应改善局部定位并检查切换过渡，使回退尽量少且稳定。
+
+复做命令（输出目录必须不存在）：
+
+```bash
+PYTHONPATH=src:packages/openpi-client/src python -m scripts.prepare_tomato100_available_crops \
+  --selection training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json \
+  --parent /home/user/datasets/derived/tomato_complete100_transport_candidates_r5 \
+  --out /home/user/datasets/derived/tomato_complete100_available_candidates_r6 --workers 8
+```
+
+### r5定位与平滑对照：修复漏手、窗口跟随和篮内红色误判（2026-11-12）
 
 最新100条、425556帧为`/home/user/datasets/derived/tomato_complete100_transport_candidates_r5`，A/B四视图包为`tomato_complete100_four_view_transport_candidate_r5`。原始数据、100条成员和动作监督均不改；无深度、无π₀.₅历史token，未启动正式策略训练或修改部署。
 

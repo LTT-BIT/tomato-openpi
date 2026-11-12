@@ -121,3 +121,19 @@ def test_crop_adapter_vector_statistics_keep_arm_delta_and_hand_absolute():
     expected[:,:,:7]-=q[:,None,:7];expected[:,:,29:36]-=q[:,None,29:36]
     np.testing.assert_array_equal(out['state'],q)
     np.testing.assert_array_equal(out['actions'],expected)
+
+
+def test_full_coverage_adapter_keeps_fallback_visible_without_promoting_local_validity():
+    c=pi0_config.Pi0Config(pi05=True,action_dim=58,image_keys=IMAGE_KEYS)
+    config=LeRobotFr3SharpaCropDataConfig(interaction_mask_key='observation.interaction_available')
+    repack,vectors=config.create_vector_transforms(c)
+    r=raw(False)
+    source={name:r[key] for key,name in repack.inputs[0].structure.items() if key!='observation/interaction_valid'}
+    source['observation.interaction_available']=np.bool_(True)
+    source['observation.interaction_valid']=np.bool_(False)
+    got=vectors.inputs[0](repack.inputs[0](source))
+    assert got['image_mask']['interaction_0_rgb']
+    assert not source['observation.interaction_valid']
+    np.testing.assert_array_equal(got['image']['interaction_0_rgb'],r['observation/interaction_image'])
+    del source['observation.interaction_available']
+    with pytest.raises(KeyError):repack.inputs[0](source)

@@ -30,17 +30,21 @@ def build_config(*,variant='b_coarse'):
     records=Path(__file__).parent/'records'
     selection_path=records/'complete100_rgb_crop_20261111_saved_labels_r1.json'
     selection=json.loads(selection_path.read_text())
+    stream_contract=manifest.get('stream_contract','black_crop_false_mask_on_loss_v1')
+    full_input=stream_contract=='current_rgb_local_or_full_fallback_v5'
+    coverage_ok=(manifest.get('full_image_coverage') is True
+                 and manifest.get('image_available_frames')==425556
+                 and manifest.get('interaction_mask_key')=='observation.interaction_available') if full_input else manifest.get('full_roi_coverage') is True
     if (manifest.get('selection_sha256')!=digest(selection_path)
-            or manifest.get('full_roi_coverage') is not True
+            or not coverage_ok
             or manifest.get('training_ready') is not True
             or manifest.get('episodes')!=100 or manifest.get('frames')!=425556
             or manifest.get('roi_generation_mode') not in ('manual_offline_interpolated','causal_prediction')
             or not manifest.get('roi_generator_signature')):
         raise ValueError('Complete hash-bound100 ROI coverage/provenance required')
-    stream_contract=manifest.get('stream_contract','black_crop_false_mask_on_loss_v1')
-    if stream_contract not in ('black_crop_false_mask_on_loss_v1','continuous_current_pixels_false_mask_on_loss_v1','continuous_current_pixels_state_guarded_v2','continuous_current_pixels_coverage_v3','continuous_current_pixels_transport_v4'):
+    if stream_contract not in ('black_crop_false_mask_on_loss_v1','continuous_current_pixels_false_mask_on_loss_v1','continuous_current_pixels_state_guarded_v2','continuous_current_pixels_coverage_v3','continuous_current_pixels_transport_v4','current_rgb_local_or_full_fallback_v5'):
         raise ValueError('Unknown crop stream contract')
-    suffix={'continuous_current_pixels_false_mask_on_loss_v1':'_stable_r1','continuous_current_pixels_state_guarded_v2':'_state_guarded_r1','continuous_current_pixels_coverage_v3':'_coverage_r4','continuous_current_pixels_transport_v4':'_transport_r5'}.get(stream_contract,'')
+    suffix={'continuous_current_pixels_false_mask_on_loss_v1':'_stable_r1','continuous_current_pixels_state_guarded_v2':'_state_guarded_r1','continuous_current_pixels_coverage_v3':'_coverage_r4','continuous_current_pixels_transport_v4':'_transport_r5','current_rgb_local_or_full_fallback_v5':'_available_r6'}.get(stream_contract,'')
     splits=json.loads((root/'splits.json').read_text())
     if splits['splits']!={'train':list(range(100))}:raise ValueError('All100 action training required')
     info=json.loads((root/variant/'meta/info.json').read_text())
@@ -51,6 +55,8 @@ def build_config(*,variant='b_coarse'):
             or set(k for k,v in info['features'].items() if v.get('dtype')=='video')!=set(FR3_SHARPA_CROP.camera_keys)
             or info['features'].get('observation.interaction_valid',{}).get('dtype')!='bool'):
         raise ValueError('Four-view metadata/mask/tasks mismatch')
+    if full_input and info['features'].get('observation.interaction_available',{}).get('dtype')!='bool':
+        raise ValueError('Full input coverage requires separate image availability')
     dataset=common.Dataset(version=f'tomato_complete100_rgb_crop_saved_labels_r1{suffix}',
         repo_id=f'fr3_sharpa/tomato_complete100_rgb_crop_{short}_saved_labels_r1{suffix}',root=str(root/variant),
         assets_dir=str(common.repository_root()/'assets'),asset_id=f'tomato_complete100_rgb_crop_{short}_saved_labels_r1{suffix}_delta_30hz',
@@ -59,6 +65,7 @@ def build_config(*,variant='b_coarse'):
         exp_name=f'tomato_complete100_{short}_crop_delta_r1{suffix}_s42',embodiment=FR3_SHARPA_CROP,dataset=dataset)
     return replace(config,model=replace(config.model,image_keys=IMAGE_KEYS,max_token_len=256),
         data=replace(config.data,extra_delta_transform=True,
+            interaction_mask_key='observation.interaction_available' if full_input else 'observation.interaction_valid',
             base_config=TaskDataConfig(prompt_from_task=True,task_view=TaskView(split_path=str(root/'splits.json'),split='train'))),
         batch_size=512,num_train_steps=8000,fsdp_devices=8,
         policy_metadata={**config.policy_metadata,'subtask_variant':variant,
@@ -66,6 +73,7 @@ def build_config(*,variant='b_coarse'):
             'selection_sha256':digest(selection_path),'crop_manifest_sha256':digest(crop),
             'roi_generation_mode':manifest['roi_generation_mode'],'model_image_keys':list(IMAGE_KEYS),
             'crop_stream_contract':stream_contract,
+            'interaction_mask_key':'observation.interaction_available' if full_input else 'observation.interaction_valid',
             'max_token_len':256,'visual_tokens':1024,'memory_to_pi05':False,
             'phases':list(PHASES),'goal':GOAL,'data_policy':'all_sources',
             'gpu_memory_preflight_required':True,'agent_enabled':False})
