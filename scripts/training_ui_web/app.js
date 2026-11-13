@@ -165,6 +165,7 @@ async function refreshGPUs(){const old=new Set(selectedGPUs());const result=awai
 async function stopTask(id){
   if(!id)throw Error('请先在任务记录中选择运行中的任务');
   const job=await api('/api/job?id='+id);
+  if(job.read_only)throw Error('CLI接入任务仅供查看，请使用原CLI管理训练');
   if(terminal.has(job.status))throw Error('该任务已结束');
   if(!confirm('停止任务 '+job.exp_name+'？准备/下载过程也会停止，只保留已保存的 checkpoint。'))return;
   const result=await api('/api/stop',{id});notice(result.message);
@@ -176,11 +177,11 @@ async function refreshJobs(){
     const row=node('div',undefined,'job-row'),button=node('button',job.exp_name,'job');
     button.append(node('small',`${statusNames[job.status]||job.status} · ${job.stage||''} · ${job.created_at}`));
     button.addEventListener('click',()=>perform(async()=>{await showJob(job.id);$('output-section').scrollIntoView({behavior:'smooth',block:'start'});}));row.append(button);
-    if(!terminal.has(job.status)){const stop=node('button','停止任务','danger');stop.addEventListener('click',()=>perform(()=>stopTask(job.id),stop));row.append(stop);}
+    if(!job.read_only&&!terminal.has(job.status)){const stop=node('button','停止任务','danger');stop.addEventListener('click',()=>perform(()=>stopTask(job.id),stop));row.append(stop);}
     $('jobs').append(row);
   }
 }
-async function showJob(id){currentJob=id;const job=await api('/api/job?id='+id);if(currentJob!==id)return;$('stop-active').disabled=terminal.has(job.status);$('active-task').textContent=job.exp_name+' · '+(statusNames[job.status]||job.status);$('output-title').textContent=job.exp_name;$('output').textContent=job.log||'后台任务准备中…';$('job-status').textContent=(statusNames[job.status]||job.status)+' · '+job.stage;$('job-status').classList.remove('hidden');$('stop').classList.toggle('hidden',terminal.has(job.status));$('resume').classList.toggle('hidden',!terminal.has(job.status)||job.status==='completed');$('job-info').textContent=`配置：${job.config_path}\n权重：${job.checkpoint_dir}`+(job.error?'\n错误：'+job.error:'');}
+async function showJob(id){currentJob=id;const job=await api('/api/job?id='+id);if(currentJob!==id)return;$('stop-active').disabled=job.read_only||terminal.has(job.status);$('active-task').textContent=job.exp_name+' · '+(statusNames[job.status]||job.status);$('output-title').textContent=job.exp_name;$('output').textContent=job.log||'后台任务准备中…';$('job-status').textContent=(statusNames[job.status]||job.status)+' · '+job.stage;$('job-status').classList.remove('hidden');$('stop').classList.toggle('hidden',job.read_only||terminal.has(job.status));$('resume').classList.toggle('hidden',job.read_only||!terminal.has(job.status)||job.status==='completed');$('job-info').textContent=`配置：${job.config_path}\n权重：${job.checkpoint_dir}`+(job.error?'\n错误：'+job.error:'');}
 async function showPreview(check){
   currentJob=null;$('stop-active').disabled=true;$('active-task').textContent='在任务记录中选择要停止的任务。';
   $('output-title').textContent=check?'数据与统计检查':'最终训练配置';

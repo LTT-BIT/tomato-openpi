@@ -66,9 +66,70 @@ def process_identity(pid):
         return None
 
 
+def attach_cli_job(manifest_path, console_path, pid):
+    """Register an existing CLI run for read-only monitoring; never spawn training."""
+    root = common.repository_root().resolve()
+    manifest_path, console_path = Path(manifest_path).resolve(), Path(console_path).resolve()
+    for path in (manifest_path, console_path):
+        if not path.is_relative_to(root / 'logs') or not path.is_file():
+            raise ValueError('CLI manifest and console must be existing repository logs')
+    manifest = json.loads(manifest_path.read_text())
+    config = manifest['config']['fields']
+    identity = process_identity(pid)
+    command = Path(f'/proc/{int(pid)}/cmdline').read_bytes().split(b'\0')
+    if not identity or b'scripts.run_training' not in command or config['exp_name'].encode() not in command:
+        raise ValueError('PID must identify the existing matching CLI training process')
+    if str(manifest_path) not in console_path.read_text(errors='replace'):
+        raise ValueError('Console does not belong to this run manifest')
+    job_id = uuid.uuid5(uuid.NAMESPACE_URL, str(manifest_path)).hex
+    directory = job_directory(job_id)
+    with submit_lock():
+        if directory.exists():
+            existing = read_job(job_id)
+            if existing.get('external_manifest') != str(manifest_path):
+                raise ValueError('Conflicting UI attachment')
+            return existing
+        directory.mkdir()
+        (directory / 'console.log').symlink_to(console_path)
+        try:
+            created_at = datetime.strptime(manifest['started_at'], '%Y%m%d_%H%M%S_%f').replace(
+                tzinfo=ZoneInfo('Asia/Shanghai')).isoformat(timespec='seconds')
+        except ValueError:
+            created_at = manifest['started_at']
+        source = manifest.get('experiment_source', {})
+        config_path = source.get('original_path', '') if isinstance(source, dict) else source
+        state = dict(id=job_id, host=socket.gethostname(), status='running',
+            stage='训练中 · CLI只读', created_at=created_at, updated_at=now(),
+            exp_name=config['exp_name'], checkpoint_dir=manifest['checkpoint_dir'],
+            config_path=config_path, resolved_config=manifest['config'],
+            external_manifest=str(manifest_path), child_pid=int(pid), child_start=identity,
+            read_only=True)
+        atomic_json(directory / 'state.json', state)
+    return state
+
+
+def external_job_state(state):
+    manifest = json.loads(Path(state['external_manifest']).read_text())
+    status = manifest.get('status')
+    if status == 'training_completed':
+        status, stage = 'completed', '训练完成 · CLI只读'
+    elif status == 'failed':
+        status, stage = 'failed', '训练失败 · CLI只读'
+    elif state.get('host') == socket.gethostname() and process_identity(state['child_pid']) == state['child_start']:
+        status, stage = 'running', '训练中 · CLI只读'
+    else:
+        status, stage = 'interrupted', 'CLI进程已退出，请检查日志'
+    config = manifest['config']['fields']
+    return {**state, 'status': status,
+        'stage': f"{stage} · batch{config['batch_size']} · {config['num_train_steps']}步",
+        'updated_at': now()}
+
+
 def read_job(job_id):
     path = job_directory(job_id) / "state.json"
     state = json.loads(path.read_text())
+    if state.get("external_manifest"):
+        return external_job_state(state)
     if (
         state["status"] not in TERMINAL
         and state.get("host") == socket.gethostname()
@@ -296,6 +357,8 @@ def start_job(request):
 def resume_job(request):
     with submit_lock():
         original = read_job(request["id"])
+        if original.get("read_only"):
+            raise ValueError("CLI接入任务仅供查看，请使用原CLI入口续训")
         if original.get("host") != socket.gethostname():
             raise ValueError("请在原训练服务器的 UI 中恢复任务")
         if original["status"] not in TERMINAL or original["status"] == "completed":
@@ -332,6 +395,8 @@ def resume_job(request):
 
 def stop_job(job_id):
     state = read_job(job_id)
+    if state.get("read_only"):
+        raise ValueError("CLI接入任务仅供查看，不由UI接管进程")
     if state.get("host") != socket.gethostname():
         raise ValueError("请在原训练服务器的 UI 中停止任务")
     if state["status"] in TERMINAL:
@@ -615,9 +680,17 @@ def main():
     parser.add_argument("--worker", help=argparse.SUPPRESS)
     parser.add_argument("--validate-module", help=argparse.SUPPRESS)
     parser.add_argument("--ui-run", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--attach-manifest", type=Path)
+    parser.add_argument("--attach-console", type=Path)
+    parser.add_argument("--attach-pid", type=int)
     args = parser.parse_args()
     os.environ["JAX_PLATFORMS"] = "cpu"
     common.configure_environment()
+    if args.attach_manifest:
+        if args.attach_console is None or args.attach_pid is None:
+            parser.error("CLI接入需要 --attach-console 和 --attach-pid")
+        print(json.dumps(attach_cli_job(args.attach_manifest,args.attach_console,args.attach_pid),ensure_ascii=False))
+        return
     if args.worker:
         worker(args.worker)
         return

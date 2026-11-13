@@ -2,6 +2,10 @@
 
 ## complete100 RGB＋局部crop：训练准备
 
+### UI查看已启动的CLI训练（2026-11-13）
+
+原训练UI现在支持接入现有CLI运行：在训练服务器运行`bash scripts/python.sh -m scripts.training_ui --attach-manifest <本次运行JSON> --attach-console <本次控制台日志> --attach-pid <训练PID>`。接入前核对PID身份、实验名、日志归属与仓库路径；同一运行重复接入不重复登记。不会重新开训，也不接管训练进程。列表状态根据原运行manifest及进程身份刷新，详情直接读取原实时日志；只读任务不提供UI停止或续训按钮，完成/失败/进程退出均按真实来源显示。已有UI服务更新后需重载服务代码，训练进程不重启。
+
 ### 2026-11-13训练设置更新
 
 用户指定complete100 A/B为batch256、16000步、FSDP8，每4000完成步保存并保留一次checkpoint：4000/8000/12000/16000。使用已有ScheduledTrainConfig按完成步数编号，keep_period=4000，避免中间checkpoint被只保留最新的策略删除。原学习率计划warmup1000/decay30000不变；样本总量仍为4096000。新exp_name追加`_b256_s16000_c4000`，与昨日准备名及旧normal93隔离。下面11月12日的batch512/8000与GPU占用结论属于历史记录。
