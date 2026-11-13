@@ -4,6 +4,8 @@
 
 ### 4000步后切换精确逐帧缓存
 
+2026-11-13实际验收：r2覆盖100条425556帧、400路视频数组（256232425472字节），2000次视频参考像素检查通过；100条共300组完整模型输入（含dtype、四路像素、state/action/token/mask）完全一致。32批读取测试的后24批均值0.1599秒/batch，首批冷启动68.51秒；这是CPU供数速度，不是GPU训练步耗时。143项回归通过，证据为`subtasks/records/complete100_rgb_cache_20261113_validation_r2.json`。初版r1因误用JAX resize被实际输入比较拦下，未启用，已替换为实际训练PIL实现。当前原进程继续运行（抽查step3020），原生对话自动检查`4000-rgb`每10分钟检查完整4000 checkpoint后执行一次受保护接续；尚未切换，续训后的真实GPU速度和完成时间待测。
+
 为解决长GOP的随机解码等待，单独创建`complete100_rgb224_cache_r2`，四路视频顺序解码一次，按原float32/255→adapter uint8→训练实际使用的openpi_client PIL resize_with_pad224路径保存逐帧无损npy。源视频、原数据包及统计只读。每段完整核对帧数/30Hz时间轴、源视频SHA及缓存SHA，并独立随机寻帧核对5个像素参考；最终必须覆盖100条全部四路，缓存文件只读，数据集仍使用原metadata/state/action/prompt。
 
 `PI05_RGB_FRAME_CACHE`显式启用缓存；无此变量时原读取路径不变。`scripts.prepare_rgb_cache_resume`比较全部100条300个实际模型输入（图像、mask、state、动作窗口、tokens逐位一致），再用原seed和原16000步有限采样计划从4000位置实测至少24批。只有稳态读取均值低于5.5秒/批、数据/统计/采样/训练契约完全相同时，才生成哈希绑定迁移报告。原复现manifest和样本索引不覆盖；`PI05_INPUT_EXECUTION_MIGRATION`仅放行报告绑定的读取执行代码与已审阅的UI/离线ROI准备工具代码差异，模型、损失、数据、统计、种子和训练设置改变仍拒绝续训。
