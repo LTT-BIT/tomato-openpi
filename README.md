@@ -6,6 +6,10 @@
 
 旧normal93配置、数据与B checkpoint7999保留，旧入口`scripts.tomato_ab_run`不改。100条与旧93条有90条共同录制，移出3条、加入10条，并重新计算统计；因此不能把新旧结果当作仅增加crop的严格消融。r11裁剪坐标由前后帧辅助离线生成，图像始终来自当前帧；实时ROI与部署另行验证。
 
+新 `normal/speedup/full-block-more` 数据使用独立 `scripts.tomato_full_block_roi` 离线流程：先冻结原始文件SHA256，再逐批检测右手及邻近果串，以180像素为最小取景、300像素为局部上限规划平滑窗口，输出224×224局部RGB。前后帧只辅助坐标，像素始终取当前cam0；左手放果时保持右手果串为中心。`process --source <只读缓存根目录> --output <派生根目录> --category normal|speedup` 独立处理两种时间轴，保留逐帧坐标、检测距离、视频解码和几何检查。服务器 `publish --source <tomato_sharpa根目录> --output <同一根目录> --freeze <冻结清单>` 仅在各类别 `full-block-more/subtask-roi/A或B/原数据集名` 内复制原三路、state/action和元数据，并新增第四路及校验清单；不使用可写硬链接。原始数据前后哈希必须一致，冲突文件拒绝覆盖。该批数据不自动接入旧训练，不生成Subtask标签；视频完整性、抽帧语义复核和正式训练就绪状态分别记录。
+
+2026-11-13已发布normal 100条/301891帧、speedup 100条/223405帧至28上述目录，局部图覆盖全部525296帧，原始948个文件前后SHA256一致。原600路视频与新增200路均完整解码；200条各抽取3个中段时刻，并复核179段较长检测缺口的各6个时刻，未将抽帧复核声称逐帧语义准确率。Subtask标签及新批训练配置尚待后续工作，旧训练不变。结果见[本批校验记录](training_configs/experiments/tomato_sharpa/subtasks/records/full_block_more_roi_20261113_r1.json)。
+
 本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。
 
 多人在同一服务器训练时，各自在自己的目录独立 clone。日常训练直接使用公共 baseline，或在本地 `template/<负责人>/` 保存个人配置；个人配置已被 Git 忽略，不创建分支、不提交、不上传。只有团队决定新增或修改公共 baseline 时才进入公共开发流程。目录和配置类的组合关系见[开发结构说明](多人开发README.md#目录与配置的组合关系)。

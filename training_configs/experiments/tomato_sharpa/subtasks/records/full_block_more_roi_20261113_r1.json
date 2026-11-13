@@ -1,0 +1,139 @@
+{
+  "version": "full-block-right-truss-180-v1",
+  "episodes": 200,
+  "frames": 525296,
+  "black_frames": 0,
+  "crop_image_coverage": 1.0,
+  "all_outputs_decoded": true,
+  "raw_source_files": 948,
+  "sampled_visual_review_episodes": 200,
+  "long_detection_gap_ranges_reviewed": 179,
+  "all_frames_semantically_verified": false,
+  "subtask_labels_generated": false,
+  "training_ready": false,
+  "categories": {
+    "normal": {
+      "episodes": 100,
+      "frames": 301891
+    },
+    "speedup": {
+      "episodes": 100,
+      "frames": 223405
+    }
+  },
+  "max_center_step_px": 3.8078865529319543,
+  "max_scale_step_fraction": 0.012,
+  "source_freeze_sha256": "78f0cd758523dd2cc263a4cb4525a29a42e95600e66cc3e9097f28e75bbccb72",
+  "raw_video_audit_sha256": "bfe423f84c34548e2080e4a169c9ede12cd10b2d67136c8263f1251274426373",
+  "publication": {
+    "status": "published_verified",
+    "categories": {
+      "normal": {
+        "manifest": {
+          "version": "full-block-right-truss-180-v1",
+          "packages": [
+            {
+              "path": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+              "category": "normal",
+              "group": "A",
+              "episodes": 59,
+              "frames": 175358,
+              "manifest_sha256": "ffa342c025563e92e5fc3788cc1a1944fff1b36ad6e90ba51e4ba539a19ae113"
+            },
+            {
+              "path": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+              "category": "normal",
+              "group": "A",
+              "episodes": 12,
+              "frames": 32182,
+              "manifest_sha256": "37518d75248ce3b0863deae77f6cda07e648cb9e8aebe422f0973a04ff58240d"
+            },
+            {
+              "path": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+              "category": "normal",
+              "group": "B",
+              "episodes": 27,
+              "frames": 88944,
+              "manifest_sha256": "ea12978d1dc72029be63cba82f17d4ddab5b170ab6534211d98ff72c373083a8"
+            },
+            {
+              "path": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1113_1018_1033_normal",
+              "category": "normal",
+              "group": "B",
+              "episodes": 2,
+              "frames": 5407,
+              "manifest_sha256": "a4f5ba7ec36145b8c5fee513d92b4c610c4255224050e8c0cc0a1ee82623fee1"
+            }
+          ],
+          "episodes": 100,
+          "frames": 301891,
+          "raw_sha256_verified_files": 948,
+          "raw_unchanged": true,
+          "training_ready": false,
+          "subtask_labels_generated": false
+        },
+        "sha256": "484d48209ac82631d6f7fb04d5b4273eebb5daae4641f301a67c8de5cd7e1391"
+      },
+      "speedup": {
+        "manifest": {
+          "version": "full-block-right-truss-180-v1",
+          "packages": [
+            {
+              "path": "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/full-block-more/subtask-roi/A/1112_820_1014_speedup",
+              "category": "speedup",
+              "group": "A",
+              "episodes": 59,
+              "frames": 131131,
+              "manifest_sha256": "ec7a8b2200b70c6f8a5751b897a08fa65832e5b081cb4dfc8dbd4c7100317f75"
+            },
+            {
+              "path": "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/full-block-more/subtask-roi/A/1113_1017_1049_speedup",
+              "category": "speedup",
+              "group": "A",
+              "episodes": 12,
+              "frames": 25140,
+              "manifest_sha256": "118425702a629e7fd38eefb2387fa9e7935ac9eb12cce4df6ab08375388c0dbf"
+            },
+            {
+              "path": "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/full-block-more/subtask-roi/B/1112_821_1011_speedup",
+              "category": "speedup",
+              "group": "B",
+              "episodes": 27,
+              "frames": 62857,
+              "manifest_sha256": "fc65a9096da99bdff4ae62be7958827c17af698b11096e329a4be6eae6deeaa8"
+            },
+            {
+              "path": "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/full-block-more/subtask-roi/B/1113_1018_1033_speedup",
+              "category": "speedup",
+              "group": "B",
+              "episodes": 2,
+              "frames": 4277,
+              "manifest_sha256": "e2fec83fb53ce73d77036b26bc122ba989eb792a69faefc45771c8079681d5d5"
+            }
+          ],
+          "episodes": 100,
+          "frames": 223405,
+          "raw_sha256_verified_files": 948,
+          "raw_unchanged": true,
+          "training_ready": false,
+          "subtask_labels_generated": false
+        },
+        "sha256": "9049dbc58ef83f4e73f0d49741eda8108f4c20f14c169b617a57a840629fa109"
+      }
+    },
+    "raw_source_unchanged_sha256_files": 948
+  },
+  "tests": {
+    "passed": 33,
+    "scope": [
+      "new_roi_pipeline",
+      "offline_window_regression",
+      "locator",
+      "stable_roi",
+      "transport_roi"
+    ]
+  },
+  "local_artifacts": "/home/user/datasets/derived/tomato_full_block_more_roi_20261113_r1",
+  "raw_video_streams_fully_decoded": 600,
+  "output_video_streams_fully_decoded": 200
+}

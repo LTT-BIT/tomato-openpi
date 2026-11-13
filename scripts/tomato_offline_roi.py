@@ -67,14 +67,18 @@ def template_step(previous,current,box):
     return np.asarray(box,float)+np.r_[shift,shift]
 
 
-def plan_windows(tight,width,height):
+def plan_windows(tight,width,height, *, minimum=220., maximum=None, context_ratio=1.5):
     """Look ahead offline to pan/zoom before a target transition; contain every box."""
     from scipy.ndimage import gaussian_filter1d
     tight=np.asarray(tight,float)
     if tight.ndim!=2 or tight.shape[1]!=4 or not np.isfinite(tight).all():
         raise ValueError('Finite complete interaction boxes required')
     if np.any(tight[:,2:]<=tight[:,:2]):raise ValueError('Empty interaction box')
-    minimum,maximum=220.,min(width,height)*.95
+    maximum=min(width,height)*.95 if maximum is None else float(maximum)
+    if not 0 < minimum <= maximum <= min(width,height):
+        raise ValueError('Invalid local window limits')
+    if context_ratio < 1:
+        raise ValueError('Context ratio must contain the target')
     if np.max(tight[:,2:]-tight[:,:2])>maximum-2:
         raise ValueError('Interaction is too large for local crop limit')
     desired=(tight[:,:2]+tight[:,2:])/2
@@ -100,7 +104,7 @@ def plan_windows(tight,width,height):
         backward[i]=np.clip(center[i],np.maximum(lo[i],backward[i+1]-speed),np.minimum(hi[i],backward[i+1]+speed))
     center=(forward+backward)/2
     required=np.maximum(minimum,2*np.max(np.maximum(center-tight[:,:2],tight[:,2:]-center),axis=1)+2)
-    preferred=np.maximum(required,np.minimum(maximum,1.5*np.max(tight[:,2:]-tight[:,:2],axis=1)))
+    preferred=np.maximum(required,np.minimum(maximum,context_ratio*np.max(tight[:,2:]-tight[:,:2],axis=1)))
     # A symmetric envelope expands before a transition and contracts afterwards.
     side=preferred.copy()
     decay=np.exp(-.008)
