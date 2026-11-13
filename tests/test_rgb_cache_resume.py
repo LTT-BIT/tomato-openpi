@@ -95,13 +95,15 @@ def test_handoff_never_stops_before_finalized_checkpoint(tmp_path,monkeypatch):
     monkeypatch.setattr(tomato100_run,'ROOT',tmp_path)
     monkeypatch.setattr(handoff,'checkpoint_ready',lambda path:False)
     monkeypatch.setattr(handoff,'validate_process',lambda *args:None)
+    monkeypatch.setattr(handoff,'choose_stop_signal',lambda pid:__import__('signal').SIGINT)
     monkeypatch.setattr(handoff.os,'kill',lambda *args:pytest.fail('must not signal training'))
     with pytest.raises(ValueError,match='not finalized'):
         handoff.handoff(SimpleNamespace(checkpoint_dir=tmp_path/'run',exp_name='run'),
             {'status':'ready','old_identity':'expected'},tmp_path/'report.json')
 
 
-def test_handoff_launches_one_resume_and_preserves_experiment(tmp_path,monkeypatch):
+@pytest.mark.parametrize('recover_stopping',[False,True])
+def test_handoff_launches_one_resume_and_preserves_experiment(tmp_path,monkeypatch,recover_stopping):
     from scripts import tomato100_cached_resume as handoff
     from scripts import tomato100_run,tomato_ab_run,training_ui
     import signal
@@ -109,6 +111,7 @@ def test_handoff_launches_one_resume_and_preserves_experiment(tmp_path,monkeypat
     (tmp_path/'logs/complete100_preflight').mkdir(parents=True)
     monkeypatch.setattr(handoff,'checkpoint_ready',lambda path:True)
     monkeypatch.setattr(handoff,'validate_process',lambda *args:None)
+    monkeypatch.setattr(handoff,'choose_stop_signal',lambda pid:__import__('signal').SIGINT)
     monkeypatch.setattr(training_ui,'process_identity',lambda pid:None)
     monkeypatch.setattr(handoff.subprocess,'check_output',lambda *a,**k:str(handoff.OLD_PID)+'\n')
     monkeypatch.setattr(tomato_ab_run,'gpu_inventory',lambda:[])
@@ -128,9 +131,34 @@ def test_handoff_launches_one_resume_and_preserves_experiment(tmp_path,monkeypat
     monkeypatch.setattr(handoff.subprocess,'Popen',launch)
     config=SimpleNamespace(checkpoint_dir=tmp_path/'checkpoint',exp_name='same_experiment')
     status={'status':'ready','old_identity':'pinnedidentity'}
-    handoff.handoff(config,status,tmp_path/'report.json')
+    if recover_stopping:
+        (tmp_path/'logs/complete100_preflight/rgb_cache_handoff_4000.json').write_text(json.dumps(dict(
+            phase='stopping_original_after_finalized4000',old_identity='pinnedidentity',
+            report=str(tmp_path/'report.json'),handoff_pid=999)))
+    handoff.handoff(config,status,tmp_path/'report.json',recover_stopping=recover_stopping)
     assert signals==[(handoff.OLD_PID,signal.SIGINT)]
     assert len(calls)==1 and '--resume' in calls[0]
     assert calls[0][calls[0].index('--exp-name')+1]=='same_experiment'
     handoff.handoff(config,status,tmp_path/'report.json')
     assert len(calls)==1 and len(signals)==1
+
+
+def test_nohup_signal_selection():
+    import signal
+    from scripts.tomato100_cached_resume import stop_signal_from_status
+    assert stop_signal_from_status('SigIgn: 0\nSigCgt: 0\n')==signal.SIGINT
+    assert stop_signal_from_status('SigIgn: 0000000001001007\nSigCgt: 0000000100010000\n')==signal.SIGTERM
+    with pytest.raises(ValueError,match='Both normal stop signals'):
+        stop_signal_from_status(f'SigIgn: {(1<<(signal.SIGINT-1))|(1<<(signal.SIGTERM-1)):x}\n')
+
+
+def test_stopping_recovery_rejects_existing_resume(tmp_path,monkeypatch):
+    from scripts import tomato100_cached_resume as handoff,tomato100_run
+    monkeypatch.setattr(tomato100_run,'ROOT',tmp_path)
+    directory=tmp_path/'logs/complete100_preflight';directory.mkdir(parents=True)
+    (directory/'rgb_cache_handoff_4000.json').write_text(json.dumps(dict(
+        phase='cached_resume_started',new_pid=123,old_identity='expected',report='report',handoff_pid=1)))
+    monkeypatch.setattr(handoff.os,'kill',lambda *a:pytest.fail('must not signal training'))
+    with pytest.raises(ValueError,match='Cannot recover'):
+        handoff.handoff(SimpleNamespace(),dict(status='ready',old_identity='expected'),
+            Path('report'),recover_stopping=True)

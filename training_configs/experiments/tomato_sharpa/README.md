@@ -10,7 +10,7 @@
 
 `PI05_RGB_FRAME_CACHE`显式启用缓存；无此变量时原读取路径不变。`scripts.prepare_rgb_cache_resume`比较全部100条300个实际模型输入（图像、mask、state、动作窗口、tokens逐位一致），再用原seed和原16000步有限采样计划从4000位置实测至少24批。只有稳态读取均值低于5.5秒/批、数据/统计/采样/训练契约完全相同时，才生成哈希绑定迁移报告。原复现manifest和样本索引不覆盖；`PI05_INPUT_EXECUTION_MIGRATION`仅放行报告绑定的读取执行代码与已审阅的UI/离线ROI准备工具代码差异，模型、损失、数据、统计、种子和训练设置改变仍拒绝续训。
 
-`scripts.tomato100_cached_resume check --report <报告>`只检查；`handoff`必须在4000完整提交（含train_state和params）后才能执行。切换仅SIGINT原PID575579，先核对进程启动身份、命令与GPU独占；未提交checkpoint或发现其他GPU任务就拒绝操作。GPU释放后恢复完整checkpoint、optimizer和step，原采样位置为4000×256；总目标仍16000步，保留4000/8000/12000/16000。新进程自动登记UI实时日志，旧UI记录标为主动切换停止；失败时保留4000，不反复自动开训。吞吐及ETA以缓存验收和续训实测为准，准备缓存期间原训练继续。
+`scripts.tomato100_cached_resume check --report <报告>`只检查；`handoff`必须在4000完整提交（含train_state和params）后才能执行。切换仅向原PID575579发送正常退出信号（优先SIGINT；若/proc确认继承SIG_IGN则使用未被忽略的SIGTERM），先核对进程启动身份、命令与GPU独占；未提交checkpoint或发现其他GPU任务就拒绝操作。GPU释放后恢复完整checkpoint、optimizer和step，原采样位置为4000×256；总目标仍16000步，保留4000/8000/12000/16000。新进程自动登记UI实时日志，旧UI记录标为主动切换停止；失败时保留4000，不反复自动开训。吞吐及ETA以缓存验收和续训实测为准，准备缓存期间原训练继续。
 
 ### UI查看已启动的CLI训练（2026-11-13）
 
@@ -494,3 +494,5 @@ PYTHONPATH=src bash scripts/python.sh -m pytest -q tests/test_tomato_interaction
 ```
 
 实际输出为28共享工程的`outputs/normal93_interaction_preview_28_20261110_v2/`；源帧与三路时间戳、独立crop像素、导出视频帧数/帧率均已校验，结果见`subtasks/records/normal93_20261110_interaction_preview.json`。新增9项裁剪测试和既有10项prompt探针测试通过。抓取的局部图明显放大接触区；双手采摘框更宽，放大收益较小。与224等比例全图比较，线性放大约1.66～4.48倍，**不是清晰度测量或策略成功率提升**；原腕部图有时更清楚。保留B不变，不开新训练。下一步先复核短片框随动作移动的覆盖质量，再决定组件标注/自动定位方案和独立图像输入适配；部署不能依赖预先知道真实阶段或录制时间的选框表。
+
+2026-11-13 23:52首次交接发现原进程继承nohup的SIGINT忽略掩码`0000000001001007`，60秒后控制器拒绝再启动，4000完整checkpoint保留。修复退出信号选择；`recover-stopping`只允许前次控制器已退出、尚无新PID、相同原进程身份/报告及完整4000与GPU归属再次通过时恢复该次交接，保留前次尝试记录；其他阶段仍不可重复启动。修复后重新执行完整输入/吞吐验收，结果和实际恢复情况以服务器回执为准。

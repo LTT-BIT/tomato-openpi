@@ -65,7 +65,23 @@ def check(report_path):
         'checkpoint_dir':str(config.checkpoint_dir),'cache_root':report['cache_root']}
 
 
-def handoff(config,status,report_path):
+def stop_signal_from_status(text):
+    masks={line.split(':',1)[0]:int(line.split(':',1)[1].strip(),16)
+        for line in text.splitlines() if line.startswith(('SigIgn:', 'SigCgt:'))}
+    ignored=masks['SigIgn']
+    if not ignored & (1 << (signal.SIGINT-1)):
+        return signal.SIGINT
+    # nohup may pass SIGINT=SIG_IGN to Python; SIGTERM remains a normal exit signal.
+    if ignored & (1 << (signal.SIGTERM-1)):
+        raise ValueError('Both normal stop signals are ignored; do not force kill')
+    return signal.SIGTERM
+
+
+def choose_stop_signal(pid):
+    return stop_signal_from_status(Path(f'/proc/{pid}/status').read_text())
+
+
+def handoff(config,status,report_path,*,recover_stopping=False):
     from scripts.tomato100_run import ROOT,MODULES
     from scripts.tomato_ab_run import gpu_inventory,validate_gpus
     from scripts.training_environment import cuda_environment
@@ -78,8 +94,19 @@ def handoff(config,status,report_path):
     lock_path.parent.mkdir(exist_ok=True)
     with lock_path.open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        previous=None
         if receipt.exists():
-            print(receipt.read_text(),flush=True);return
+            previous=json.loads(receipt.read_text())
+            if not recover_stopping:
+                print(receipt.read_text(),flush=True);return
+            if (previous.get('phase')!='stopping_original_after_finalized4000'
+                    or previous.get('new_pid') is not None
+                    or previous.get('old_identity')!=status['old_identity']
+                    or previous.get('report')!=str(report_path)
+                    or process_identity(previous['handoff_pid']) is not None):
+                raise ValueError('Cannot recover an active, changed or already launched handoff')
+        elif recover_stopping:
+            raise ValueError('No stopped handoff to recover')
         validate_process(OLD_PID,status['old_identity'],config.exp_name)
         if not checkpoint_ready(config.checkpoint_dir):raise ValueError('Checkpoint4000 not finalized')
         gpu_processes=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid','--format=csv,noheader,nounits'],text=True)
@@ -87,8 +114,12 @@ def handoff(config,status,report_path):
         if pids!={OLD_PID}:raise ValueError('Unexpected GPU processes; do not interrupt them')
         state={**status,'phase':'stopping_original_after_finalized4000','report':str(report_path),
             'handoff_pid':os.getpid(),'started_at':datetime.now(ZoneInfo('Asia/Shanghai')).isoformat()}
+        stop_signal=choose_stop_signal(OLD_PID)
+        state['stop_signal']=signal.Signals(stop_signal).name
+        if previous is not None:
+            state['previous_stop_attempt']=previous
         atomic_json(receipt,state)
-        os.kill(OLD_PID,signal.SIGINT)
+        os.kill(OLD_PID,stop_signal)
         for _ in range(60):
             if process_identity(OLD_PID)!=status['old_identity']:break
             time.sleep(1)
@@ -147,13 +178,13 @@ def handoff(config,status,report_path):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action',choices=['check','handoff'],default='check',nargs='?')
+    parser.add_argument('action',choices=['check','handoff','recover-stopping'],default='check',nargs='?')
     parser.add_argument('--report',type=Path,required=True)
     args=parser.parse_args()
     os.environ['JAX_PLATFORMS']='cpu';os.environ['CUDA_VISIBLE_DEVICES']=''
     config,status=check(args.report)
     if args.action=='check':print(json.dumps(status),flush=True)
-    else:handoff(config,status,args.report)
+    else:handoff(config,status,args.report,recover_stopping=args.action=='recover-stopping')
 
 
 if __name__=='__main__':main()
