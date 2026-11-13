@@ -43,9 +43,13 @@ def main():
     for ep,row in enumerate(rows):
         for frame in [0,row['length']//2,row['length']-1]:
             a,b=old_inputs[offset+frame],new_inputs[offset+frame]
-            leaves_a,tree_a=jax.tree_util.tree_flatten(a);leaves_b,tree_b=jax.tree_util.tree_flatten(b)
-            if tree_a != tree_b or any(not np.array_equal(x,y) for x,y in zip(leaves_a,leaves_b,strict=True)):
-                raise ValueError(f'Model input changed at episode{ep} frame{frame}')
+            leaves_a,tree_a=jax.tree_util.tree_flatten_with_path(a);leaves_b,tree_b=jax.tree_util.tree_flatten_with_path(b)
+            if tree_a != tree_b:
+                raise ValueError(f'Model input structure changed at episode{ep} frame{frame}')
+            differences=[str(path) for (path,x),(_,y) in zip(leaves_a,leaves_b,strict=True)
+                if np.asarray(x).dtype!=np.asarray(y).dtype or not np.array_equal(x,y)]
+            if differences:
+                raise ValueError(f'Model input changed at episode{ep} frame{frame}: {differences}')
             checked+=1
         offset+=row['length']
         if (ep+1)%10==0:print('Exact inputs checked',ep+1,'/100',flush=True)
