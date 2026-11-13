@@ -22,7 +22,7 @@ def build_video(job):
     import torch
     import torchvision
     from openpi.policies.fr3_sharpa_policy import _parse_image
-    from openpi.shared.image_tools import resize_with_pad
+    from openpi_client.image_tools import resize_with_pad
     from openpi.training.frame_cache import sha256
 
     torch.set_num_threads(1)
@@ -105,11 +105,18 @@ def main():
     from openpi.training.frame_cache import sha256
     from lerobot.common.datasets.lerobot_dataset import LeRobotDatasetMetadata
     meta = LeRobotDatasetMetadata('local/rgb-cache', root=args.source)
+    from openpi.policies import fr3_sharpa_policy
+    from openpi_client import image_tools
+    pipeline={'parse_image':sha256(fr3_sharpa_policy.__file__),'resize':sha256(image_tools.__file__)}
     args.out.mkdir(parents=True, exist_ok=True)
     if (args.out/'manifest.json').exists():
         previous=json.loads((args.out/'manifest.json').read_text())
         if previous.get('complete') is True:
             raise FileExistsError(args.out/'manifest.json')
+        if previous.get('schema')!='rgb224_exact_pil_v2' or previous.get('pixel_pipeline')!=pipeline:
+            raise ValueError('Partial cache uses a different pixel pipeline; use a fresh directory')
+    elif any(args.out.iterdir()):
+        raise ValueError('Unbound partial cache; use a fresh output directory')
     selected = args.episodes if args.episodes is not None else sorted(meta.episodes)
     jobs = [(str(args.source/meta.get_video_file_path(ep, cam)),
              str(args.out/cam/f'episode_{ep:06d}.npy'),ep,cam,meta.episodes[ep]['length'],meta.fps)
@@ -127,8 +134,8 @@ def main():
             print(json.dumps({'done':len(results),'total':len(jobs),'episode':result['episode'],
                 'camera':result['camera'],'seconds':round(result['seconds'],2)}),flush=True)
     from openpi.policies import fr3_sharpa_policy
-    from openpi.shared import image_tools
-    manifest=dict(schema='rgb224_exact_v1',complete=args.episodes is None,
+    from openpi_client import image_tools
+    manifest=dict(schema='rgb224_exact_pil_v2',complete=args.episodes is None,
         pixel_pipeline={'parse_image':sha256(fr3_sharpa_policy.__file__),'resize':sha256(image_tools.__file__)},
         builder_sha256=sha256(__file__),
         episodes=len(selected),frames=sum(meta.episodes[ep]['length'] for ep in selected),

@@ -48,11 +48,18 @@ def test_real_video_cache_matches_decoder_and_preserves_timestamp(tmp_path):
     with av.open(str(source),'w') as output:
         stream=output.add_stream('libx264',rate=30);stream.width=20;stream.height=16;stream.pix_fmt='yuv420p'
         for i in range(12):
-            frame=av.VideoFrame.from_ndarray(np.full((16,20,3),[i*10,80,140],np.uint8),format='rgb24')
+            frame=av.VideoFrame.from_ndarray(np.random.default_rng(i).integers(0,255,(16,20,3),dtype=np.uint8),format='rgb24')
             for packet in stream.encode(frame):output.mux(packet)
         for packet in stream.encode():output.mux(packet)
     cache=tmp_path/'cache';destination=cache/'cam0/episode_000000.npy'
     entry=build_video((str(source),str(destination),0,'cam0',12,30))
+    from openpi import transforms
+    from openpi.policies.fr3_sharpa_policy import _parse_image
+    import torch
+    with av.open(str(source)) as video:
+        first=next(video.decode(video.streams.video[0])).to_rgb().to_ndarray()
+    actual=transforms.ResizeImages(224,224)({'image':{'cam0':_parse_image(torch.from_numpy(first).permute(2,0,1).float()/255)}})['image']['cam0']
+    np.testing.assert_array_equal(np.load(destination,mmap_mode='r')[0],actual)
     assert entry['exact_reference_samples']==5 and not destination.stat().st_mode & 0o222
     reader=object.__new__(CachedLeRobotDataset);reader.meta=SimpleNamespace(fps=30)
     reader.cache_root=cache;reader.cache_entries={(0,'cam0'):entry};reader._cache_maps={};reader.tolerance_s=1e-4

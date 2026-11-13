@@ -15,6 +15,9 @@ ALLOWED_CODE_CHANGES = {
     'scripts/tomato100_cached_resume.py',
     # These UI-only changes were made after the original CLI launch.
     'scripts/training_ui.py',
+    # Separate offline ROI preparation added after this run; frozen training videos are unchanged.
+    'scripts/tomato_full_block_roi.py',
+    'scripts/tomato_offline_roi.py',
 }
 
 

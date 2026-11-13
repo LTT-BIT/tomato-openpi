@@ -19,11 +19,11 @@ class CachedLeRobotDataset(LeRobotDataset):
         self.cache_root = Path(cache_root).resolve()
         self.cache_manifest = json.loads((self.cache_root / 'manifest.json').read_text())
         if (self.cache_manifest.get('complete') is not True
-                or self.cache_manifest.get('schema') != 'rgb224_exact_v1'
+                or self.cache_manifest.get('schema') != 'rgb224_exact_pil_v2'
                 or self.image_transforms is not None):
             raise ValueError('Complete exact RGB cache without extra image transforms required')
         from openpi.policies import fr3_sharpa_policy
-        from openpi.shared import image_tools
+        from openpi_client import image_tools
         pipeline = {'parse_image': sha256(fr3_sharpa_policy.__file__), 'resize': sha256(image_tools.__file__)}
         if self.cache_manifest.get('pixel_pipeline') != pipeline:
             raise ValueError('Cache pixel pipeline changed')
