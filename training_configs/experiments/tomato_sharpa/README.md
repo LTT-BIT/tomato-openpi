@@ -8,6 +8,8 @@
 
 28的8卡已核验空闲，本轮启动默认B；A仅同步配置，不自动排队。命令为`bash scripts/python.sh -m scripts.tomato100_run start --variant b`。保留原四视图、100条数据、统计与英文prompt，无深度或Memory，W&B offline及本地日志。启动及显存实际结果以运行日志为准。
 
+实际B训练已启动，代码提交`34738e9`，训练PID575579，W&B offline。首步loss1.6016/grad_norm1.8457，第10步loss1.6188/grad_norm1.8203，均为有限值；8卡各约66181MiB显存，batch256已经真实执行，无OOM。完整16000步尚未完成；不会自动启动A。启动配置、数据/统计身份、日志及checkpoint完整路径见`subtasks/records/complete100_b256_launch_20261113.json`。控制台为`logs/complete100_b256_s16000_c4000_20261113.console.log`。
+
 ### 28服务器100条四视图训练入口（2026-11-12）
 
 当前分支`tomato-subtask-policy`。数据已同步至`/home/mengxiang/workspace/data/sharpa/no-block-more/complete100_rgb_crop_offline_r11`：100条、425556帧，A/B各四路视频，全包1513文件9126087596字节，逐文件SHA256一致。服务器现有normal源视频也与本地300份源视频逐一核对一致；原始数据只读，没有硬链接。传输、来源差异和哈希接纳记录为`subtasks/records/complete100_server28_preparation_20261112_r11.json`。
