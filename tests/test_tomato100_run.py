@@ -56,9 +56,26 @@ def test_default_only_checks_b(tmp_path,monkeypatch):
     variants=[]
     def preflight(variant,exp):
         variants.append(variant)
-        return SimpleNamespace(fsdp_devices=8,batch_size=512),{'variant':variant}
+        return SimpleNamespace(fsdp_devices=8,batch_size=256),{'variant':variant}
     monkeypatch.setattr(run,'cpu_preflight',preflight)
     monkeypatch.setattr(run.subprocess,'call',lambda *a,**k:pytest.fail('must not launch'))
     run.main()
     assert variants==['b']
     assert len(list((tmp_path/'logs/complete100_preflight').glob('*.json')))==1
+
+
+def test_actual_all100_recipe_saves_completed_steps_and_keeps_each_checkpoint(monkeypatch):
+    from training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop import build_config
+    from scripts.train import should_save_checkpoint
+    bundle=Path('/home/user/datasets/derived/tomato_complete100_four_view_offline_local_candidate_r11')
+    if not bundle.exists():pytest.skip('Actual prepared all100 data is unavailable')
+    monkeypatch.setenv('PI05_TOMATO100_CROP_BUNDLE',str(bundle))
+    monkeypatch.setenv('PI05_TOMATO100_CROP_A_BUNDLE',str(bundle))
+    monkeypatch.setenv('PI05_TOMATO100_PREPARATION_REPORT',str(run.PREPARATION))
+    for variant in ['a_goal','b_coarse']:
+        config=build_config(variant=variant)
+        assert (config.batch_size,config.num_train_steps,config.fsdp_devices)==(256,16000,8)
+        assert config.save_interval==config.keep_period==4000
+        assert [step+1 for step in range(16000) if should_save_checkpoint(config,step,0)]==[4000,8000,12000,16000]
+        assert config.batch_size*config.num_train_steps==512*8000
+        assert config.lr_schedule.warmup_steps==1000 and config.lr_schedule.decay_steps==30000

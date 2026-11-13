@@ -2,7 +2,7 @@
 
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
-当前 `tomato-subtask-policy` 分支准备100条normal完整录制的四视图π₀.₅训练：原三路RGB＋当前局部RGB、58D state、阶段英文prompt，无深度、无π₀.₅ Memory。28服务器数据、独立100条统计及B主方案/A对照入口见[番茄训练说明](training_configs/experiments/tomato_sharpa/README.md)。视觉token1024、文本上限256，batch512/8000步/FSDP8及原学习率保持。默认只检查：`bash scripts/python.sh -m scripts.tomato100_run check`；显式`start`才启动，拒绝占用中的GPU。本次仅准备与同步，目标batch显存尚待验证。
+当前 `tomato-subtask-policy` 分支准备100条normal完整录制的四视图π₀.₅训练：原三路RGB＋当前局部RGB、58D state、阶段英文prompt，无深度、无π₀.₅ Memory。28服务器数据、独立100条统计及B主方案/A对照入口见[番茄训练说明](training_configs/experiments/tomato_sharpa/README.md)。视觉token1024、文本上限256，batch256/16000步/FSDP8，每4000完成步保存并保留checkpoint，原学习率保持。默认只检查：`bash scripts/python.sh -m scripts.tomato100_run check`；显式`start`才启动，拒绝占用中的GPU。本次仅准备与同步，目标batch显存尚待验证。
 
 旧normal93配置、数据与B checkpoint7999保留，旧入口`scripts.tomato_ab_run`不改。100条与旧93条有90条共同录制，移出3条、加入10条，并重新计算统计；因此不能把新旧结果当作仅增加crop的严格消融。r11裁剪坐标由前后帧辅助离线生成，图像始终来自当前帧；实时ROI与部署另行验证。
 

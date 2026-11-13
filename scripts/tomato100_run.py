@@ -77,7 +77,7 @@ def main():
         print(json.dumps(devices, indent=2))
         return
     if args.action == "start":
-        validate_gpus(devices, selected, batch_size=512)
+        validate_gpus(devices, selected, batch_size=256)
     os.environ["JAX_PLATFORMS"] = "cpu"
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
     config, report = cpu_preflight(args.variant, args.exp_name)

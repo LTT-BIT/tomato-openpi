@@ -3,14 +3,14 @@
 No training starts by importing this module. Set PI05_TOMATO100_CROP_BUNDLE to
 an independently materialized four-view bundle with a bound crop_manifest.json.
 """
-from dataclasses import replace
+from dataclasses import fields, replace
 import json
 import os
 from pathlib import Path
 
 from openpi.subtasks.rgb100 import IMAGE_KEYS, digest
 from openpi.subtasks.tomato import GOAL, PHASES, PROMPTS
-from openpi.training.config import TaskDataConfig
+from openpi.training.config import ScheduledTrainConfig, TaskDataConfig
 from openpi.training.task_view import TaskView
 from training_configs import common
 from training_configs.embodiments.fr3_sharpa_crop import FR3_SHARPA_CROP
@@ -105,11 +105,11 @@ def build_config(*,variant='b_coarse'):
         sources=(str(crop),str(selection_path)),prompt_example=GOAL if short=='a' else PROMPTS[1])
     config=recipe(name=f'pi05_sharpa_tomato_complete100_{short}_crop_fullft_delta_r1{suffix}',
         exp_name=f'tomato_complete100_{short}_crop_delta_r1{suffix}_s42',embodiment=FR3_SHARPA_CROP,dataset=dataset)
-    return replace(config,model=replace(config.model,image_keys=IMAGE_KEYS,max_token_len=256),
+    config=replace(config,exp_name=config.exp_name+"_b256_s16000_c4000",model=replace(config.model,image_keys=IMAGE_KEYS,max_token_len=256),
         data=replace(config.data,extra_delta_transform=True,
             interaction_mask_key='observation.interaction_available' if full_input else 'observation.interaction_valid',
             base_config=TaskDataConfig(prompt_from_task=True,task_view=TaskView(split_path=str(root/'splits.json'),split='train'))),
-        batch_size=512,num_train_steps=8000,fsdp_devices=8,
+        batch_size=256,num_train_steps=16000,fsdp_devices=8,save_interval=4000,keep_period=4000,
         policy_metadata={**config.policy_metadata,'subtask_variant':variant,
             'training_action_semantics':'delta_arm_joint_target_absolute_hand',
             'selection_sha256':digest(selection_path),'crop_manifest_sha256':digest(crop),
@@ -122,3 +122,9 @@ def build_config(*,variant='b_coarse'):
             'offline_training_preparation_sha256':digest(Path(os.environ['PI05_TOMATO100_PREPARATION_REPORT'])) if prepared else None,
             'independent_semantic_accuracy_measured':False,
             'gpu_memory_preflight_required':True,'agent_enabled':False})
+
+    # Completed-step numbering preserves all four requested checkpoints.
+    return ScheduledTrainConfig(
+        **{field.name:getattr(config,field.name) for field in fields(config)},
+        save_before_step=1,save_steps_before=(),save_interval_after=4000,
+    )

@@ -2,6 +2,12 @@
 
 ## complete100 RGB＋局部crop：训练准备
 
+### 2026-11-13训练设置更新
+
+用户指定complete100 A/B为batch256、16000步、FSDP8，每4000完成步保存并保留一次checkpoint：4000/8000/12000/16000。使用已有ScheduledTrainConfig按完成步数编号，keep_period=4000，避免中间checkpoint被只保留最新的策略删除。原学习率计划warmup1000/decay30000不变；样本总量仍为4096000。新exp_name追加`_b256_s16000_c4000`，与昨日准备名及旧normal93隔离。下面11月12日的batch512/8000与GPU占用结论属于历史记录。
+
+28的8卡已核验空闲，本轮启动默认B；A仅同步配置，不自动排队。命令为`bash scripts/python.sh -m scripts.tomato100_run start --variant b`。保留原四视图、100条数据、统计与英文prompt，无深度或Memory，W&B offline及本地日志。启动及显存实际结果以运行日志为准。
+
 ### 28服务器100条四视图训练入口（2026-11-12）
 
 当前分支`tomato-subtask-policy`。数据已同步至`/home/mengxiang/workspace/data/sharpa/no-block-more/complete100_rgb_crop_offline_r11`：100条、425556帧，A/B各四路视频，全包1513文件9126087596字节，逐文件SHA256一致。服务器现有normal源视频也与本地300份源视频逐一核对一致；原始数据只读，没有硬链接。传输、来源差异和哈希接纳记录为`subtasks/records/complete100_server28_preparation_20261112_r11.json`。
