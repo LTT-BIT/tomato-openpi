@@ -14,6 +14,7 @@ import hashlib
 import importlib
 import json
 import logging
+import os
 import pathlib
 import re
 import shutil
@@ -233,9 +234,19 @@ def prepare_run(
         manifest = json.loads((directory / "manifest.json").read_text())
         if manifest["contract"] != contract:
             changed = [key for key in contract if manifest["contract"].get(key) != contract[key]]
-            raise ValueError(
-                f"Reproducibility contract changed: {changed}. Use a new exp_name for a changed experiment."
-            )
+            migration_path = os.environ.get("PI05_INPUT_EXECUTION_MIGRATION")
+            if not resuming or not migration_path:
+                raise ValueError(
+                    f"Reproducibility contract changed: {changed}. Use a new exp_name for a changed experiment."
+                )
+            from openpi.training.input_migration import validate_migration
+            migration = validate_migration(manifest["contract"], contract, migration_path)
+            migration_dir = directory / "input_execution_migrations"
+            migration_dir.mkdir(exist_ok=True)
+            migration_file = migration_dir / (hashlib.sha256(_json_bytes(migration)).hexdigest() + ".json")
+            if not migration_file.exists():
+                migration_file.write_bytes(_json_bytes(migration))
+            logging.info("Verified pixel-equivalent input execution migration: %s", migration_file)
         for name, expected in manifest["artifacts"].items():
             if file_sha256(directory / name) != expected:
                 raise ValueError(f"Reproducibility artifact changed: {name}")

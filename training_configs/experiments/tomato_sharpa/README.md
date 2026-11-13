@@ -2,6 +2,14 @@
 
 ## complete100 RGB＋局部crop：训练准备
 
+### 4000步后切换精确逐帧缓存
+
+为解决长GOP的随机解码等待，单独创建`complete100_rgb224_cache_r1`，四路视频顺序解码一次，按原float32/255→adapter uint8→JAX resize_with_pad224路径保存逐帧无损npy。源视频、原数据包及统计只读。每段完整核对帧数/30Hz时间轴、源视频SHA及缓存SHA，并独立随机寻帧核对5个像素参考；最终必须覆盖100条全部四路，缓存文件只读，数据集仍使用原metadata/state/action/prompt。
+
+`PI05_RGB_FRAME_CACHE`显式启用缓存；无此变量时原读取路径不变。`scripts.prepare_rgb_cache_resume`比较全部100条300个实际模型输入（图像、mask、state、动作窗口、tokens逐位一致），再用原seed和原16000步有限采样计划从4000位置实测至少24批。只有稳态读取均值低于5.5秒/批、数据/统计/采样/训练契约完全相同时，才生成哈希绑定迁移报告。原复现manifest和样本索引不覆盖；`PI05_INPUT_EXECUTION_MIGRATION`仅放行报告绑定的读取执行代码与已经发生的UI代码差异，模型、损失、数据、统计、种子和训练设置改变仍拒绝续训。
+
+`scripts.tomato100_cached_resume check --report <报告>`只检查；`handoff`必须在4000完整提交（含train_state和params）后才能执行。切换仅SIGINT原PID575579，先核对进程启动身份、命令与GPU独占；未提交checkpoint或发现其他GPU任务就拒绝操作。GPU释放后恢复完整checkpoint、optimizer和step，原采样位置为4000×256；总目标仍16000步，保留4000/8000/12000/16000。新进程自动登记UI实时日志，旧UI记录标为主动切换停止；失败时保留4000，不反复自动开训。吞吐及ETA以缓存验收和续训实测为准，准备缓存期间原训练继续。
+
 ### UI查看已启动的CLI训练（2026-11-13）
 
 原训练UI现在支持接入现有CLI运行：在训练服务器运行`bash scripts/python.sh -m scripts.training_ui --attach-manifest <本次运行JSON> --attach-console <本次控制台日志> --attach-pid <训练PID>`。接入前核对PID身份、实验名、日志归属与仓库路径；同一运行重复接入不重复登记。不会重新开训，也不接管训练进程。列表状态根据原运行manifest及进程身份刷新，详情直接读取原实时日志；只读任务不提供UI停止或续训按钮，完成/失败/进程退出均按真实来源显示。已有UI服务更新后需重载服务代码，训练进程不重启。

@@ -318,11 +318,19 @@ def create_torch_dataset(
         action_delta_timestamps = [
             round(t * dataset_meta.fps / action_hz) / dataset_meta.fps for t in range(action_horizon)
         ]
-        dataset: Dataset = lerobot_dataset.LeRobotDataset(
+        cache_root = os.environ.get("PI05_RGB_FRAME_CACHE")
+        dataset_type = lerobot_dataset.LeRobotDataset
+        cache_options = {}
+        if cache_root:
+            from openpi.training.frame_cache import CachedLeRobotDataset
+            dataset_type = CachedLeRobotDataset
+            cache_options = {"cache_root": cache_root}
+        dataset: Dataset = dataset_type(
             dataset_repo_id,
             root=dataset_root,
             delta_timestamps=dict.fromkeys(data_config.action_sequence_keys, action_delta_timestamps),
             video_backend=data_config.video_backend,
+            **cache_options,
         )
         view = getattr(data_config, "task_view", None)
         if view is not None:
