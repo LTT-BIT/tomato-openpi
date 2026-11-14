@@ -99,14 +99,38 @@ def test_publication_copies_raw_bytes_without_links_and_refuses_conflicts(tmp_pa
     (roi / 'episode_000000.receipt.json').write_text(json.dumps(receipt))
     (destination / 'visual_review.json').write_text(json.dumps(dict(
         episodes=[dict(episode=0, output_sha256=sha(video))])))
-    args = SimpleNamespace(source=base, output=base, freeze=frozen)
+    args = SimpleNamespace(source=base, output=base, freeze=frozen, datasets=['example'])
     module.publish(args)
     assert sha(raw / 'meta/info.json') == next(f['sha256'] for f in files if f['path'].endswith('info.json'))
     assert sha(destination / 'state.parquet') == sha(raw / 'state.parquet')
     assert (destination / 'state.parquet').stat().st_ino != (raw / 'state.parquet').stat().st_ino
     assert json.loads((destination / 'meta/info.json').read_text())['total_videos'] == 4
-    module.publish(args)  # Idempotent with matching files.
+    # A previous batch must remain in the index and keep its original bytes.
+    old = base / 'normal/full-block-more/subtask-roi/B/previous_batch'
+    old.mkdir(parents=True)
+    (old / 'roi_manifest.json').write_text('{"previous_batch":true}\n')
+    (old / 'state.parquet').write_bytes(b'previous batch state')
+    old_digest = sha(old / 'roi_manifest.json')
+    root_index = base / 'normal/full-block-more/subtask-roi/manifest.json'
+    existing = json.loads(root_index.read_text())
+    existing['packages'].append(dict(path=str(old), category='normal', group='B',
+                                     episodes=4, frames=48, manifest_sha256=old_digest))
+    root_index.write_text(json.dumps(existing))
+    module.publish(args)  # Idempotent while preserving unrelated batches.
+    merged = json.loads(root_index.read_text())
+    assert merged['episodes'] == 5 and merged['frames'] == 60
+    assert sha(old / 'roi_manifest.json') == old_digest
+    assert (old / 'state.parquet').read_bytes() == b'previous batch state'
     (destination / 'state.parquet').write_bytes(b'user changed derived file')
     with pytest.raises(ValueError, match='Existing package file differs'):
         module.publish(args)
     assert (raw / 'state.parquet').read_bytes() == b'original state and action bytes'
+
+
+def test_dataset_selection_rejects_missing_names_instead_of_processing_everything():
+    import pytest
+    from scripts.tomato_full_block_roi import select_datasets
+    rows = [dict(dataset='old', episode=0), dict(dataset='new', episode=0)]
+    assert select_datasets(rows, ['new']) == [rows[1]]
+    with pytest.raises(ValueError, match='Requested datasets missing'):
+        select_datasets(rows, ['typo'])

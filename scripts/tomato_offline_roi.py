@@ -84,8 +84,11 @@ def plan_windows(tight,width,height, *, minimum=220., maximum=None, context_rati
     desired=(tight[:,:2]+tight[:,2:])/2
     center=gaussian_filter1d(desired,15,axis=0,mode='nearest')
     # Feasible centers at the maximum local scale, with a pixel for rounding.
-    lo=np.maximum(maximum/2,tight[:,2:]-maximum/2+1)
-    hi=np.minimum(np.array([width,height])-maximum/2,tight[:,:2]+maximum/2-1)
+    extent=np.array([width,height])
+    # Keep rounding padding inside the image: an annotation touching x=width
+    # must be allowed to use a crop ending exactly at width.
+    lo=np.maximum(maximum/2,np.minimum(tight[:,2:]+1,extent)-maximum/2)
+    hi=np.minimum(extent-maximum/2,np.maximum(tight[:,:2]-1,0)+maximum/2)
     # Propagate future feasible intervals before projecting the center. Merely
     # clipping a smoothed center can jump when a two-hand constraint disappears.
     speed=3.

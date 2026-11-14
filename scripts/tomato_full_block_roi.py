@@ -61,10 +61,20 @@ def inventory(base):
     return result
 
 
-def freeze(base, output):
+def select_datasets(rows, names):
+    if not names:
+        return rows
+    wanted = set(names)
+    found = {r['dataset'] for r in rows} & wanted
+    if found != wanted:
+        raise ValueError(f'Requested datasets missing: {sorted(wanted - found)}')
+    return [r for r in rows if r['dataset'] in wanted]
+
+
+def freeze(base, output, datasets=None):
     """Run on source host before processing; only read raw [AB]/dataset trees."""
     base = Path(base)
-    rows = inventory(base)
+    rows = select_datasets(inventory(base), datasets)
     roots = sorted({r['relative_dataset'] for r in rows})
     paths = [p for rel in roots for p in sorted((base / rel).rglob('*')) if p.is_file()]
     def record(p):
@@ -296,7 +306,7 @@ def process(args):
     from scripts.tomato_repair_locator import RgbLocator
     torch.set_num_threads(4)
     cv2.setNumThreads(2)
-    rows = inventory(args.source)
+    rows = select_datasets(inventory(args.source), getattr(args, 'datasets', None))
     if args.stride < 1:
         raise ValueError('Detection stride must be positive')
     if args.category:
@@ -361,7 +371,7 @@ def publish(args):
     if Path(args.output).resolve() != base:
         raise ValueError('publish output must be the source base; writes are restricted to subtask-roi')
     frozen = json.loads(Path(args.freeze).read_text())
-    rows = inventory(base)
+    rows = select_datasets(inventory(base), getattr(args, 'datasets', None))
     indexed = {f['path']: f for f in frozen['files']}
     current_files = {str(p.relative_to(base)) for rel in {r['relative_dataset'] for r in rows}
                      for p in (base / rel).rglob('*') if p.is_file()}
@@ -452,9 +462,24 @@ def publish(args):
             raise ValueError(f'Raw changed during publication: {item["path"]}')
     for category in ('normal', 'speedup'):
         selected = [p for p in packages if p['category'] == category]
-        save(base / category / 'full-block-more/subtask-roi/manifest.json',
+        if not selected:
+            continue
+        manifest_path = base / category / 'full-block-more/subtask-roi/manifest.json'
+        previous = json.loads(manifest_path.read_text()) if manifest_path.exists() else None
+        if previous:
+            if previous['version'] != VERSION:
+                raise ValueError('Different existing ROI version requires a separate destination')
+            for entry in previous['packages']:
+                if sha(Path(entry['path']) / 'roi_manifest.json') != entry['manifest_sha256']:
+                    raise ValueError('Previously published package manifest changed')
+            merged = {p['path']: p for p in previous['packages']}
+            merged.update({p['path']: p for p in selected})
+            selected = sorted(merged.values(), key=lambda p: p['path'])
+        save(manifest_path,
              dict(version=VERSION, packages=selected, episodes=sum(p['episodes'] for p in selected),
                   frames=sum(p['frames'] for p in selected), raw_sha256_verified_files=len(indexed),
+                  raw_verification_scope='selected_source_datasets_only',
+                  raw_verification_datasets=sorted({r['relative_dataset'] for r in rows}),
                   raw_unchanged=True, training_ready=False, subtask_labels_generated=False))
 
 def main():
@@ -468,9 +493,10 @@ def main():
     parser.add_argument('--select')
     parser.add_argument('--category', choices=('normal', 'speedup'))
     parser.add_argument('--freeze', type=Path)
+    parser.add_argument('--datasets', nargs='+', help='Exact source dataset names; preserve other published packages')
     args = parser.parse_args()
     if args.mode == 'freeze':
-        freeze(args.source, args.output)
+        freeze(args.source, args.output, args.datasets)
     elif args.mode == 'process':
         process(args)
     else:

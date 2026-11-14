@@ -50,6 +50,14 @@ def test_offline_window_does_not_fabricate_coverage_for_impossible_annotations()
         plan_windows([[0,0,float('nan'),30]],640,400)
 
 
+@pytest.mark.parametrize('tight', [[405,135,640,354], [0,0,200,150], [200,230,360,400]])
+def test_offline_window_contains_annotations_at_native_image_edges(tight):
+    boxes,quality=plan_windows(np.tile(tight,(90,1)),640,400,minimum=180.,maximum=300.,context_ratio=1.12)
+    assert quality['all_boxes_contained']
+    assert quality['center_steps_over_3pct']==quality['scale_steps_over_2pct']==0
+    assert np.all(boxes[:,:2]>=0) and np.all(boxes[:,2:]<=[640,400])
+
+
 def test_future_annotation_requires_explicit_offline_reader_and_complete_provenance(tmp_path):
     import gzip,json
     from scripts.materialize_tomato100_four_view import read_candidate_index

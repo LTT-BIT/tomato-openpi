@@ -10,6 +10,10 @@
 
 2026-11-13已发布normal 100条/301891帧、speedup 100条/223405帧至28上述目录，局部图覆盖全部525296帧，原始948个文件前后SHA256一致。原600路视频与新增200路均完整解码；200条各抽取3个中段时刻，并复核179段较长检测缺口的各6个时刻，未将抽帧复核声称逐帧语义准确率。Subtask标签及新批训练配置尚待后续工作，旧训练不变。结果见[本批校验记录](training_configs/experiments/tomato_sharpa/subtasks/records/full_block_more_roi_20261113_r1.json)。
 
+增量批次在 `freeze/process/publish` 中使用 `--datasets <精确源数据集名...>` 固定成员；名称不存在会报错，避免误处理其他批次。发布总清单合并保留既有数据包，并核对其包清单哈希；`raw_verification_datasets` 明确列出本次重新核验的原始目录，`raw_sha256_verified_files` 只统计本次选中来源，不把历史验收伪称为本次全量重验。ROI检测、框选、插值和平滑参数保持同版本。
+
+2026-11-14新增A `1114_1056_1082` 14条、B `1114_1055_1079` 5条，normal/speedup各19条已补齐四路：56079/44822帧，共100901帧局部RGB，全量解码无黑帧。修复源图边缘1像素舍入余量造成的不可行约束；A7剔除3个支架误检锚点，A0/B0的normal及speedup部分时段使用明确记录的人工复核局部框，未扩大300像素上限。38条中段及74段较长定位缺口已抽帧复核，不代表逐帧语义100%。原始195个文件前后哈希一致，旧8个包清单未变；合并总清单为normal/speedup各119条。来源、人工修正及校验见[增量批次结果](training_configs/experiments/tomato_sharpa/subtasks/records/full_block_more_roi_20261114_r1.json)，数据侧记录位于各自 `subtask-roi/provenance/20261114_r1`，保留昨日记录。未生成Subtask标签或修改训练数据选择。
+
 本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。
 
 多人在同一服务器训练时，各自在自己的目录独立 clone。日常训练直接使用公共 baseline，或在本地 `template/<负责人>/` 保存个人配置；个人配置已被 Git 忽略，不创建分支、不提交、不上传。只有团队决定新增或修改公共 baseline 时才进入公共开发流程。目录和配置类的组合关系见[开发结构说明](多人开发README.md#目录与配置的组合关系)。

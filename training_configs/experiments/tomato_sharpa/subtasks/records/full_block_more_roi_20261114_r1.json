@@ -1,0 +1,295 @@
+{
+  "version": "full-block-right-truss-180-v1",
+  "episodes": 38,
+  "frames": 100901,
+  "black_frames": 0,
+  "crop_image_coverage": 1.0,
+  "all_outputs_decoded": true,
+  "raw_source_files": 195,
+  "sampled_visual_review_episodes": 38,
+  "long_detection_gap_ranges_reviewed": 74,
+  "all_frames_semantically_verified": false,
+  "subtask_labels_generated": false,
+  "training_ready": false,
+  "categories": {
+    "normal": {
+      "episodes": 19,
+      "frames": 56079
+    },
+    "speedup": {
+      "episodes": 19,
+      "frames": 44822
+    }
+  },
+  "max_center_step_px": 3.5355339059327378,
+  "max_scale_step_fraction": 0.012,
+  "source_freeze_sha256": "76eab93a959ebf8a93aca978a6caeeaafdd2ed7b2cd80e02453a2f9152bbc9ab",
+  "raw_video_audit_sha256": "507053e87d0981c4a5a20044264cb55d28be0ee6c9620b088dd0516edccc2d67",
+  "coordinate_corrections": {
+    "reviewed_anchor_repairs.json": {
+      "dataset": "1114_1056_1082_normal",
+      "episode": 7,
+      "source_sha256": "94bf59149930388a93e6df3cbf68674187e1c56fd436367d29f909bb6b7ff21d",
+      "original_cache_sha256": "9d85751ccf049c5cdcbd02baa0107598fbe3e2bde30c749d5519fdc1594d4b75",
+      "excluded_detection_frames": [
+        150,
+        159,
+        1320
+      ],
+      "reason": "visually_confirmed_camera_mount_false_positives",
+      "reviewer": "coding_agent",
+      "same_current_rgb_pixels": true,
+      "gallery_sha256": "73c57d25666b455682b2f9519d51a85126d85472a0b4fff662586e6b4b98ec10"
+    },
+    "reviewed_A0_fixed_region.json": {
+      "reviewer": "coding_agent",
+      "independent": false,
+      "records": [
+        {
+          "category": "normal",
+          "dataset": "1114_1056_1082_normal",
+          "episode": 0,
+          "source_sha256": "acd959636e99fd549ccafa31b15024506f97312778818a6a0238430337ae86d1",
+          "original_cache_sha256": "3e9a03d6ade61ea51b5b0c8ecca93ca77939ad41829a997dd8830de4dfb390a0",
+          "range": [
+            1050,
+            1860
+          ],
+          "box": [
+            275,
+            140,
+            415,
+            260
+          ],
+          "reviewed_anchors": 271,
+          "geometry": {
+            "all_boxes_contained": true,
+            "uncovered_frames": [],
+            "max_center_step_px": 3.1622776601683795,
+            "center_steps_over_3pct": 0,
+            "max_scale_step_fraction": 0.011627906976744186,
+            "scale_steps_over_2pct": 0,
+            "detection_anchors": 1055,
+            "sampled_frames": 1144,
+            "max_anchor_gap_frames": 63,
+            "max_nearest_anchor_distance_frames": 31,
+            "frames_over_15_from_anchor": 46,
+            "minimum_side": 180,
+            "median_side": 180.0,
+            "maximum_side": 300,
+            "future_coordinates_used": true,
+            "same_current_frame_pixels": true,
+            "independent_semantic_quality_accepted": false
+          }
+        },
+        {
+          "category": "speedup",
+          "dataset": "1114_1056_1082_speedup",
+          "episode": 0,
+          "source_sha256": "e7d5d46756fa58d1f16d150255ea5cd7874700715ca7844d17899e0610f6949a",
+          "original_cache_sha256": "bd5f2c7fe080f254d1d03033a244cfb7103579dcd96785475d1e57e77c3aa0dc",
+          "range": [
+            811,
+            1455
+          ],
+          "box": [
+            275,
+            140,
+            415,
+            260
+          ],
+          "reviewed_anchors": 215,
+          "geometry": {
+            "all_boxes_contained": true,
+            "uncovered_frames": [],
+            "max_center_step_px": 3.1622776601683795,
+            "center_steps_over_3pct": 0,
+            "max_scale_step_fraction": 0.011235955056179775,
+            "scale_steps_over_2pct": 0,
+            "detection_anchors": 801,
+            "sampled_frames": 877,
+            "max_anchor_gap_frames": 57,
+            "max_nearest_anchor_distance_frames": 28,
+            "frames_over_15_from_anchor": 26,
+            "minimum_side": 180,
+            "median_side": 180.0,
+            "maximum_side": 278,
+            "future_coordinates_used": true,
+            "same_current_frame_pixels": true,
+            "independent_semantic_quality_accepted": false
+          }
+        }
+      ],
+      "source_mapping": "speedup processing source_index maps source frames1050..1860",
+      "native_review_sha256": "f9ee87e01b09521635c2858d6f1ce8094169cd3f61d0eff3056d0c773bd75de8"
+    },
+    "reviewed_B0_fixed_region.json": {
+      "reviewer": "coding_agent",
+      "independent": false,
+      "records": [
+        {
+          "category": "normal",
+          "dataset": "1114_1055_1079_normal",
+          "episode": 0,
+          "source_sha256": "28a3401313b96e34378783ff5cff2091c3a26f1ab7d1b250a097a4ce6d075956",
+          "original_cache_sha256": "9e0dfdad4c009d1614825841b51608eeee45a1361f169d8bcc20a21352b74a08",
+          "range": [
+            3000,
+            3850
+          ],
+          "box": [
+            285,
+            205,
+            400,
+            305
+          ],
+          "reviewed_anchors": 284,
+          "reason": "camera_mount_false_detection_instead_of_grasp",
+          "geometry": {
+            "all_boxes_contained": true,
+            "uncovered_frames": [],
+            "max_center_step_px": 3.5355339059327378,
+            "center_steps_over_3pct": 0,
+            "max_scale_step_fraction": 0.011764705882352941,
+            "scale_steps_over_2pct": 0,
+            "detection_anchors": 1415,
+            "sampled_frames": 1436,
+            "max_anchor_gap_frames": 33,
+            "max_nearest_anchor_distance_frames": 16,
+            "frames_over_15_from_anchor": 2,
+            "minimum_side": 180,
+            "median_side": 201.0,
+            "maximum_side": 300,
+            "future_coordinates_used": true,
+            "same_current_frame_pixels": true,
+            "independent_semantic_quality_accepted": false
+          }
+        },
+        {
+          "category": "speedup",
+          "dataset": "1114_1055_1079_speedup",
+          "episode": 0,
+          "source_sha256": "f91e2b65125521a9b365f0b6cbd3db60ba0a70150b2788db23f2072b675acc3a",
+          "original_cache_sha256": "90870d28f4fcf2704246dfe7b1af4af1eff598c31e550604c22547ee4bb23b88",
+          "range": [
+            2170,
+            2944
+          ],
+          "box": [
+            285,
+            205,
+            400,
+            305
+          ],
+          "reviewed_anchors": 258,
+          "reason": "camera_mount_false_detection_instead_of_grasp",
+          "geometry": {
+            "all_boxes_contained": true,
+            "uncovered_frames": [],
+            "max_center_step_px": 2.5495097567963922,
+            "center_steps_over_3pct": 0,
+            "max_scale_step_fraction": 0.011627906976744186,
+            "scale_steps_over_2pct": 0,
+            "detection_anchors": 1098,
+            "sampled_frames": 1113,
+            "max_anchor_gap_frames": 24,
+            "max_nearest_anchor_distance_frames": 12,
+            "frames_over_15_from_anchor": 0,
+            "minimum_side": 180,
+            "median_side": 199.0,
+            "maximum_side": 299,
+            "future_coordinates_used": true,
+            "same_current_frame_pixels": true,
+            "independent_semantic_quality_accepted": false
+          }
+        }
+      ],
+      "source_mapping": "speedup processing/episode_000000.json source_index maps source frames3000..3850",
+      "native_review_sha256": "79cbd17665b66f282b6ce6bb3e6fc71fe94477b2bae8360ab0eb352ab8204597"
+    }
+  },
+  "native_edge_padding_fix": true,
+  "tests_passed": 37,
+  "publication": {
+    "status": "published_verified",
+    "categories": {
+      "normal": {
+        "merged_episodes": 119,
+        "merged_frames": 357970,
+        "batch_episodes": 19,
+        "batch_frames": 56079,
+        "new_packages": [
+          {
+            "path": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+            "category": "normal",
+            "group": "A",
+            "episodes": 14,
+            "frames": 39063,
+            "manifest_sha256": "28e76d40d9f75369e8ded1ba5c5ff0072a78eab055a63a44586909ef7c237e84"
+          },
+          {
+            "path": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1114_1055_1079_normal",
+            "category": "normal",
+            "group": "B",
+            "episodes": 5,
+            "frames": 17016,
+            "manifest_sha256": "5ac4fcd7562ecbdc02fce338d108cc6d0c23c6bee897ee318fdd4e4548ab3a1b"
+          }
+        ],
+        "root_manifest_sha256": "f3fb74cd72417d1eef2abfc3664ef950318b856fc4aeb9a93115dd1f7cb6ea86"
+      },
+      "speedup": {
+        "merged_episodes": 119,
+        "merged_frames": 268227,
+        "batch_episodes": 19,
+        "batch_frames": 44822,
+        "new_packages": [
+          {
+            "path": "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/full-block-more/subtask-roi/A/1114_1056_1082_speedup",
+            "category": "speedup",
+            "group": "A",
+            "episodes": 14,
+            "frames": 31583,
+            "manifest_sha256": "860f410db8efbff0e3fb16f5df447106e03f6142bea20ec6b470ab6fc31be445"
+          },
+          {
+            "path": "/mnt/data/train_platform/datasets/tomato_sharpa/speedup/full-block-more/subtask-roi/B/1114_1055_1079_speedup",
+            "category": "speedup",
+            "group": "B",
+            "episodes": 5,
+            "frames": 13239,
+            "manifest_sha256": "a3ee8fcca7213ddf3411737490a19617124ded9a595f61ad51ab38c7f42aa497"
+          }
+        ],
+        "root_manifest_sha256": "259b6cf9ae3acf30034232539036767125553f163c59ad1678d08c6b27c2a6f4"
+      }
+    },
+    "raw_source_sha256_verified_files": 195,
+    "previous_package_manifests_unchanged": 8
+  },
+  "batch_datasets": [
+    {
+      "dataset": "1114_1056_1082_normal",
+      "episodes": 14,
+      "frames": 39063
+    },
+    {
+      "dataset": "1114_1055_1079_normal",
+      "episodes": 5,
+      "frames": 17016
+    },
+    {
+      "dataset": "1114_1056_1082_speedup",
+      "episodes": 14,
+      "frames": 31583
+    },
+    {
+      "dataset": "1114_1055_1079_speedup",
+      "episodes": 5,
+      "frames": 13239
+    }
+  ],
+  "raw_video_streams_fully_decoded": 114,
+  "output_video_streams_fully_decoded": 38,
+  "local_artifacts": "/home/user/datasets/derived/tomato_full_block_more_roi_20261114_r1"
+}
