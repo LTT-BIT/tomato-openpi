@@ -1,0 +1,45 @@
+"""Fresh five-phase in-hand119 B experiment; independent from seven-phase100."""
+from dataclasses import fields,replace
+import json
+import os
+from pathlib import Path
+
+from openpi.subtasks import tomato_in_hand as contract
+from openpi.subtasks.rgb100 import IMAGE_KEYS,digest
+from openpi.training.config import ScheduledTrainConfig
+from training_configs import common
+from training_configs.embodiments.fr3_sharpa_crop import FR3_SHARPA_CROP
+from training_configs.recipes.pi05_fullft_v1 import build_config as recipe
+
+
+def build_config():
+    root=Path(os.environ.get('PI05_IN_HAND119_BUNDLE',contract.DEFAULT_BUNDLE)).expanduser().resolve()
+    manifest=json.loads((root/'bundle.json').read_text());dataset_root=root/'b_coarse'
+    info=json.loads((dataset_root/'meta/info.json').read_text());contract.validate_info(info)
+    tasks=[json.loads(l)['task'] for l in (dataset_root/'meta/tasks.jsonl').read_text().splitlines() if l]
+    if (manifest.get('version')!=contract.VERSION or manifest.get('profile')!=contract.PROFILE
+            or manifest.get('input_preparation_complete') is not True
+            or manifest.get('physical_columns_equal') is not True or manifest.get('raw_sources_unchanged') is not True
+            or manifest.get('episodes')!=contract.EPISODES or manifest.get('frames')!=contract.FRAMES
+            or manifest.get('data_policy')!='all_sources' or tasks!=list(contract.TASKS)
+            or info['total_episodes']!=contract.EPISODES or info['total_frames']!=contract.FRAMES
+            or info['features'].get('observation.interaction_available',{}).get('dtype')!='bool'):
+        raise ValueError('Frozen full119 v3 four-view B bundle required')
+    for name in ['selection.json','b_coarse/meta/info.json','b_coarse/meta/episodes.jsonl','b_coarse/meta/tasks.jsonl']:
+        if digest(root/name)!=manifest['files'][name]:raise ValueError('Prepared metadata changed')
+    dataset=common.Dataset(version=contract.VERSION,repo_id=contract.REPO_ID,root=str(dataset_root),
+        assets_dir=str(common.repository_root()/'assets'),asset_id=contract.ASSET_ID,
+        sources=(str(root/'bundle.json'),str(root/'selection.json')),prompt_example=contract.TASKS[1])
+    config=recipe(name='pi05_sharpa_in_hand119_b_crop_fullft_delta_v3_r1',
+        exp_name='tomato_in_hand119_b_crop_delta_v3_r1_s42_b256_s16000_c4000',embodiment=FR3_SHARPA_CROP,dataset=dataset)
+    config=replace(config,model=replace(config.model,image_keys=IMAGE_KEYS,max_token_len=256),
+        data=replace(config.data,extra_delta_transform=True,interaction_mask_key='observation.interaction_available'),
+        batch_size=256,num_train_steps=16000,fsdp_devices=8,save_interval=4000,keep_period=4000,
+        policy_metadata={**config.policy_metadata,'subtask_variant':'in_hand_b_coarse','prompt_profile':contract.PROFILE,
+            'training_action_semantics':'delta_arm_joint_target_absolute_hand','data_policy':'all_sources',
+            'selection_sha256':digest(root/'selection.json'),'bundle_sha256':digest(root/'bundle.json'),
+            'phases':list(contract.PHASES),'prompts':list(contract.TASKS),'max_token_len':256,'visual_tokens':1024,
+            'offline_roi_uses_future_annotation':True,'independent_semantic_accuracy_measured':False,
+            'memory_to_pi05':False,'agent_enabled':False,'gpu_memory_preflight_required':True})
+    return ScheduledTrainConfig(**{f.name:getattr(config,f.name) for f in fields(config)},
+        save_before_step=1,save_steps_before=(),save_interval_after=4000)

@@ -498,3 +498,22 @@ PYTHONPATH=src bash scripts/python.sh -m pytest -q tests/test_tomato_interaction
 2026-11-13 23:52首次交接发现原进程继承nohup的SIGINT忽略掩码`0000000001001007`，60秒后控制器拒绝再启动，4000完整checkpoint保留。修复退出信号选择；`recover-stopping`只允许前次控制器已退出、尚无新PID、相同原进程身份/报告及完整4000与GPU归属再次通过时恢复该次交接，保留前次尝试记录；其他阶段仍不可重复启动。修复后重新执行完整输入/吞吐验收，结果和实际恢复情况以服务器回执为准。
 
 2026-11-14 00:00缓存交接成功：重新完整验收100条300组输入相等，32批后24批供数均值0.1956秒/batch，13项交接测试通过。原进程正常SIGTERM退出后，新PID873695恢复4000完整模型/optimizer，日志确认sample position1024000；实际4000/4010/4020步loss与梯度有限，8卡100%利用率，UI任务`b7ebaba1ed305b17bc01d9a2c149c3e4` API状态running。初步稳定5.7～5.8秒/步，预计11月14日19～20点完成（暂估）；16000尚未完成。成功切换后自动检查`4000-rgb`已暂停。实际回执及证据见`subtasks/records/complete100_cached_resume_20261114.json`，原4000及原数据保留。
+
+
+### 五阶段手中调整119条（2026-11-16独立准备）
+
+来源是28的`/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi`，normal全119条/357970帧，全部用于训练。v3顺序为pickup→harvest→adjust→harvest→return；adjust是在手中调整位置/朝向，最终return仍保留。四路RGB、实测state116取位置58、action58按手臂14维Delta/手部44维Absolute、50步动作窗口保持既有适配器。不使用深度、Agent或Memory，不覆盖旧七阶段100条配置/统计/checkpoint。数据目录A/B是来源分组，本次统一生成独立B阶段指令副本。
+
+新契约`openpi.subtasks.tomato_in_hand`严格检查119条身份、v3四种原文Prompt、完整五段边界、reviewed、标注绑定的所有原视频与Parquet SHA。`scripts.prepare_tomato_in_hand119`只向新目录写独立复制的四路视频、物理值不变的Parquet以及逐帧task_index/coarse_phase_index和图像availability；availability只表示当前局部RGB存在，不代表独立语义定位准确率。ROI仍是使用前后坐标的离线裁剪，不能直接声称在线方法。
+
+配置模块：`training_configs.experiments.tomato_sharpa.subtasks.in_hand119_b_crop`，新实验`tomato_in_hand119_b_crop_delta_v3_r1_s42_b256_s16000_c4000`，独立assets `tomato_in_hand119_rgb_crop_v3_r1_delta_30hz`。batch256/FSDP8/16000步/每4000完成步保存；原学习率warmup1000/decay30000和随机种子不变，从base权重重新训练，不自动恢复旧100条optimizer。视觉1024 tokens、文本上限256（包括58维离散state），使用实际SentencePiece审计新Prompt上界。
+
+默认训练副本：`/home/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_four_view_v3_r1`，缓存：同父目录`in_hand119_rgb224_cache_v3_r1`。先准备副本，使用`scripts.compute_experiment_norm`重算全部119条，使用`scripts.build_rgb_frame_cache`逐帧顺序解码为精确PIL224缓存；`scripts.check_tomato_in_hand119`验收原文件SHA、物理列不变、逐帧监督、所有阶段起止实际Prompt、357组完整模型输入逐位等价及32批CPU供数。训练GPU容量需区分历史同形状batch256验证与本次实际开训。
+
+验收报告通过后默认只检查：
+
+```bash
+JAX_PLATFORMS=cpu CUDA_VISIBLE_DEVICES='' bash scripts/python.sh -m scripts.tomato_in_hand119_run check
+```
+
+用户另行要求正式开训时，同入口改为`start`，锁定8卡并检查空闲，启用缓存及W&B offline，登记训练UI。该命令失败时不要重复开训，先查console和checkpoint。

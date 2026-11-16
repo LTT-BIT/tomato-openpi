@@ -71,6 +71,7 @@ def transform_vectors(
         # Image-independent statistics use an explicitly invalid dummy crop;
         # only state/actions are compared with real loaded samples below.
         raw["observation.interaction_valid"] = np.bool_(False)
+        raw["observation.interaction_available"] = np.bool_(False)
     return transform(raw)
 
 
