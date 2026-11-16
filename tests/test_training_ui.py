@@ -676,7 +676,7 @@ def test_collection_parent_reuses_members_and_rejects_unknown_parent(workspace, 
 @pytest.mark.parametrize("preset", ["flash_fullft", "flash_f4", "reference_fullft"])
 @pytest.mark.parametrize(
     ("workers", "override", "expected"),
-    [(2, None, "multiprocess"), (2, "legacy", "legacy"), (2, "multiprocess", "multiprocess"), (0, None, "legacy")],
+    [(2, None, "multiprocess"), (2, "legacy", "multiprocess"), (2, "multiprocess", "multiprocess"), (0, None, None)],
 )
 def test_flash_ui_records_and_forwards_effective_input_pipeline(
     workspace, fake_launch, monkeypatch, preset, workers, override, expected
@@ -694,6 +694,11 @@ def test_flash_ui_records_and_forwards_effective_input_pipeline(
         "num_workers": workers,
     }
     request = {**workspace, "baseline": module, "values": values}
+    if expected is None:
+        with pytest.raises(ValueError, match="num_workers >= 1"):
+            ui.start_job(request)
+        assert not ui.jobs()
+        return
     config, _ = ui.build_request(request)
     state = ui.start_job(request)
     monkeypatch.setattr(run_training, "load_experiment", lambda module: config)

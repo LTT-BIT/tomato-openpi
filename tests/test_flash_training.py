@@ -326,20 +326,16 @@ def test_resume_ignores_source_text_but_preserves_semantic_contract():
             validate_resume_contract(saved, {**current, key: "different"})
 
 
-@pytest.mark.parametrize(
-    ("workers", "override", "expected"),
-    [(8, None, "multiprocess"), (0, None, "legacy"), (8, "legacy", "legacy"), (8, "multiprocess", "multiprocess")],
-)
-def test_default_input_pipeline_and_explicit_overrides(workers, override, expected):
-    from openpi.training.flash_loader import resolve_input_pipeline
+@pytest.mark.parametrize("workers", [1, 2, 8])
+def test_prefetch_workers(workers):
+    from openpi.training.flash_loader import validate_prefetch_workers
 
-    environment = {} if override is None else {"FLASH_INPUT_PIPELINE": override}
-    assert resolve_input_pipeline(workers, environment) == expected
+    validate_prefetch_workers(workers)
 
 
-@pytest.mark.parametrize(("workers", "override"), [(0, "multiprocess"), (8, "invalid"), (8, "")])
-def test_invalid_input_pipeline_is_rejected(workers, override):
-    from openpi.training.flash_loader import resolve_input_pipeline
+@pytest.mark.parametrize("workers", [0, -1, True, 1.5])
+def test_prefetch_requires_positive_integer_workers(workers):
+    from openpi.training.flash_loader import validate_prefetch_workers
 
-    with pytest.raises(ValueError, match="FLASH"):
-        resolve_input_pipeline(workers, {"FLASH_INPUT_PIPELINE": override})
+    with pytest.raises(ValueError, match="num_workers >= 1"):
+        validate_prefetch_workers(workers)

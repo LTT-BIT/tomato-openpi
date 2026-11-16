@@ -18,18 +18,13 @@ from openpi.models.tokenizer import PaligemmaTokenizer
 from openpi.training.flash_native import CAMERAS
 from openpi.training.flash_native import NativeDataset
 
+INPUT_PIPELINE = "multiprocess"
 
-def resolve_input_pipeline(num_workers, environment=None):
-    """Use persistent prefetch by default; retain zero-worker diagnostics and explicit overrides."""
-    environment = os.environ if environment is None else environment
-    pipeline = environment.get("FLASH_INPUT_PIPELINE")
-    if pipeline is None:
-        pipeline = "multiprocess" if num_workers > 0 else "legacy"
-    if pipeline not in ("legacy", "multiprocess"):
-        raise ValueError("FLASH_INPUT_PIPELINE must be legacy or multiprocess")
-    if pipeline == "multiprocess" and num_workers < 1:
+
+def validate_prefetch_workers(num_workers):
+    """FLASH training has a single persistent multiprocessing input pipeline."""
+    if type(num_workers) is not int or num_workers < 1:
         raise ValueError("Multiprocess FLASH loader requires num_workers >= 1")
-    return pipeline
 
 
 def concatenate(items):
@@ -158,8 +153,7 @@ class PrefetchedBatches:
     def __init__(self, dataset, start_step, end_step, *, prefetch_factor=2):
         if start_step < 0 or end_step < start_step:
             raise ValueError("Invalid completed-step range")
-        if dataset.config.num_workers < 1:
-            raise ValueError("Multiprocess FLASH loader requires num_workers >= 1")
+        validate_prefetch_workers(dataset.config.num_workers)
         self.batch_size = dataset.config.batch_size
         workers = dataset.config.num_workers
         # Dispatch small tasks to all workers even when only one GPU batch is needed.
@@ -203,56 +197,3 @@ class PrefetchedBatches:
         if self.iterator is not None:
             self.iterator._shutdown_workers()  # noqa: SLF001
             self.iterator = None
-
-
-def verify_input_migration(saved, current, root):
-    """Explicit, narrow upgrade from the audited e64c9a41 input pipeline.
-
-    Keep every model/optimizer/data/seed contract and objective function identical.
-    The original checkpoint contract remains untouched for auditability.
-    """
-    import ast
-    import subprocess
-
-    from openpi.training.flash_native import digest
-
-    before = {k: v for k, v in saved.items() if k != "training_code_sha256"}
-    after = {k: v for k, v in current.items() if k != "training_code_sha256"}
-    if before != after:
-        raise ValueError("Input migration cannot change model/optimizer/data/RNG/batch contract")
-    base = "e64c9a41ecb24494ea6c81e2df3dd4bbbfdcc45c"
-    names = (
-        "scripts/train_flash.py",
-        "src/openpi/training/flash_native.py",
-        "src/openpi/models/pi0_flash.py",
-        "src/openpi/shared/flash_polynomial.py",
-        "src/openpi/training/optimizer.py",
-        "src/openpi/models/pi0.py",
-        "src/openpi/models/gemma.py",
-        "src/openpi/models/siglip.py",
-        "scripts/train.py",
-    )
-    original = {
-        name: subprocess.check_output(["git", "-C", str(root), "show", base + ":" + name], text=True) for name in names
-    }
-    if digest(original) != saved["training_code_sha256"]:
-        raise ValueError("Checkpoint was not written by the audited prefetch migration base")
-    for name in names[1:]:
-        if original[name] != (root / name).read_text():
-            raise ValueError(f"Input migration cannot change {name}")
-
-    def objectives(source):
-        return {
-            node.name: ast.dump(node, include_attributes=False)
-            for node in ast.parse(source).body
-            if isinstance(node, ast.FunctionDef) and node.name in ("step", "evaluate_batch", "validation")
-        }
-
-    if objectives(original[names[0]]) != objectives((root / names[0]).read_text()):
-        raise ValueError("Input migration cannot change loss/update/evaluation mathematics")
-    return {
-        "from_code_sha256": saved["training_code_sha256"],
-        "to_code_sha256": current["training_code_sha256"],
-        "audited_base_commit": base,
-        "kind": "cpu_prefetch_only",
-    }

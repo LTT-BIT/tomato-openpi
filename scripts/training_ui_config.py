@@ -495,8 +495,10 @@ def apply_overrides(config, values: dict):
     )
     validate_config(result)
     if result.policy_metadata.get("algorithm") in ("flash", "flash_reference"):
+        from openpi.training.flash_loader import validate_prefetch_workers
         from openpi.training.flash_native import bind_stats
 
+        validate_prefetch_workers(result.num_workers)
         result = bind_stats(result)
         if hasattr(result.model, "t3_assets"):
             result = replace(

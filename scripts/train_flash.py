@@ -19,7 +19,9 @@ from openpi.models.tokenizer import PaligemmaTokenizer
 from openpi.training import checkpoints
 from openpi.training import sharding
 from openpi.training import tracking
-from openpi.training.flash_loader import resolve_input_pipeline
+from openpi.training.flash_loader import INPUT_PIPELINE
+from openpi.training.flash_loader import PrefetchedBatches
+from openpi.training.flash_loader import validate_prefetch_workers
 from openpi.training.flash_native import NativeDataset
 from openpi.training.flash_native import bind_stats
 from openpi.training.flash_native import preflight
@@ -165,12 +167,12 @@ def validate_resume_contract(saved, current):
 
 
 def main(config):
+    validate_prefetch_workers(config.num_workers)
     config = bind_stats(config)
     inputs = preflight(config)
     if config.batch_size % jax.device_count():
         raise ValueError("Global batch must be divisible by selected GPU count")
-    pipeline = resolve_input_pipeline(config.num_workers)
-    print(f"FLASH input pipeline: {pipeline} (num_workers={config.num_workers})", flush=True)
+    print(f"FLASH input pipeline: {INPUT_PIPELINE} (num_workers={config.num_workers})", flush=True)
     mesh = sharding.make_mesh(config.fsdp_devices)
     data_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS))
     replicated = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
@@ -223,19 +225,12 @@ def main(config):
         )
         output = Path(config.checkpoint_dir) / "flash_metrics"
         output.mkdir(exist_ok=True)
-        if pipeline == "multiprocess":
-            from openpi.training.flash_loader import PrefetchedBatches
-
-            batches = loader_scope.enter_context(PrefetchedBatches(dataset, start, config.num_train_steps))
+        batches = loader_scope.enter_context(PrefetchedBatches(dataset, start, config.num_train_steps))
         with tracking.session(config, resuming=resuming, start_step=start):
             for completed in range(start, config.num_train_steps):
                 # This cursor also determines the next window exactly after checkpoint restore.
                 data_before = time.perf_counter()
-                if pipeline == "multiprocess":
-                    host_batch = next(batches)
-                else:
-                    indices = [dataset.index(completed * config.batch_size + i) for i in range(config.batch_size)]
-                    host_batch = dataset.batch(indices)
+                host_batch = next(batches)
                 batch = jax.device_put(host_batch, data_sharding)
                 data_wait = time.perf_counter() - data_before
                 del host_batch
@@ -251,7 +246,7 @@ def main(config):
                     step=int(state.step),
                     seconds=time.perf_counter() - before,
                     data_wait_seconds=data_wait,
-                    input_pipeline=pipeline,
+                    input_pipeline=INPUT_PIPELINE,
                     learning_rate=float(config.lr_schedule.create()(completed)),
                     effective_samples=int(state.step) * config.batch_size,
                 )

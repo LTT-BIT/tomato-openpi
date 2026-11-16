@@ -422,6 +422,10 @@ def worker(job_id):
     signal.signal(signal.SIGINT, stop_signal)
     try:
         config = job_config(state)
+        if config.policy_metadata.get("algorithm") in ("flash", "flash_reference"):
+            from openpi.training.flash_loader import validate_prefetch_workers
+
+            validate_prefetch_workers(config.num_workers)
         overrides = job_overrides(state)
         python = ["bash", str(common.repository_root() / "scripts/python.sh"), "-u", "-m"]
         cpu_env = {**os.environ, "JAX_PLATFORMS": "cpu", "CUDA_VISIBLE_DEVICES": "", "PYTHONUNBUFFERED": "1"}
@@ -474,9 +478,9 @@ def worker(job_id):
         env["JAX_PLATFORMS"] = "cuda"
         is_flash = config.policy_metadata.get("algorithm") in ("flash", "flash_reference")
         if is_flash:
-            from openpi.training.flash_loader import resolve_input_pipeline
+            from openpi.training.flash_loader import INPUT_PIPELINE
 
-            env["FLASH_INPUT_PIPELINE"] = resolve_input_pipeline(config.num_workers, env)
+            env["FLASH_INPUT_PIPELINE"] = INPUT_PIPELINE
         state["training_environment"] = {
             key: env[key]
             for key in (
