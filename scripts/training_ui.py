@@ -472,6 +472,11 @@ def worker(job_id):
         env.pop("JAX_PLATFORM_NAME", None)
         # Fail if CUDA cannot initialize rather than accidentally training on CPU.
         env["JAX_PLATFORMS"] = "cuda"
+        is_flash = config.policy_metadata.get("algorithm") in ("flash", "flash_reference")
+        if is_flash:
+            from openpi.training.flash_loader import resolve_input_pipeline
+
+            env["FLASH_INPUT_PIPELINE"] = resolve_input_pipeline(config.num_workers, env)
         state["training_environment"] = {
             key: env[key]
             for key in (
@@ -480,6 +485,8 @@ def worker(job_id):
                 "XLA_PYTHON_CLIENT_MEM_FRACTION",
             )
         }
+        if is_flash:
+            state["training_environment"]["FLASH_INPUT_PIPELINE"] = env["FLASH_INPUT_PIPELINE"]
         print("Training environment: " + json.dumps(state["training_environment"], sort_keys=True), flush=True)
         job_config(state)  # Recheck semantic configuration after preparing assets.
         command = [*python, "scripts.run_training", state["module"], *overrides, "--wandb-mode", state["wandb_mode"]]

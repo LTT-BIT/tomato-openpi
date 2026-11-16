@@ -671,3 +671,38 @@ def test_collection_parent_reuses_members_and_rejects_unknown_parent(workspace, 
     other.mkdir()
     with pytest.raises(ValueError, match="数据父目录"):
         editor.apply_overrides(config, {**values, "dataset_root": str(other)})
+
+
+@pytest.mark.parametrize("preset", ["flash_fullft", "flash_f4", "reference_fullft"])
+@pytest.mark.parametrize(
+    ("workers", "override", "expected"),
+    [(2, None, "multiprocess"), (2, "legacy", "legacy"), (2, "multiprocess", "multiprocess"), (0, None, "legacy")],
+)
+def test_flash_ui_records_and_forwards_effective_input_pipeline(
+    workspace, fake_launch, monkeypatch, preset, workers, override, expected
+):
+    if override is None:
+        monkeypatch.delenv("FLASH_INPUT_PIPELINE", raising=False)
+    else:
+        monkeypatch.setenv("FLASH_INPUT_PIPELINE", override)
+    module = "training_configs.experiments.tomato_sharpa.flash.tomato_fr3_sharpa_" + preset + "_v1"
+    values = {
+        **editor.defaults(module)["values"],
+        "exp_name": "flash_loader_test",
+        "batch_size": 2,
+        "fsdp_devices": 1,
+        "num_workers": workers,
+    }
+    request = {**workspace, "baseline": module, "values": values}
+    config, _ = ui.build_request(request)
+    state = ui.start_job(request)
+    monkeypatch.setattr(run_training, "load_experiment", lambda module: config)
+    calls = []
+    monkeypatch.setattr(ui, "run_stage", lambda directory, state, label, command, env: calls.append((label, env)))
+    ui.worker(state["id"])
+    saved = ui.read_job(state["id"])
+    assert saved["status"] == "completed", saved.get("error")
+    assert calls[-1][0] == "训练中"
+    assert calls[-1][1]["FLASH_INPUT_PIPELINE"] == expected
+    assert saved["training_environment"]["FLASH_INPUT_PIPELINE"] == expected
+    assert calls[-1][1]["JAX_PLATFORMS"] == "cuda"

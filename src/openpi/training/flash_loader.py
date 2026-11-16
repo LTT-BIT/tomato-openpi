@@ -19,6 +19,19 @@ from openpi.training.flash_native import CAMERAS
 from openpi.training.flash_native import NativeDataset
 
 
+def resolve_input_pipeline(num_workers, environment=None):
+    """Use persistent prefetch by default; retain zero-worker diagnostics and explicit overrides."""
+    environment = os.environ if environment is None else environment
+    pipeline = environment.get("FLASH_INPUT_PIPELINE")
+    if pipeline is None:
+        pipeline = "multiprocess" if num_workers > 0 else "legacy"
+    if pipeline not in ("legacy", "multiprocess"):
+        raise ValueError("FLASH_INPUT_PIPELINE must be legacy or multiprocess")
+    if pipeline == "multiprocess" and num_workers < 1:
+        raise ValueError("Multiprocess FLASH loader requires num_workers >= 1")
+    return pipeline
+
+
 def concatenate(items):
     return jax.tree.map(lambda *xs: np.concatenate(xs, axis=0), *items)
 

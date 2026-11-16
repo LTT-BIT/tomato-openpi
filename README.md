@@ -340,13 +340,13 @@ UI 的 GPU 训练子进程显式设置 `XLA_PYTHON_CLIENT_PREALLOCATE=false`、`
 
 normal 数据快捷按钮会识别并直接应用真实 LeRobot 成员目录；成员与当前来源相同则保持封存顺序并复用现有统计。父目录不能作为单个 LeRobot 根：已配置集合的父目录会展开为原成员，其他父目录要求先识别并应用，未应用的发现结果不能启动任务。
 
-### FLASH 可选多进程输入链路
+### FLASH 默认多进程预读
 
-新增 `openpi.training.flash_loader.PrefetchedBatches`：8 个常驻 spawn CPU 进程、每 worker 预取 2 个小批任务，按原始 sample cursor 保序拼回全局 Batch。每 worker 最多保留 16 个视频解码器和 128 张缩放后图像；FFmpeg 单线程，加载进程不接触 GPU。窗口索引、视频时间对齐、图像缩放、Token、Normalization、历史和标签沿用原实现。`FLASH_INPUT_PIPELINE=legacy` 为默认值，不会热切换已经运行的训练。
+使用 `openpi.training.flash_loader.PrefetchedBatches`：常驻 spawn CPU 进程数由 `num_workers` 控制（正式配方为 8），每 worker 预取 2 个小批任务，按原始 sample cursor 保序拼回全局 Batch。每 worker 最多保留 16 个视频解码器和 128 张缩放后图像；FFmpeg 单线程，加载进程不接触 GPU。窗口索引、视频时间对齐、图像缩放、Token、Normalization、历史和标签沿用原实现。FLASH（含 F1–F4 与同数据 π05 对照）在 `num_workers>0` 时默认启用该链路，UI 和命令行都无需额外 export；`num_workers=0` 的诊断配置保留同步链路。需要对照或排障时仍可显式设置 `FLASH_INPUT_PIPELINE=legacy`，显式要求 multiprocess 但 workers=0 时明确报错。不会热切换已经运行的训练。
 
 只读基准入口：`JAX_PLATFORMS=cpu CUDA_VISIBLE_DEVICES= bash scripts/python.sh -m scripts.benchmark_flash_loader --output .cache/new_loader_benchmark.json --batch-size 256 --workers 8 --batches 3 --start-step 2800`。先比较相同窗口的新旧整批字节 Hash，再报告启动与后续批次耗时；并发训练会影响基准数值，不能直接当作端到端训练加速比。
 
-后续切换预读链路设置 `FLASH_INPUT_PIPELINE=multiprocess`。恢复时忽略历史 `training_code_sha256`，不再需要 `FLASH_ALLOW_INPUT_MIGRATION` 白名单；仍严格比较模型、算法资产、数据、随机种子、batch、优化器与调度合同。预读位置不替代已完成训练步数。CPU 一致性不代表多卡吞吐或真实训练验收完成。
+更新代码后，新启动或恢复的 FLASH 任务默认自动启用预读，无需增加命令行参数。启动日志输出实际链路及 worker 数，UI 将实际 `FLASH_INPUT_PIPELINE` 记录在任务的 `training_environment` 中；每步日志与 W&B 继续记录 `input_pipeline`、`data_wait_seconds` 和 `seconds`。已有 UI 服务需在不影响其后台训练的前提下重启后才使用新代码；当前运行的训练不会改变。恢复时忽略历史 `training_code_sha256`，不再需要 `FLASH_ALLOW_INPUT_MIGRATION` 白名单；仍严格比较模型、算法资产、数据、随机种子、batch、优化器与调度合同。预读位置不替代已完成训练步数。CPU 一致性不代表多卡吞吐或真实训练验收完成。
 
 2026-11-05 真实 normal480 / Batch256、8 worker 连续 8 批只读对比：旧链路平均取批 20.30 秒；新链路启动首批 50.55 秒，后 7 批平均等待 2.41 秒。含启动的 8 批等待合计 162.38 → 67.42 秒。全部图像/Token/历史/目标叶子的字节 Hash 相同，两轮共 11 批通过；结果 `training_configs/experiments/tomato_sharpa/flash/validation/prefetch_benchmark_20261105.json`。基准与原训练并发、固定旧链路先跑，不能把取批等待比当作 GPU 训练提速比。当前训练进程未切换；完整 GPU 续训还需在新保存点做实际验收，保留 Batch256 和 8000 步，不从 Step2000 回退重算当前未保存进度。
 

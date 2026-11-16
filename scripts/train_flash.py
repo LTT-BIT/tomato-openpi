@@ -4,7 +4,6 @@ from contextlib import ExitStack
 from dataclasses import replace
 import functools
 import json
-import os
 from pathlib import Path
 import time
 
@@ -20,6 +19,7 @@ from openpi.models.tokenizer import PaligemmaTokenizer
 from openpi.training import checkpoints
 from openpi.training import sharding
 from openpi.training import tracking
+from openpi.training.flash_loader import resolve_input_pipeline
 from openpi.training.flash_native import NativeDataset
 from openpi.training.flash_native import bind_stats
 from openpi.training.flash_native import preflight
@@ -169,6 +169,8 @@ def main(config):
     inputs = preflight(config)
     if config.batch_size % jax.device_count():
         raise ValueError("Global batch must be divisible by selected GPU count")
+    pipeline = resolve_input_pipeline(config.num_workers)
+    print(f"FLASH input pipeline: {pipeline} (num_workers={config.num_workers})", flush=True)
     mesh = sharding.make_mesh(config.fsdp_devices)
     data_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS))
     replicated = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
@@ -177,10 +179,6 @@ def main(config):
         config.checkpoint_dir, keep_period=config.keep_period, overwrite=False, resume=config.resume
     )
     loader_scope = ExitStack()
-    pipeline = os.environ.get("FLASH_INPUT_PIPELINE", "legacy")
-    if pipeline not in ("legacy", "multiprocess"):
-        manager.close()
-        raise ValueError("FLASH_INPUT_PIPELINE must be legacy or multiprocess")
     try:
         state, layout = init_train_state(config, jax.random.key(config.model_seed), mesh, resume=resuming)
         contract = {

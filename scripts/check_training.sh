@@ -20,7 +20,7 @@ CHECK_PATHS=(
   scripts/train_flash.py scripts/verify_flash_backend.py
   src/openpi/models/pi0_flash_delta_t3.py src/openpi/shared/flash_delta_t3.py src/openpi/training/flash_delta_t3_data.py src/openpi/training/flash_delta_t3_ui.py
   src/openpi/models/pi0_flash.py src/openpi/shared/flash_polynomial.py
-  src/openpi/training/flash_native.py src/openpi/training/flash_checkpoint.py
+  src/openpi/training/flash_native.py src/openpi/training/flash_loader.py src/openpi/training/flash_checkpoint.py
   scripts/training_ui.py scripts/training_ui_config.py
   scripts/run_training.py scripts/compute_experiment_norm.py scripts/train.py scripts/train_reproducibility_test.py
   src/openpi/training/norm_provenance.py examples/fr3_wuji/compute_norm_stats.py
