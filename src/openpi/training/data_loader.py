@@ -319,7 +319,12 @@ def create_torch_dataset(
             round(t * dataset_meta.fps / action_hz) / dataset_meta.fps for t in range(action_horizon)
         ]
         cache_root = os.environ.get("PI05_RGB_FRAME_CACHE")
+        if data_config.fovea_labels_root and cache_root:
+            raise ValueError("Fovea requires source-resolution RGB; unset PI05_RGB_FRAME_CACHE")
         dataset_type = lerobot_dataset.LeRobotDataset
+        if data_config.fovea_labels_root:
+            from openpi.training.fovea_dataset import FoveaSourceDataset
+            dataset_type = FoveaSourceDataset
         cache_options = {}
         if cache_root:
             from openpi.training.frame_cache import CachedLeRobotDataset
@@ -332,6 +337,11 @@ def create_torch_dataset(
             video_backend=data_config.video_backend,
             **cache_options,
         )
+        if data_config.fovea_labels_root:
+            from openpi.training.fovea_dataset import FoveaDataset
+            if len(data_config.lerobot_datasets) != 1 or action_hz != dataset_meta.fps:
+                raise ValueError("Fovea v1 requires one dataset at source FPS")
+            dataset = FoveaDataset(dataset, data_config.fovea_labels_root, data_config.fovea_execute_steps)
         view = getattr(data_config, "task_view", None)
         if view is not None:
             from openpi.training.task_view import TaskViewDataset

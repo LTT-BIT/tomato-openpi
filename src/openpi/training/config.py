@@ -131,6 +131,10 @@ class DataConfig:
     # Optional explicit LeRobot video decoder (for example, "pyav").
     video_backend: str | None = None
 
+    # Opt-in dynamic source-resolution crops and future location-token labels.
+    fovea_labels_root: str | None = None
+    fovea_execute_steps: int = 8
+
     # Only used for RLDS data loader (ie currently only used for DROID).
     rlds_data_dir: str | None = None
     # Action space for DROID dataset.

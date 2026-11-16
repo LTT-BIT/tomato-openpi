@@ -2,6 +2,24 @@
 
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
+## 番茄 FoveaVLA v1：`tomato-foveavla-v1` 分支
+
+参考 [FoveaVLA](https://tml.stanford.edu/FoveaVLA/) 的联合动作/未来框机制，适配双FR3/Sharpa、四路RGB、58D动作（手臂Delta/手部Absolute）及119条五阶段v3英文指令。没有历史帧Memory或Agent输入。共享前缀预测50步动作及执行8步后的主相机框；动作/框分支互相不可见。PaliGemma已有1024个location token按ymin/xmin/ymax/xmax表示补边224全图坐标，损失为flow + 0.1 × box CE，分别记录 `action_loss`、`box_loss`、`loss`。
+
+独立数据目录为服务器 `/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-foveavla-v1`，原 `subtask-roi` 不修改。新目录保存标签及元数据，引用已验证119条副本的物理列和视频。357970源帧形成348688个t→t+8有效配对，排除跨episode尾部及远离检测锚点的无效配对。归一化仍覆盖全部119条源帧；物理文件哈希和357个输入/Delta变换对比一致后，复用数值并建立本实验独立资产绑定。
+
+v1使用**弱监督框**：已有右手/果串ROI、左手检测、固定相机下的篮子/盘子区域先验；不是逐帧人工标注，未测量独立语义准确率。初始框是原图归一化xyxy `[0.25,0.22,0.83,0.86]`；局部图从当前640×400原图生成1.5倍正方形裁剪并按需零补边。训练混合45%名义框、45%扰动框、10%固定初始框，监督仍是未来未扰动框。关闭破坏框坐标的旋转/随机全图裁剪，保留颜色增强。相机/容器位置改变时需要重新核对先验。禁止使用旧RGB224缓存生成新crop。
+
+配置 `training_configs.experiments.tomato_sharpa.subtasks.foveavla_v1` 从π0.5 base全量微调，保留既有学习率、batch256/FSDP8/30000步，每5000完成步保存且保留。正式GPU容量及闭环效果仍待新训练验证。
+
+```bash
+unset PI05_RGB_FRAME_CACHE
+bash scripts/python.sh -m scripts.run_training training_configs.experiments.tomato_sharpa.subtasks.foveavla_v1 --check --wandb-mode offline
+bash scripts/python.sh -m scripts.check_fovea
+```
+
+以上只检查。开训时才去掉 `--check`，保留 `--wandb-mode offline`；本次开发没有启动正式训练。数据准备入口为 `scripts.prepare_fovea --bundle <已验证119条副本> --detections <normal检测缓存> --output <新目录>`，拒绝覆盖非空目录；`scripts.bind_fovea_norm --source-norm <原119条统计>` 验证物理列和变换后创建独立资产。checkpoint自动保存 `assets/fovea_contract.json` 及自身统计。同名部署分支提供 `fovea_serve` 和 `run --fovea`。
+
 当前 `tomato-subtask-policy` 分支准备100条normal完整录制的四视图π₀.₅训练：原三路RGB＋当前局部RGB、58D state、阶段英文prompt，无深度、无π₀.₅ Memory。28服务器数据、独立100条统计及B主方案/A对照入口见[番茄训练说明](training_configs/experiments/tomato_sharpa/README.md)。视觉token1024、文本上限256，batch256/16000步/FSDP8，每4000完成步保存并保留checkpoint，原学习率保持。默认只检查：`bash scripts/python.sh -m scripts.tomato100_run check`；显式`start`才启动，拒绝占用中的GPU。2026-11-13已在28启动B：batch256实际训练通过，第10步loss1.6188，8卡各约64.6GiB显存；完整训练尚未完成。
 
 旧normal93配置、数据与B checkpoint7999保留，旧入口`scripts.tomato_ab_run`不改。100条与旧93条有90条共同录制，移出3条、加入10条，并重新计算统计；因此不能把新旧结果当作仅增加crop的严格消融。r11裁剪坐标由前后帧辅助离线生成，图像始终来自当前帧；实时ROI与部署另行验证。

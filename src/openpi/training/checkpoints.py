@@ -73,6 +73,23 @@ def save_state(
         norm_stats = data_config.norm_stats
         if norm_stats is not None and data_config.asset_id is not None:
             _normalize.save(directory / data_config.asset_id, norm_stats)
+        if getattr(data_config, "fovea_labels_root", None):
+            import json
+            from pathlib import Path
+            from openpi.training.fovea_dataset import digest
+
+            source = Path(data_config.fovea_labels_root) / "manifest.json"
+            manifest = json.loads(source.read_text())
+            record = dict(
+                contract=manifest["contract"],
+                labels_manifest_sha256=digest(source),
+                norm_asset_id=data_config.asset_id,
+                norm_stats_sha256=digest(Path(str(directory)) / data_config.asset_id / "norm_stats.json"),
+                action_semantics="delta_arm_joint_target_absolute_hand",
+                box_supervision="task-adapted weak supervision",
+                training_checkpoint=True,
+            )
+            (directory / "fovea_contract.json").write_text(json.dumps(record, indent=2) + "\n")
 
     # Split params that can be used for inference into a separate item.
     with at.disable_typechecking():

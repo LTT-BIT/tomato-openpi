@@ -1,0 +1,121 @@
+{
+  "status": "PASS",
+  "training_started": false,
+  "hardware_executed": false,
+  "source_episodes": 119,
+  "source_frames": 357970,
+  "training_pairs": 348688,
+  "excluded_query_starts": 9282,
+  "all_pairs_checked": 348688,
+  "actual_video_transform_samples": [
+    {
+      "dataset_index": 0,
+      "episode": 0,
+      "frame": 0,
+      "future_frame": 8,
+      "prompt": "Right hand grasps and lifts the truss to the center",
+      "token_length": 203
+    },
+    {
+      "dataset_index": 31698,
+      "episode": 9,
+      "frame": 689,
+      "future_frame": 697,
+      "prompt": "Left hand picks tomatoes into left basket while right hand holds truss",
+      "token_length": 217
+    },
+    {
+      "dataset_index": 63397,
+      "episode": 20,
+      "frame": 2858,
+      "future_frame": 2866,
+      "prompt": "Left hand picks tomatoes into left basket while right hand holds truss",
+      "token_length": 219
+    },
+    {
+      "dataset_index": 95096,
+      "episode": 30,
+      "frame": 2504,
+      "future_frame": 2512,
+      "prompt": "Left hand picks tomatoes into left basket while right hand holds truss",
+      "token_length": 219
+    },
+    {
+      "dataset_index": 126795,
+      "episode": 40,
+      "frame": 2126,
+      "future_frame": 2134,
+      "prompt": "Left hand picks tomatoes into left basket while right hand holds truss",
+      "token_length": 221
+    },
+    {
+      "dataset_index": 158494,
+      "episode": 53,
+      "frame": 1335,
+      "future_frame": 1343,
+      "prompt": "Left hand picks tomatoes into left basket while right hand holds truss",
+      "token_length": 222
+    },
+    {
+      "dataset_index": 190192,
+      "episode": 66,
+      "frame": 632,
+      "future_frame": 640,
+      "prompt": "Left hand picks tomatoes into left basket while right hand holds truss",
+      "token_length": 230
+    },
+    {
+      "dataset_index": 221891,
+      "episode": 77,
+      "frame": 2583,
+      "future_frame": 2591,
+      "prompt": "Left hand picks tomatoes into left basket while right hand holds truss",
+      "token_length": 226
+    },
+    {
+      "dataset_index": 253590,
+      "episode": 88,
+      "frame": 1960,
+      "future_frame": 1968,
+      "prompt": "Left hand picks tomatoes into left basket while right hand holds truss",
+      "token_length": 215
+    },
+    {
+      "dataset_index": 285289,
+      "episode": 98,
+      "frame": 1357,
+      "future_frame": 1365,
+      "prompt": "Left hand picks tomatoes into left basket while right hand holds truss",
+      "token_length": 230
+    },
+    {
+      "dataset_index": 316988,
+      "episode": 108,
+      "frame": 1416,
+      "future_frame": 1424,
+      "prompt": "Left hand picks tomatoes into left basket while right hand holds truss",
+      "token_length": 224
+    },
+    {
+      "dataset_index": 348687,
+      "episode": 118,
+      "frame": 2493,
+      "future_frame": 2501,
+      "prompt": "Right hand returns the held object to the right plate",
+      "token_length": 204
+    }
+  ],
+  "worker_loader_batch_shape": [
+    2,
+    50,
+    58
+  ],
+  "worker_loader_startup_seconds": 15.95733411796391,
+  "norm_provenance": "verified",
+  "manifest_sha256": "2069ebdb25313e8386fc3a8f418b76d80e37d53e82be44d3cb5e4ffd5e6cd1d8",
+  "memory_enabled": false,
+  "weak_box_supervision": true,
+  "independent_semantic_accuracy_measured": false,
+  "gpu_batch_capacity_verified": false,
+  "config_module": "training_configs.experiments.tomato_sharpa.subtasks.foveavla_v1"
+}

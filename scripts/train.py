@@ -129,15 +129,20 @@ def train_step(
         kwargs = {}
         if config.augmentation_seed is not None:
             kwargs["augmentation_rng"] = jax.random.fold_in(jax.random.key(config.augmentation_seed), state.step)
+        if hasattr(model, "compute_loss_components"):
+            components = model.compute_loss_components(rng, observation, actions, train=True, **kwargs)
+            return jnp.mean(components["loss"]), {k: jnp.mean(v) for k, v in components.items() if k != "loss"}
         chunked_loss = model.compute_loss(rng, observation, actions, train=True, **kwargs)
-        return jnp.mean(chunked_loss)
+        return jnp.mean(chunked_loss), {}
 
     train_rng = jax.random.fold_in(rng, state.step)
     observation, actions = batch
 
     # Filter out frozen params.
     diff_state = nnx.DiffState(0, config.trainable_filter)
-    loss, grads = nnx.value_and_grad(loss_fn, argnums=diff_state)(model, train_rng, observation, actions)
+    (loss, components), grads = nnx.value_and_grad(loss_fn, argnums=diff_state, has_aux=True)(
+        model, train_rng, observation, actions
+    )
 
     params = state.params.filter(config.trainable_filter)
     updates, new_opt_state = state.tx.update(grads, state.opt_state, params)
@@ -166,6 +171,7 @@ def train_step(
         ),
     )
     info = {
+        **components,
         "loss": loss,
         "grad_norm": optax.global_norm(grads),
         "param_norm": optax.global_norm(kernel_params),
