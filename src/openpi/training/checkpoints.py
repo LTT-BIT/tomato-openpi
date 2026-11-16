@@ -73,6 +73,13 @@ def save_state(
         norm_stats = data_config.norm_stats
         if norm_stats is not None and data_config.asset_id is not None:
             _normalize.save(directory / data_config.asset_id, norm_stats)
+        memory = getattr(data_config, "visual_memory", None)
+        if memory is not None:
+            import json
+
+            (directory / "visual_memory_contract.json").write_text(
+                json.dumps({**memory.contract(), "training_checkpoint": True}, sort_keys=True, indent=2)
+            )
 
     # Split params that can be used for inference into a separate item.
     with at.disable_typechecking():

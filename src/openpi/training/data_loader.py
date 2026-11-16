@@ -332,6 +332,13 @@ def create_torch_dataset(
             video_backend=data_config.video_backend,
             **cache_options,
         )
+        memory = getattr(data_config, "visual_memory", None)
+        if memory is not None:
+            from openpi.training.visual_memory import VisualMemoryDataset
+
+            if getattr(data_config, "task_view", None) is not None:
+                raise ValueError("Visual history requires complete recordings, not task views")
+            dataset = VisualMemoryDataset(dataset, memory, data_config.history_mask_key)
         view = getattr(data_config, "task_view", None)
         if view is not None:
             from openpi.training.task_view import TaskViewDataset
@@ -465,6 +472,8 @@ def create_data_loader(
         skip_norm_stats: Whether to skip data normalization.
         framework: The framework to use ("jax" or "pytorch").
     """
+    if hasattr(config.model, "memory") and (framework != "jax" or config.data.rlds_data_dir is not None):
+        raise ValueError("Visual memory currently requires JAX and standard LeRobot data")
     data_config = config.data.create(config.assets_dirs, config.model)
     logging.info(f"data_config: {data_config}")
 

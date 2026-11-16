@@ -2,6 +2,29 @@
 
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
+当前 `tomato-visual-memory` 从 `tomato-subtask-policy@01ead34` 独立开发四路视觉历史基线，上一项 `tomato-foveavla-v1` 保留。本版是**采样历史图像＋空间池化视觉前缀**，不是完整复现 MEM/LTM，也不含 Fovea 框预测损失。配置入口为 `training_configs.experiments.tomato_sharpa.subtasks.visual_memory_v1`。
+
+默认使用当前四路图像及 t−45/t−30/t−15 的四路历史（30 Hz，跨度1.5秒）。当前图像各保留256个token，历史图像各池化为4×4个token，增加192个token，视觉前缀合计1216；显式加入相机/相对时间编码，沿用π0.5前缀注意力和动作flow损失。历史不包含state、动作目标、阶段真值或未来帧；**当前58D state保留**，动作仍为手臂Delta＋手部Absolute，预测50步。图像增强在同相机的各时间槽保持一致。此方案仍须逐帧编码历史，尚未做特征缓存或时延优化。
+
+数据复用已冻结的119条五阶段v3四视图B副本（357970帧），原 `subtask-roi`、旧实验与checkpoint不修改。所有录制仍属于动作训练数据，不能用其回放宣称独立泛化。历史严格在同一录制内按源帧ID取样，缺失历史置零并mask；阶段prompt变化不清空同一录制的视觉历史。现有第四路ROI有前后帧辅助坐标，**该数据不构成在线因果ROI验收**。
+
+在已切换本分支的训练工程中，设置实际数据路径后做CPU检查（命令不会训练）：
+
+```bash
+export PI05_IN_HAND119_BUNDLE=/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_four_view_v3_r1
+export PI05_RGB_FRAME_CACHE=/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_rgb224_cache_v3_r1
+JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.check_visual_memory --workers 2
+```
+
+本版使用独立归一化资产 `tomato_visual_memory_v1_h4_s15_g4_delta_30hz`。首次准备且目标资产不存在时，执行 `JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.bind_visual_memory_norm --source-norm assets/tomato_in_hand119_rgb_crop_v3_r1_delta_30hz`：核验旧统计来源、完全相同的当前向量变换链及每条录制3个样本后，原值复制并建立新版本绑定，拒绝覆盖旧资产。`PI05_VISUAL_MEMORY_FRAMES=1` 为无历史对照；`PI05_VISUAL_MEMORY_STRIDE`、`PI05_VISUAL_MEMORY_GRID` 可改采样间隔及池化网格。每组设置生成独立实验名和资产ID，必须单独绑定；默认不复用旧训练UI的输入验收报告。
+
+`VisualHistory` 提供有界推理缓存，要求明确episode身份、单调的采集frame ID及timestamp，缺失的精确历史时刻保持mask，禁止把策略调用次数当30 Hz时间轴。`VisualMemoryPolicy` 是使用训练原始输入协议（116D原始state，经适配为58D）的离线策略包装器，要求匹配checkpoint内的 `assets/visual_memory_contract.json`；还没有接入机器人部署仓库的58D传输接口。按需在策略调用之间向历史缓存写入实际采集帧，新任务reset。
+
+2026-11-16：70项相关本地测试通过，包含小型CPU底座的真实训练更新、动作采样、参数兼容与单帧回归；服务器载入119条/357970帧索引，在6个位置验证历史像素/掩码与推理缓存一致，双worker组批通过。另对生产模型完成CPU抽象图检查：含文本前缀为 `[1,1472,2048]`，动作loss为 `[1,50]`，该检查不分配生产权重、不代表GPU容量验收。真实检查记录见 `training_configs/experiments/tomato_sharpa/subtasks/records/visual_memory_v1_h4_s15_g4_input_check_20261116.json`。配置继承batch256/FSDP8/30000步/每5000步保存，**本版GPU容量、完整训练、Memory收益及实机部署均未验证**；尚未启动正式训练。
+
+以下保留既有基线与数据说明。
+
+
 当前 `tomato-subtask-policy` 分支准备100条normal完整录制的四视图π₀.₅训练：原三路RGB＋当前局部RGB、58D state、阶段英文prompt，无深度、无π₀.₅ Memory。28服务器数据、独立100条统计及B主方案/A对照入口见[番茄训练说明](training_configs/experiments/tomato_sharpa/README.md)。视觉token1024、文本上限256，batch256/16000步/FSDP8，每4000完成步保存并保留checkpoint，原学习率保持。默认只检查：`bash scripts/python.sh -m scripts.tomato100_run check`；显式`start`才启动，拒绝占用中的GPU。2026-11-13已在28启动B：batch256实际训练通过，第10步loss1.6188，8卡各约64.6GiB显存；完整训练尚未完成。
 
 旧normal93配置、数据与B checkpoint7999保留，旧入口`scripts.tomato_ab_run`不改。100条与旧93条有90条共同录制，移出3条、加入10条，并重新计算统计；因此不能把新旧结果当作仅增加crop的严格消融。r11裁剪坐标由前后帧辅助离线生成，图像始终来自当前帧；实时ROI与部署另行验证。

@@ -79,6 +79,9 @@ def validate_config(config: cfg.TrainConfig) -> None:
     if any(seed is None for seed in (config.model_seed, config.data_seed, config.augmentation_seed)):
         raise ValueError("Record all independent model/data/augmentation seeds")
     metadata = config.policy_metadata or {}
+    memory = getattr(config.model, "memory", None)
+    if memory is not None and metadata.get("visual_memory") != memory.contract():
+        raise ValueError("Visual memory settings differ from the experiment contract; use a versioned configuration")
     physical_dim = metadata.get("physical_action_dim")
     model_dim = metadata.get("model_action_dim", physical_dim)
     if not isinstance(physical_dim, int) or not 0 < physical_dim <= config.model.action_dim:
