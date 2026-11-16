@@ -34,6 +34,9 @@ def checked_config(bundle,cache,report_path):
     os.environ['PI05_IN_HAND119_BUNDLE']=str(bundle.resolve());os.environ['PI05_RGB_FRAME_CACHE']=str(cache.resolve())
     os.environ.pop('PI05_INPUT_EXECUTION_MIGRATION',None)
     config=load_experiment(MODULE);validate_config(config);inputs=preflight(config)
+    from openpi.training import reproducibility
+    if report.get('code_inventory')!=reproducibility._code_inventory(config):
+        raise ValueError('Code changed after acceptance; rerun the input check')
     if (inputs['training_episodes']!=contract.EPISODES or inputs['training_frames']!=contract.FRAMES
             or inputs['norm_stats_sha256']!=report['norm']['norm_stats_sha256']):
         raise ValueError('Accepted inputs or norm changed')

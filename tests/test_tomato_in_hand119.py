@@ -93,3 +93,30 @@ def test_materialization_rejects_changed_source(tmp_path,frozen):
 def test_materialization_rejects_source_destination(frozen):
     selection,root=frozen
     with pytest.raises(ValueError,match='separate'):materialize(selection,root/'prepared',Tokenizer())
+
+
+def test_independent_config_preserves_training_contract(tmp_path,frozen,monkeypatch):
+    selection,root=frozen;dest=tmp_path/'prepared';materialize(selection,dest,Tokenizer())
+    monkeypatch.setenv('PI05_IN_HAND119_BUNDLE',str(dest))
+    from training_configs.experiments.tomato_sharpa.subtasks.in_hand119_b_crop import build_config
+    from openpi.subtasks.tomato import COARSE_SEQUENCE
+    config=build_config()
+    assert config.batch_size==256 and config.num_train_steps==16000 and config.fsdp_devices==8
+    assert config.model.action_horizon==50 and config.model.action_dim==58
+    assert config.data.extra_delta_transform and config.keep_period==4000
+    assert config.data.interaction_mask_key=='observation.interaction_available'
+    assert config.weight_loader.params_path.endswith('pi05_base/params')
+    assert len(COARSE_SEQUENCE)==7 and len(c.SEQUENCE)==5
+    assert config.policy_metadata['prompts']==list(c.TASKS)
+    assert config.model.max_token_len==256 and len(config.model.image_keys)==4
+    p=dest/'b_coarse/meta/tasks.jsonl';p.write_text(p.read_text().replace('at the center','on the plate'))
+    with pytest.raises(ValueError):build_config()
+
+
+def test_vector_statistics_supports_available_crop_key():
+    from examples.fr3_wuji.compute_norm_stats import transform_vectors
+    def transform(raw):
+        assert raw['observation.interaction_available']==np.bool_(False)
+        return {'state':raw['observation.state'],'actions':raw['action']}
+    result=transform_vectors(np.zeros((3,116)),np.ones((3,58)),np.array([0,2]),50,transform,camera_keys=c.CAMERAS)
+    assert result['actions'].shape==(2,50,58)

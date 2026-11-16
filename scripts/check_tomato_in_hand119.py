@@ -40,7 +40,7 @@ def check(bundle,cache,out):
     cached=create_torch_dataset(data,config.model.action_horizon,config.model,sampling_mode=config.sampling_mode)
     old_inputs,new_inputs=transform_dataset(original,data),transform_dataset(cached,data)
     assert len(original)==len(cached)==contract.FRAMES
-    offset=checked=phase_checks=0
+    offset=checked=phase_checks=0; token_lengths=[]
     for row in selection['episodes']:
         ep=row['episode_index'];length=row['length']
         doc=json.loads((bundle/f'b_coarse/annotations/episode_{ep:06d}.json').read_text())
@@ -69,6 +69,7 @@ def check(bundle,cache,out):
                 if np.issubdtype(np.asarray(x).dtype,np.number) and not np.isfinite(x).all():raise ValueError('Nonfinite input')
             if np.asarray(b['state']).shape!=(58,) or np.asarray(b['actions']).shape!=(50,58):raise ValueError('Wrong model vector shape')
             if not all(bool(v) for v in b['image_mask'].values()):raise ValueError('Missing RGB view')
+            token_lengths.append(int(np.asarray(b['tokenized_prompt_mask']).sum()))
             checked+=1
         offset+=length
         if (ep+1)%10==0:print('Exact inputs',ep+1,'/119',flush=True)
@@ -81,7 +82,19 @@ def check(bundle,cache,out):
         print('Cached batch',index+1,round(durations[-1],3),flush=True)
     if len(durations)!=32 or statistics.mean(durations[8:])>=5.5:raise ValueError('Cached reader too slow')
     cache_manifest=json.loads((cache/'manifest.json').read_text())
+    crop_frames=black_crop_frames=0
+    for entry in cache_manifest['entries']:
+        if entry['camera']!='observation.images.interaction':continue
+        array=np.load(cache/entry['cache_file'],mmap_mode='r',allow_pickle=False)
+        for start in range(0,len(array),128):
+            values=array[start:start+128]
+            black_crop_frames+=int((~np.any(values,axis=(1,2,3))).sum())
+            crop_frames+=len(values)
+        del array
+    if crop_frames!=contract.FRAMES or black_crop_frames:
+        raise ValueError('Full119 local RGB contains missing/black frames')
     from openpi.subtasks.prepare import write_json
+    from openpi.training import reproducibility
     report=dict(status='in_hand119_training_inputs_accepted',training_started=False,
         episodes=contract.EPISODES,frames=contract.FRAMES,bundle=str(bundle.resolve()),cache=str(cache.resolve()),
         bundle_sha256=digest(bundle/'bundle.json'),selection_sha256=digest(bundle/'selection.json'),
@@ -89,7 +102,10 @@ def check(bundle,cache,out):
         all_model_inputs_equal=True,model_samples_checked=checked,phase_boundary_samples_checked=phase_checks,
         per_frame_prompts_checked=offset,original_sources_unchanged=True,physical_columns_equal=True,
         loader_batches=len(durations),batch_seconds=durations,steady_batch_seconds=statistics.mean(durations[8:]),
+        code_inventory=reproducibility._code_inventory(config),
+        actual_token_lengths=dict(min=min(token_lengths),max=max(token_lengths),samples=len(token_lengths)),
         cache_entries=len(cache_manifest['entries']),exact_video_reference_samples=sum(e['exact_reference_samples'] for e in cache_manifest['entries']),
+        crop_frames_checked=crop_frames,black_crop_frames=black_crop_frames,
         all_videos_decoded=True,offline_roi_uses_future_coordinates=True,independent_semantic_accuracy_measured=False,
         gpu_capacity='not_exercised_this_run; prior four-view batch256 verified separately')
     if out.exists():raise FileExistsError(out)
