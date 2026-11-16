@@ -525,3 +525,5 @@ JAX_PLATFORMS=cpu CUDA_VISIBLE_DEVICES='' bash scripts/python.sh -m scripts.toma
 
 
 2026-11-16用户更新本次训练设置：使用27服务器UI手动启动，119条五阶段B配置改为30000步、每5000完成步保存并全部保留（5000/10000/15000/20000/25000/30000），batch256/FSDP8与原学习率计划不变，新实验名`tomato_in_hand119_b_crop_delta_v3_r1_s42_b256_s30000_c5000`。复用共享NAS上的数据、norm与精确缓存；原16k准备验收记录属于历史，不是此次训练完成记录。新输入接纳报告为`logs/in_hand119_preflight/accepted_20261116_s30000_c5000.json`。UI已加入119条配置，27的独立UI通过`PI05_UI_DEFAULT_BASELINE`默认选择本配置，W&B默认offline；只在用户点击启动后才创建训练任务，worker会核对接纳报告并传入该实验的RGB缓存环境。其他方案不会继承该缓存，旧100条训练不修改。本轮不点击启动。
+
+27 UI实际就绪：`http://127.0.0.1:18767/`转发到27的localhost:8768，页面默认119条B/30000步/batch256/FSDP8/每5000保存与保留/offline，已选0～7卡；没有点击启动。27重新完成357组模型输入等价、全1190阶段端点、全357970帧监督/局部图黑帧0检查，32批后24批CPU供数均值0.4415秒/batch；UI数据统计API显示“已验证，可复用”，86项相关测试和JS语法检查通过。UI worker会校验接纳报告并使用该实验的精确缓存，未启动GPU训练。证据为`subtasks/records/in_hand119_server27_ui_20261116_r1.json`。
