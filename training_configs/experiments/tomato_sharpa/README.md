@@ -522,3 +522,6 @@ JAX_PLATFORMS=cpu CUDA_VISIBLE_DEVICES='' bash scripts/python.sh -m scripts.toma
 2026-11-16实际准备完成（尚未正式开训）：119条/357970帧来源SHA及物理列保持一致，119条全部v3五阶段。新统计覆盖357970个state和17898500个50步动作位置，357个真实LeRobot样本对照通过。476路视频全部解码，2380次参考像素检查；357组实际完整模型输入像素/dtype/state/action/token相等，357970帧监督及1190个阶段起止Prompt检查通过；357970张局部图全帧检查黑帧为0。真实抽样文本token长度188～235，理论最坏253～255；视觉1024/文本256不变。32批CPU供数测试后24批均值0.1322秒/batch（不含GPU计算），39项回归通过。启动入口check已通过，28的8卡当时空闲；本次尚未运行GPU训练步骤或确认本次显存峰值。
 
 验收回执：`subtasks/records/in_hand119_server28_preparation_20261116_r1.json`；完整绑定代码/数据/cache/norm的启动报告在服务器`logs/in_hand119_preflight/accepted_20261116.json`。新norm SHA为`8b06358841e0570ff842883ab8a49a0fd3c9be7b68b59820d93741cd8a06ccde`，独立统计也镜像到本地ignored assets。原ROI发布manifest保持原值，其历史training_ready=false不被改写；本次独立接纳报告通过后训练入口才放行。缓存为完整精确PIL v2，约215.54GB。源目录、旧100条数据/配置/统计/checkpoint未改写。
+
+
+2026-11-16用户更新本次训练设置：使用27服务器UI手动启动，119条五阶段B配置改为30000步、每5000完成步保存并全部保留（5000/10000/15000/20000/25000/30000），batch256/FSDP8与原学习率计划不变，新实验名`tomato_in_hand119_b_crop_delta_v3_r1_s42_b256_s30000_c5000`。复用共享NAS上的数据、norm与精确缓存；原16k准备验收记录属于历史，不是此次训练完成记录。新输入接纳报告为`logs/in_hand119_preflight/accepted_20261116_s30000_c5000.json`。UI已加入119条配置，27的独立UI通过`PI05_UI_DEFAULT_BASELINE`默认选择本配置，W&B默认offline；只在用户点击启动后才创建训练任务，worker会核对接纳报告并传入该实验的RGB缓存环境。其他方案不会继承该缓存，旧100条训练不修改。本轮不点击启动。

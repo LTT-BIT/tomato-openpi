@@ -456,6 +456,20 @@ def job_config(state):
     return resolve_experiment(state["module"], job_overrides(state))
 
 
+def prepare_input_environment(config):
+    """Use only the selected experiment's accepted frame cache in this worker."""
+    metadata=config.policy_metadata or {}
+    report=metadata.get('input_acceptance_report')
+    if report:
+        from scripts.tomato_in_hand119_run import checked_config
+        bundle=Path(metadata['dataset_root']).parent
+        cache=Path(metadata['rgb_frame_cache'])
+        checked_config(bundle,cache,Path(report))
+    else:
+        os.environ.pop('PI05_RGB_FRAME_CACHE',None)
+        os.environ.pop('PI05_INPUT_EXECUTION_MIGRATION',None)
+
+
 def worker(job_id):
     directory = job_directory(job_id)
     # The creator publishes the PID before releasing this handshake.
@@ -478,6 +492,7 @@ def worker(job_id):
             raise ValueError("保存后配置被修改，请新建实验")
         config = job_config(state)
         overrides = job_overrides(state)
+        prepare_input_environment(config)
         python = ["bash", str(common.repository_root() / "scripts/python.sh"), "-u", "-m"]
         cpu_env = {**os.environ, "JAX_PLATFORMS": "cpu", "CUDA_VISIBLE_DEVICES": "", "PYTHONUNBUFFERED": "1"}
         # Metadata validation is in a separate process so stop remains responsive.
@@ -618,7 +633,7 @@ def handler_class(token):
                         "python": sys.executable,
                         "host": socket.gethostname(),
                         "server_label": os.environ.get("PI05_UI_SERVER_LABEL", socket.gethostname()),
-                        "default_baseline": config_ui.DEFAULT_AB_MODULE if config_ui.experiment_catalog() else None,
+                        "default_baseline": os.environ.get("PI05_UI_DEFAULT_BASELINE", config_ui.DEFAULT_AB_MODULE) if config_ui.experiment_catalog() else None,
                     }
                 elif url.path == "/api/baseline":
                     value = config_ui.defaults(query["id"])

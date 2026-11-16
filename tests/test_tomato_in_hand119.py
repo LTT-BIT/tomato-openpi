@@ -101,9 +101,12 @@ def test_independent_config_preserves_training_contract(tmp_path,frozen,monkeypa
     from training_configs.experiments.tomato_sharpa.subtasks.in_hand119_b_crop import build_config
     from openpi.subtasks.tomato import COARSE_SEQUENCE
     config=build_config()
-    assert config.batch_size==256 and config.num_train_steps==16000 and config.fsdp_devices==8
+    assert config.batch_size==256 and config.num_train_steps==30000 and config.fsdp_devices==8
     assert config.model.action_horizon==50 and config.model.action_dim==58
-    assert config.data.extra_delta_transform and config.keep_period==4000
+    assert config.data.extra_delta_transform and config.keep_period==5000
+    assert config.save_interval_after==5000 and config.save_before_step==1
+    assert config.exp_name.endswith('s30000_c5000')
+    assert config.policy_metadata['rgb_frame_cache']==c.DEFAULT_CACHE
     assert config.data.interaction_mask_key=='observation.interaction_available'
     assert config.weight_loader.params_path.endswith('pi05_base/params')
     assert len(COARSE_SEQUENCE)==7 and len(c.SEQUENCE)==5
@@ -144,3 +147,30 @@ def test_checked_launcher_uses_full_dataset_counts(tmp_path,frozen,monkeypatch):
     assert actual.exp_name==config.exp_name
     report['code_inventory']={};write_json(report_path,report)
     with pytest.raises(ValueError,match='Code changed'):checked_config(dest,cache,report_path)
+
+
+def test_ui_exposes119_profile_and_accepted_cache(tmp_path,frozen,monkeypatch):
+    selection,root=frozen;dest=tmp_path/'prepared';materialize(selection,dest,Tokenizer())
+    monkeypatch.setenv('PI05_IN_HAND119_BUNDLE',str(dest))
+    from scripts import training_ui_config,training_ui
+    from scripts import tomato_in_hand119_run
+    from scripts.check_tomato_in_hand119 import MODULE
+    assert MODULE in {r['id'] for r in training_ui_config.experiment_catalog()}
+    result=training_ui_config.defaults(MODULE)
+    assert result['values']['num_train_steps']==30000
+    assert result['values']['save_interval_after']==5000
+    assert result['protocol']['training_episodes']==2
+    assert result['protocol']['action_prompts']==c.ACTION_PROMPTS
+    calls=[]
+    def checked(bundle,cache,report):
+        calls.append((bundle,cache,report));monkeypatch.setenv('PI05_RGB_FRAME_CACHE',str(cache))
+    monkeypatch.setattr(tomato_in_hand119_run,'checked_config',checked)
+    config=training_ui_config.source_config(MODULE)
+    training_ui.prepare_input_environment(config)
+    assert len(calls)==1 and calls[0][0]==dest
+    assert calls[0][1]==Path(c.DEFAULT_CACHE)
+    assert 's30000_c5000' in str(calls[0][2])
+    assert __import__('os').environ['PI05_RGB_FRAME_CACHE']==c.DEFAULT_CACHE
+    from types import SimpleNamespace
+    training_ui.prepare_input_environment(SimpleNamespace(policy_metadata={}))
+    assert 'PI05_RGB_FRAME_CACHE' not in __import__('os').environ

@@ -31,15 +31,19 @@ def build_config():
         assets_dir=str(common.repository_root()/'assets'),asset_id=contract.ASSET_ID,
         sources=(str(root/'bundle.json'),str(root/'selection.json')),prompt_example=contract.TASKS[1])
     config=recipe(name='pi05_sharpa_in_hand119_b_crop_fullft_delta_v3_r1',
-        exp_name='tomato_in_hand119_b_crop_delta_v3_r1_s42_b256_s16000_c4000',embodiment=FR3_SHARPA_CROP,dataset=dataset)
+        exp_name='tomato_in_hand119_b_crop_delta_v3_r1_s42_b256_s30000_c5000',embodiment=FR3_SHARPA_CROP,dataset=dataset)
     config=replace(config,model=replace(config.model,image_keys=IMAGE_KEYS,max_token_len=256),
         data=replace(config.data,extra_delta_transform=True,interaction_mask_key='observation.interaction_available'),
-        batch_size=256,num_train_steps=16000,fsdp_devices=8,save_interval=4000,keep_period=4000,
+        batch_size=256,num_train_steps=30000,fsdp_devices=8,save_interval=5000,keep_period=5000,
         policy_metadata={**config.policy_metadata,'subtask_variant':'in_hand_b_coarse','prompt_profile':contract.PROFILE,
             'training_action_semantics':'delta_arm_joint_target_absolute_hand','data_policy':'all_sources',
             'selection_sha256':digest(root/'selection.json'),'bundle_sha256':digest(root/'bundle.json'),
             'phases':list(contract.PHASES),'prompts':list(contract.TASKS),'max_token_len':256,'visual_tokens':1024,
             'offline_roi_uses_future_annotation':True,'independent_semantic_accuracy_measured':False,
+            'training_episodes':contract.EPISODES,'training_frames':contract.FRAMES,
+            'action_prompts':dict(contract.ACTION_PROMPTS),
+            'rgb_frame_cache':contract.DEFAULT_CACHE,
+            'input_acceptance_report':str(common.repository_root()/'logs/in_hand119_preflight/accepted_20261116_s30000_c5000.json'),
             'memory_to_pi05':False,'agent_enabled':False,'gpu_memory_preflight_required':True})
     return ScheduledTrainConfig(**{f.name:getattr(config,f.name) for f in fields(config)},
-        save_before_step=1,save_steps_before=(),save_interval_after=4000)
+        save_before_step=1,save_steps_before=(),save_interval_after=5000)

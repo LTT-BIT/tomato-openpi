@@ -14,7 +14,7 @@ from scripts.check_tomato_in_hand119 import MODULE
 from scripts.tomato_ab_run import gpu_inventory,validate_gpus
 
 ROOT=Path(__file__).resolve().parents[1]
-REPORT=ROOT/'logs/in_hand119_preflight/accepted_20261116.json'
+REPORT=ROOT/'logs/in_hand119_preflight/accepted_20261116_s30000_c5000.json'
 
 
 def checked_config(bundle,cache,report_path):

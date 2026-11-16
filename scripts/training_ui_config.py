@@ -71,6 +71,7 @@ def experiment_catalog():
     root = common.repository_root()
     entries = []
     for stem, label in (
+        ("in_hand119_b_crop", "整串番茄 · 手中调整五阶段 · 119条四路RGB · B · 30000步"),
         ("normal93_b_stage", "整串番茄 · B 阶段指令 · 手臂Delta · 全93条 · 全参"),
         ("normal93_a_goal", "整串番茄 · A 总体目标 · 手臂Delta · 全93条 · 全参"),
     ):
@@ -232,7 +233,11 @@ def defaults(module: str) -> dict:
             "subtask_variant": config.policy_metadata.get("subtask_variant"),
             "data_policy": config.policy_metadata.get("data_policy"),
             "locked_fields": list(AB_LOCKED_FIELDS) if config.policy_metadata.get("selection_sha256") else [],
-            "action_prompts": ACTION_PROMPTS if config.policy_metadata.get("subtask_variant") == "b_coarse" else {},
+            "action_prompts": config.policy_metadata.get("action_prompts",
+                ACTION_PROMPTS if config.policy_metadata.get("subtask_variant") == "b_coarse" else {}),
+            "training_episodes": config.policy_metadata.get("training_episodes"),
+            "training_frames": config.policy_metadata.get("training_frames"),
+            "prompt_profile": config.policy_metadata.get("prompt_profile"),
         },
     }
 
@@ -272,12 +277,12 @@ def apply_overrides(config, values: dict):
             if key in ("dataset_root", "assets_dir"):
                 actual, expected = Path(actual).expanduser().resolve(), Path(expected).expanduser().resolve()
             if actual != expected:
-                raise ValueError(f"当前AB方案固定全93条数据、统计和监督，不能修改 {key}；请新建实验版本")
+                raise ValueError(f"当前实验固定已验收的数据、统计和监督，不能修改 {key}；请新建实验版本")
         roots = values.get("dataset_roots", [values["dataset_root"]])
         if [str(Path(root).expanduser().resolve()) for root in roots] != [
             str(Path(original["dataset_root"]).resolve())
         ]:
-            raise ValueError("当前AB方案固定全93条数据，不能更换或增加数据目录")
+            raise ValueError("当前实验固定已验收的数据，不能更换或增加数据目录")
     source_semantics = "delta" if getattr(config.data, "extra_delta_transform", False) else "absolute"
     action_semantics = values.get("action_semantics", source_semantics)
     if action_semantics not in ("absolute", "delta"):

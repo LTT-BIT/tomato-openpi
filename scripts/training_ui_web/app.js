@@ -63,6 +63,7 @@ function addField(container, definition, value, original) {
   fields.set(key,{input,type});container.append(wrapper);
 }
 function fillForm(result) {
+  $('wandb-mode').value='offline';
   $('dataset-candidates').replaceChildren();$('apply-datasets').classList.add('hidden');
   $('groups-result').textContent='';
   initial=result.values;sourceHash=result.source_sha256;protocol=result.protocol;fields.clear();
@@ -72,10 +73,11 @@ function fillForm(result) {
   }
   $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
   if(protocol.subtask_variant){
-    $('protocol').append(node('div','revision2 · 全部93条 / 410456帧训练 · 无验证测试留出 · 无Agent · 50步动作窗口'));
+    const episodeCount=protocol.training_episodes||93, frameCount=protocol.training_frames||410456;
+    $('protocol').append(node('div',`${protocol.prompt_profile||'revision2'} · 全部${episodeCount}条 / ${frameCount}帧训练 · 无验证测试留出 · 无Agent · ${initial.action_horizon}步动作窗口`));
     $('protocol').append(node('div','训练环境：JAX=cuda · PREALLOCATE=false · MEM_FRACTION=0.90 · 公共NCCL 2.31.2'));
     const texts=Object.values(protocol.action_prompts||{});
-    if(protocol.subtask_variant==='b_coarse')for(const [i,text] of texts.entries())$('protocol').append(node('div',`${i+1}. ${text}`));
+    if(texts.length)for(const [i,text] of texts.entries())$('protocol').append(node('div',`${i+1}. ${text}`));
     $('wandb-mode').value='offline';
   }else if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。'));
   for(const key of protocol.locked_fields||[]){if(fields.has(key))fields.get(key).input.disabled=true;}
