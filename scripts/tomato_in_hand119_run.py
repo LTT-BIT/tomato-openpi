@@ -37,7 +37,7 @@ def checked_config(bundle,cache,report_path):
     from openpi.training import reproducibility
     if report.get('code_inventory')!=reproducibility._code_inventory(config):
         raise ValueError('Code changed after acceptance; rerun the input check')
-    if (inputs['training_episodes']!=contract.EPISODES or inputs['training_frames']!=contract.FRAMES
+    if (inputs['episodes']!=contract.EPISODES or inputs['frames']!=contract.FRAMES
             or inputs['norm_stats_sha256']!=report['norm']['norm_stats_sha256']):
         raise ValueError('Accepted inputs or norm changed')
     if config.resume or config.overwrite or config.checkpoint_dir.exists():

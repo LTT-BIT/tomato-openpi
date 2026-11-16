@@ -120,3 +120,27 @@ def test_vector_statistics_supports_available_crop_key():
         return {'state':raw['observation.state'],'actions':raw['action']}
     result=transform_vectors(np.zeros((3,116)),np.ones((3,58)),np.array([0,2]),50,transform,camera_keys=c.CAMERAS)
     assert result['actions'].shape==(2,50,58)
+
+
+def test_checked_launcher_uses_full_dataset_counts(tmp_path,frozen,monkeypatch):
+    selection,root=frozen;dest=tmp_path/'prepared';materialize(selection,dest,Tokenizer())
+    cache=tmp_path/'cache';write_json(cache/'manifest.json',{})
+    monkeypatch.setenv('PI05_IN_HAND119_BUNDLE',str(dest))
+    from scripts.check_tomato_in_hand119 import MODULE
+    from scripts.run_training import load_experiment
+    from scripts import run_training
+    from scripts.tomato_in_hand119_run import checked_config
+    from openpi.training import reproducibility
+    config=load_experiment(MODULE)
+    report=dict(status='in_hand119_training_inputs_accepted',episodes=2,frames=20,
+        all_model_inputs_equal=True,original_sources_unchanged=True,model_samples_checked=6,
+        per_frame_prompts_checked=20,loader_batches=32,steady_batch_seconds=.2,
+        bundle=str(dest.resolve()),cache=str(cache.resolve()),bundle_sha256=digest(dest/'bundle.json'),
+        cache_manifest_sha256=digest(cache/'manifest.json'),norm={'norm_stats_sha256':'normsha'},
+        code_inventory=reproducibility._code_inventory(config))
+    report_path=tmp_path/'report.json';write_json(report_path,report)
+    monkeypatch.setattr(run_training,'preflight',lambda config:dict(episodes=2,frames=20,norm_stats_sha256='normsha'))
+    actual,_=checked_config(dest,cache,report_path)
+    assert actual.exp_name==config.exp_name
+    report['code_inventory']={};write_json(report_path,report)
+    with pytest.raises(ValueError,match='Code changed'):checked_config(dest,cache,report_path)
