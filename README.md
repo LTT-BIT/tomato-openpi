@@ -4,9 +4,9 @@
 
 ## 番茄 FoveaVLA v1：`tomato-foveavla-v1` 分支
 
-参考 [FoveaVLA](https://tml.stanford.edu/FoveaVLA/) 的联合动作/未来框机制，适配双FR3/Sharpa、四路RGB、58D动作（手臂Delta/手部Absolute）及119条五阶段v3英文指令。没有历史帧Memory或Agent输入。共享前缀预测50步动作及执行8步后的主相机框；动作/框分支互相不可见。PaliGemma已有1024个location token按ymin/xmin/ymax/xmax表示补边224全图坐标，损失为flow + 0.1 × box CE，分别记录 `action_loss`、`box_loss`、`loss`。
+参考 [FoveaVLA](https://tml.stanford.edu/FoveaVLA/) 的联合动作/未来框机制，适配双FR3/Sharpa、四路RGB、58D动作（手臂Delta/手部Absolute）及119条五阶段v3英文指令。没有历史帧Memory或Agent输入。共享前缀预测50步动作及执行15步后的主相机框；动作/框分支互相不可见。PaliGemma已有1024个location token按ymin/xmin/ymax/xmax表示补边224全图坐标，损失为flow + 0.1 × box CE，分别记录 `action_loss`、`box_loss`、`loss`。
 
-独立数据目录为服务器 `/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-foveavla-v1`，原 `subtask-roi` 不修改。新目录保存标签及元数据，引用已验证119条副本的物理列和视频。357970源帧形成348688个t→t+8有效配对，排除跨episode尾部及远离检测锚点的无效配对。归一化仍覆盖全部119条源帧；物理文件哈希和357个输入/Delta变换对比一致后，复用数值并建立本实验独立资产绑定。
+独立数据目录为服务器 `/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-foveavla-v1-h15`，原 `subtask-roi` 不修改，旧8步派生目录也保留；新契约版本为 `tomato-foveavla-rgb-v1-h15`。新目录保存标签及元数据，引用已验证119条副本的物理列和视频。357970源帧形成347161个t→t+15有效配对，排除跨episode尾部及远离检测锚点的无效配对。归一化仍覆盖全部119条源帧；物理文件哈希和357个输入/Delta变换对比一致后，复用数值并建立本实验独立资产绑定。
 
 v1使用**弱监督框**：已有右手/果串ROI、左手检测、固定相机下的篮子/盘子区域先验；不是逐帧人工标注，未测量独立语义准确率。初始框是原图归一化xyxy `[0.25,0.22,0.83,0.86]`；局部图从当前640×400原图生成1.5倍正方形裁剪并按需零补边。训练混合45%名义框、45%扰动框、10%固定初始框，监督仍是未来未扰动框。关闭破坏框坐标的旋转/随机全图裁剪，保留颜色增强。相机/容器位置改变时需要重新核对先验。禁止使用旧RGB224缓存生成新crop。
 

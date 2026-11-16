@@ -39,14 +39,14 @@ def check():
         assert all(np.asarray(x).shape == (224, 224, 3) for x in obs.images.values())
         assert obs.foveation_tokens.shape == (4,)
         ep, frame = int(row["episode_index"]), int(row["frame_index"])
-        expected = fovea.encode_box(source.labels[ep][0][frame + 8], 640, 400)
+        expected = fovea.encode_box(source.labels[ep][0][frame + fovea.EXECUTE_STEPS], 640, 400)
         np.testing.assert_array_equal(obs.foveation_tokens, expected)
         samples.append(
             {
                 "dataset_index": int(i),
                 "episode": ep,
                 "frame": frame,
-                "future_frame": frame + 8,
+                "future_frame": frame + fovea.EXECUTE_STEPS,
                 "prompt": row["prompt"],
                 "token_length": int(np.asarray(obs.tokenized_prompt_mask).sum()),
             }
@@ -56,9 +56,9 @@ def check():
     for ep in np.unique(columns["episode_index"]):
         frames = columns["frame_index"][columns["episode_index"] == ep]
         boxes, valid = source.labels[int(ep)]
-        assert (frames + 8 < len(boxes)).all()
+        assert (frames + fovea.EXECUTE_STEPS < len(boxes)).all()
         assert valid[frames].all()
-        assert valid[frames + 8].all()
+        assert valid[frames + fovea.EXECUTE_STEPS].all()
     root = Path(config.data.labels_root)
     started = time.monotonic()
     loader = data_loader.create_torch_data_loader(
@@ -83,6 +83,8 @@ def check():
         "source_episodes": 119,
         "source_frames": 357970,
         "training_pairs": len(raw),
+        "execute_steps": fovea.EXECUTE_STEPS,
+        "action_horizon": config.model.action_horizon,
         "excluded_query_starts": 357970 - len(raw),
         "all_pairs_checked": len(raw),
         "actual_video_transform_samples": samples,

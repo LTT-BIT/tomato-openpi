@@ -1,6 +1,6 @@
 # 本仓库开发约定
 
-- 2026-11-16最新任务：`tomato-foveavla-v1` 是独立的双FR3/Sharpa适配分支，用户已授权开发动作＋未来框联合预测及同名部署分支，暂不加入历史帧Memory。保留四路RGB、58D动作和五阶段v3指令；固定初始框，执行8步后使用预测框。原 `subtask-roi` 不改，派生标签放同级 `subtask-foveavla-v1`。框为显式弱监督先验，不宣称人工逐帧或独立准确率。允许开发、离线验证、中文提交和推送；不自动启动正式训练或机器人执行。服务器已有工作副本保留原分支，新分支可先只取回Git引用。
+- 2026-11-16最新任务：`tomato-foveavla-v1` 是独立的双FR3/Sharpa适配分支，用户已授权开发动作＋未来框联合预测及同名部署分支，暂不加入历史帧Memory。保留四路RGB、58D动作和五阶段v3指令；固定初始框，执行15步后使用预测框（用户已确认50/15，监督t+15；旧50/8仅保留作对照）。原 `subtask-roi` 不改，当前派生标签放同级 `subtask-foveavla-v1-h15`，保留旧8步目录。框为显式弱监督先验，不宣称人工逐帧或独立准确率。允许开发、离线验证、中文提交和推送；不自动启动正式训练或机器人执行。服务器已有工作副本保留原分支，新分支可先只取回Git引用。
 
 - 本分支 `tomato-subtask-policy` 用于无 Agent 的整串番茄 A/B 训练；用户明确要求分支不使用 codex 前缀。在现有 `/home/user/tomato-openpi` 开发，27/28 共用 `/home/mengxiang/workspace/code/tomato-openpi-sharpa`，不另建 clone/worktree。本轮只准备、校验和同步，不启动正式训练，不改部署端。
 - 用户已授权验证通过后自动中文提交并推送 GitHub 对应分支；本分支推送 `github/tomato-subtask-policy`，不强推。数据和权重不纳入 Git。

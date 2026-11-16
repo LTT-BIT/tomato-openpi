@@ -18,8 +18,8 @@ from training_configs import common
 from training_configs.embodiments.fr3_sharpa_crop import FR3_SHARPA_CROP
 from training_configs.recipes.pi05_fullft_v1 import build_config as recipe
 
-DEFAULT_ROOT = "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-foveavla-v1"
-ASSET_ID = "tomato_foveavla_v1_delta_30hz"
+DEFAULT_ROOT = "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-foveavla-v1-h15"
+ASSET_ID = "tomato_foveavla_v1_h15_delta_30hz"
 
 
 @dataclass(frozen=True)
@@ -29,11 +29,11 @@ class FoveaDataConfig(LeRobotFr3SharpaCropDataConfig):
     def create(self, assets_dirs, model_config):
         if (
             model_config.action_horizon != 50
-            or model_config.execute_steps != 8
+            or model_config.execute_steps != fovea.EXECUTE_STEPS
             or model_config.box_loss_weight != 0.1
             or model_config.rtc_max_delay
         ):
-            raise ValueError("Fovea v1 data/checkpoint contract requires horizon50, execute8, lambda0.1 and no RTC")
+            raise ValueError("Fovea v1 data/checkpoint contract requires horizon50, execute15, lambda0.1 and no RTC")
         config = super().create(assets_dirs, model_config)
         return replace(config, fovea_labels_root=self.labels_root, fovea_execute_steps=model_config.execute_steps)
 
@@ -56,7 +56,7 @@ def build_config():
         raise ValueError("Prepare the versioned Fovea label bundle first")
     dataset = common.Dataset(
         version=fovea.VERSION,
-        repo_id="fr3_sharpa/tomato_foveavla_v1",
+        repo_id="fr3_sharpa/tomato_foveavla_v1_h15",
         root=str(root / "dataset"),
         assets_dir=str(root / "assets"),
         asset_id=ASSET_ID,
@@ -64,8 +64,8 @@ def build_config():
         prompt_example=tomato_in_hand.TASKS[1],
     )
     config = recipe(
-        name="pi05_sharpa_foveavla_v1",
-        exp_name="tomato_foveavla_v1_s42_b256_s30000_c5000",
+        name="pi05_sharpa_foveavla_v1_h15",
+        exp_name="tomato_foveavla_v1_h15_s42_b256_s30000_c5000",
         embodiment=FR3_SHARPA_CROP,
         dataset=dataset,
     )

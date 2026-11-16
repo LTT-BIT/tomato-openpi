@@ -97,7 +97,8 @@ def test_joint_network_gradients_and_teacher_isolation(monkeypatch):
     assert not np.array_equal(before, model.action_out_proj.kernel.value)
 
 
-def test_episode_pair_filter_and_future_target(tmp_path):
+@pytest.mark.parametrize(("offset", "expected_pairs"), [(8, 62), (15, 48)])
+def test_episode_pair_filter_and_future_target(tmp_path, offset, expected_pairs):
     import json
 
     from openpi.training.fovea_dataset import FoveaDataset
@@ -112,41 +113,41 @@ def test_episode_pair_filter_and_future_target(tmp_path):
         hf_dataset = Table()
 
         def __len__(self):
-            return 40
+            return 80
 
         def __getitem__(self, index):
             return {
-                "episode_index": index // 20,
-                "frame_index": index % 20,
+                "episode_index": index // 40,
+                "frame_index": index % 40,
                 "observation.images.cam0": np.full((400, 640, 3), 80, np.uint8),
             }
 
     records = []
     for ep in range(2):
-        boxes = np.tile([0.2, 0.2, 0.7, 0.7], (20, 1)).astype(np.float32)
-        boxes[:, 0] += np.arange(20) * 0.001
-        valid = np.ones(20, bool)
+        boxes = np.tile([0.2, 0.2, 0.7, 0.7], (40, 1)).astype(np.float32)
+        boxes[:, 0] += np.arange(40) * 0.001
+        valid = np.ones(40, bool)
         if ep == 0:
-            valid[10] = False
+            valid[20] = False
         path = tmp_path / f"{ep}.npz"
         np.savez(path, boxes=boxes, valid=valid)
-        records.append({"episode_index": ep, "frames": 20, "labels": path.name, "sha256": digest(path)})
+        records.append({"episode_index": ep, "frames": 40, "labels": path.name, "sha256": digest(path)})
     manifest = {
         "version": fovea.VERSION,
         "complete": True,
-        "execute_steps": 8,
+        "execute_steps": offset,
         "dataset_metadata": {},
         "episodes": records,
-        "training_pairs": 22,
+        "training_pairs": expected_pairs,
         "source_size": [640, 400],
     }
     (tmp_path / "manifest.json").write_text(json.dumps(manifest))
-    dataset = FoveaDataset(Source(), tmp_path, 8)
-    assert len(dataset) == 22
-    assert 2 not in dataset.indices
-    assert 10 not in dataset.indices
-    assert not set(range(12, 20)).intersection(dataset.indices)
-    assert not set(range(32, 40)).intersection(dataset.indices)
+    dataset = FoveaDataset(Source(), tmp_path, offset)
+    assert len(dataset) == expected_pairs
+    assert 20 - offset not in dataset.indices
+    assert 20 not in dataset.indices
+    assert not set(range(40 - offset, 40)).intersection(dataset.indices)
+    assert not set(range(80 - offset, 80)).intersection(dataset.indices)
     row = dataset[0]
-    np.testing.assert_array_equal(row["foveation_tokens"], fovea.encode_box(dataset.labels[0][0][8], 640, 400))
+    np.testing.assert_array_equal(row["foveation_tokens"], fovea.encode_box(dataset.labels[0][0][offset], 640, 400))
     assert row["observation.images.interaction"].shape == (3, 224, 224)
