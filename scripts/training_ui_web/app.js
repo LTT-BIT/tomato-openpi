@@ -72,6 +72,7 @@ function fillForm(result) {
     for(const definition of defs){const key=definition[0];if(section==='advanced'&&!(key in initial))continue;let value=initial[key];if(key==='dataset_root')value=(initial.dataset_roots||[initial.dataset_root]).join('\n');if(key==='owner')value=result.owner;if(key==='exp_name')value=result.suggested_exp_name;if(key==='stats_batch_size')value=512;addField(container,definition,value,initial[key]);}
   }
   $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
+  if(protocol.foveation)$('protocol').append(node('div',`FoveaVLA · 固定初始框 · 预测下一次查询框 · 执行 ${protocol.foveation.execute_steps} 步后更新裁剪 · 无历史帧 Memory`));
   if(protocol.subtask_variant){
     const episodeCount=protocol.training_episodes||93, frameCount=protocol.training_frames||410456;
     $('protocol').append(node('div',`${protocol.prompt_profile||'revision2'} · 全部${episodeCount}条 / ${frameCount}帧训练 · 无验证测试留出 · 无Agent · ${initial.action_horizon}步动作窗口`));

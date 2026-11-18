@@ -71,6 +71,7 @@ def experiment_catalog():
     root = common.repository_root()
     entries = []
     for stem, label in (
+        ("foveavla_v1", "FoveaVLA · 119条 · 动作＋未来框 · 50/15 · 20000步"),
         ("in_hand119_b_crop", "整串番茄 · 手中调整五阶段 · 119条四路RGB · B · 30000步"),
         ("normal93_b_stage", "整串番茄 · B 阶段指令 · 手臂Delta · 全93条 · 全参"),
         ("normal93_a_goal", "整串番茄 · A 总体目标 · 手臂Delta · 全93条 · 全参"),
@@ -231,8 +232,9 @@ def defaults(module: str) -> dict:
             "actions": values["action_semantics"],
             "delta_available": delta_supported(config),
             "subtask_variant": config.policy_metadata.get("subtask_variant"),
+            "foveation": config.policy_metadata.get("foveation"),
             "data_policy": config.policy_metadata.get("data_policy"),
-            "locked_fields": list(AB_LOCKED_FIELDS) if config.policy_metadata.get("selection_sha256") else [],
+            "locked_fields": list(AB_LOCKED_FIELDS) if (config.policy_metadata.get("selection_sha256") or config.policy_metadata.get("foveation")) else [],
             "action_prompts": config.policy_metadata.get("action_prompts",
                 ACTION_PROMPTS if config.policy_metadata.get("subtask_variant") == "b_coarse" else {}),
             "training_episodes": config.policy_metadata.get("training_episodes"),
@@ -270,7 +272,7 @@ def apply_overrides(config, values: dict):
     }
     if missing := required - set(values):
         raise ValueError(f"缺少参数: {sorted(missing)}")
-    if config.policy_metadata.get("selection_sha256"):
+    if config.policy_metadata.get("selection_sha256") or config.policy_metadata.get("foveation"):
         original = config_values(config)
         for key in AB_LOCKED_FIELDS:
             actual, expected = values.get(key, original[key]), original[key]

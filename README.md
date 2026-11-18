@@ -18,6 +18,8 @@ bash scripts/python.sh -m scripts.run_training training_configs.experiments.toma
 bash scripts/python.sh -m scripts.check_fovea
 ```
 
+27服务器可用训练UI手动启动本实验：设置 `PI05_UI_DEFAULT_BASELINE=training_configs.experiments.tomato_sharpa.subtasks.foveavla_v1` 后运行 `bash scripts/python.sh -m scripts.training_ui --port 8769`，按终端带token链接访问。UI默认20000步、每3000步保存并保留最终20000；使用独立运行名，用户点击开始后才开训。
+
 以上只检查。开训时才去掉 `--check`，保留 `--wandb-mode offline`；本次开发没有启动正式训练。数据准备入口为 `scripts.prepare_fovea --bundle <已验证119条副本> --detections <normal检测缓存> --output <新目录>`，拒绝覆盖非空目录；`scripts.bind_fovea_norm --source-norm <原119条统计>` 验证物理列和变换后创建独立资产。checkpoint自动保存 `assets/fovea_contract.json` 及自身统计。同名部署分支提供 `fovea_serve` 和 `run --fovea`。
 
 当前 `tomato-subtask-policy` 分支准备100条normal完整录制的四视图π₀.₅训练：原三路RGB＋当前局部RGB、58D state、阶段英文prompt，无深度、无π₀.₅ Memory。28服务器数据、独立100条统计及B主方案/A对照入口见[番茄训练说明](training_configs/experiments/tomato_sharpa/README.md)。视觉token1024、文本上限256，batch256/16000步/FSDP8，每4000完成步保存并保留checkpoint，原学习率保持。默认只检查：`bash scripts/python.sh -m scripts.tomato100_run check`；显式`start`才启动，拒绝占用中的GPU。2026-11-13已在28启动B：batch256实际训练通过，第10步loss1.6188，8卡各约64.6GiB显存；完整训练尚未完成。
