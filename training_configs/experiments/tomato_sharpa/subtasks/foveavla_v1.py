@@ -65,7 +65,7 @@ def build_config():
     )
     config = recipe(
         name="pi05_sharpa_foveavla_v1_h15",
-        exp_name="tomato_foveavla_v1_h15_s42_b256_s15000_c3000",
+        exp_name="tomato_foveavla_v1_h15_s42_b256_s20000_c3000",
         embodiment=FR3_SHARPA_CROP,
         dataset=dataset,
     )
@@ -85,7 +85,7 @@ def build_config():
         model=model,
         data=data,
         batch_size=256,
-        num_train_steps=15000,
+        num_train_steps=20000,
         fsdp_devices=8,
         save_interval=3000,
         keep_period=3000,
