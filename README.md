@@ -10,7 +10,7 @@
 
 v1使用**弱监督框**：已有右手/果串ROI、左手检测、固定相机下的篮子/盘子区域先验；不是逐帧人工标注，未测量独立语义准确率。初始框是原图归一化xyxy `[0.25,0.22,0.83,0.86]`；局部图从当前640×400原图生成1.5倍正方形裁剪并按需零补边。训练混合45%名义框、45%扰动框、10%固定初始框，监督仍是未来未扰动框。关闭破坏框坐标的旋转/随机全图裁剪，保留颜色增强。相机/容器位置改变时需要重新核对先验。禁止使用旧RGB224缓存生成新crop。
 
-配置 `training_configs.experiments.tomato_sharpa.subtasks.foveavla_v1` 从π0.5 base全量微调，保留既有学习率、batch256/FSDP8/30000步，每5000完成步保存且保留。正式GPU容量及闭环效果仍待新训练验证。
+配置 `training_configs.experiments.tomato_sharpa.subtasks.foveavla_v1` 从π0.5 base全量微调，保留既有学习率、batch256/FSDP8，总15000步，每3000完成步保存且保留3000/6000/9000/12000/15000；实验名为 `tomato_foveavla_v1_h15_s42_b256_s15000_c3000`。正式GPU容量及闭环效果仍待新训练验证。
 
 ```bash
 unset PI05_RGB_FRAME_CACHE
