@@ -22,6 +22,8 @@ JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.check_visual_memory --worker
 
 2026-11-16：70项相关本地测试通过，包含小型CPU底座的真实训练更新、动作采样、参数兼容与单帧回归；服务器载入119条/357970帧索引，在6个位置验证历史像素/掩码与推理缓存一致，双worker组批通过。另对生产模型完成CPU抽象图检查：含文本前缀为 `[1,1472,2048]`，动作loss为 `[1,50]`，该检查不分配生产权重、不代表GPU容量验收。真实检查记录见 `training_configs/experiments/tomato_sharpa/subtasks/records/visual_memory_v1_h4_s15_g4_input_check_20261116.json`。配置继承batch256/FSDP8/30000步/每5000步保存，**本版GPU容量、完整训练、Memory收益及实机部署均未验证**；尚未启动正式训练。
 
+2026-11-18重新审计119条数据：357970帧标签、物理列与历史索引检查通过，1309个阶段边界/锚点完成15708次历史视图像素与mask对照；原三路视频哈希组合及state/action逐字节指纹未发现完全重复录制。本轮16项相关契约测试通过。全量476个缓存文件（215538093568字节）的SHA256与原验收一致，但迁移后的476个mtime均不匹配旧清单，**生产缓存入口仍会拒绝，训练迁移验收尚未更新**；本轮使用全哈希验证后的只读审计入口，不改清单、不放宽生产保护。候选来源包整体划分为训练86条/264302帧、开发14条/37589帧、测试19条/56079帧，尚未启用；包名前缀只作为导出批次分组，不宣称真实采集日期或未见果串/场景。已核验另一个无Memory的全119条动作实验完成并保存30000步，其checkpoint不能用于这份候选划分的独立测试；新实验须从未使用待测录制的底座开始，归一化仅使用训练86条。事件结果与摘要标签仍缺失，本轮不测物理成功率或Memory收益、不启动训练。记录及候选成员见 `training_configs/experiments/tomato_sharpa/subtasks/records/visual_memory_all119_audit_20261118.json`；复查入口为 `scripts.check_visual_memory_data --report <新JSON路径>`，迁移缓存需显式加 `--verify-migrated-cache` 做全内容校验。
+
 以下保留既有基线与数据说明。
 
 
