@@ -7,10 +7,12 @@ from dataclasses import replace
 from datetime import datetime
 import getpass
 import hashlib
+import importlib
 import math
 from pathlib import Path
 import pprint
 import re
+import sys
 from zoneinfo import ZoneInfo
 
 from openpi.training import config as train_config
@@ -146,6 +148,16 @@ def source_path(module: str) -> Path:
 
 
 def config_from_source(source: str, module: str, filename: str):
+    # Register an unchanged on-disk source for inspect/tyro to resolve classes
+    # declared by the embedded recipe. Still evaluate copies in separate globals.
+    path = Path(filename)
+    if (
+        module not in sys.modules
+        and any(isinstance(node, ast.ClassDef) for node in ast.parse(source).body)
+        and path.is_file()
+        and path.read_text() == source
+    ):
+        importlib.import_module(module)
     # A separate namespace keeps repeated UI copies from overwriting earlier wrappers.
     scope = {"__name__": module, "__package__": module.rpartition(".")[0], "__file__": filename}
     exec(compile(source, filename, "exec"), scope)

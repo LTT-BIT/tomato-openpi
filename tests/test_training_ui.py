@@ -579,3 +579,38 @@ def test_personal_catalog_skips_broken_and_external_files(workspace, tmp_path):
     (directory / "helper.py").write_text("VALUE = 1")
     (directory / "external.py").symlink_to(Path(__file__).resolve())
     assert editor.personal_catalog() == []
+
+
+def test_fovea_personal_snapshot_is_inspectable_in_fresh_worker(tmp_path):
+    """The UI parent may import the recipe; its fresh worker has not."""
+    import subprocess
+
+    from openpi.subtasks import fovea
+
+    manifest = {
+        "complete": True, "version": fovea.VERSION, "execute_steps": 15,
+        "contract": {"execute_steps": 15}, "training_pairs": 347161, "frames": 357970,
+    }
+    (tmp_path / "manifest.json").write_text(json.dumps(manifest))
+    code = """
+import inspect
+import sys
+from pathlib import Path
+import tyro
+from scripts.training_ui_config import config_from_source
+module = "training_configs.experiments.tomato_sharpa.subtasks.foveavla_v1"
+assert module not in sys.modules
+path = Path("training_configs/experiments/tomato_sharpa/subtasks/foveavla_v1.py").resolve()
+config = config_from_source(path.read_text(), module, str(path))
+assert "class FoveaDataConfig" in inspect.getsource(type(config.data))
+resolved = tyro.cli(type(config), default=config, args=[])
+assert resolved.model.execute_steps == 15
+assert resolved.num_train_steps == 20000
+assert resolved.data == config.data
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", code], cwd=common.repository_root(),
+        env={**os.environ, "JAX_PLATFORMS": "cpu", "CUDA_VISIBLE_DEVICES": "", "PI05_FOVEA_ROOT": str(tmp_path)},
+        capture_output=True, text=True, timeout=120, check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
