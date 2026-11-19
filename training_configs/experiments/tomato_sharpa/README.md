@@ -527,3 +527,11 @@ JAX_PLATFORMS=cpu CUDA_VISIBLE_DEVICES='' bash scripts/python.sh -m scripts.toma
 2026-11-16用户更新本次训练设置：使用27服务器UI手动启动，119条五阶段B配置改为30000步、每5000完成步保存并全部保留（5000/10000/15000/20000/25000/30000），batch256/FSDP8与原学习率计划不变，新实验名`tomato_in_hand119_b_crop_delta_v3_r1_s42_b256_s30000_c5000`。复用共享NAS上的数据、norm与精确缓存；原16k准备验收记录属于历史，不是此次训练完成记录。新输入接纳报告为`logs/in_hand119_preflight/accepted_20261116_s30000_c5000.json`。UI已加入119条配置，27的独立UI通过`PI05_UI_DEFAULT_BASELINE`默认选择本配置，W&B默认offline；只在用户点击启动后才创建训练任务，worker会核对接纳报告并传入该实验的RGB缓存环境。其他方案不会继承该缓存，旧100条训练不修改。本轮不点击启动。
 
 27 UI实际就绪：`http://127.0.0.1:18767/`转发到27的localhost:8768，页面默认119条B/30000步/batch256/FSDP8/每5000保存与保留/offline，已选0～7卡；没有点击启动。27重新完成357组模型输入等价、全1190阶段端点、全357970帧监督/局部图黑帧0检查，32批后24批CPU供数均值0.4415秒/batch；UI数据统计API显示“已验证，可复用”，86项相关测试和JS语法检查通过。UI worker会校验接纳报告并使用该实验的精确缓存，未启动GPU训练。证据为`subtasks/records/in_hand119_server27_ui_20261116_r1.json`。
+
+### 可选逐时间步归一化、相关噪声与 Train RTC
+
+工作台中的 `in_hand119_b_crop` 和 `visual_memory_v1` 都支持两项独立勾选。单选双臂逐时间步 Z-score 为 T1，单选相关高斯噪声为 T2，两项同开为 T3。T2 沿用全局分位数归一化，T1/T3 的手部和当前状态也沿用分位数归一化。相关噪声按时间优先展平 50×58 动作块，并使用 `β=0.5` 的相关矩阵与单位矩阵混合。Train RTC 可独立设置，默认关闭。正值表示均匀抽取 0 至该值的干净动作前缀长度，训练损失只监督余下动作。
+
+这两种方案继续使用经冻结的全119条五阶段 B 数据、原四路 RGB 与交互图可用性 mask。阶段英文来自当前帧 `task_index`。启用任一论文选项后，采样与统计均使用 episode 内的完整动作窗口，排除需要末帧补齐的尾部起点。跨阶段的真实窗口继续保留。视觉历史方案沿用同一录制内的历史图像与 mask。界面自动分配新资产 ID，并可在启动时计算 `norm_stats.json`、`norm_metadata.json`、`delta_paper.json` 和 `delta_paper.npz`。普通 Delta 统计、其它组合的统计及旧 checkpoint 不能用于这些新实验。仅调整 Train RTC 时可沿用同一方案的统计，训练使用新的实验名。
+
+启动前设置 `PI05_IN_HAND119_BUNDLE` 指向已准备的正式数据。四路当前帧方案的 UI worker 继续核对精确缓存验收报告，报告包含代码指纹。更新代码后，用 `scripts.check_tomato_in_hand119 --out <新报告路径>` 生成新版回执，并在启动 UI 前通过 `PI05_IN_HAND119_ACCEPTANCE_REPORT` 指定该路径。新选项已做本地配置和 CPU 训练链路测试，正式 119 条统计计算、GPU 容量和完整训练需在训练环境验收。

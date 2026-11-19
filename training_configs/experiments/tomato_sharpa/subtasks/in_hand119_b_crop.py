@@ -12,9 +12,8 @@ from training_configs.embodiments.fr3_sharpa_crop import FR3_SHARPA_CROP
 from training_configs.recipes.pi05_fullft_v1 import build_config as recipe
 
 
-def build_config():
-    root=Path(os.environ.get('PI05_IN_HAND119_BUNDLE',contract.DEFAULT_BUNDLE)).expanduser().resolve()
-    manifest=json.loads((root/'bundle.json').read_text());dataset_root=root/'b_coarse'
+def verify_bundle(root, dataset_root):
+    manifest=json.loads((root/'bundle.json').read_text())
     info=json.loads((dataset_root/'meta/info.json').read_text());contract.validate_info(info)
     tasks=[json.loads(l)['task'] for l in (dataset_root/'meta/tasks.jsonl').read_text().splitlines() if l]
     if (manifest.get('version')!=contract.VERSION or manifest.get('profile')!=contract.PROFILE
@@ -27,6 +26,17 @@ def build_config():
         raise ValueError('Frozen full119 v3 four-view B bundle required')
     for name in ['selection.json','b_coarse/meta/info.json','b_coarse/meta/episodes.jsonl','b_coarse/meta/tasks.jsonl']:
         if digest(root/name)!=manifest['files'][name]:raise ValueError('Prepared metadata changed')
+    return digest(root / "selection.json"), digest(root / "bundle.json")
+
+
+def build_config():
+    root = Path(os.environ.get("PI05_IN_HAND119_BUNDLE", contract.DEFAULT_BUNDLE)).expanduser().resolve()
+    dataset_root = root / "b_coarse"
+    # The UI can display a configuration before the machine has the prepared data.
+    selection_sha, bundle_sha = verify_bundle(root, dataset_root) if root.exists() else (None, None)
+    acceptance_report = os.environ.get("PI05_IN_HAND119_ACCEPTANCE_REPORT") or (
+        common.repository_root() / "logs/in_hand119_preflight/accepted_20261116_s30000_c5000.json"
+    )
     dataset=common.Dataset(version=contract.VERSION,repo_id=contract.REPO_ID,root=str(dataset_root),
         assets_dir=str(common.repository_root()/'assets'),asset_id=contract.ASSET_ID,
         sources=(str(root/'bundle.json'),str(root/'selection.json')),prompt_example=contract.TASKS[1])
@@ -37,13 +47,13 @@ def build_config():
         batch_size=256,num_train_steps=30000,fsdp_devices=8,save_interval=5000,keep_period=5000,
         policy_metadata={**config.policy_metadata,'subtask_variant':'in_hand_b_coarse','prompt_profile':contract.PROFILE,
             'training_action_semantics':'delta_arm_joint_target_absolute_hand','data_policy':'all_sources',
-            'selection_sha256':digest(root/'selection.json'),'bundle_sha256':digest(root/'bundle.json'),
+            'selection_sha256':selection_sha,'bundle_sha256':bundle_sha,
             'phases':list(contract.PHASES),'prompts':list(contract.TASKS),'max_token_len':256,'visual_tokens':1024,
             'offline_roi_uses_future_annotation':True,'independent_semantic_accuracy_measured':False,
             'training_episodes':contract.EPISODES,'training_frames':contract.FRAMES,
             'action_prompts':dict(contract.ACTION_PROMPTS),
             'rgb_frame_cache':contract.DEFAULT_CACHE,
-            'input_acceptance_report':str(common.repository_root()/'logs/in_hand119_preflight/accepted_20261116_s30000_c5000.json'),
+            'input_acceptance_report':str(Path(acceptance_report).expanduser().resolve()),
             'memory_to_pi05':False,'agent_enabled':False,'gpu_memory_preflight_required':True})
     return ScheduledTrainConfig(**{f.name:getattr(config,f.name) for f in fields(config)},
         save_before_step=1,save_steps_before=(),save_interval_after=5000)

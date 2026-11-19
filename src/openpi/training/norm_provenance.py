@@ -57,6 +57,9 @@ def build_contract(config: "cfg.TrainConfig", *, dataset_specs=None) -> dict:
         "vectors": vectors.inputs,
         "implementation": implementation,
     }
+    paper_contract = getattr(config.data, "paper_contract", None)
+    if paper_contract is not None:
+        transform_values["delta_paper"] = paper_contract()
     view = getattr(config.data.base_config, "task_view", None)
     if view is not None:
         from openpi.training import task_view

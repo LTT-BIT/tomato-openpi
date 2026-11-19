@@ -339,6 +339,12 @@ def create_torch_dataset(
             if getattr(data_config, "task_view", None) is not None:
                 raise ValueError("Visual history requires complete recordings, not task views")
             dataset = VisualMemoryDataset(dataset, memory, data_config.history_mask_key)
+        if getattr(data_config, "paper_complete_windows", False):
+            from openpi.training.delta_paper import CompleteWindows
+
+            if action_hz != dataset_meta.fps:
+                raise ValueError("Paper windows require source-rate action sampling")
+            dataset = CompleteWindows(dataset, action_horizon)
         view = getattr(data_config, "task_view", None)
         if view is not None:
             from openpi.training.task_view import TaskViewDataset
@@ -472,9 +478,9 @@ def create_data_loader(
         skip_norm_stats: Whether to skip data normalization.
         framework: The framework to use ("jax" or "pytorch").
     """
-    if hasattr(config.model, "memory") and (framework != "jax" or config.data.rlds_data_dir is not None):
-        raise ValueError("Visual memory currently requires JAX and standard LeRobot data")
     data_config = config.data.create(config.assets_dirs, config.model)
+    if hasattr(config.model, "memory") and (framework != "jax" or data_config.rlds_data_dir is not None):
+        raise ValueError("Visual memory currently requires JAX and standard LeRobot data")
     logging.info(f"data_config: {data_config}")
 
     if config.sampling_mode in _sampling.PLAN_MODES and (framework != "jax" or data_config.rlds_data_dir is not None):

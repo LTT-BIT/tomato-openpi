@@ -308,6 +308,9 @@ def start_job(request):
     from scripts import training_ui_config as config_ui
 
     config, path = build_request(request)
+    metadata = config.policy_metadata
+    if metadata.get("subtask_variant") == "in_hand_b_coarse" and not metadata.get("bundle_sha256"):
+        raise FileNotFoundError("请准备 119 条四路训练包并设置 PI05_IN_HAND119_BUNDLE")
     with submit_lock():
         validate_devices(request.get("gpus"), config, allow_busy=request.get("allow_busy", False))
         if any(job["status"] not in TERMINAL and job["checkpoint_dir"] == str(config.checkpoint_dir) for job in jobs()):
@@ -458,16 +461,17 @@ def job_config(state):
 
 def prepare_input_environment(config):
     """Use only the selected experiment's accepted frame cache in this worker."""
-    metadata=config.policy_metadata or {}
-    report=metadata.get('input_acceptance_report')
+    metadata = config.policy_metadata or {}
+    report = metadata.get("input_acceptance_report")
     if report:
         from scripts.tomato_in_hand119_run import checked_config
-        bundle=Path(metadata['dataset_root']).parent
-        cache=Path(metadata['rgb_frame_cache'])
-        checked_config(bundle,cache,Path(report))
+
+        bundle = Path(metadata["dataset_root"]).parent
+        cache = Path(metadata["rgb_frame_cache"])
+        checked_config(bundle, cache, Path(report), require_fresh=False)
     else:
-        os.environ.pop('PI05_RGB_FRAME_CACHE',None)
-        os.environ.pop('PI05_INPUT_EXECUTION_MIGRATION',None)
+        os.environ.pop("PI05_RGB_FRAME_CACHE", None)
+        os.environ.pop("PI05_INPUT_EXECUTION_MIGRATION", None)
 
 
 def worker(job_id):

@@ -162,7 +162,8 @@ def test_ui_exposes119_profile_and_accepted_cache(tmp_path,frozen,monkeypatch):
     assert result['protocol']['training_episodes']==2
     assert result['protocol']['action_prompts']==c.ACTION_PROMPTS
     calls=[]
-    def checked(bundle,cache,report):
+    def checked(bundle,cache,report,*,require_fresh):
+        assert not require_fresh
         calls.append((bundle,cache,report));monkeypatch.setenv('PI05_RGB_FRAME_CACHE',str(cache))
     monkeypatch.setattr(tomato_in_hand119_run,'checked_config',checked)
     config=training_ui_config.source_config(MODULE)

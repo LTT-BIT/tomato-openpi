@@ -4,6 +4,7 @@ const fragment = new URLSearchParams(location.hash.slice(1));
 if (fragment.get('token')) { sessionStorage.setItem('training-token', fragment.get('token')); history.replaceState(null, '', location.pathname); }
 let sourceHash = null;
 let baseline = null, initial = null, protocol = null, currentJob = null, gpuData = [], browseTarget = null, browseState = null, loadingVersion = 0;
+let paperTrial = 'none';
 const fields = new Map();
 const terminal = new Set(['completed', 'failed', 'stopped', 'interrupted']);
 const statusNames = {queued:'等待中', running:'运行中', completed:'训练完成', failed:'失败', stopped:'已停止', interrupted:'已中断', orphaned:'管理进程中断，子进程仍运行'};
@@ -49,7 +50,8 @@ function addField(container, definition, value, original) {
   }
   input.value=Array.isArray(value)?value.join(type==='lines'?'\n':', '):(value??'');
   const wrap=['path','paths'].includes(type)?node('div',undefined,'path-input'):wrapper;wrap.append(input);
-  if(['path','paths'].includes(type)){const browse=node('button','浏览');browse.type='button';browse.addEventListener('click',()=>perform(()=>openBrowser(input)));wrap.append(browse);wrapper.append(wrap);}
+  let browseButton;
+  if(['path','paths'].includes(type)){browseButton=node('button','浏览');browseButton.type='button';browseButton.addEventListener('click',()=>perform(()=>openBrowser(input)));wrap.append(browseButton);wrapper.append(wrap);}
   if(original!==undefined){wrapper.append(node('small','来源值：'+(Array.isArray(original)?original.join(', '):(original??'关闭')),'default'));}
   input.addEventListener('input',()=>{input.classList.toggle('changed',original!==undefined&&input.value!==(Array.isArray(original)?original.join(type==='lines'?'\n':', '):String(original??'')));updatePath();});
   if(key==='dataset_root')input.addEventListener('input',()=>{$('groups-result').textContent='数据目录已变更，请重新读取或核对分组编号。';});
@@ -60,39 +62,76 @@ function addField(container, definition, value, original) {
     else if(name.value.endsWith('_'+old))name.value=name.value.slice(0,-old.length)+input.value;
     name.dispatchEvent(new Event('input'));input.dataset.previous=input.value;input.dispatchEvent(new Event('input'));independentStats();
   });
-  fields.set(key,{input,type});container.append(wrapper);
+  fields.set(key,{input,type,browseButton});container.append(wrapper);
 }
 function fillForm(result) {
   $('wandb-mode').value='offline';
   $('dataset-candidates').replaceChildren();$('apply-datasets').classList.add('hidden');
   $('groups-result').textContent='';
   initial=result.values;sourceHash=result.source_sha256;protocol=result.protocol;fields.clear();
+  paperTrial=initial.paper_trial||'none';
   for(const [section,defs] of Object.entries(definitions)){
     const container=$(section+'-fields');container.replaceChildren();
     for(const definition of defs){const key=definition[0];if(section==='advanced'&&!(key in initial))continue;let value=initial[key];if(key==='dataset_root')value=(initial.dataset_roots||[initial.dataset_root]).join('\n');if(key==='owner')value=result.owner;if(key==='exp_name')value=result.suggested_exp_name;if(key==='stats_batch_size')value=512;addField(container,definition,value,initial[key]);}
   }
-  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
+  $('protocol').replaceChildren(node('div',`${protocol.cameras.length} 路 RGB · ${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
   if(protocol.subtask_variant){
     const episodeCount=protocol.training_episodes||93, frameCount=protocol.training_frames||410456;
     $('protocol').append(node('div',`${protocol.prompt_profile||'revision2'} · 全部${episodeCount}条 / ${frameCount}帧训练 · 无验证测试留出 · 无Agent · ${initial.action_horizon}步动作窗口`));
     $('protocol').append(node('div','训练环境：JAX=cuda · PREALLOCATE=false · MEM_FRACTION=0.90 · 公共NCCL 2.31.2'));
+    if(protocol.visual_memory){
+      const memory=protocol.visual_memory;
+      $('protocol').append(node('div',`视觉历史：${memory.frames} 帧（含当前帧） · 间隔 ${memory.stride} 帧 · ${memory.pool_grid}×${memory.pool_grid} 历史池化`));
+    }
+    if(protocol.bundle_missing)$('protocol').append(node('div','当前机器缺少已准备的 119 条训练包。可预览配置，训练需设置 PI05_IN_HAND119_BUNDLE。'));
     const texts=Object.values(protocol.action_prompts||{});
     if(texts.length)for(const [i,text] of texts.entries())$('protocol').append(node('div',`${i+1}. ${text}`));
     $('wandb-mode').value='offline';
   }else if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。'));
-  for(const key of protocol.locked_fields||[]){if(fields.has(key))fields.get(key).input.disabled=true;}
-  for(const id of ['discover-datasets','apply-datasets','new-stats'])$(id).disabled=Boolean(protocol.subtask_variant);
-  $('sampling-mode').disabled=Boolean(protocol.subtask_variant);
-
   if(result.shared_weights){const button=node('button','使用服务器公共权重','text-button');button.addEventListener('click',()=>{fields.get('weight_path').input.value=result.shared_weights;fields.get('weight_path').input.dispatchEvent(new Event('input'));});$('runtime-fields').append(button);}
   $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);
   $('groups-panel').classList.toggle('hidden',initial.sampling_mode!=='weighted_replacement');
+  syncPaperControls();
   fields.get('exp_name').input.dispatchEvent(new Event('input'));updatePath();
+}
+function syncPaperControls(){
+  const active=paperTrial!=='none';
+  $('paper-fields').classList.toggle('hidden',!protocol.paper_available);
+  $('paper-timestamp').checked=['t1','t3'].includes(paperTrial);
+  $('paper-correlated').checked=['t2','t3'].includes(paperTrial);
+  $('paper-summary').textContent={
+    none:'来源归一化 · 独立高斯噪声',
+    t1:'T1 · 双臂逐时间步 Z-score · 独立高斯噪声',
+    t2:'T2 · 全局分位数归一化 · 相关高斯噪声 β=0.5',
+    t3:'T3 · 双臂逐时间步 Z-score · 相关高斯噪声 β=0.5',
+  }[paperTrial];
+  const locked=new Set(protocol.locked_fields||[]);
+  if(active&&protocol.paper_available){locked.delete('assets_dir');locked.delete('asset_id');}
+  for(const [key,{input,browseButton}] of fields){
+    input.disabled=locked.has(key);
+    if(browseButton)browseButton.disabled=input.disabled;
+  }
+  for(const id of ['discover-datasets','apply-datasets'])$(id).disabled=locked.has('dataset_root');
+  $('new-stats').disabled=locked.has('asset_id');
+  $('sampling-mode').disabled=locked.has('sampling_mode');
+}
+function changePaperFeatures(){
+  const timestamp=$('paper-timestamp').checked, correlated=$('paper-correlated').checked;
+  paperTrial=timestamp?(correlated?'t3':'t1'):(correlated?'t2':'none');
+  const name=fields.get('exp_name').input;
+  name.value=name.value.replace(/_paper_(t[123]|none)$/,'');
+  if(paperTrial!==(initial.paper_trial||'none'))name.value+='_paper_'+paperTrial;
+  if(paperTrial===(initial.paper_trial||'none')){
+    for(const key of ['assets_dir','asset_id'])fields.get(key).input.value=initial[key];
+    fields.get('asset_id').input.dispatchEvent(new Event('input'));
+  }else independentStats();
+  syncPaperControls();
+  name.dispatchEvent(new Event('input'));
 }
 async function chooseBaseline(module){
   const version=++loadingVersion;$('start').disabled=true;
   try{const result=await api('/api/baseline?id='+encodeURIComponent(module));if(version!==loadingVersion)return;baseline=module;fillForm(result);for(const el of document.querySelectorAll('#baseline-list button, #personal-list button'))el.classList.toggle('selected',el.dataset.id===module);}
-  finally{if(version===loadingVersion)$('start').disabled=false;}
+  finally{if(version===loadingVersion)$('start').disabled=Boolean(protocol?.bundle_missing);}
 }
 function parseIds(text){
   if(!text.trim())return [];
@@ -157,6 +196,7 @@ function request(){
   if(!baseline)throw Error('请先选择配置');const values={};let owner,statsBatch;
   for(const [key,{input,type}] of fields){let value=input.value.trim();if(type==='int'||type==='float')value=value===''?NaN:Number(value);if(type==='optional-int')value=value===''?null:Number(value);if(type==='lines')value=value.split('\n').map(v=>v.trim()).filter(Boolean);if(type==='ints')value=parseIds(value);if(typeof value==='number'&&!Number.isFinite(value))throw Error(key+' 请输入有效数值');if(key==='owner')owner=value;else if(key==='stats_batch_size')statsBatch=value;else values[key]=value;}
   const roots=datasetPaths(values.dataset_root);values.dataset_root=roots[0]||'';if(roots.length>1)values.dataset_roots=roots;
+  values.paper_trial=paperTrial;
   values.sampling_mode=$('sampling-mode').value;values.sampling_groups=[];
   if(values.sampling_mode==='weighted_replacement')for(const row of $('groups').children){values.sampling_groups.push({name:row.querySelector('[data-key=name]').value.trim(),weight:Number(row.querySelector('[data-key=weight]').value),episodes:parseIds(row.querySelector('[data-key=episodes]').value)});}
   return {baseline,source_sha256:sourceHash,owner,values,gpus:selectedGPUs(),wandb_mode:$('wandb-mode').value,auto_norm:$('auto-norm').checked,allow_busy:$('allow-busy').checked,stats_batch_size:statsBatch};
@@ -205,6 +245,7 @@ async function showPreview(check){
 async function openBrowser(input){browseTarget=input;try{await browse(input.value.includes('://')?'':input.value.split('\n').filter(Boolean).at(-1));}catch{await browse('');}$('browser').showModal();}
 async function browse(path){browseState=await api('/api/browse?path='+encodeURIComponent(path));$('browse-path').value=browseState.path;$('browse-list').replaceChildren();for(const entry of browseState.entries){const button=node('button','▸ '+entry.name);button.addEventListener('click',()=>perform(()=>browse(entry.path)));$('browse-list').append(button);}if(browseState.truncated)$('browse-list').append(node('p','仅显示前 500 个目录，请直接输入路径'));}
 $('preview').addEventListener('click',()=>perform(()=>showPreview(false),$('preview')));
+for(const id of ['paper-timestamp','paper-correlated'])$(id).addEventListener('change',changePaperFeatures);
 $('check').addEventListener('click',()=>perform(()=>showPreview(true),$('check')));
 $('start').addEventListener('click',()=>perform(async()=>{const job=await api('/api/start',request());notice((job.creates_config?'已保存新配置':'已复用原配置')+'，本次实验已记录；数据检查通过后进入训练。');await refreshCatalog();await refreshJobs();await showJob(job.id);$('output-section').scrollIntoView({behavior:'smooth'});},$('start')));
 $('reset').addEventListener('click',()=>perform(()=>chooseBaseline(baseline),$('reset')));

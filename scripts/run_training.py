@@ -107,9 +107,11 @@ def validate_config(config: cfg.TrainConfig) -> None:
 def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     """Check metadata/statistics without constructing models or downloading tokenizers."""
     validate_config(config)
+    metadata = config.policy_metadata
+    if metadata.get("subtask_variant") == "in_hand_b_coarse" and not metadata.get("bundle_sha256"):
+        raise FileNotFoundError("Prepare the frozen full119 four-view bundle and set PI05_IN_HAND119_BUNDLE")
     if len(config.data.lerobot_datasets) > 1:
         return preflight_collection(config, require_norm=require_norm)
-    metadata = config.policy_metadata
     root = Path(config.data.lerobot_datasets[0].root).expanduser().resolve()
     required = [root / "meta" / name for name in ("info.json", "episodes.jsonl", "tasks.jsonl")]
     for path in required:
@@ -228,6 +230,10 @@ def preflight_collection(config, *, require_norm=True):
 
 
 def check_norm(config, result):
+    custom_validate = getattr(config.data, "validate_normalization", None)
+    if custom_validate is not None:
+        custom_validate(config, result)
+        return
     metadata = config.policy_metadata
     norm_dir = Path(config.data.assets.assets_dir or config.assets_dirs) / config.data.assets.asset_id
     result["norm_stats_path"] = str(norm_dir / "norm_stats.json")

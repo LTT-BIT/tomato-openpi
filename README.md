@@ -18,6 +18,8 @@ JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.check_visual_memory --worker
 
 本版使用独立归一化资产 `tomato_visual_memory_v1_h4_s15_g4_delta_30hz`。首次准备且目标资产不存在时，执行 `JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.bind_visual_memory_norm --source-norm assets/tomato_in_hand119_rgb_crop_v3_r1_delta_30hz`：核验旧统计来源、完全相同的当前向量变换链及每条录制3个样本后，原值复制并建立新版本绑定，拒绝覆盖旧资产。`PI05_VISUAL_MEMORY_FRAMES=1` 为无历史对照；`PI05_VISUAL_MEMORY_STRIDE`、`PI05_VISUAL_MEMORY_GRID` 可改采样间隔及池化网格。每组设置生成独立实验名和资产ID，必须单独绑定；默认不复用旧训练UI的输入验收报告。
 
+运行 `bash scripts/python.sh -m scripts.training_ui` 可在 119 条四路 RGB 和四路 RGB＋视觉历史两种方案中分别勾选**逐时间步归一化**和**相关高斯噪声**。前者对双臂 Delta 做逐步 Z-score，后者使用 `β=0.5` 的动作窗口相关高斯先验，两项同开为 T3。Train RTC 最大延迟可以独立填写整数动作步，范围为 `0 ≤ delay < action_horizon`，0 关闭。论文选项沿用当前帧阶段 prompt 和四路图像，使用 episode 内的完整动作窗口重新计算独立统计。缺少正式训练包时，工作台仍可预览最终配置。训练数据、统计和启动条件见 [Sharpa 训练说明](training_configs/experiments/tomato_sharpa/README.md#可选逐时间步归一化相关噪声与-train-rtc)。
+
 `VisualHistory` 提供有界推理缓存，要求明确episode身份、单调的采集frame ID及timestamp，缺失的精确历史时刻保持mask，禁止把策略调用次数当30 Hz时间轴。`VisualMemoryPolicy` 是使用训练原始输入协议（116D原始state，经适配为58D）的离线策略包装器，要求匹配checkpoint内的 `assets/visual_memory_contract.json`；还没有接入机器人部署仓库的58D传输接口。按需在策略调用之间向历史缓存写入实际采集帧，新任务reset。
 
 2026-11-16：70项相关本地测试通过，包含小型CPU底座的真实训练更新、动作采样、参数兼容与单帧回归；服务器载入119条/357970帧索引，在6个位置验证历史像素/掩码与推理缓存一致，双worker组批通过。另对生产模型完成CPU抽象图检查：含文本前缀为 `[1,1472,2048]`，动作loss为 `[1,50]`，该检查不分配生产权重、不代表GPU容量验收。真实检查记录见 `training_configs/experiments/tomato_sharpa/subtasks/records/visual_memory_v1_h4_s15_g4_input_check_20261116.json`。配置继承batch256/FSDP8/30000步/每5000步保存，**本版GPU容量、完整训练、Memory收益及实机部署均未验证**；尚未启动正式训练。

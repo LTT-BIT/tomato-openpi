@@ -17,7 +17,7 @@ ROOT=Path(__file__).resolve().parents[1]
 REPORT=ROOT/'logs/in_hand119_preflight/accepted_20261116_s30000_c5000.json'
 
 
-def checked_config(bundle,cache,report_path):
+def checked_config(bundle, cache, report_path, *, require_fresh=True):
     from openpi.subtasks.prepare import digest
     from scripts.run_training import load_experiment,preflight,validate_config
     report=json.loads(report_path.read_text())
@@ -40,7 +40,7 @@ def checked_config(bundle,cache,report_path):
     if (inputs['episodes']!=contract.EPISODES or inputs['frames']!=contract.FRAMES
             or inputs['norm_stats_sha256']!=report['norm']['norm_stats_sha256']):
         raise ValueError('Accepted inputs or norm changed')
-    if config.resume or config.overwrite or config.checkpoint_dir.exists():
+    if require_fresh and (config.resume or config.overwrite or config.checkpoint_dir.exists()):
         raise ValueError('Fresh experiment required; never overwrite or implicitly resume')
     return config,inputs
 

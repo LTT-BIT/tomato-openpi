@@ -14,6 +14,9 @@ import re
 from zoneinfo import ZoneInfo
 
 from openpi.training import config as train_config
+from openpi.training.delta_paper_ui import paper_available
+from openpi.training.delta_paper_ui import select_trial
+from openpi.training.delta_paper_ui import selected_trial
 from openpi.training.sampling import SamplingGroup
 from scripts.run_training import load_experiment
 from scripts.run_training import validate_config
@@ -71,6 +74,7 @@ def experiment_catalog():
     root = common.repository_root()
     entries = []
     for stem, label in (
+        ("visual_memory_v1", "整串番茄 · 五阶段 · 119条四路RGB + 视觉历史"),
         ("in_hand119_b_crop", "整串番茄 · 手中调整五阶段 · 119条四路RGB · B · 30000步"),
         ("normal93_b_stage", "整串番茄 · B 阶段指令 · 手臂Delta · 全93条 · 全参"),
         ("normal93_a_goal", "整串番茄 · A 总体目标 · 手臂Delta · 全93条 · 全参"),
@@ -178,6 +182,16 @@ def delta_supported(config) -> bool:
     return isinstance(config.data, train_config.LeRobotFr3WujiDataConfig | train_config.LeRobotFr3SharpaDataConfig)
 
 
+def locked_fields(config, trial):
+    metadata = config.policy_metadata
+    if metadata.get("subtask_variant") == "in_hand_b_coarse":
+        editable = {"rtc_max_delay"}
+        if trial != "none" or selected_trial(config) != "none":
+            editable.update(("assets_dir", "asset_id"))
+        return [key for key in AB_LOCKED_FIELDS if key not in editable]
+    return list(AB_LOCKED_FIELDS) if metadata.get("selection_sha256") else []
+
+
 def config_values(config) -> dict:
     values = {key: getattr(config, key) for key in TRAIN_INTS}
     values.update({key: getattr(config.lr_schedule, key) for key in LR_FIELDS})
@@ -198,6 +212,7 @@ def config_values(config) -> dict:
         action_semantics="delta" if getattr(config.data, "extra_delta_transform", False) else "absolute",
         sampling_mode=config.sampling_mode,
         sampling_groups=[asdict(group) for group in config.sampling_groups],
+        paper_trial=selected_trial(config),
     )
     if len(config.data.lerobot_datasets) > 1:
         values["dataset_roots"] = [spec.root for spec in config.data.lerobot_datasets]
@@ -232,7 +247,11 @@ def defaults(module: str) -> dict:
             "delta_available": delta_supported(config),
             "subtask_variant": config.policy_metadata.get("subtask_variant"),
             "data_policy": config.policy_metadata.get("data_policy"),
-            "locked_fields": list(AB_LOCKED_FIELDS) if config.policy_metadata.get("selection_sha256") else [],
+            "locked_fields": locked_fields(config, values["paper_trial"]),
+            "paper_available": paper_available(config),
+            "visual_memory": config.policy_metadata.get("visual_memory"),
+            "bundle_missing": config.policy_metadata.get("subtask_variant") == "in_hand_b_coarse"
+            and not config.policy_metadata.get("bundle_sha256"),
             "action_prompts": config.policy_metadata.get("action_prompts",
                 ACTION_PROMPTS if config.policy_metadata.get("subtask_variant") == "b_coarse" else {}),
             "training_episodes": config.policy_metadata.get("training_episodes"),
@@ -258,6 +277,7 @@ def apply_overrides(config, values: dict):
         "sampling_mode",
         "sampling_groups",
         "dataset_roots",
+        "paper_trial",
     }
     if unknown := set(values) - allowed:
         raise ValueError(f"不支持的参数: {sorted(unknown)}")
@@ -270,9 +290,13 @@ def apply_overrides(config, values: dict):
     }
     if missing := required - set(values):
         raise ValueError(f"缺少参数: {sorted(missing)}")
-    if config.policy_metadata.get("selection_sha256"):
+    paper_trial = values.get("paper_trial", selected_trial(config))
+    if not isinstance(paper_trial, str):
+        raise ValueError("paper_trial 必须为字符串")
+    locked = locked_fields(config, paper_trial)
+    if locked:
         original = config_values(config)
-        for key in AB_LOCKED_FIELDS:
+        for key in locked:
             actual, expected = values.get(key, original[key]), original[key]
             if key in ("dataset_root", "assets_dir"):
                 actual, expected = Path(actual).expanduser().resolve(), Path(expected).expanduser().resolve()
@@ -445,6 +469,7 @@ def apply_overrides(config, values: dict):
             "source_datasets": values["sources"],
         },
     )
+    result = select_trial(config, result, paper_trial)
     validate_config(result)
     return result
 
