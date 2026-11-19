@@ -67,6 +67,25 @@ def test_smaller_than_batch_is_still_complete():
     assert [batch.shape for batch in loader] == [(8,), (8,)]
 
 
+@pytest.mark.parametrize("mode", sampling.PLAN_MODES)
+def test_split_worker_batches_preserve_order_and_resume(mode):
+    options = {
+        "local_batch_size": 5,
+        "sampling_mode": mode,
+        "sample_weights": np.arange(1, 12) if mode == "weighted_replacement" else None,
+        "num_train_steps": 7,
+        "seed": 42,
+    }
+    dataset = list(range(11))
+    expected = np.stack(list(data_loader.TorchDataLoader(dataset, **options)))
+    loader = data_loader.TorchDataLoader(dataset, num_workers=2, split_worker_batches=True, **options)
+    iterator = iter(loader)
+    prefix = [next(iterator) for _ in range(3)]
+    iterator.close()
+    loader.seek(3)
+    np.testing.assert_array_equal(np.stack([*prefix, *loader]), expected)
+
+
 def test_legacy_weighted_behavior_unchanged():
     loader = data_loader.TorchDataLoader(
         list(range(11)), local_batch_size=4, sample_weights=np.ones(11), num_batches=3, framework="pytorch"

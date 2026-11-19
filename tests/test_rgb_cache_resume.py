@@ -72,6 +72,30 @@ def test_real_video_cache_matches_decoder_and_preserves_timestamp(tmp_path):
     with pytest.raises(ValueError,match='timeline'):reader._query_videos({'cam0':[-.1]},0)
 
 
+def test_reused_pyav_decoder_matches_lerobot(tmp_path):
+    import av
+    from lerobot.common.datasets.video_utils import decode_video_frames
+
+    from openpi.training.frame_cache import _PyAVReader
+
+    source = tmp_path / "source.mp4"
+    with av.open(str(source), "w") as output:
+        stream = output.add_stream("libx264", rate=30)
+        stream.width, stream.height, stream.pix_fmt = 20, 16, "yuv420p"
+        for index in range(12):
+            pixels = np.random.default_rng(index).integers(0, 256, (16, 20, 3), dtype=np.uint8)
+            for packet in stream.encode(av.VideoFrame.from_ndarray(pixels, format="rgb24")):
+                output.mux(packet)
+        for packet in stream.encode():
+            output.mux(packet)
+
+    reader = _PyAVReader()
+    for timestamps in ([11 / 30], [0.0], [5 / 30, 2 / 30, 5 / 30], [1 / 60, 5 / 60]):
+        expected = decode_video_frames(source, timestamps, tolerance_s=0.02, backend="pyav")
+        np.testing.assert_array_equal(reader.read(source, timestamps, 0.02), expected)
+    assert reader.read(source, [1.0], 1e-4) is None
+
+
 def test_runtime_cache_tolerates_mtime_and_falls_back_per_camera(tmp_path, monkeypatch):
     import json
 

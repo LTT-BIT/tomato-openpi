@@ -1,4 +1,6 @@
 from collections.abc import Iterator, Sequence
+from contextlib import contextmanager
+from contextlib import nullcontext
 import dataclasses
 import importlib.util
 import logging
@@ -318,13 +320,16 @@ def create_torch_dataset(
         action_delta_timestamps = [
             round(t * dataset_meta.fps / action_hz) / dataset_meta.fps for t in range(action_horizon)
         ]
+        memory = getattr(data_config, "visual_memory", None)
         cache_root = os.environ.get("PI05_RGB_FRAME_CACHE")
+        reuse_pyav = memory is not None and data_config.video_backend == "pyav"
         dataset_type = lerobot_dataset.LeRobotDataset
         cache_options = {}
-        if cache_root:
+        if cache_root or reuse_pyav:
             from openpi.training.frame_cache import CachedLeRobotDataset
+
             dataset_type = CachedLeRobotDataset
-            cache_options = {"cache_root": cache_root}
+            cache_options = {"cache_root": cache_root, "reuse_pyav": reuse_pyav}
         dataset: Dataset = dataset_type(
             dataset_repo_id,
             root=dataset_root,
@@ -332,7 +337,6 @@ def create_torch_dataset(
             video_backend=data_config.video_backend,
             **cache_options,
         )
-        memory = getattr(data_config, "visual_memory", None)
         if memory is not None:
             from openpi.subtasks.visual_memory import THREE_VIEWS
             from openpi.training.visual_memory_execution import FastVisualMemoryDataset
@@ -615,6 +619,7 @@ def create_torch_data_loader(
         framework=framework,
         sampling_mode=sampling_mode,
         num_train_steps=num_train_steps,
+        split_worker_batches=framework == "jax" and getattr(data_config, "visual_memory", None) is not None,
     )
 
     return DataLoaderImpl(data_config, data_loader, source_dataset=source_dataset)
@@ -661,6 +666,22 @@ def create_rlds_data_loader(
     return DataLoaderImpl(data_config, data_loader)
 
 
+class _WorkerBatchSampler:
+    """Split each complete training batch into ordered, nearly equal worker tasks."""
+
+    def __init__(self, batches: torch.utils.data.BatchSampler, chunks: int, batch_size: int):
+        self._batches = batches
+        self._ranges = [(i * batch_size // chunks, (i + 1) * batch_size // chunks) for i in range(chunks)]
+
+    def __iter__(self) -> Iterator[list[int]]:
+        for batch in self._batches:
+            for start, end in self._ranges:
+                yield batch[start:end]
+
+    def __len__(self) -> int:
+        return len(self._batches) * len(self._ranges)
+
+
 class TorchDataLoader:
     """Torch data loader implementation."""
 
@@ -679,6 +700,7 @@ class TorchDataLoader:
         framework: str = "jax",
         sampling_mode: str = "legacy",
         num_train_steps: int | None = None,
+        split_worker_batches: bool = False,
     ):
         """Create a PyTorch data loader.
 
@@ -696,6 +718,7 @@ class TorchDataLoader:
             seed: The seed to use for shuffling the data.
             sampling_mode: epoch_shuffle builds a finite plan and supports seeking by completed steps.
             num_train_steps: Total batch budget of that plan, including already completed steps on resume.
+            split_worker_batches: Distribute a training batch across CPU-only worker processes.
         """
         if jax.process_count() > 1:
             raise NotImplementedError("Data loading with multiple processes is not supported.")
@@ -713,6 +736,8 @@ class TorchDataLoader:
             )
         self._num_batches = num_batches
         self._local_batch_size = local_batch_size
+        self._cpu_workers = split_worker_batches and num_workers > 0
+        self._worker_chunks = max(1, min(num_workers, local_batch_size)) if self._cpu_workers else 1
         self.plan_sampler = None
 
         mp_context = None
@@ -746,18 +771,36 @@ class TorchDataLoader:
                 replacement=True,
                 generator=generator,
             )
+        if self._worker_chunks > 1:
+            if sampler is None:
+                sampler = (
+                    torch.utils.data.RandomSampler(dataset, generator=generator)
+                    if shuffle
+                    else torch.utils.data.SequentialSampler(dataset)
+                )
+            batches = torch.utils.data.BatchSampler(sampler, local_batch_size, drop_last=True)
+            batch_options = {"batch_sampler": _WorkerBatchSampler(batches, self._worker_chunks, local_batch_size)}
+            logging.info(
+                "Visual history prefetch: %d ordered worker tasks per batch with %d CPU workers",
+                self._worker_chunks,
+                num_workers,
+            )
+        else:
+            batch_options = {
+                "batch_size": local_batch_size,
+                "shuffle": sampler is None and shuffle,
+                "sampler": sampler,
+                "drop_last": self.plan_sampler is None,
+            }
         self._data_loader = torch.utils.data.DataLoader(
             typing.cast(torch.utils.data.Dataset, dataset),
-            batch_size=local_batch_size,
-            shuffle=(sampler is None and shuffle),  # Don't shuffle if using sampler
-            sampler=sampler,
             num_workers=num_workers,
             multiprocessing_context=mp_context,
             persistent_workers=num_workers > 0,
             collate_fn=_collate_fn,
             worker_init_fn=_worker_init_fn,
-            drop_last=self.plan_sampler is None,
             generator=generator,
+            **batch_options,
         )
 
     @property
@@ -767,7 +810,8 @@ class TorchDataLoader:
     def __iter__(self):
         num_items = 0
         while True:
-            data_iter = iter(self._data_loader)
+            with _cpu_worker_environment() if self._cpu_workers else nullcontext():
+                data_iter = iter(self._data_loader)
             while True:
                 if self._num_batches is not None and num_items >= self._num_batches:
                     return
@@ -775,6 +819,10 @@ class TorchDataLoader:
                     batch = next(data_iter)
                 except StopIteration:
                     break  # We've exhausted the dataset. Create a new iterator and start over.
+                if self._worker_chunks > 1:
+                    chunks = [batch] + [next(data_iter) for _ in range(self._worker_chunks - 1)]
+                    batch = jax.tree.map(lambda *leaves: np.concatenate(leaves, axis=0), *chunks)
+                    del chunks
                 num_items += 1
                 # For JAX, convert to sharded arrays; for PyTorch, return torch tensors
                 if self._sharding is not None:
@@ -795,6 +843,22 @@ def _collate_fn(items):
     # Make sure to convert to numpy arrays before stacking since some of the incoming elements
     # may be JAX arrays.
     return jax.tree.map(lambda *xs: np.stack([np.asarray(x) for x in xs], axis=0), *items)
+
+
+@contextmanager
+def _cpu_worker_environment():
+    """Set the backend before spawned children import JAX, then restore the trainer environment."""
+    values = {"JAX_PLATFORMS": "cpu", "CUDA_VISIBLE_DEVICES": "", "OPENBLAS_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"}
+    previous = {key: os.environ.get(key) for key in values}
+    os.environ.update(values)
+    try:
+        yield
+    finally:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
 
 
 def _worker_init_fn(worker_id: int) -> None:

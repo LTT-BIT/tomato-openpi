@@ -24,6 +24,8 @@ JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.check_visual_memory --worker
 
 119 条视觉历史工作台会使用可访问的 RGB 缓存，支持通过 `PI05_RGB_FRAME_CACHE` 指定目录。缓存按录制和相机匹配源视频，文件迁移造成的修改时间变化不会拦截。与源视频不匹配、缺失或无法读取的缓存逐路回退到源视频。历史时刻按相机合并读取，动作窗口只在当前帧加载一次。
 
+JAX 视觉历史训练会将同一训练批分给多个 CPU worker 预读，训练进程按采样顺序合批后再传入设备。断点续训仍以已完成步数恢复样本位置。回退到 PyAV 源视频时复用已打开的解码器，只对所需帧执行 RGB 色彩转换。
+
 `VisualHistory` 提供有界推理缓存，要求明确episode身份、单调的采集frame ID及timestamp，缺失的精确历史时刻保持mask，禁止把策略调用次数当30 Hz时间轴。`VisualMemoryPolicy` 是使用训练原始输入协议（116D原始state，经适配为58D）的离线策略包装器，要求匹配checkpoint内的 `assets/visual_memory_contract.json`；还没有接入机器人部署仓库的58D传输接口。按需在策略调用之间向历史缓存写入实际采集帧，新任务reset。
 
 2026-11-16：70项相关本地测试通过，包含小型CPU底座的真实训练更新、动作采样、参数兼容与单帧回归；服务器载入119条/357970帧索引，在6个位置验证历史像素/掩码与推理缓存一致，双worker组批通过。另对生产模型完成CPU抽象图检查：含文本前缀为 `[1,1472,2048]`，动作loss为 `[1,50]`，该检查不分配生产权重、不代表GPU容量验收。真实检查记录见 `training_configs/experiments/tomato_sharpa/subtasks/records/visual_memory_v1_h4_s15_g4_input_check_20261116.json`。配置继承batch256/FSDP8/30000步/每5000步保存，**本版GPU容量、完整训练、Memory收益及实机部署均未验证**；尚未启动正式训练。
