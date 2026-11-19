@@ -460,7 +460,7 @@ def job_config(state):
 
 
 def prepare_input_environment(config):
-    """Use only the selected experiment's accepted frame cache in this worker."""
+    """Bind the selected experiment's optional RGB cache in this worker."""
     metadata = config.policy_metadata or {}
     report = metadata.get("input_acceptance_report")
     if report:
@@ -470,8 +470,17 @@ def prepare_input_environment(config):
         cache = Path(metadata["rgb_frame_cache"])
         checked_config(bundle, cache, Path(report), require_fresh=False)
     else:
-        os.environ.pop("PI05_RGB_FRAME_CACHE", None)
         os.environ.pop("PI05_INPUT_EXECUTION_MIGRATION", None)
+        cache = None
+        if metadata.get("subtask_variant") == "in_hand_b_coarse" and metadata.get("visual_memory"):
+            root = os.environ.get("PI05_RGB_FRAME_CACHE") or metadata.get("rgb_frame_cache")
+            if root and (Path(root).expanduser() / "manifest.json").is_file():
+                cache = Path(root).expanduser().resolve()
+        if cache is None:
+            os.environ.pop("PI05_RGB_FRAME_CACHE", None)
+        else:
+            os.environ["PI05_RGB_FRAME_CACHE"] = str(cache)
+            print(f"RGB cache candidate: {cache}; incompatible streams use source video", flush=True)
 
 
 def worker(job_id):

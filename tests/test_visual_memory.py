@@ -21,6 +21,7 @@ from openpi.subtasks.visual_memory import VisualMemoryPolicy
 from openpi.subtasks.visual_memory import VisualMemorySpec
 from openpi.training.visual_memory import LeRobotVisualMemoryDataConfig
 from openpi.training.visual_memory import VisualMemoryDataset
+from openpi.training.visual_memory_execution import FastVisualMemoryDataset
 
 
 def sample(index, *, valid=True):
@@ -81,6 +82,47 @@ def test_dataset_matches_online_across_episode_and_prompt_boundaries():
     # A caller mutating returned arrays must not alter retained history.
     actual[HISTORY]["image"][spec.key(IMAGE_KEYS[0], 2)][:] = 255
     assert int(online.frames[-3][1][0][IMAGE_KEYS[0]][0, 0, 0]) != 255
+
+
+def test_history_reads_only_images_and_groups_timestamps_by_camera():
+    class VideoSource(Source):
+        def __init__(self):
+            super().__init__()
+            self.image_transforms = None
+            self.meta.video_keys = RAW_KEYS
+            self.hf_dataset.columns["timestamp"] = np.tile(np.arange(7, dtype=np.float32) / 30, 2)
+            self.hf_dataset.columns["observation.interaction_available"] = np.array(
+                [item["observation.interaction_available"] for item in self.samples]
+            )
+            self.full_reads = []
+            self.queries = []
+
+        def __getitem__(self, index):
+            self.full_reads.append(index)
+            return super().__getitem__(index)
+
+        def _query_videos(self, timestamps, episode):
+            self.queries.append((timestamps, episode))
+            result = {}
+            for key, times in timestamps.items():
+                images = np.stack([self.samples[episode * 7 + round(ts * 30)][key] for ts in times])
+                result[key] = images[0] if len(times) == 1 else images
+            return result
+
+    source = VideoSource()
+    spec = VisualMemorySpec(frames=3, stride=2)
+    accelerated = FastVisualMemoryDataset(source, spec)
+    reference = VisualMemoryDataset(Source(), spec)
+    for index in (2, 4, 7, 11):
+        batch = accelerated[index]
+        expected = reference[index]
+        np.testing.assert_array_equal(batch["action"], expected["action"])
+        for key in spec.history_keys:
+            np.testing.assert_array_equal(batch[HISTORY]["image"][key], expected[HISTORY]["image"][key])
+            assert batch[HISTORY]["image_mask"][key] == expected[HISTORY]["image_mask"][key]
+    assert source.full_reads == [2, 4, 7, 11]
+    assert [episode for _, episode in source.queries] == [0, 0, 1]
+    assert [len(timestamps[RAW_KEYS[0]]) for timestamps, _ in source.queries] == [1, 2, 2]
 
 
 def test_missing_observations_do_not_become_fabricated_history():

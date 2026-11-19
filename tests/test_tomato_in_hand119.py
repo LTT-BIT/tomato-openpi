@@ -175,3 +175,23 @@ def test_ui_exposes119_profile_and_accepted_cache(tmp_path,frozen,monkeypatch):
     from types import SimpleNamespace
     training_ui.prepare_input_environment(SimpleNamespace(policy_metadata={}))
     assert 'PI05_RGB_FRAME_CACHE' not in __import__('os').environ
+
+
+def test_visual_memory_ui_binds_optional_cache_without_old_report(tmp_path, monkeypatch):
+    import os
+    from types import SimpleNamespace
+
+    from scripts.training_ui import prepare_input_environment
+
+    monkeypatch.setenv("PI05_RGB_FRAME_CACHE", "")
+    monkeypatch.setenv("PI05_INPUT_EXECUTION_MIGRATION", "older-run.json")
+    (tmp_path / "manifest.json").write_text("{}")
+    config = SimpleNamespace(policy_metadata={
+        "subtask_variant": "in_hand_b_coarse",
+        "visual_memory": {"frames": 4},
+        "rgb_frame_cache": str(tmp_path),
+        "input_acceptance_report": None,
+    })
+    prepare_input_environment(config)
+    assert os.environ["PI05_RGB_FRAME_CACHE"] == str(tmp_path)
+    assert "PI05_INPUT_EXECUTION_MIGRATION" not in os.environ

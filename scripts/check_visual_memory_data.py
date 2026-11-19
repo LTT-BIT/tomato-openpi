@@ -26,7 +26,7 @@ from openpi.subtasks.visual_memory import HISTORY
 from openpi.subtasks.visual_memory import IMAGE_KEYS
 from openpi.subtasks.visual_memory import VisualHistory
 from openpi.training import data_loader
-from openpi.training.frame_cache import CachedLeRobotDataset
+from openpi.training.frame_cache import read_cached_frames
 from openpi.training.reproducibility import file_sha256
 from openpi.training.visual_memory import VisualMemoryDataset
 from scripts.check_visual_memory import MODULE
@@ -159,12 +159,17 @@ class HashVerifiedAuditReader(LeRobotDataset):
                 raise ValueError("Cache source video or episode length changed")
 
     def _query_videos(self, query_timestamps, ep_idx):
-        for camera in query_timestamps:
-            entry = self.cache_entries[int(ep_idx), camera]
+        frames = {}
+        for camera, timestamps in query_timestamps.items():
+            key = (int(ep_idx), camera)
+            entry = self.cache_entries[key]
             stat = (self.cache_root / entry["cache_file"]).stat()
             if (stat.st_size, stat.st_mtime_ns) != self.verified[entry["cache_file"]]:
                 raise ValueError("Cache changed after full hash validation")
-        return CachedLeRobotDataset._query_videos(self, query_timestamps, ep_idx)  # noqa: SLF001
+            frames[camera] = read_cached_frames(
+                self.cache_root, self._cache_maps, key, entry, timestamps, self.fps, self.tolerance_s
+            )
+        return frames
 
 
 def audit(report_path, checkpoint_run, *, verify_migration=False):

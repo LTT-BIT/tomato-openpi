@@ -12,8 +12,8 @@ from openpi.subtasks.visual_memory import THREE_VIEWS
 from openpi.training import config
 from openpi.training.visual_memory import LeRobotVisualMemoryDataConfig
 from openpi.training.visual_memory import VisualMemoryDataConfig
-from openpi.training.visual_memory import VisualMemoryDataset
 from openpi.training.visual_memory import VisualMemoryInputs
+from openpi.training.visual_memory_execution import FastVisualMemoryDataset
 
 
 @dataclass(frozen=True)
@@ -24,7 +24,7 @@ class FixedGlobalPrompt:
         return {**data, "prompt": self.prompt}
 
 
-class ThreeViewVisualMemoryDataset(VisualMemoryDataset):
+class ThreeViewVisualMemoryDataset(FastVisualMemoryDataset):
     def __init__(self, dataset, spec):
         super().__init__(dataset, replace(spec, image_keys=IMAGE_KEYS), mask_key=None)
         self.spec = spec

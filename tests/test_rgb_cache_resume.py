@@ -67,8 +67,67 @@ def test_real_video_cache_matches_decoder_and_preserves_timestamp(tmp_path):
     np.testing.assert_array_equal(value,np.load(destination,mmap_mode='r')[5])
     assert value.shape==(224,224,3)
     assert reader.__getstate__()['_cache_maps']=={}
-    with pytest.raises(ValueError,match='current image only'):reader._query_videos({'cam0':[0,.1]},0)
+    pixels=reader._query_videos({'cam0':[0,.1,0]},0)['cam0']
+    np.testing.assert_array_equal(pixels,np.load(destination,mmap_mode='r')[[0,3,0]])
     with pytest.raises(ValueError,match='timeline'):reader._query_videos({'cam0':[-.1]},0)
+
+
+def test_runtime_cache_tolerates_mtime_and_falls_back_per_camera(tmp_path, monkeypatch):
+    import json
+
+    from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+    from openpi_client import image_tools
+    import torch
+
+    from openpi.policies import fr3_sharpa_policy
+    from openpi.training.frame_cache import CachedLeRobotDataset
+    from openpi.training.frame_cache import sha256
+
+    cameras = ("kept", "corrected", "bad_cache")
+    cache = tmp_path / "cache"
+    cache.mkdir()
+    entries = []
+    for camera in cameras:
+        source = tmp_path / f"{camera}.mp4"
+        source.write_bytes(b"old stream")
+        pixels = np.full((3, 224, 224, 3), 7, np.uint8)
+        filename = cache / f"{camera}.npy"
+        np.save(filename, pixels[..., 0] if camera == "bad_cache" else pixels)
+        entries.append({
+            "camera": camera, "episode": 0, "frames": 3, "cache_file": filename.name,
+            "exact_reference_samples": 3, "source_sha256": sha256(source), "mtime_ns": 1,
+        })
+    (tmp_path / "corrected.mp4").write_bytes(b"new stream")
+    (cache / "manifest.json").write_text(json.dumps({
+        "schema": "rgb224_exact_pil_v2", "complete": False, "entries": entries,
+        "source_metadata": {"meta/info.json": "old-binding"},
+        "pixel_pipeline": {"parse_image": sha256(fr3_sharpa_policy.__file__), "resize": sha256(image_tools.__file__)},
+    }))
+
+    def init(dataset):
+        dataset.root = tmp_path
+        dataset.meta = SimpleNamespace(
+            episodes={0: {"length": 3}}, fps=30, video_keys=cameras,
+            get_video_file_path=lambda ep, camera: f"{camera}.mp4",
+        )
+        dataset.tolerance_s = 1e-4
+        dataset.image_transforms = None
+
+    calls = []
+
+    def query(dataset, timestamps, episode):
+        calls.append((timestamps, episode))
+        return {camera: torch.zeros(3, 10, 10) for camera in timestamps}
+
+    monkeypatch.setattr(LeRobotDataset, "__init__", init)
+    monkeypatch.setattr(LeRobotDataset, "_query_videos", query)
+    reader = CachedLeRobotDataset(cache_root=cache)
+    assert (cache / "kept.npy").stat().st_mtime_ns != entries[0]["mtime_ns"]
+    result = reader._query_videos(dict.fromkeys(cameras, [0.0]), 0)
+    assert result["kept"].shape == (224, 224, 3)
+    assert np.all(np.asarray(result["kept"]) == 7)
+    assert calls == [({"corrected": [0.0], "bad_cache": [0.0]}, 0)]
+    assert set(reader.cache_entries) == {(0, "kept")}
 
 
 def test_actual_orbax_checkpoint4000_is_finalized_and_restores_optimizer(tmp_path):

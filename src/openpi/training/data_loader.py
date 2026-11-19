@@ -335,7 +335,7 @@ def create_torch_dataset(
         memory = getattr(data_config, "visual_memory", None)
         if memory is not None:
             from openpi.subtasks.visual_memory import THREE_VIEWS
-            from openpi.training.visual_memory import VisualMemoryDataset
+            from openpi.training.visual_memory_execution import FastVisualMemoryDataset
             from openpi.training.visual_memory_options import ThreeViewVisualMemoryDataset
 
             if getattr(data_config, "task_view", None) is not None:
@@ -343,7 +343,7 @@ def create_torch_dataset(
             dataset = (
                 ThreeViewVisualMemoryDataset(dataset, memory)
                 if memory.image_keys == THREE_VIEWS
-                else VisualMemoryDataset(dataset, memory, data_config.history_mask_key)
+                else FastVisualMemoryDataset(dataset, memory, data_config.history_mask_key)
             )
         if getattr(data_config, "paper_complete_windows", False):
             from openpi.training.delta_paper import CompleteWindows
