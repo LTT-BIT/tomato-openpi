@@ -150,7 +150,7 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
         "source_datasets": metadata["source_datasets"],
         "frames": info["total_frames"],
         "episodes": info["total_episodes"],
-        "prompts": prompts,
+        "prompts": [config.data.global_prompt] if getattr(config.data, "global_prompt", None) else prompts,
         "norm_stats_path": str(norm_dir / "norm_stats.json"),
     }
     view = getattr(config.data.base_config, "task_view", None)

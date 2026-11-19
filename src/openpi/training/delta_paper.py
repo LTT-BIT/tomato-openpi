@@ -14,7 +14,8 @@ from openpi.shared import delta_paper as paper
 from openpi.shared import normalize
 from openpi.training import config as cfg
 from openpi.training.visual_memory import LeRobotVisualMemoryDataConfig
-from openpi.training.visual_memory import VisualMemoryDataConfig
+from openpi.training.visual_memory_options import LeRobotVisualMemoryOptionsDataConfig
+from openpi.training.visual_memory_options import VisualMemoryOptionsView
 
 
 class CompleteWindows:
@@ -48,7 +49,7 @@ class CompleteWindows:
 
 
 @dataclass(frozen=True)
-class PaperDataView(VisualMemoryDataConfig):
+class PaperDataView(VisualMemoryOptionsView):
     paper_complete_windows: bool = True
     paper_asset_dir: str = ""
     paper_bundle_sha256: str = ""
@@ -204,4 +205,9 @@ class PaperSharpaData(PaperNormalizationConfig, cfg.LeRobotFr3SharpaCropDataConf
 
 @dataclass(frozen=True)
 class PaperVisualMemoryData(PaperNormalizationConfig, LeRobotVisualMemoryDataConfig):
+    pass
+
+
+@dataclass(frozen=True)
+class PaperVisualMemoryOptionsData(PaperNormalizationConfig, LeRobotVisualMemoryOptionsDataConfig):
     pass

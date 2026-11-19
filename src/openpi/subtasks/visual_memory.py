@@ -15,6 +15,7 @@ from openpi.policies.fr3_sharpa_policy import _parse_image
 
 VERSION = "tomato-visual-memory-pooled-v1"
 IMAGE_KEYS = ("base_0_rgb", "left_wrist_0_rgb", "right_wrist_0_rgb", "interaction_0_rgb")
+THREE_VIEWS = IMAGE_KEYS[:3]
 RAW_KEYS = (
     "observation.images.cam0",
     "observation.images.cam2",
@@ -72,23 +73,32 @@ class VisualMemorySpec:
             "current_state": True,
             "history_tokens": len(self.history_keys) * self.pool_grid**2,
             "history_span_seconds": (self.frames - 1) * self.stride / self.fps,
-            "roi_source": "existing_offline_roi_may_use_future_annotation",
+            "roi_source": "existing_offline_roi_may_use_future_annotation"
+            if "interaction_0_rgb" in self.image_keys
+            else None,
             "method": "sampled_spatial_pool_visual_prefix",
         }
 
 
 def camera_frame(sample, mask_key="observation.interaction_available"):
-    """Copy only image pixels/masks; historical actions, states and prompts are excluded."""
+    """Copy image pixels and masks; a null mask key selects the three original RGB views."""
+    image_keys = THREE_VIEWS if mask_key is None else IMAGE_KEYS
     images = {}
+    masks = {}
     for camera, raw in zip(IMAGE_KEYS, RAW_KEYS, strict=True):
+        if camera not in image_keys:
+            continue
         image = _parse_image(sample[raw])
         if image.dtype != np.uint8 or image.ndim != 3 or image.shape[-1] != 3 or min(image.shape[:2]) < 1:
             raise ValueError(f"RGB uint8 image required: {raw}")
         images[camera] = image.copy()
-    valid = np.asarray(sample[mask_key])
-    if valid.shape != () or valid.dtype != np.bool_:
-        raise ValueError("Scalar boolean ROI availability required")
-    return images, {k: np.bool_(valid if k == "interaction_0_rgb" else True) for k in IMAGE_KEYS}
+        masks[camera] = np.True_
+    if "interaction_0_rgb" in images:
+        valid = np.asarray(sample[mask_key])
+        if valid.shape != () or valid.dtype != np.bool_:
+            raise ValueError("Scalar boolean ROI availability required")
+        masks["interaction_0_rgb"] = np.bool_(valid)
+    return images, masks
 
 
 def pack_history(spec, current, lookup):

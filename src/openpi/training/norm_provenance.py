@@ -60,6 +60,8 @@ def build_contract(config: "cfg.TrainConfig", *, dataset_specs=None) -> dict:
     paper_contract = getattr(config.data, "paper_contract", None)
     if paper_contract is not None:
         transform_values["delta_paper"] = paper_contract()
+    if global_prompt := getattr(config.data, "global_prompt", None):
+        transform_values["global_prompt"] = global_prompt
     view = getattr(config.data.base_config, "task_view", None)
     if view is not None:
         from openpi.training import task_view

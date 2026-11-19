@@ -12,7 +12,9 @@ from openpi.shared import delta_paper as paper
 from openpi.training.config import LeRobotFr3SharpaCropDataConfig
 from openpi.training.delta_paper import PaperSharpaData
 from openpi.training.delta_paper import PaperVisualMemoryData
+from openpi.training.delta_paper import PaperVisualMemoryOptionsData
 from openpi.training.visual_memory import LeRobotVisualMemoryDataConfig
+from openpi.training.visual_memory_options import LeRobotVisualMemoryOptionsDataConfig
 from openpi.training.weight_loaders import PartialCheckpointWeightLoader
 
 TRIALS = {
@@ -32,7 +34,14 @@ def selected_trial(config):
 def paper_available(config):
     return (
         type(config.data)
-        in (LeRobotFr3SharpaCropDataConfig, LeRobotVisualMemoryDataConfig, PaperSharpaData, PaperVisualMemoryData)
+        in (
+            LeRobotFr3SharpaCropDataConfig,
+            LeRobotVisualMemoryDataConfig,
+            LeRobotVisualMemoryOptionsDataConfig,
+            PaperSharpaData,
+            PaperVisualMemoryData,
+            PaperVisualMemoryOptionsData,
+        )
         and type(config.model) in (Pi0Config, VisualMemoryConfig, PaperPi0Config, PaperVisualMemoryConfig)
         and isinstance(config.weight_loader, PartialCheckpointWeightLoader)
         and config.model.pi05
@@ -51,7 +60,7 @@ def select_trial(source, config, trial):
     if trial == previous == "none":
         return config
     if not paper_available(config) or trial not in ("none", *TRIALS):
-        raise ValueError("逐时间步归一化和相关高斯噪声仅支持 30 Hz 四路 Sharpa π0.5 全参配置")
+        raise ValueError("逐时间步归一化和相关高斯噪声仅支持兼容的 30 Hz Sharpa π0.5 全参配置")
     if trial != previous and config.data.assets.asset_id == source.data.assets.asset_id:
         raise ValueError("切换论文功能需要独立的统计 asset_id")
     if not config.data.extra_delta_transform or config.sampling_mode != "epoch_shuffle" or config.sampling_groups:
@@ -60,7 +69,10 @@ def select_trial(source, config, trial):
     def inherited(cls, obj):
         return {field.name: getattr(obj, field.name) for field in fields(cls)}
 
-    if isinstance(config.model, VisualMemoryConfig):
+    if isinstance(config.data, LeRobotVisualMemoryOptionsDataConfig):
+        data_cls, model_cls = LeRobotVisualMemoryOptionsDataConfig, VisualMemoryConfig
+        paper_data_cls, paper_model_cls = PaperVisualMemoryOptionsData, PaperVisualMemoryConfig
+    elif isinstance(config.model, VisualMemoryConfig):
         data_cls, model_cls = LeRobotVisualMemoryDataConfig, VisualMemoryConfig
         paper_data_cls, paper_model_cls = PaperVisualMemoryData, PaperVisualMemoryConfig
     else:

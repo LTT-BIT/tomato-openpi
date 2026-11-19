@@ -630,14 +630,18 @@ def handler_class(token):
 
                 query = {key: value[0] for key, value in parse_qs(url.query).items()}
                 if url.path == "/api/baselines":
+                    tomato_sources = {entry["id"] for entry in config_ui.experiment_catalog()}
+                    tomato = config_ui.DEFAULT_AB_MODULE if config_ui.DEFAULT_AB_MODULE in tomato_sources else None
+                    default = os.environ.get("PI05_UI_DEFAULT_BASELINE")
                     value = {
-                        "baselines": config_ui.experiment_catalog() + config_ui.baseline_catalog(),
+                        "baselines": config_ui.baseline_catalog(),
                         "personal": config_ui.personal_catalog(),
                         "repository": str(common.repository_root()),
                         "python": sys.executable,
                         "host": socket.gethostname(),
                         "server_label": os.environ.get("PI05_UI_SERVER_LABEL", socket.gethostname()),
-                        "default_baseline": os.environ.get("PI05_UI_DEFAULT_BASELINE", config_ui.DEFAULT_AB_MODULE) if config_ui.experiment_catalog() else None,
+                        "tomato_baseline": tomato,
+                        "default_baseline": tomato if not default or default in tomato_sources else default,
                     }
                 elif url.path == "/api/baseline":
                     value = config_ui.defaults(query["id"])

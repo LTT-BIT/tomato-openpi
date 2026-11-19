@@ -5,3 +5,4 @@
 .paper-fields legend{padding:0 5px;color:var(--accent);font-weight:650;font-size:12px}
 .paper-fields .check{margin-top:5px;font-size:12px}
 .paper-fields .help:last-child{margin-bottom:0}
+.training-input-options{grid-template-columns:repeat(2,minmax(0,1fr))}

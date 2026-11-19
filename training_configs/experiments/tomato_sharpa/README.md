@@ -530,8 +530,10 @@ JAX_PLATFORMS=cpu CUDA_VISIBLE_DEVICES='' bash scripts/python.sh -m scripts.toma
 
 ### 可选逐时间步归一化、相关噪声与 Train RTC
 
-工作台中的 `in_hand119_b_crop` 和 `visual_memory_v1` 都支持两项独立勾选。单选双臂逐时间步 Z-score 为 T1，单选相关高斯噪声为 T2，两项同开为 T3。T2 沿用全局分位数归一化，T1/T3 的手部和当前状态也沿用分位数归一化。相关噪声按时间优先展平 50×58 动作块，并使用 `β=0.5` 的相关矩阵与单位矩阵混合。Train RTC 可独立设置，默认关闭。正值表示均匀抽取 0 至该值的干净动作前缀长度，训练损失只监督余下动作。
+整串番茄工作台使用 `visual_memory_v1` 作为默认训练来源。两列下拉框分别选择阶段指令或全局 Prompt、三路原始 RGB 或四路 RGB＋ROI。阶段指令来自当前帧 `task_index`。全局模式对每帧使用 `Harvest all tomatoes into the left basket and return stem to right plate.`。三路模式读取外部和双腕 RGB，四路额外读取交互 ROI；当前帧和视觉历史使用相同视角集合。切换时使用独立统计资产，训练输入通过配置记录。
 
-这两种方案继续使用经冻结的全119条五阶段 B 数据、原四路 RGB 与交互图可用性 mask。阶段英文来自当前帧 `task_index`。启用任一论文选项后，采样与统计均使用 episode 内的完整动作窗口，排除需要末帧补齐的尾部起点。跨阶段的真实窗口继续保留。视觉历史方案沿用同一录制内的历史图像与 mask。界面自动分配新资产 ID，并可在启动时计算 `norm_stats.json`、`norm_metadata.json`、`delta_paper.json` 和 `delta_paper.npz`。普通 Delta 统计、其它组合的统计及旧 checkpoint 不能用于这些新实验。仅调整 Train RTC 时可沿用同一方案的统计，训练使用新的实验名。
+单选双臂逐时间步 Z-score 为 T1，单选相关高斯噪声为 T2，两项同开为 T3。T2 沿用全局分位数归一化，T1/T3 的手部和当前状态也沿用分位数归一化。相关噪声按时间优先展平 50×58 动作块，并使用 `β=0.5` 的相关矩阵与单位矩阵混合。Train RTC 可独立设置，默认关闭。正值表示均匀抽取 0 至该值的干净动作前缀长度，训练损失只监督余下动作。
+
+各组合使用冻结的全119条五阶段数据。启用任一论文选项后，采样与统计均使用 episode 内的完整动作窗口，排除需要末帧补齐的尾部起点，保留跨阶段的真实窗口。界面自动分配新资产 ID，并可在启动时计算 `norm_stats.json`、`norm_metadata.json`、`delta_paper.json` 和 `delta_paper.npz`。仅调整 Train RTC 时可沿用同一方案的统计，训练使用新的实验名。
 
 启动前设置 `PI05_IN_HAND119_BUNDLE` 指向已准备的正式数据。四路当前帧方案的 UI worker 继续核对精确缓存验收报告，报告包含代码指纹。更新代码后，用 `scripts.check_tomato_in_hand119 --out <新报告路径>` 生成新版回执，并在启动 UI 前通过 `PI05_IN_HAND119_ACCEPTANCE_REPORT` 指定该路径。新选项已做本地配置和 CPU 训练链路测试，正式 119 条统计计算、GPU 容量和完整训练需在训练环境验收。

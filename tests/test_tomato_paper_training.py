@@ -17,6 +17,7 @@ from openpi import transforms
 from openpi.models import siglip
 from openpi.shared import delta_paper as paper
 from openpi.shared import normalize
+from openpi.subtasks.tomato import GOAL
 from openpi.subtasks.tomato_in_hand import TASKS
 from openpi.training import config as cfg
 from openpi.training import data_loader
@@ -27,6 +28,42 @@ from scripts import training_ui_config as ui
 from scripts.train import train_step
 
 PREFIX = "training_configs.experiments.tomato_sharpa.subtasks."
+
+
+@pytest.mark.parametrize("prompt_mode", ["stage", "global"])
+@pytest.mark.parametrize("video_views", [3, 4])
+def test_training_input_options_survive_paper_and_personal_configs(prompt_mode, video_views, tmp_path, monkeypatch):
+    monkeypatch.setenv("PI05_IN_HAND119_BUNDLE", str(tmp_path / "missing"))
+    module = ui.DEFAULT_AB_MODULE
+    source = ui.source_config(module)
+    defaults = ui.defaults(module)
+    assert defaults["values"]["prompt_mode"] == "stage"
+    assert defaults["values"]["video_views"] == 4
+    values = {**defaults["values"], "prompt_mode": prompt_mode, "video_views": video_views, "rtc_max_delay": 8}
+    if (prompt_mode, video_views) != ("stage", 4):
+        with pytest.raises(ValueError, match="asset_id"):
+            ui.apply_overrides(source, values)
+    values.update(asset_id="smoke_config", paper_trial="t3")
+    saved = ui.personal_source(module, "test", values)
+    config = ui.config_from_source(saved, module, "saved.py")
+    assert len(config.model.memory.image_keys) == len(config.policy_metadata["camera_keys"]) == video_views
+    assert len(config.model.image_keys) == video_views * config.model.memory.frames
+    assert getattr(config.data, "global_prompt", None) == (GOAL if prompt_mode == "global" else None)
+    assert config.model.rtc_max_delay == 8
+    assert config.model.paper_beta == 0.5
+    reverted = ui.apply_overrides(
+        config,
+        {
+            **ui.config_values(config),
+            "prompt_mode": "stage",
+            "video_views": 4,
+            "paper_trial": "none",
+            "asset_id": "smoke_reverted",
+        },
+    )
+    assert reverted.name == source.name
+    assert reverted.model.image_keys == source.model.image_keys
+    assert not hasattr(reverted.data, "global_prompt")
 
 
 @pytest.mark.parametrize("recipe", ["in_hand119_b_crop", "visual_memory_v1"])

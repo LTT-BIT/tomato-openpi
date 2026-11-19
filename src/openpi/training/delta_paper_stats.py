@@ -7,17 +7,15 @@ import numpy as np
 import pyarrow.parquet as pq
 
 from openpi import transforms
-from openpi.models.pi0_config import Pi0Config
 from openpi.shared import delta_paper as paper
 from openpi.shared import normalize
 from openpi.shared.local_storage import new_artifact_directory
-from openpi.subtasks.rgb100 import IMAGE_KEYS
-from openpi.training import config as cfg
 from openpi.training import data_loader
 from openpi.training import norm_provenance
 from openpi.training.dataset_collection import collection_layout
 from openpi.training.delta_paper import PaperDataView
 from openpi.training.delta_paper import PaperNormalizationConfig
+from openpi.training.visual_memory_options import current_frame_transforms
 
 
 def compute(config, *, batch_size=128):
@@ -47,8 +45,7 @@ def _compute(config, *, batch_size, output):
     if total < 2:
         raise ValueError("Paper statistics require at least two complete training windows")
     contract = norm_provenance.build_contract(config)
-    current_model = Pi0Config(pi05=True, action_dim=58, image_keys=IMAGE_KEYS)
-    repack, vectors = cfg.LeRobotFr3SharpaCropDataConfig.create_vector_transforms(data, current_model)
+    repack, vectors = current_frame_transforms(data, config.model)
     vector = transforms.compose([*repack.inputs, *vectors.inputs])
     actual_repack, actual_vectors = data.create_vector_transforms(config.model)
     training_vector = transforms.compose([*actual_repack.inputs, *actual_vectors.inputs])
@@ -63,6 +60,7 @@ def _compute(config, *, batch_size, output):
         video_backend=data.video_backend,
         visual_memory=getattr(config.model, "memory", None),
         history_mask_key=data.interaction_mask_key,
+        global_prompt=getattr(data, "global_prompt", None),
     )
     reference = data_loader.create_torch_dataset(source_view, horizon, config.model, sampling_mode="epoch_shuffle")
     if len(reference) != total:
@@ -183,7 +181,7 @@ def _compute(config, *, batch_size, output):
         "norm_stats_sha256": digest,
         "bundle_sha256": paper.sha256(output / paper.BUNDLE),
         "source_contract": contract,
-        "prompt_source": "meta/tasks.jsonl",
+        "prompt_source": "fixed_global_prompt" if source_view.global_prompt else "meta/tasks.jsonl",
         "config_name": config.name,
     }
     (output / paper.MANIFEST).write_text(json.dumps(metadata, indent=2) + "\n")

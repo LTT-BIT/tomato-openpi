@@ -173,6 +173,8 @@ def _training_contract(config: _config.TrainConfig, data_config: _config.DataCon
         "use_quantile_norm": data_config.use_quantile_norm,
         "video_backend": data_config.video_backend,
     }
+    if global_prompt := getattr(data_config, "global_prompt", None):
+        values["data_transforms"]["global_prompt"] = global_prompt
     if getattr(data_config, "paper_bundle_sha256", None):
         values["paper_bundle_sha256"] = data_config.paper_bundle_sha256
     return json.loads(_json_bytes(values))

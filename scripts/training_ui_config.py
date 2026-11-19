@@ -3,6 +3,7 @@
 
 import ast
 from dataclasses import asdict
+from dataclasses import fields
 from dataclasses import replace
 from datetime import datetime
 import getpass
@@ -13,11 +14,19 @@ import pprint
 import re
 from zoneinfo import ZoneInfo
 
+from openpi.subtasks.tomato import GOAL
+from openpi.subtasks.tomato_in_hand import CAMERAS
+from openpi.subtasks.tomato_in_hand import TASKS
+from openpi.subtasks.visual_memory import IMAGE_KEYS
 from openpi.training import config as train_config
+from openpi.training.delta_paper import PaperVisualMemoryData
+from openpi.training.delta_paper import PaperVisualMemoryOptionsData
 from openpi.training.delta_paper_ui import paper_available
 from openpi.training.delta_paper_ui import select_trial
 from openpi.training.delta_paper_ui import selected_trial
 from openpi.training.sampling import SamplingGroup
+from openpi.training.visual_memory import LeRobotVisualMemoryDataConfig
+from openpi.training.visual_memory_options import LeRobotVisualMemoryOptionsDataConfig
 from scripts.run_training import load_experiment
 from scripts.run_training import validate_config
 from training_configs import common
@@ -54,7 +63,7 @@ TEXT_FIELDS = (
     "weight_path",
     "project_name",
 )
-DEFAULT_AB_MODULE = "training_configs.experiments.tomato_sharpa.subtasks.normal93_b_stage"
+DEFAULT_AB_MODULE = "training_configs.experiments.tomato_sharpa.subtasks.visual_memory_v1"
 AB_LOCKED_FIELDS = (
     "dataset_root",
     "repo_id",
@@ -182,11 +191,66 @@ def delta_supported(config) -> bool:
     return isinstance(config.data, train_config.LeRobotFr3WujiDataConfig | train_config.LeRobotFr3SharpaDataConfig)
 
 
-def locked_fields(config, trial):
+def input_values(config):
+    if config.policy_metadata.get("subtask_variant") != "in_hand_b_coarse" or not isinstance(
+        config.data, LeRobotVisualMemoryDataConfig
+    ):
+        return {}
+    return {
+        "prompt_mode": "global" if getattr(config.data, "global_prompt", None) else "stage",
+        "video_views": len(config.model.memory.image_keys),
+    }
+
+
+def input_suffix(options):
+    parts = []
+    if options["prompt_mode"] == "global":
+        parts.append("global")
+    if options["video_views"] == 3:
+        parts.append("rgb3")
+    return "".join(f"_{part}" for part in parts)
+
+
+def apply_training_inputs(config, before, after):
+    if before == after:
+        return config
+    global_prompt = GOAL if after["prompt_mode"] == "global" else None
+    camera_count = after["video_views"]
+    memory = replace(config.model.memory, image_keys=IMAGE_KEYS[:camera_count])
+    current_fields = {field.name: getattr(config.data, field.name) for field in fields(config.data)}
+    trial = selected_trial(config)
+    if after == {"prompt_mode": "stage", "video_views": 4}:
+        cls = PaperVisualMemoryData if trial != "none" else LeRobotVisualMemoryDataConfig
+        current_fields.pop("global_prompt", None)
+    else:
+        cls = PaperVisualMemoryOptionsData if trial != "none" else LeRobotVisualMemoryOptionsDataConfig
+        current_fields["global_prompt"] = global_prompt
+    paper_suffix = f"_paper_{trial}" if trial != "none" else ""
+    name = config.name.removesuffix(paper_suffix).removesuffix(input_suffix(before))
+    return replace(
+        config,
+        name=f"{name}{input_suffix(after)}{paper_suffix}",
+        model=replace(config.model, memory=memory),
+        data=cls(**current_fields),
+        policy_metadata={
+            **config.policy_metadata,
+            **after,
+            "camera_keys": list(CAMERAS[:camera_count]),
+            "visual_memory": memory.contract(),
+            "visual_tokens": camera_count * 256 + len(memory.history_keys) * memory.pool_grid**2,
+            "offline_roi_uses_future_annotation": camera_count == 4,
+            "prompt_example": global_prompt or TASKS[1],
+            "prompts": [global_prompt] if global_prompt else list(TASKS),
+            "prompt_source": "fixed_global_prompt" if global_prompt else "meta/tasks.jsonl",
+        },
+    )
+
+
+def locked_fields(config, trial, *, inputs_changed=False):
     metadata = config.policy_metadata
     if metadata.get("subtask_variant") == "in_hand_b_coarse":
         editable = {"rtc_max_delay"}
-        if trial != "none" or selected_trial(config) != "none":
+        if trial != "none" or selected_trial(config) != "none" or inputs_changed:
             editable.update(("assets_dir", "asset_id"))
         return [key for key in AB_LOCKED_FIELDS if key not in editable]
     return list(AB_LOCKED_FIELDS) if metadata.get("selection_sha256") else []
@@ -216,6 +280,7 @@ def config_values(config) -> dict:
     )
     if len(config.data.lerobot_datasets) > 1:
         values["dataset_roots"] = [spec.root for spec in config.data.lerobot_datasets]
+    values.update(input_values(config))
     return values
 
 
@@ -240,6 +305,8 @@ def defaults(module: str) -> dict:
             "action_hz": config.data.action_hz,
             "cameras": config.policy_metadata["camera_keys"],
             "prompt": config.policy_metadata["prompt_example"],
+            "global_prompt": GOAL if input_values(config) else None,
+            "stage_prompt": TASKS[1] if input_values(config) else None,
             "task_view": asdict(config.data.base_config.task_view)
             if getattr(config.data.base_config, "task_view", None)
             else None,
@@ -278,6 +345,8 @@ def apply_overrides(config, values: dict):
         "sampling_groups",
         "dataset_roots",
         "paper_trial",
+        "prompt_mode",
+        "video_views",
     }
     if unknown := set(values) - allowed:
         raise ValueError(f"不支持的参数: {sorted(unknown)}")
@@ -293,7 +362,20 @@ def apply_overrides(config, values: dict):
     paper_trial = values.get("paper_trial", selected_trial(config))
     if not isinstance(paper_trial, str):
         raise ValueError("paper_trial 必须为字符串")
-    locked = locked_fields(config, paper_trial)
+    before_inputs = input_values(config)
+    if not before_inputs and {"prompt_mode", "video_views"} & values.keys():
+        raise ValueError("此配置不支持切换训练指令或视频输入")
+    after_inputs = {key: values.get(key, value) for key, value in before_inputs.items()}
+    if after_inputs and (
+        after_inputs["prompt_mode"] not in ("stage", "global")
+        or type(after_inputs["video_views"]) is not int
+        or after_inputs["video_views"] not in (3, 4)
+    ):
+        raise ValueError("请选择阶段指令或全局 Prompt，以及三路或四路视频")
+    inputs_changed = before_inputs != after_inputs
+    if inputs_changed and values["asset_id"] == config.data.assets.asset_id:
+        raise ValueError("切换训练指令或视频输入需要独立的统计 asset_id")
+    locked = locked_fields(config, paper_trial, inputs_changed=inputs_changed)
     if locked:
         original = config_values(config)
         for key in locked:
@@ -469,6 +551,7 @@ def apply_overrides(config, values: dict):
             "source_datasets": values["sources"],
         },
     )
+    result = apply_training_inputs(result, before_inputs, after_inputs)
     result = select_trial(config, result, paper_trial)
     validate_config(result)
     return result
