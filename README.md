@@ -37,6 +37,8 @@ JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.check_visual_memory --worker
 
 增量批次在 `freeze/process/publish` 中使用 `--datasets <精确源数据集名...>` 固定成员；名称不存在会报错，避免误处理其他批次。发布总清单合并保留既有数据包，并核对其包清单哈希；`raw_verification_datasets` 明确列出本次重新核验的原始目录，`raw_sha256_verified_files` 只统计本次选中来源，不把历史验收伪称为本次全量重验。ROI检测、框选、插值和平滑参数保持同版本。
 
+局部图清晰度可通过 `process --image-profile lanczos4_unsharp065_sigma085_crf14_v1` 显式启用：从当前cam0帧直接裁剪，Lanczos4一次缩放至224×224，Gaussian sigma0.85、unsharp amount0.65轻度锐化，H.264 CRF14编码。默认 `baseline` 仍为双三次缩放、CRF18；取框与时序规则不变。运行配置、逐帧记录及视频收据保存图像profile，已有输出与请求profile不符时拒绝复用。该处理不使用生成式超分，不能恢复源视频未记录的细节；新批次仍须检查遮挡、果串完整性与锐化伪影，不自动替换旧ROI或训练输入。
+
 2026-11-14新增A `1114_1056_1082` 14条、B `1114_1055_1079` 5条，normal/speedup各19条已补齐四路：56079/44822帧，共100901帧局部RGB，全量解码无黑帧。修复源图边缘1像素舍入余量造成的不可行约束；A7剔除3个支架误检锚点，A0/B0的normal及speedup部分时段使用明确记录的人工复核局部框，未扩大300像素上限。38条中段及74段较长定位缺口已抽帧复核，不代表逐帧语义100%。原始195个文件前后哈希一致，旧8个包清单未变；合并总清单为normal/speedup各119条。来源、人工修正及校验见[增量批次结果](training_configs/experiments/tomato_sharpa/subtasks/records/full_block_more_roi_20261114_r1.json)，数据侧记录位于各自 `subtask-roi/provenance/20261114_r1`，保留昨日记录。未生成Subtask标签或修改训练数据选择。
 
 本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。

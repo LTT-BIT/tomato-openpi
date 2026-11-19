@@ -2,6 +2,7 @@ import json
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 
 from scripts.tomato_full_block_roi import coordinates, export, interaction, sha
 
@@ -30,7 +31,8 @@ def test_zoomed_path_preserves_local_geometry_and_reports_long_detection_gaps():
     assert checks['center_steps_over_3pct'] == checks['scale_steps_over_2pct'] == 0
 
 
-def test_export_keeps_current_pixels_and_raw_bytes(tmp_path):
+@pytest.mark.parametrize('image_profile', ['baseline', 'lanczos4_unsharp065_sigma085_crf14_v1'])
+def test_export_keeps_current_pixels_and_raw_bytes(tmp_path, image_profile):
     import av
     from fractions import Fraction
     row = dict(category='normal', group='A', dataset='example', episode=0, fps=30,
@@ -55,7 +57,11 @@ def test_export_keeps_current_pixels_and_raw_bytes(tmp_path):
     detection = dict(frames=12, source_sha256=before, samples=[
         dict(frame=i, interaction=dict(box=[330, 180, 420, 260])) for i in (0, 11)
     ])
-    receipt = export(row, source, tmp_path / 'out', detection)
+    receipt = export(row, source, tmp_path / 'out', detection, image_profile)
+    assert receipt['image_profile'] == image_profile
+    other_profile = 'baseline' if image_profile != 'baseline' else 'lanczos4_unsharp065_sigma085_crf14_v1'
+    with pytest.raises(ValueError, match='Output collision'):
+        export(row, source, tmp_path / 'out', detection, other_profile)
     assert sha(video) == before
     assert receipt['decoded_frames'] == 12 and receipt['black_frames'] == 0
     assert receipt['checks']['same_current_frame_pixels']

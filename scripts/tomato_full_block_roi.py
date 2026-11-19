@@ -20,6 +20,20 @@ from scripts.tomato_offline_roi import plan_windows, union
 
 CAMERA = 'observation.images.interaction'
 VERSION = 'full-block-right-truss-180-v1'
+CLARITY_PROFILE = 'lanczos4_unsharp065_sigma085_crf14_v1'
+
+
+def render_crop(crop, profile='baseline'):
+    """Resize current RGB once; optional deterministic, non-generative sharpening."""
+    import cv2
+    if profile not in ('baseline', CLARITY_PROFILE):
+        raise ValueError(f'Unknown image profile: {profile}')
+    method = cv2.INTER_CUBIC if profile == 'baseline' else cv2.INTER_LANCZOS4
+    image = cv2.resize(crop, (224, 224), interpolation=method)
+    if profile != 'baseline':
+        blur = cv2.GaussianBlur(image, (0, 0), .85)
+        image = cv2.addWeighted(image, 1.65, blur, -.65, 0)
+    return image
 
 
 def sha(path):
@@ -206,7 +220,7 @@ def coordinates(detection, width=640, height=400):
     return boxes, tight, nearest, checks
 
 
-def export(row, source, output, detection):
+def export(row, source, output, detection, image_profile='baseline'):
     import av
     import cv2
     from PIL import Image, ImageDraw
@@ -216,7 +230,8 @@ def export(row, source, output, detection):
     receipt = folder / f'roi/chunk-{ep // 1000:03d}/episode_{ep:06d}.receipt.json'
     if receipt.exists():
         previous = json.loads(receipt.read_text())
-        if previous['source_sha256'] == detection['source_sha256'] and previous['version'] == VERSION:
+        if (previous['source_sha256'] == detection['source_sha256'] and previous['version'] == VERSION
+                and previous.get('image_profile', 'baseline') == image_profile):
             return previous
         raise ValueError(f'Output collision: {receipt}')
     boxes, tight, nearest, checks = coordinates(detection)
@@ -234,7 +249,7 @@ def export(row, source, output, detection):
         stream = outgoing.add_stream('libx264', rate=row['fps'])
         stream.width = stream.height = 224
         stream.pix_fmt = 'yuv420p'
-        stream.options = {'crf': '18', 'preset': 'fast', 'threads': '2'}
+        stream.options = {'crf': '18' if image_profile == 'baseline' else '14', 'preset': 'fast', 'threads': '2'}
         count = 0
         timestamp_error = 0.
         for i, frame in enumerate(incoming.decode(video=0)):
@@ -246,7 +261,7 @@ def export(row, source, output, detection):
             crop = rgb[y1:y2, x1:x2]
             if crop.size == 0:
                 raise ValueError('Empty crop')
-            resized = cv2.resize(crop, (224, 224), interpolation=cv2.INTER_CUBIC)
+            resized = render_crop(crop, image_profile)
             result = av.VideoFrame.from_ndarray(resized, format='rgb24')
             result.pts, result.time_base = i, Fraction(1, row['fps'])
             for packet in stream.encode(result):
@@ -255,6 +270,7 @@ def export(row, source, output, detection):
                                         crop_box=boxes[i].tolist(), interaction_box=tight[i].tolist(),
                                         nearest_detection_frames=int(nearest[i]),
                                         provenance='offline_neighbor_coordinate_interpolation_current_rgb',
+                                        image_profile=image_profile,
                                         image_available=True, semantic_quality_verified=False)) + '\n')
             if i in gallery_frames:
                 im = Image.fromarray(rgb)
@@ -289,7 +305,7 @@ def export(row, source, output, detection):
         for j, cell in enumerate(cells):
             sheet.paste(cell, ((j % 2) * 544, (j // 2) * 224))
         sheet.save(receipt.with_name(f'episode_{ep:06d}.qa_{page // 12:02d}.jpg'), quality=92)
-    result = dict(version=VERSION, source=row, source_sha256=detection['source_sha256'],
+    result = dict(version=VERSION, image_profile=image_profile, source=row, source_sha256=detection['source_sha256'],
                   output_video=str(video.relative_to(output)), output_sha256=sha(video),
                   coordinates_sha256=sha(sidecar), frames=count, decoded_frames=decoded,
                   black_frames=black_frames, max_timestamp_error=max_pts_error,
@@ -319,7 +335,8 @@ def process(args):
     model = RgbLocator(args.model, device=args.device)
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
-    save(output / f'run_config_{args.category or "all"}.json', dict(version=VERSION, model=str(args.model), model_sha256=sha(Path(args.model) / 'model.pt'),
+    image_profile = getattr(args, 'image_profile', 'baseline')
+    save(output / f'run_config_{args.category or "all"}.json', dict(version=VERSION, image_profile=image_profile, model=str(args.model), model_sha256=sha(Path(args.model) / 'model.pt'),
                                          stride=args.stride, source=str(args.source), future_coordinate_use=True,
                                          raw_write_operations=0, subtask_labels_generated=False))
     finished = 0
@@ -351,7 +368,7 @@ def process(args):
             cache = output / 'detections' / row['category'] / row['group'] / row['dataset'] / f'episode_{row["episode"]:06d}.json'
             try:
                 detection = detect(row, Path(args.source), cache, model, args.stride)
-                pending[pool.submit(export, row, Path(args.source), output, detection)] = (row, start)
+                pending[pool.submit(export, row, Path(args.source), output, detection, image_profile)] = (row, start)
             except Exception as exc:
                 failure(row, exc)
             ready = {f for f in pending if f.done()}
@@ -490,6 +507,7 @@ def main():
     parser.add_argument('--model', type=Path, default=Path('/home/user/datasets/derived/tomato_roi_locator_hard_case_repair_r2'))
     parser.add_argument('--device', default='cuda')
     parser.add_argument('--stride', type=int, default=3)
+    parser.add_argument('--image-profile', choices=('baseline', CLARITY_PROFILE), default='baseline')
     parser.add_argument('--select')
     parser.add_argument('--category', choices=('normal', 'speedup'))
     parser.add_argument('--freeze', type=Path)
