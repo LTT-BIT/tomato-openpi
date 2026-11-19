@@ -13,6 +13,8 @@ from openpi import transforms
 from openpi.shared import delta_paper as paper
 from openpi.shared import normalize
 from openpi.training import config as cfg
+from openpi.training.sampling import PLAN_MODES
+from openpi.training.sampling import complete_window_count
 from openpi.training.visual_memory import LeRobotVisualMemoryDataConfig
 from openpi.training.visual_memory_options import LeRobotVisualMemoryOptionsDataConfig
 from openpi.training.visual_memory_options import VisualMemoryOptionsView
@@ -34,7 +36,7 @@ class CompleteWindows:
             positions = np.flatnonzero(episodes == episode)
             if not np.array_equal(frames[positions], np.arange(len(positions))):
                 raise ValueError("Paper training requires contiguous episode frames")
-            indices.extend(positions[: max(0, len(positions) - horizon + 1)])
+            indices.extend(positions[: complete_window_count(len(positions), horizon)])
         self.indices = np.sort(np.asarray(indices, np.int64))
         if not len(self.indices):
             raise ValueError("Dataset contains no complete action windows")
@@ -92,11 +94,10 @@ class PaperNormalizationConfig:
             or self.action_hz != 30
             or getattr(self.base_config, "task_view", None) is not None
         ):
-            raise ValueError(
-                "Paper experiment requires 30Hz Sharpa Delta datasets with uniform complete-window sampling"
-            )
+            raise ValueError("Paper statistics require one unweighted 30Hz Sharpa Delta source and complete windows")
 
     def paper_contract(self):
+        # The statistics and Gaussian prior use uniform windows, independent of the training sampler.
         return {
             "version": paper.VERSION,
             "mode": self.paper_mode,
@@ -116,8 +117,8 @@ class PaperNormalizationConfig:
         from openpi.training import norm_provenance
 
         directory = self.asset_directory(config.assets_dirs)
-        if not isinstance(config.model, PaperNoiseConfig) or config.sampling_mode != "epoch_shuffle":
-            raise ValueError("Paper data requires its matching model and epoch_shuffle")
+        if not isinstance(config.model, PaperNoiseConfig) or config.sampling_mode not in PLAN_MODES:
+            raise ValueError("Paper data requires its matching model and a deterministic sampling plan")
         if Path(config.model.paper_asset_dir).resolve() != directory.resolve():
             raise ValueError("Paper model/data asset paths differ; rebuild experiment after path changes")
         metadata, _ = paper.load_bundle(

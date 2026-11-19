@@ -21,6 +21,7 @@ from openpi.subtasks.tomato import GOAL
 from openpi.subtasks.tomato_in_hand import TASKS
 from openpi.training import config as cfg
 from openpi.training import data_loader
+from openpi.training import sampling
 from openpi.training import utils
 from openpi.training.delta_paper_stats import compute
 from scripts import run_training
@@ -74,12 +75,22 @@ def test_paper_ui_preserves_recipe_and_checks_independent_stats(recipe, tmp_path
     assert defaults["protocol"]["bundle_missing"]
     assert defaults["protocol"]["paper_available"]
     assert "rtc_max_delay" not in defaults["protocol"]["locked_fields"]
+    assert {"sampling_mode", "sampling_groups"}.isdisjoint(defaults["protocol"]["locked_fields"])
     for trial, parameters in {
         "t1": ("timestamp_zscore_arms", 0),
         "t2": ("global_quantile", 0.5),
         "t3": ("timestamp_zscore_arms", 0.5),
     }.items():
-        values = {**defaults["values"], "paper_trial": trial, "rtc_max_delay": 8}
+        values = {
+            **defaults["values"],
+            "paper_trial": trial,
+            "rtc_max_delay": 8,
+            "sampling_mode": "weighted_replacement",
+            "sampling_groups": [
+                {"name": "A", "episodes": [0], "weight": 7},
+                {"name": "B", "episodes": [1], "weight": 3},
+            ],
+        }
         with pytest.raises(ValueError, match="asset_id"):
             ui.apply_overrides(source, values)
         values["asset_id"] += "_" + trial
@@ -93,6 +104,7 @@ def test_paper_ui_preserves_recipe_and_checks_independent_stats(recipe, tmp_path
         restored = ui.config_from_source(text, PREFIX + recipe, "test.py")
         assert restored.model == config.model
         assert restored.data == config.data
+        assert restored.sampling_groups == config.sampling_groups
         with pytest.raises(FileNotFoundError, match="full119"):
             run_training.preflight(config, require_norm=False)
     with pytest.raises(ValueError, match="rtc_max_delay"):
@@ -110,6 +122,7 @@ def test_paper_ui_preserves_recipe_and_checks_independent_stats(recipe, tmp_path
     resolved = run_training.resolve_experiment(PREFIX + recipe, ["--ui-run", str(run_record)])
     assert resolved.model.rtc_max_delay == 8
     assert resolved.model.paper_beta == 0.5
+    assert resolved.sampling_mode == "weighted_replacement"
 
 
 def test_visual_memory_t3_statistics_loading_and_jitted_rtc_update(tmp_path, monkeypatch):
@@ -129,7 +142,7 @@ def test_visual_memory_t3_statistics_loading_and_jitted_rtc_update(tmp_path, mon
         "observation.state": {"shape": [116], "names": source.policy_metadata["source_state_joint_names"]},
         **{key: {"shape": [16, 16, 3]} for key in cameras},
     }
-    lengths = (5, 4)
+    lengths = (5, 4, 2)
     episodes = [{"episode_index": index, "length": length} for index, length in enumerate(lengths)]
     info = {
         "codebase_version": "v2.1",
@@ -215,12 +228,23 @@ def test_visual_memory_t3_statistics_loading_and_jitted_rtc_update(tmp_path, mon
         policy_metadata={**source.policy_metadata, "bundle_sha256": "synthetic"},
     )
     pending = replace(source, data=replace(source.data, assets=cfg.AssetsConfig(str(tmp_path / "assets"), "t3")))
-    config = ui.select_trial(source, pending, "t3")
+    groups = (sampling.SamplingGroup("A", (0,), 7), sampling.SamplingGroup("B", (1,), 3))
+    weighted = replace(pending, sampling_mode="weighted_replacement", sampling_groups=groups)
+    config = ui.select_trial(source, weighted, "t3")
     compute(config, batch_size=2)
-    config = ui.select_trial(source, pending, "t3")
+    config = ui.select_trial(source, weighted, "t3")
     report = run_training.preflight(config)
     assert report["training_windows"] == 5
     assert report["norm_provenance"] == "verified"
+    assert report["sampling"]["eligible_windows"] == 5
+    assert [row["eligible_windows"] for row in report["sampling"]["groups"]] == [3, 2]
+    np.testing.assert_allclose([row["probability"] for row in report["sampling"]["groups"]], [0.7, 0.3])
+    with pytest.raises(ValueError, match=r"absent from data=\[2\]"):
+        run_training.preflight(replace(config, sampling_groups=(groups[0], replace(groups[1], episodes=(1, 2)))))
+    assert (
+        run_training.preflight(ui.select_trial(source, pending, "t3"))["paper_bundle_sha256"]
+        == report["paper_bundle_sha256"]
+    )
     data = config.data.create(config.assets_dirs, config.model)
     assert data.visual_memory == source.model.memory
     assert data.norm_stats["actions"].mean.shape == (3, 58)

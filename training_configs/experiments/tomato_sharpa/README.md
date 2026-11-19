@@ -536,4 +536,6 @@ JAX_PLATFORMS=cpu CUDA_VISIBLE_DEVICES='' bash scripts/python.sh -m scripts.toma
 
 各组合使用冻结的全119条五阶段数据。启用任一论文选项后，采样与统计均使用 episode 内的完整动作窗口，排除需要末帧补齐的尾部起点，保留跨阶段的真实窗口。界面自动分配新资产 ID，并可在启动时计算 `norm_stats.json`、`norm_metadata.json`、`delta_paper.json` 和 `delta_paper.npz`。仅调整 Train RTC 时可沿用同一方案的统计，训练使用新的实验名。
 
+“采样策略”默认逐轮等权打乱。选择“按分组权重，有放回采样”后，可从冻结训练包的来源映射填入 A/B 组，也可手动输入训练包的 episode 编号。各组须互斥并覆盖所有有可用窗口的 episode。权重 7:3 表示长期目标抽样比例为 70% 和 30%，组内的合法起点等权。检查数据时会列出每组有效窗口数和目标比例，运行清单会记录采样配置、训练计划及各组实际计划抽样数。组权重只影响训练抽样，归一化以及相关高斯噪声的估计仍对完整窗口等权，单独改权重可复用已有统计并创建新实验。
+
 启动前设置 `PI05_IN_HAND119_BUNDLE` 指向已准备的正式数据。四路当前帧方案的 UI worker 继续核对精确缓存验收报告，报告包含代码指纹。更新代码后，用 `scripts.check_tomato_in_hand119 --out <新报告路径>` 生成新版回执，并在启动 UI 前通过 `PI05_IN_HAND119_ACCEPTANCE_REPORT` 指定该路径。新选项已做本地配置和 CPU 训练链路测试，正式 119 条统计计算、GPU 容量和完整训练需在训练环境验收。

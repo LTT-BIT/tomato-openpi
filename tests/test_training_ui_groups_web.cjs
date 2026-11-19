@@ -58,7 +58,7 @@ test('loading an existing group preserves its episode order',()=>{
   assert.equal(run('groupInputs()[0].episodes'),'5,0,2');
 });
 
-for(const mutation of ["fields.get('dataset_root').input.value='/new'",'loadingVersion++',"$('sampling-mode').value='epoch_shuffle'","addGroup({name:'manual',weight:2,episodes:[9]})"]){
+for(const mutation of ["fields.get('dataset_root').input.value='/new'",'loadingVersion++',"$('sampling-mode').value='epoch_shuffle'","paperTrial='t3'","addGroup({name:'manual',weight:2,episodes:[9]})"]){
   test('in-flight result cannot overwrite changed input: '+mutation,async()=>{
     const {context,run}=setup(); context.result=detected;
     run('let finish; api=()=>new Promise(resolve=>{finish=resolve})');
@@ -68,6 +68,12 @@ for(const mutation of ["fields.get('dataset_root').input.value='/new'",'loadingV
     assert.equal(run('JSON.stringify(groupInputs())'),changed);
   });
 }
+
+test('target percentages normalize relative weights and reject zero weights',()=>{
+  const {run}=setup();
+  assert.equal(run("JSON.stringify(groupShares([{weight:7},{weight:3}]))"),'[0.7,0.3]');
+  assert.equal(run("JSON.stringify(groupShares([{weight:7},{weight:0}]))"),'[]');
+});
 
 test('stop from a task row targets that job, including download/preparation stages',async()=>{
   const {context,run}=setup(); context.calls=[];context.confirm=()=>true;

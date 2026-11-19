@@ -249,7 +249,7 @@ def apply_training_inputs(config, before, after):
 def locked_fields(config, trial, *, inputs_changed=False):
     metadata = config.policy_metadata
     if metadata.get("subtask_variant") == "in_hand_b_coarse":
-        editable = {"rtc_max_delay"}
+        editable = {"rtc_max_delay", "sampling_mode", "sampling_groups"}
         if trial != "none" or selected_trial(config) != "none" or inputs_changed:
             editable.update(("assets_dir", "asset_id"))
         return [key for key in AB_LOCKED_FIELDS if key not in editable]
@@ -319,6 +319,7 @@ def defaults(module: str) -> dict:
             "visual_memory": config.policy_metadata.get("visual_memory"),
             "bundle_missing": config.policy_metadata.get("subtask_variant") == "in_hand_b_coarse"
             and not config.policy_metadata.get("bundle_sha256"),
+            "bundle_grouping": config.policy_metadata.get("subtask_variant") == "in_hand_b_coarse",
             "action_prompts": config.policy_metadata.get("action_prompts",
                 ACTION_PROMPTS if config.policy_metadata.get("subtask_variant") == "b_coarse" else {}),
             "training_episodes": config.policy_metadata.get("training_episodes"),

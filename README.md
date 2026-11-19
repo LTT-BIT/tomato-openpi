@@ -20,6 +20,8 @@ JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.check_visual_memory --worker
 
 运行 `bash scripts/python.sh -m scripts.training_ui` 打开整串番茄训练表单，默认使用已准备的 119 条五阶段数据、阶段指令和四路视频。可在“训练参数”中独立选择阶段指令或全局 Prompt、三路原始 RGB 或四路 RGB＋ROI，视觉历史跟随所选视频路数。两个选项都可与逐时间步归一化、相关高斯噪声及 Train RTC 组合。Train RTC 接受 `0 ≤ delay < action_horizon` 的整数动作步，0 为关闭。缺少正式训练包时，工作台可预览最终配置。训练数据、统计和启动条件见 [Sharpa 训练说明](training_configs/experiments/tomato_sharpa/README.md#可选逐时间步归一化相关噪声与-train-rtc)。
 
+“采样策略”可切换为按分组权重有放回抽样，支持与 T1/T2/T3 一起使用。训练工作台可从 119 条冻结训练包读取 A/B 分组，权重也支持按训练 episode 编号手动配置。
+
 `VisualHistory` 提供有界推理缓存，要求明确episode身份、单调的采集frame ID及timestamp，缺失的精确历史时刻保持mask，禁止把策略调用次数当30 Hz时间轴。`VisualMemoryPolicy` 是使用训练原始输入协议（116D原始state，经适配为58D）的离线策略包装器，要求匹配checkpoint内的 `assets/visual_memory_contract.json`；还没有接入机器人部署仓库的58D传输接口。按需在策略调用之间向历史缓存写入实际采集帧，新任务reset。
 
 2026-11-16：70项相关本地测试通过，包含小型CPU底座的真实训练更新、动作采样、参数兼容与单帧回归；服务器载入119条/357970帧索引，在6个位置验证历史像素/掩码与推理缓存一致，双worker组批通过。另对生产模型完成CPU抽象图检查：含文本前缀为 `[1,1472,2048]`，动作loss为 `[1,50]`，该检查不分配生产权重、不代表GPU容量验收。真实检查记录见 `training_configs/experiments/tomato_sharpa/subtasks/records/visual_memory_v1_h4_s15_g4_input_check_20261116.json`。配置继承batch256/FSDP8/30000步/每5000步保存，**本版GPU容量、完整训练、Memory收益及实机部署均未验证**；尚未启动正式训练。

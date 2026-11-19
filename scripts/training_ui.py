@@ -574,12 +574,24 @@ def browse(path):
 
 def detect_sampling_groups(request):
     from scripts import training_ui_config as config_ui
+    from scripts.training_ui_groups import detect_bundle_groups
     from scripts.training_ui_groups import detect_groups
 
     config = config_ui.source_config(request["baseline"])
     if getattr(config.data.base_config, "task_view", None) is not None:
         raise ValueError("当前配置有任务或阶段筛选，请按有效训练 episode 手动填写分组；自动读取目前用于全数据训练")
     roots = request.get("dataset_roots", [request["dataset_root"]])
+    if config.policy_metadata.get("subtask_variant") == "in_hand_b_coarse":
+        root = config.data.lerobot_datasets[0].root
+        if [Path(path).expanduser().resolve() for path in roots] != [Path(root).resolve()]:
+            raise ValueError("请使用已冻结的 119 条训练包读取 A/B 分组")
+        trial = request.get("paper_trial", config_ui.selected_trial(config))
+        if trial not in ("none", "t1", "t2", "t3"):
+            raise ValueError("未知的归一化与噪声组合")
+        return detect_bundle_groups(
+            root, config.policy_metadata["bundle_sha256"],
+            horizon=config.model.action_horizon if trial != "none" else 1,
+        )
     if len(roots) > 1:
         from scripts.training_ui_datasets import dataset_groups
 

@@ -15,13 +15,17 @@ from openpi.training import norm_provenance
 from openpi.training.dataset_collection import collection_layout
 from openpi.training.delta_paper import PaperDataView
 from openpi.training.delta_paper import PaperNormalizationConfig
+from openpi.training.sampling import PLAN_MODES
+from openpi.training.sampling import complete_window_count
 from openpi.training.visual_memory_options import current_frame_transforms
 
 
 def compute(config, *, batch_size=128):
     data = config.data
-    if not isinstance(data, PaperNormalizationConfig) or config.sampling_mode != "epoch_shuffle" or batch_size < 1:
-        raise ValueError("Paper statistics require its own data adapter, epoch_shuffle and positive batch size")
+    if not isinstance(data, PaperNormalizationConfig) or config.sampling_mode not in PLAN_MODES or batch_size < 1:
+        raise ValueError(
+            "Paper statistics require its own data adapter, deterministic sampling and positive batch size"
+        )
     with new_artifact_directory(data.asset_directory(config.assets_dirs)) as output:
         _compute(config, batch_size=batch_size, output=output)
 
@@ -31,14 +35,14 @@ def _compute(config, *, batch_size, output):
     layout = collection_layout([spec.root for spec in data.lerobot_datasets])
     if any(item["info"]["fps"] != 30 for item in layout):
         raise ValueError("Paper episode metadata/FPS mismatch")
-    total = sum(max(0, row["length"] - horizon + 1) for item in layout for row in item["episodes"])
+    total = sum(complete_window_count(row["length"], horizon) for item in layout for row in item["episodes"])
     source_reports = [
         {
             "repo_id": spec.repo_id,
             "root": item["root"],
             "frames": item["info"]["total_frames"],
             "episodes": item["info"]["total_episodes"],
-            "training_windows": sum(max(0, row["length"] - horizon + 1) for row in item["episodes"]),
+            "training_windows": sum(complete_window_count(row["length"], horizon) for row in item["episodes"]),
         }
         for spec, item in zip(data.lerobot_datasets, layout, strict=True)
     ]
@@ -82,7 +86,7 @@ def _compute(config, *, batch_size, output):
         root, info = Path(item["root"]), item["info"]
         for episode in sorted(item["episodes"], key=lambda row: row["episode_index"]):
             index, length = episode["episode_index"], episode["length"]
-            count = max(0, length - horizon + 1)
+            count = complete_window_count(length, horizon)
             if not count:
                 continue
             path = root / info["data_path"].format(episode_chunk=index // info["chunks_size"], episode_index=index)

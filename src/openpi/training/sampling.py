@@ -19,6 +19,10 @@ WEIGHTED_SAMPLER_VERSION = "weighted_replacement_pcg64_v1"
 PLAN_MODES = ("epoch_shuffle", "weighted_replacement")
 
 
+def complete_window_count(length: int, horizon: int) -> int:
+    return max(0, length - horizon + 1)
+
+
 @dataclass(frozen=True)
 class SamplingGroup:
     """One disjoint episode group; weight controls its total sampling probability."""
@@ -53,13 +57,23 @@ def validate_groups(groups: tuple[SamplingGroup, ...]) -> None:
         episodes.update(group.episodes)
 
 
+def group_probabilities(groups: tuple[SamplingGroup, ...]) -> np.ndarray:
+    validate_groups(groups)
+    probabilities = np.asarray([group.weight for group in groups], dtype=np.float64)
+    probabilities /= probabilities.max()
+    probabilities /= probabilities.sum()
+    if np.any(probabilities <= 0):
+        raise ValueError("Sampling group weights have an unsupported dynamic range")
+    return probabilities
+
+
 def group_frame_weights(episode_ids, groups: tuple[SamplingGroup, ...]) -> np.ndarray:
     """Divide each group probability uniformly across its loaded start frames.
 
     All loaded episodes must belong to exactly one group. This keeps sampling
     separate from data selection and lets normalization cover the same dataset.
     """
-    validate_groups(groups)
+    probabilities = group_probabilities(groups)
     episode_ids = np.asarray(episode_ids)
     if episode_ids.ndim != 1 or episode_ids.dtype.kind not in "iu" or not len(episode_ids):
         raise ValueError("Sampling requires a nonempty integer episode ID vector")
@@ -70,11 +84,6 @@ def group_frame_weights(episode_ids, groups: tuple[SamplingGroup, ...]) -> np.nd
             f"Sampling groups must cover exactly the loaded episodes; "
             f"missing from groups={sorted(actual - expected)}, absent from data={sorted(expected - actual)}"
         )
-    probabilities = np.asarray([group.weight for group in groups], dtype=np.float64)
-    probabilities /= probabilities.max()
-    probabilities /= probabilities.sum()
-    if np.any(probabilities <= 0):
-        raise ValueError("Sampling group weights have an unsupported dynamic range")
     weights = np.zeros(len(episode_ids), dtype=np.float64)
     for group, probability in zip(groups, probabilities, strict=True):
         mask = np.isin(episode_ids, group.episodes)

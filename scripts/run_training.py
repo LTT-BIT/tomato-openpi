@@ -128,7 +128,10 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     if features["observation.state"]["shape"] not in [[dim] for dim in metadata["raw_state_dims"]]:
         raise ValueError("Dataset raw state shape is not supported by the embodiment")
     joint_names = metadata.get("joint_names")
-    for key, source_names in (("observation.state", "source_state_joint_names"), ("action", "source_action_joint_names")):
+    for key, source_names in (
+        ("observation.state", "source_state_joint_names"),
+        ("action", "source_action_joint_names"),
+    ):
         expected_names = metadata.get(source_names, joint_names)
         if expected_names is not None and features[key].get("names") != expected_names:
             raise ValueError(f"Dataset {key} joint names/order differ from the embodiment protocol")
@@ -167,24 +170,17 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
         result["effective_prompt_examples"] = [selected.vectors(i)["prompt"] for i in (0, len(selected) - 1)]
     if config.sampling_mode == "weighted_replacement":
         if view is not None:
-            episode_ids = selected.ids[:, 0]
+            ids, counts = np.unique(selected.ids[:, 0], return_counts=True)
+            windows = dict(zip(ids.tolist(), counts.tolist(), strict=True))
         else:
-            episodes = [json.loads(line) for line in required[1].read_text().splitlines() if line.strip()]
-            episode_ids = np.array([row["episode_index"] for row in episodes], dtype=np.int64)
-        sampling.group_frame_weights(episode_ids, config.sampling_groups)
-        max_weight = max(group.weight for group in config.sampling_groups)
-        total_weight = sum(group.weight / max_weight for group in config.sampling_groups)
-        result["sampling"] = {
-            "mode": config.sampling_mode,
-            "groups": [
-                {
-                    "name": group.name,
-                    "episodes": list(group.episodes),
-                    "probability": (group.weight / max_weight) / total_weight,
-                }
-                for group in config.sampling_groups
-            ],
-        }
+            episodes = collection_layout([root])[0]["episodes"]
+            horizon = config.model.action_horizon if hasattr(config.data, "paper_contract") else 1
+            windows = {
+                row["episode_index"]: count
+                for row in episodes
+                if (count := sampling.complete_window_count(row["length"], horizon))
+            }
+        result["sampling"] = weighted_sampling_report(config.sampling_groups, windows)
     if require_norm:
         check_norm(config, result)
     return result
@@ -213,20 +209,30 @@ def preflight_collection(config, *, require_norm=True):
         "episode_mappings": [{"root": item["root"], "local_to_global": item["mapping"]} for item in layout],
     }
     if config.sampling_mode == "weighted_replacement":
-        ids = np.array([i for item in layout for i in item["mapping"].values()], dtype=np.int64)
-        sampling.group_frame_weights(ids, config.sampling_groups)
-        max_weight = max(g.weight for g in config.sampling_groups)
-        total_weight = sum(g.weight / max_weight for g in config.sampling_groups)
-        result["sampling"] = {
-            "mode": config.sampling_mode,
-            "groups": [
-                {"name": g.name, "episodes": list(g.episodes), "probability": (g.weight / max_weight) / total_weight}
-                for g in config.sampling_groups
-            ],
-        }
+        windows = {item["mapping"][row["episode_index"]]: row["length"] for item in layout for row in item["episodes"]}
+        result["sampling"] = weighted_sampling_report(config.sampling_groups, windows)
     if require_norm:
         check_norm(config, result)
     return result
+
+
+def weighted_sampling_report(groups, windows):
+    # One entry per episode suffices to check exact episode membership and valid probabilities.
+    sampling.group_frame_weights(np.asarray(list(windows), dtype=np.int64), groups)
+    return {
+        "mode": "weighted_replacement",
+        "eligible_windows": sum(windows.values()),
+        "groups": [
+            {
+                "name": group.name,
+                "episodes": list(group.episodes),
+                "weight": group.weight,
+                "probability": probability,
+                "eligible_windows": sum(windows[episode] for episode in group.episodes),
+            }
+            for group, probability in zip(groups, sampling.group_probabilities(groups).tolist(), strict=True)
+        ],
+    }
 
 
 def check_norm(config, result):

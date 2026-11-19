@@ -27,6 +27,7 @@ async function perform(callback, button) { if(button)button.disabled=true; try{a
 function selectedGPUs(){return [...document.querySelectorAll('#gpus input:checked')].map(input=>input.value);}
 function updatePath(){
   if(!baseline||!fields.has('owner')||!initial)return;
+  renderGroupProbabilities();
   try{
     const values=request().values, runFields=new Set(['exp_name','dataset_root','assets_dir','asset_id','project_name','dataset_roots']);
     const changed=Object.keys(initial).filter(k=>!runFields.has(k)&&JSON.stringify(values[k])!==JSON.stringify(initial[k]));
@@ -133,10 +134,18 @@ function syncPaperControls(){
   for(const id of ['discover-datasets','apply-datasets'])$(id).disabled=locked.has('dataset_root');
   $('new-stats').disabled=locked.has('asset_id');
   $('sampling-mode').disabled=locked.has('sampling_mode');
+  $('detect-groups').textContent=protocol.bundle_grouping?'按来源读取 A/B 分组':'从数据读取分组';
+  $('group-source-help').textContent=protocol.bundle_grouping
+    ?'按冻结训练包中的 A/B 来源填入训练 episode 编号，也可以手动划分。启用 T1/T2/T3 时，各组只从完整动作窗口抽样。权重只改变训练抽样比例，归一化统计和噪声估计仍等权。'
+    :'单数据集按转换来源识别，多数据集按每个目录分组。读取后保留同名组的权重，新组权重为 1。';
 }
 function changePaperFeatures(){
   const timestamp=$('paper-timestamp').checked, correlated=$('paper-correlated').checked;
+  const wasPaper=paperTrial!=='none';
   paperTrial=timestamp?(correlated?'t3':'t1'):(correlated?'t2':'none');
+  if(wasPaper!==(paperTrial!=='none')&&protocol.bundle_grouping&&$('sampling-mode').value==='weighted_replacement'){
+    $('groups-result').textContent='可用动作窗口规则已变更，可重新读取 A/B 或检查数据与统计。';
+  }
   updateFeatureSelection();
 }
 function updateFeatureSelection(){
@@ -198,19 +207,32 @@ function formatIds(ids){
   return ranges.join(',');
 }
 function groupInputs(){return [...$('groups').children].map(row=>Object.fromEntries([...row.querySelectorAll('input')].map(input=>[input.dataset.key,input.value])));}
+function groupShares(groups){
+  const weights=groups.map(group=>Number(group.weight));
+  if(!weights.length||weights.some(weight=>!Number.isFinite(weight)||weight<=0))return [];
+  const max=Math.max(...weights), scaled=weights.map(weight=>weight/max);
+  const total=scaled.reduce((sum,weight)=>sum+weight,0);
+  return scaled.map(weight=>weight/total);
+}
+function renderGroupProbabilities(){
+  const groups=groupInputs(), shares=groupShares(groups);
+  $('group-probabilities').textContent=$('sampling-mode').value==='weighted_replacement'&&shares.length
+    ?'目标抽样比例 '+groups.map((group,i)=>`${group.name||'组 '+(i+1)} ${(shares[i]*100).toFixed(2)}%`).join(' · '):'';
+}
 async function detectGroups(){
   if(!baseline)throw Error('请先选择配置');
   const module=baseline, version=loadingVersion, root=fields.get('dataset_root').input.value.trim(), previous=groupInputs();
-  const mode=$('sampling-mode').value;
-  $('groups-result').textContent='正在读取并核对转换来源记录…';
+  const mode=$('sampling-mode').value, trial=paperTrial;
+  $('groups-result').textContent='正在读取并核对来源记录…';
   try{
-    const roots=datasetPaths(root);const result=await api('/api/sampling-groups',{baseline:module,dataset_root:roots[0],dataset_roots:roots});
-    if(version!==loadingVersion||baseline!==module||fields.get('dataset_root').input.value.trim()!==root||$('sampling-mode').value!==mode||JSON.stringify(groupInputs())!==JSON.stringify(previous))throw Error('读取期间配置、目录或分组已修改，请重新读取。');
+    const roots=datasetPaths(root);const result=await api('/api/sampling-groups',{baseline:module,dataset_root:roots[0],dataset_roots:roots,paper_trial:trial});
+    if(version!==loadingVersion||baseline!==module||fields.get('dataset_root').input.value.trim()!==root||$('sampling-mode').value!==mode||paperTrial!==trial||JSON.stringify(groupInputs())!==JSON.stringify(previous))throw Error('读取期间配置、目录或分组已修改，请重新读取。');
     const weights=new Map(previous.map(g=>[g.name.trim(),Number(g.weight)]));
     $('groups').replaceChildren();
     for(const group of result.groups){const weight=weights.get(group.name);addGroup({...group,episode_text:formatIds(group.episodes),weight:Number.isFinite(weight)&&weight>0?weight:1});}
-    $('groups-result').textContent=`已核对 ${result.episodes} 条 episode / ${result.frames} 帧。`+result.groups.map(g=>`${g.name}：${g.episodes.length} 条 / ${g.frames} 帧（来源 ${g.source_root}）`).join('；')+'。请确认各组采样权重。';
-    updatePath();notice('已从转换来源填入分组；同名组保留原权重，新组权重为 1。');
+    const count=row=>row.eligible_windows===undefined?`${row.frames} 帧`:`${row.eligible_windows} 个可采样窗口`;
+    $('groups-result').textContent=`已核对 ${result.episodes} 条 episode / ${count(result)}。`+result.groups.map(g=>`${g.name}：${g.episodes.length} 条 / ${count(g)}（来源 ${g.source_root}）`).join('；')+'。请确认各组采样权重。';
+    updatePath();notice('已按来源填入分组。同名组保留原权重，新组权重为 1。');
   }catch(error){if(version===loadingVersion)$('groups-result').textContent='未应用识别结果，现有分组保留。';throw error;}
 }
 function addGroup(group={name:'',weight:1,episodes:[]}){
@@ -282,7 +304,7 @@ $('check').addEventListener('click',()=>perform(()=>showPreview(true),$('check')
 $('start').addEventListener('click',()=>perform(async()=>{const job=await api('/api/start',request());notice((job.creates_config?'已保存新配置':'已复用原配置')+'，本次实验已记录；数据检查通过后进入训练。');await refreshCatalog();await refreshJobs();await showJob(job.id);$('output-section').scrollIntoView({behavior:'smooth'});},$('start')));
 $('reset').addEventListener('click',()=>perform(()=>chooseBaseline(baseline),$('reset')));
 $('new-stats').addEventListener('click',independentStats);
-$('sampling-mode').addEventListener('change',()=>{const enabled=$('sampling-mode').value==='weighted_replacement';$('groups-panel').classList.toggle('hidden',!enabled);if(enabled&&!$('groups').children.length){addGroup({name:'A',weight:7,episodes:[]});addGroup({name:'B',weight:3,episodes:[]});}updatePath();});
+$('sampling-mode').addEventListener('change',()=>{const enabled=$('sampling-mode').value==='weighted_replacement';$('groups-panel').classList.toggle('hidden',!enabled);if(enabled&&!$('groups').children.length&&!protocol?.bundle_grouping){addGroup({name:'A',weight:7,episodes:[]});addGroup({name:'B',weight:3,episodes:[]});}updatePath();});
 $('discover-datasets').addEventListener('click',()=>perform(discoverDatasets,$('discover-datasets')));
 $('apply-datasets').addEventListener('click',()=>perform(async()=>applyDatasets(),$('apply-datasets')));
 $('detect-groups').addEventListener('click',()=>perform(detectGroups,$('detect-groups')));

@@ -13,6 +13,7 @@ from openpi.training.config import LeRobotFr3SharpaCropDataConfig
 from openpi.training.delta_paper import PaperSharpaData
 from openpi.training.delta_paper import PaperVisualMemoryData
 from openpi.training.delta_paper import PaperVisualMemoryOptionsData
+from openpi.training.sampling import PLAN_MODES
 from openpi.training.visual_memory import LeRobotVisualMemoryDataConfig
 from openpi.training.visual_memory_options import LeRobotVisualMemoryOptionsDataConfig
 from openpi.training.weight_loaders import PartialCheckpointWeightLoader
@@ -63,8 +64,8 @@ def select_trial(source, config, trial):
         raise ValueError("逐时间步归一化和相关高斯噪声仅支持兼容的 30 Hz Sharpa π0.5 全参配置")
     if trial != previous and config.data.assets.asset_id == source.data.assets.asset_id:
         raise ValueError("切换论文功能需要独立的统计 asset_id")
-    if not config.data.extra_delta_transform or config.sampling_mode != "epoch_shuffle" or config.sampling_groups:
-        raise ValueError("论文功能要求双臂 delta、双手 absolute、逐轮无放回采样")
+    if not config.data.extra_delta_transform or config.sampling_mode not in PLAN_MODES:
+        raise ValueError("论文功能要求双臂 delta、双手 absolute 和可复现采样")
 
     def inherited(cls, obj):
         return {field.name: getattr(obj, field.name) for field in fields(cls)}
