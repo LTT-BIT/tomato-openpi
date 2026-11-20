@@ -4,7 +4,7 @@
 
 入口 `training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_crop`，27服务器，batch256/FSDP8，20000步，每5000完成步保存并保留5000/10000/15000/20000。学习率仍warmup1000、peak2.5e-5、decay_steps30000、end2.5e-6；只调整总步数，未改学习率曲线。默认W&B offline，由用户通过UI手动启动。从pi05_base全参微调，不能隐式接续旧119 checkpoint。
 
-源发布目录只读；训练副本 `in_hand204_four_view_v3_r1`、归一化 `tomato_in_hand204_rgb_crop_v3_r1_delta_30hz`、缓存 `in_hand204_rgb224_cache_v3_r1`。旧缓存仅在像素流水线、源视频SHA、数组SHA/形状/类型匹配时只读复用；新视频完整解码并检查时间戳。准备后验证全204条阶段边界、输入等价和全帧黑图。`bash scripts/python.sh -m scripts.tomato_in_hand204_run check`默认只检查。验收报告绑定代码、数据、缓存和统计，未通过不能启动。全部204条训练，无独立验证集，训练loss不能代表泛化或实机成功率。
+源发布目录只读；本次工作数据位于训练NAS `/mnt/data/users/mengxiang/workspace/training_data/sharpa/full-block-more`，避免旧data软链接指向对象存储。训练副本 `in_hand204_four_view_v3_r1`、归一化 `tomato_in_hand204_rgb_crop_v3_r1_delta_30hz`、缓存 `in_hand204_rgb224_cache_v3_r1`。旧缓存仅在像素流水线、源视频SHA、数组SHA/形状/类型匹配时只读复用；新视频完整解码并检查时间戳。准备后验证全204条阶段边界、输入等价和全帧黑图。`bash scripts/python.sh -m scripts.tomato_in_hand204_run check`默认只检查。验收报告绑定代码、数据、缓存和统计，未通过不能启动。全部204条训练，无独立验证集，训练loss不能代表泛化或实机成功率。
 
 旧119源码配置可从Git历史恢复；已归档权重不改。下文旧批次说明保留历史背景，不能用作当前204条验收结论。
 
