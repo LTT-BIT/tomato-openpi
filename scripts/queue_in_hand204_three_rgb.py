@@ -66,6 +66,22 @@ def predecessor_ready(state,binding,identity):
     return all((root/name/'_METADATA').is_file() for name in ['params','train_state']) and (root/'assets').is_dir()
 
 
+def predecessor_command_matches(command,state,directory):
+    if b'scripts.run_training' not in command or state['module'].encode() not in command:return False
+    if b'--ui-run' in command:
+        index=command.index(b'--ui-run')+1
+        if index>=len(command):return False
+        path=Path(os.fsdecode(command[index])).resolve()
+        if path!=(Path(directory)/'run.json').resolve():return False
+        run=json.loads(path.read_text())
+        return (run.get('module')==state['module'] and run.get('config_sha256')==state['config_sha256']
+            and run.get('values',{}).get('exp_name')==state['exp_name'])
+    if b'--exp-name' in command:
+        index=command.index(b'--exp-name')+1
+        return index<len(command) and command[index]==state['exp_name'].encode()
+    return False
+
+
 def enqueue(predecessor):
     from openpi.training.reproducibility import serialize_config
     from openpi.subtasks.prepare import digest
@@ -73,8 +89,9 @@ def enqueue(predecessor):
     old=json.loads((job_directory(predecessor)/'state.json').read_text())
     if old.get('host')!=socket.gethostname() or old.get('status')!='running':raise ValueError('Expected our running local crop UI job')
     command=Path(f"/proc/{old['child_pid']}/cmdline").read_bytes().split(b'\0')
-    if (process_identity(old['child_pid'])!=old['child_start'] or b'scripts.run_training' not in command
-            or old['exp_name'].encode() not in command or old['values']['num_train_steps']!=20000):
+    if (process_identity(old['child_pid'])!=old['child_start']
+            or not predecessor_command_matches(command,old,job_directory(predecessor))
+            or old['values']['num_train_steps']!=20000):
         raise ValueError('Predecessor PID/start/command/steps differs')
     root=common.repository_root();shared_root=(root/'logs').resolve().parent
     code_report=shared_root/'logs/in_hand204_preflight/accepted_20261120_s20000_c5000.json'

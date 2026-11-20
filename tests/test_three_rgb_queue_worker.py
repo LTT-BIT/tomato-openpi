@@ -75,3 +75,23 @@ def test_audit_releases_episode_maps_and_file_descriptors(tmp_path):
     before=count();release_frame_maps(TransformedDataset(TransformedDataset(a,[]),[]),TransformedDataset(b,[]))
     assert not a._cache_maps and not b._cache_maps
     assert count()<=before-12
+
+
+def test_predecessor_ui_run_is_bound_to_job_experiment_and_config(tmp_path):
+    state=dict(module='training_configs.experiments.crop',exp_name='my-crop',config_sha256='source-sha')
+    run=tmp_path/'run.json';write_json(run,dict(module=state['module'],config_sha256='source-sha',values={'exp_name':'my-crop'}))
+    command=[b'python',b'-m',b'scripts.run_training',state['module'].encode(),b'--ui-run',str(run).encode()]
+    assert q.predecessor_command_matches(command,state,tmp_path)
+    assert not q.predecessor_command_matches(command,{**state,'exp_name':'other'},tmp_path)
+    assert not q.predecessor_command_matches(command,{**state,'config_sha256':'other'},tmp_path)
+    assert not q.predecessor_command_matches(command,state,tmp_path/'other-job')
+    assert q.predecessor_command_matches(command[:4]+[b'--exp-name',b'my-crop'],state,tmp_path)
+
+
+def test_rebinding_refuses_any_trainer_or_data_code_change():
+    from tools.revalidate_three_rgb_queue_code import changed_queue_only
+    old={'scripts/queue_in_hand204_three_rgb.py':'old','src/openpi/training/data_loader.py':'same'}
+    new={**old,'scripts/queue_in_hand204_three_rgb.py':'new'}
+    assert changed_queue_only(old,new)==['scripts/queue_in_hand204_three_rgb.py']
+    with pytest.raises(ValueError,match='Only queue'):changed_queue_only(old,{**new,'src/openpi/training/data_loader.py':'changed'})
+    with pytest.raises(ValueError,match='Only queue'):changed_queue_only(old,{**new,'scripts/extra.py':'new'})
