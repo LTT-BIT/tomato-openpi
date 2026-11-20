@@ -4,6 +4,8 @@ const fragment = new URLSearchParams(location.hash.slice(1));
 if (fragment.get('token')) { sessionStorage.setItem('training-token', fragment.get('token')); history.replaceState(null, '', location.pathname); }
 let sourceHash = null;
 let baseline = null, initial = null, protocol = null, currentJob = null, gpuData = [], browseTarget = null, browseState = null, loadingVersion = 0;
+let paperTrial = 'none', paperAutoDelta = false;
+let tomatoBaseline = null, featureSuffix = '';
 const fields = new Map();
 const terminal = new Set(['completed', 'failed', 'stopped', 'interrupted']);
 const statusNames = {queued:'等待中', running:'运行中', completed:'训练完成', failed:'失败', stopped:'已停止', interrupted:'已中断', orphaned:'管理进程中断，子进程仍运行'};
@@ -25,6 +27,7 @@ async function perform(callback, button) { if(button)button.disabled=true; try{a
 function selectedGPUs(){return [...document.querySelectorAll('#gpus input:checked')].map(input=>input.value);}
 function updatePath(){
   if(!baseline||!fields.has('owner')||!initial)return;
+  renderGroupProbabilities();
   try{
     const values=request().values, runFields=new Set(['exp_name','dataset_root','assets_dir','asset_id','project_name','dataset_roots']);
     const changed=Object.keys(initial).filter(k=>!runFields.has(k)&&JSON.stringify(values[k])!==JSON.stringify(initial[k]));
@@ -41,6 +44,7 @@ function addField(container, definition, value, original) {
   if(type==='action-semantics'){
     for(const [mode,text] of [['absolute','absolute · 原始绝对目标'],['delta','delta · 手臂目标减当前状态，手部保持绝对目标']]){const option=node('option',text);option.value=mode;input.append(option);}
     if(!protocol.delta_available){input.querySelector('[value=delta]').disabled=true;wrapper.append(node('small','当前仅番茄 Wuji / Sharpa 支持 delta。','default'));}
+    input.querySelector('[value=absolute]').disabled=paperTrial!=='none';
   }
   if(['int','float','optional-int'].includes(type)){input.type='number';input.step=type==='float'?'any':'1';}
   if(key==='rtc_max_delay'){
@@ -49,9 +53,11 @@ function addField(container, definition, value, original) {
   }
   input.value=Array.isArray(value)?value.join(type==='lines'?'\n':', '):(value??'');
   const wrap=['path','paths'].includes(type)?node('div',undefined,'path-input'):wrapper;wrap.append(input);
-  if(['path','paths'].includes(type)){const browse=node('button','浏览');browse.type='button';browse.addEventListener('click',()=>perform(()=>openBrowser(input)));wrap.append(browse);wrapper.append(wrap);}
+  let browseButton;
+  if(['path','paths'].includes(type)){browseButton=node('button','浏览');browseButton.type='button';browseButton.addEventListener('click',()=>perform(()=>openBrowser(input)));wrap.append(browseButton);wrapper.append(wrap);}
   if(original!==undefined){wrapper.append(node('small','来源值：'+(Array.isArray(original)?original.join(', '):(original??'关闭')),'default'));}
   input.addEventListener('input',()=>{input.classList.toggle('changed',original!==undefined&&input.value!==(Array.isArray(original)?original.join(type==='lines'?'\n':', '):String(original??'')));updatePath();});
+  if(['rtc_max_delay','action_semantics','assets_dir','asset_id'].includes(key))input.addEventListener('input',renderProtocol);
   if(key==='dataset_root')input.addEventListener('input',()=>{$('groups-result').textContent='数据目录已变更，请重新读取或核对分组编号。';});
   if(key==='action_horizon'){input.addEventListener('change',()=>{if(Number(input.value)!==initial.action_horizon)independentStats();});}
   if(key==='action_semantics')input.addEventListener('change',()=>{
@@ -60,39 +66,148 @@ function addField(container, definition, value, original) {
     else if(name.value.endsWith('_'+old))name.value=name.value.slice(0,-old.length)+input.value;
     name.dispatchEvent(new Event('input'));input.dataset.previous=input.value;input.dispatchEvent(new Event('input'));independentStats();
   });
-  fields.set(key,{input,type});container.append(wrapper);
+  fields.set(key,{input,type,browseButton});container.append(wrapper);
 }
 function fillForm(result) {
   $('wandb-mode').value='offline';
   $('dataset-candidates').replaceChildren();$('apply-datasets').classList.add('hidden');
   $('groups-result').textContent='';
   initial=result.values;sourceHash=result.source_sha256;protocol=result.protocol;fields.clear();
+  paperTrial=initial.paper_trial||'none';
+  paperAutoDelta=false;
+  featureSuffix='';
+  $('training-input-options').classList.toggle('hidden',!('prompt_mode' in initial));
+  $('prompt-mode').value=initial.prompt_mode??'stage';
+  $('video-views').value=String(initial.video_views??4);
   for(const [section,defs] of Object.entries(definitions)){
     const container=$(section+'-fields');container.replaceChildren();
     for(const definition of defs){const key=definition[0];if(section==='advanced'&&!(key in initial))continue;let value=initial[key];if(key==='dataset_root')value=(initial.dataset_roots||[initial.dataset_root]).join('\n');if(key==='owner')value=result.owner;if(key==='exp_name')value=result.suggested_exp_name;if(key==='stats_batch_size')value=512;addField(container,definition,value,initial[key]);}
   }
-  $('protocol').replaceChildren(node('div',`${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · 来源监督 ${protocol.actions}`),node('div','英文 prompt 示例：'+protocol.prompt));
+  renderProtocol();
+  if(result.shared_weights){const button=node('button','使用服务器公共权重','text-button');button.addEventListener('click',()=>{fields.get('weight_path').input.value=result.shared_weights;fields.get('weight_path').input.dispatchEvent(new Event('input'));});$('runtime-fields').append(button);}
+  $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);
+  $('groups-panel').classList.toggle('hidden',initial.sampling_mode!=='weighted_replacement');
+  syncPaperControls();
+  $('tomato-training').classList.toggle('hidden',!tomatoBaseline||baseline===tomatoBaseline);
+  fields.get('exp_name').input.dispatchEvent(new Event('input'));updatePath();
+}
+function paperAlgorithm(){
+  if(paperTrial==='none')return null;
+  const modes={t0:['global_quantile',0],t1:['timestamp_zscore_arms',0],t2:['global_quantile',.5],t3:['timestamp_zscore_arms',.5],tg:['global_zscore_arms',0]};
+  const pair=modes[paperTrial];if(!pair)return protocol.paper_algorithm;
+  const same=paperTrial===initial.paper_trial&&fields.get('asset_id')?.input.value===initial.asset_id&&fields.get('assets_dir')?.input.value===initial.assets_dir;
+  return {mode:pair[0],beta:pair[1],asset_sha256:same?protocol.paper_algorithm?.asset_sha256:null};
+}
+function renderProtocol(){
+  const selectable='prompt_mode' in initial;
+  const global=selectable&&$('prompt-mode').value==='global';
+  const cameraCount=selectable?Number($('video-views').value):protocol.cameras.length;
+  const prompt=selectable?(global?protocol.global_prompt:protocol.stage_prompt):protocol.prompt;
+  $('protocol').replaceChildren(node('div',`${cameraCount} 路 RGB · ${protocol.action_dim} 维动作 · 模型 ${protocol.model_action_dim} 维 · ${protocol.action_hz} Hz · 来源监督 ${protocol.actions}`),node('div',(global?'全局 Prompt：':'英文 prompt 示例：')+prompt));
+  const current=key=>fields.get(key)?.input.value??initial[key], paper=paperAlgorithm();
+  $('protocol').append(node('div',`${paper?'Paper 专用配置':'普通 π0.5'} · RTC 最大延迟 ${current('rtc_max_delay')} 步 · 动作监督 ${current('action_semantics')}`),node('div','统计资产：'+current('assets_dir')+'/'+current('asset_id')));
+  if(paper)$('protocol').append(node('div',`Paper mode=${paper.mode} · beta=${paper.beta} · bundle SHA256=${paper.asset_sha256||'待计算'}`));
   if(protocol.subtask_variant){
     const episodeCount=protocol.training_episodes||93, frameCount=protocol.training_frames||410456;
     $('protocol').append(node('div',`${protocol.prompt_profile||'revision2'} · 全部${episodeCount}条 / ${frameCount}帧训练 · 无验证测试留出 · 无Agent · ${initial.action_horizon}步动作窗口`));
     $('protocol').append(node('div','训练环境：JAX=cuda · PREALLOCATE=false · MEM_FRACTION=0.90 · 公共NCCL 2.31.2'));
-    const texts=Object.values(protocol.action_prompts||{});
+    if(protocol.bundle_missing)$('protocol').append(node('div','当前机器缺少已准备的 204 条训练包。可预览配置，训练需设置 PI05_IN_HAND204_BUNDLE。'));
+    const texts=global?[]:Object.values(protocol.action_prompts||{});
     if(texts.length)for(const [i,text] of texts.entries())$('protocol').append(node('div',`${i+1}. ${text}`));
-    $('wandb-mode').value='offline';
   }else if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。'));
-  for(const key of protocol.locked_fields||[]){if(fields.has(key))fields.get(key).input.disabled=true;}
-  for(const id of ['discover-datasets','apply-datasets','new-stats'])$(id).disabled=Boolean(protocol.subtask_variant);
-  $('sampling-mode').disabled=Boolean(protocol.subtask_variant);
-
-  if(result.shared_weights){const button=node('button','使用服务器公共权重','text-button');button.addEventListener('click',()=>{fields.get('weight_path').input.value=result.shared_weights;fields.get('weight_path').input.dispatchEvent(new Event('input'));});$('runtime-fields').append(button);}
-  $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);
-  $('groups-panel').classList.toggle('hidden',initial.sampling_mode!=='weighted_replacement');
-  fields.get('exp_name').input.dispatchEvent(new Event('input'));updatePath();
+}
+function inputChanges(){
+  if(!('prompt_mode' in initial))return [];
+  const changes=[];
+  if($('prompt-mode').value!==initial.prompt_mode)changes.push($('prompt-mode').value);
+  if(Number($('video-views').value)!==initial.video_views)changes.push('rgb'+$('video-views').value);
+  return changes;
+}
+function syncPaperControls(){
+  const active=paperTrial!=='none';
+  const lockSampling=active&&!protocol.paper_weighted_sampling;
+  $('paper-fields').classList.toggle('hidden',!protocol.paper_available);
+  $('paper-timestamp').checked=['t1','t3'].includes(paperTrial);
+  $('paper-correlated').checked=['t2','t3'].includes(paperTrial);
+  for(const id of ['paper-timestamp','paper-correlated'])$(id).disabled=paperTrial==='custom';
+  $('paper-summary').textContent={
+    none:'来源归一化 · 独立高斯噪声',
+    t0:'T0 · 全局分位数归一化 · 独立高斯噪声',
+    t1:'T1 · 双臂逐时间步 Z-score · 独立高斯噪声',
+    t2:'T2 · 全局分位数归一化 · 相关高斯噪声 β=0.5',
+    t3:'T3 · 双臂逐时间步 Z-score · 相关高斯噪声 β=0.5',
+    tg:'TG · 双臂全局 Z-score · 独立高斯噪声',
+    custom:'保留来源配置的归一化与相关噪声',
+  }[paperTrial];
+  const locked=new Set(protocol.locked_fields||[]);
+  if((active&&protocol.paper_available)||inputChanges().length){locked.delete('assets_dir');locked.delete('asset_id');}
+  for(const [key,{input,browseButton}] of fields){
+    input.disabled=locked.has(key);
+    if(browseButton)browseButton.disabled=input.disabled;
+  }
+  for(const id of ['discover-datasets','apply-datasets'])$(id).disabled=locked.has('dataset_root');
+  $('new-stats').disabled=locked.has('asset_id');
+  $('sampling-mode').disabled=locked.has('sampling_mode');
+  const action=fields.get('action_semantics').input;
+  action.querySelector('[value=absolute]').disabled=active;
+  if(active)action.value='delta';
+  $('sampling-mode').querySelector('[value=weighted_replacement]').disabled=lockSampling;
+  if(lockSampling){
+    $('sampling-mode').value='epoch_shuffle';
+    $('groups').replaceChildren();
+    $('groups-panel').classList.add('hidden');
+  }
+  $('detect-groups').textContent=protocol.bundle_grouping?'按来源读取 A/B 分组':'从数据读取分组';
+  $('group-source-help').textContent=protocol.bundle_grouping
+    ?'按冻结训练包中的 A/B 来源填入训练 episode 编号，也可以手动划分。启用 T1/T2/T3 时，各组只从完整动作窗口抽样。权重只改变训练抽样比例，归一化统计和噪声估计仍等权。'
+    :'单数据集按转换来源识别，多数据集按每个目录分组。读取后保留同名组的权重，新组权重为 1。';
+}
+function changePaperFeatures(){
+  const timestamp=$('paper-timestamp').checked, correlated=$('paper-correlated').checked;
+  const wasPaper=paperTrial!=='none';
+  paperTrial=timestamp?(correlated?'t3':'t1'):(correlated?'t2':'none');
+  const active=paperTrial!=='none';
+  if(wasPaper!==active){
+    const action=fields.get('action_semantics').input;
+    const name=fields.get('exp_name').input;
+    if(active&&action.value==='absolute'){
+      paperAutoDelta=true;
+      action.value='delta';
+      name.value=name.value.replace(/_absolute(?=_|$)/,'_delta');
+    }else if(!active&&paperAutoDelta){
+      paperAutoDelta=false;
+      action.value='absolute';
+      name.value=name.value.replace(/_delta(?=_|$)/,'_absolute');
+    }
+    action.dispatchEvent(new Event('input'));
+    if($('sampling-mode').value==='weighted_replacement'){
+      $('groups-result').textContent='可用动作窗口规则已变更，请核对分组或检查数据与统计。';
+    }
+  }
+  updateFeatureSelection();
+}
+function updateFeatureSelection(){
+  syncPaperControls();
+  const changes=inputChanges();
+  if(paperTrial!==(initial.paper_trial||'none'))changes.push('paper_'+paperTrial);
+  const name=fields.get('exp_name').input;
+  if(featureSuffix&&name.value.endsWith(featureSuffix))name.value=name.value.slice(0,-featureSuffix.length);
+  featureSuffix=changes.length?'_'+changes.join('_'):'';
+  name.value+=featureSuffix;
+  const sameData=datasetPaths(fields.get('dataset_root').input.value).join('\n')===(initial.dataset_roots||[initial.dataset_root]).join('\n');
+  const sameStatistics=sameData&&fields.get('action_semantics').input.value===initial.action_semantics
+    &&Number(fields.get('action_horizon').input.value)===initial.action_horizon;
+  if(!changes.length&&sameStatistics){
+    for(const key of ['assets_dir','asset_id'])fields.get(key).input.value=initial[key];
+    fields.get('asset_id').input.dispatchEvent(new Event('input'));
+  }else independentStats();
+  renderProtocol();
+  name.dispatchEvent(new Event('input'));
 }
 async function chooseBaseline(module){
   const version=++loadingVersion;$('start').disabled=true;
   try{const result=await api('/api/baseline?id='+encodeURIComponent(module));if(version!==loadingVersion)return;baseline=module;fillForm(result);for(const el of document.querySelectorAll('#baseline-list button, #personal-list button'))el.classList.toggle('selected',el.dataset.id===module);}
-  finally{if(version===loadingVersion)$('start').disabled=false;}
+  finally{if(version===loadingVersion)$('start').disabled=Boolean(protocol?.bundle_missing);}
 }
 function parseIds(text){
   if(!text.trim())return [];
@@ -133,19 +248,33 @@ function formatIds(ids){
   return ranges.join(',');
 }
 function groupInputs(){return [...$('groups').children].map(row=>Object.fromEntries([...row.querySelectorAll('input')].map(input=>[input.dataset.key,input.value])));}
+function groupShares(groups){
+  const weights=groups.map(group=>Number(group.weight));
+  if(!weights.length||weights.some(weight=>!Number.isFinite(weight)||weight<=0))return [];
+  const max=Math.max(...weights), scaled=weights.map(weight=>weight/max);
+  const total=scaled.reduce((sum,weight)=>sum+weight,0);
+  return scaled.map(weight=>weight/total);
+}
+function renderGroupProbabilities(){
+  const groups=groupInputs(), shares=groupShares(groups);
+  $('group-probabilities').textContent=$('sampling-mode').value==='weighted_replacement'&&shares.length
+    ?'目标抽样比例 '+groups.map((group,i)=>`${group.name||'组 '+(i+1)} ${(shares[i]*100).toFixed(2)}%`).join(' · '):'';
+}
 async function detectGroups(){
   if(!baseline)throw Error('请先选择配置');
   const module=baseline, version=loadingVersion, root=fields.get('dataset_root').input.value.trim(), previous=groupInputs();
-  const mode=$('sampling-mode').value;
-  $('groups-result').textContent='正在读取并核对转换来源记录…';
+  const mode=$('sampling-mode').value, trial=paperTrial;
+  const horizon=fields.get('action_horizon')?.input.value;
+  $('groups-result').textContent='正在读取并核对来源记录…';
   try{
-    const roots=datasetPaths(root);const result=await api('/api/sampling-groups',{baseline:module,dataset_root:roots[0],dataset_roots:roots});
-    if(version!==loadingVersion||baseline!==module||fields.get('dataset_root').input.value.trim()!==root||$('sampling-mode').value!==mode||JSON.stringify(groupInputs())!==JSON.stringify(previous))throw Error('读取期间配置、目录或分组已修改，请重新读取。');
+    const roots=datasetPaths(root);const result=await api('/api/sampling-groups',{baseline:module,dataset_root:roots[0],dataset_roots:roots,paper_trial:trial,...(trial==='none'?{}:{action_horizon:Number(horizon)})});
+    if(version!==loadingVersion||baseline!==module||fields.get('dataset_root').input.value.trim()!==root||$('sampling-mode').value!==mode||paperTrial!==trial||fields.get('action_horizon')?.input.value!==horizon||JSON.stringify(groupInputs())!==JSON.stringify(previous))throw Error('读取期间配置、目录或分组已修改，请重新读取。');
     const weights=new Map(previous.map(g=>[g.name.trim(),Number(g.weight)]));
     $('groups').replaceChildren();
     for(const group of result.groups){const weight=weights.get(group.name);addGroup({...group,episode_text:formatIds(group.episodes),weight:Number.isFinite(weight)&&weight>0?weight:1});}
-    $('groups-result').textContent=`已核对 ${result.episodes} 条 episode / ${result.frames} 帧。`+result.groups.map(g=>`${g.name}：${g.episodes.length} 条 / ${g.frames} 帧（来源 ${g.source_root}）`).join('；')+'。请确认各组采样权重。';
-    updatePath();notice('已从转换来源填入分组；同名组保留原权重，新组权重为 1。');
+    const count=row=>row.eligible_windows===undefined?`${row.frames} 帧`:`${row.eligible_windows} 个可采样窗口`;
+    $('groups-result').textContent=`已核对 ${result.episodes} 条 episode / ${count(result)}。`+result.groups.map(g=>`${g.name}：${g.episodes.length} 条 / ${count(g)}（来源 ${g.source_root}）`).join('；')+'。请确认各组采样权重。';
+    updatePath();notice('已按来源填入分组。同名组保留原权重，新组权重为 1。');
   }catch(error){if(version===loadingVersion)$('groups-result').textContent='未应用识别结果，现有分组保留。';throw error;}
 }
 function addGroup(group={name:'',weight:1,episodes:[]}){
@@ -157,6 +286,11 @@ function request(){
   if(!baseline)throw Error('请先选择配置');const values={};let owner,statsBatch;
   for(const [key,{input,type}] of fields){let value=input.value.trim();if(type==='int'||type==='float')value=value===''?NaN:Number(value);if(type==='optional-int')value=value===''?null:Number(value);if(type==='lines')value=value.split('\n').map(v=>v.trim()).filter(Boolean);if(type==='ints')value=parseIds(value);if(typeof value==='number'&&!Number.isFinite(value))throw Error(key+' 请输入有效数值');if(key==='owner')owner=value;else if(key==='stats_batch_size')statsBatch=value;else values[key]=value;}
   const roots=datasetPaths(values.dataset_root);values.dataset_root=roots[0]||'';if(roots.length>1)values.dataset_roots=roots;
+  values.paper_trial=paperTrial;
+  if(initial&&'prompt_mode' in initial){
+    values.prompt_mode=$('prompt-mode').value;
+    values.video_views=Number($('video-views').value);
+  }
   values.sampling_mode=$('sampling-mode').value;values.sampling_groups=[];
   if(values.sampling_mode==='weighted_replacement')for(const row of $('groups').children){values.sampling_groups.push({name:row.querySelector('[data-key=name]').value.trim(),weight:Number(row.querySelector('[data-key=weight]').value),episodes:parseIds(row.querySelector('[data-key=episodes]').value)});}
   return {baseline,source_sha256:sourceHash,owner,values,gpus:selectedGPUs(),wandb_mode:$('wandb-mode').value,auto_norm:$('auto-norm').checked,allow_busy:$('allow-busy').checked,stats_batch_size:statsBatch};
@@ -205,11 +339,14 @@ async function showPreview(check){
 async function openBrowser(input){browseTarget=input;try{await browse(input.value.includes('://')?'':input.value.split('\n').filter(Boolean).at(-1));}catch{await browse('');}$('browser').showModal();}
 async function browse(path){browseState=await api('/api/browse?path='+encodeURIComponent(path));$('browse-path').value=browseState.path;$('browse-list').replaceChildren();for(const entry of browseState.entries){const button=node('button','▸ '+entry.name);button.addEventListener('click',()=>perform(()=>browse(entry.path)));$('browse-list').append(button);}if(browseState.truncated)$('browse-list').append(node('p','仅显示前 500 个目录，请直接输入路径'));}
 $('preview').addEventListener('click',()=>perform(()=>showPreview(false),$('preview')));
+for(const id of ['paper-timestamp','paper-correlated'])$(id).addEventListener('change',changePaperFeatures);
+for(const id of ['prompt-mode','video-views'])$(id).addEventListener('change',updateFeatureSelection);
+$('tomato-training').addEventListener('click',()=>perform(()=>chooseBaseline(tomatoBaseline)));
 $('check').addEventListener('click',()=>perform(()=>showPreview(true),$('check')));
 $('start').addEventListener('click',()=>perform(async()=>{const job=await api('/api/start',request());notice((job.creates_config?'已保存新配置':'已复用原配置')+'，本次实验已记录；数据检查通过后进入训练。');await refreshCatalog();await refreshJobs();await showJob(job.id);$('output-section').scrollIntoView({behavior:'smooth'});},$('start')));
 $('reset').addEventListener('click',()=>perform(()=>chooseBaseline(baseline),$('reset')));
 $('new-stats').addEventListener('click',independentStats);
-$('sampling-mode').addEventListener('change',()=>{const enabled=$('sampling-mode').value==='weighted_replacement';$('groups-panel').classList.toggle('hidden',!enabled);if(enabled&&!$('groups').children.length){addGroup({name:'A',weight:7,episodes:[]});addGroup({name:'B',weight:3,episodes:[]});}updatePath();});
+$('sampling-mode').addEventListener('change',()=>{const enabled=$('sampling-mode').value==='weighted_replacement';$('groups-panel').classList.toggle('hidden',!enabled);if(enabled&&!$('groups').children.length&&!protocol?.bundle_grouping){addGroup({name:'A',weight:7,episodes:[]});addGroup({name:'B',weight:3,episodes:[]});}updatePath();});
 $('discover-datasets').addEventListener('click',()=>perform(discoverDatasets,$('discover-datasets')));
 $('apply-datasets').addEventListener('click',()=>perform(async()=>applyDatasets(),$('apply-datasets')));
 $('detect-groups').addEventListener('click',()=>perform(detectGroups,$('detect-groups')));
@@ -225,6 +362,7 @@ $('browse-parent').addEventListener('click',()=>perform(()=>browse(browseState.p
 $('browse-select').addEventListener('click',()=>{browseTarget.value=browseTarget.id==='field-dataset_root'?appendDatasetPath(browseTarget.value,browseState.path):browseState.path;browseTarget.dispatchEvent(new Event('input'));browseTarget.dispatchEvent(new Event('change'));$('browser').close();});
 async function refreshCatalog(){
   const info=await api('/api/baselines');
+  tomatoBaseline=info.tomato_baseline;
   $('runtime').textContent=(info.host?'服务器：'+(info.server_label||info.host)+' · '+info.host+'\n':'')+info.repository+'\nPython: '+info.python;
   for(const [id,entries] of [['baseline-list',info.baselines],['personal-list',info.personal||[]]]){
     $(id).replaceChildren();
@@ -234,5 +372,5 @@ async function refreshCatalog(){
   return info;
 }
 $('refresh-configs').addEventListener('click',()=>perform(refreshCatalog,$('refresh-configs')));
-perform(async()=>{const info=await refreshCatalog();if(info.baselines.length)await chooseBaseline(info.default_baseline||info.baselines.find(e=>e.id.includes('tomato_wuji')&&e.id.includes('lora'))?.id||info.baselines[0].id);await Promise.all([refreshGPUs(),refreshJobs()]);});
+perform(async()=>{const info=await refreshCatalog();const selected=info.default_baseline||info.baselines.find(e=>e.id.includes('tomato_wuji')&&e.id.includes('lora'))?.id||info.baselines[0]?.id;if(selected)await chooseBaseline(selected);await Promise.all([refreshGPUs(),refreshJobs()]);});
 let polling=false;setInterval(async()=>{if(polling||document.hidden)return;polling=true;try{if(currentJob)await showJob(currentJob);await refreshJobs();}catch(error){notice('连接中断：'+error.message,true);}finally{polling=false;}},5000);

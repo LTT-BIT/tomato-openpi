@@ -70,8 +70,8 @@ def transform_vectors(
     if "observation.images.interaction" in camera_keys:
         # Image-independent statistics use an explicitly invalid dummy crop;
         # only state/actions are compared with real loaded samples below.
-        raw["observation.interaction_valid"] = np.bool_(False)
-        raw["observation.interaction_available"] = np.bool_(False)
+        raw["observation.interaction_valid"] = np.False_
+        raw["observation.interaction_available"] = np.False_
     return transform(raw)
 
 
@@ -108,9 +108,15 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
     data_config = config.data.create(config.assets_dirs, config.model)
     if data_config.local_dataset_loader is not None or tuple(data_config.action_sequence_keys) != ("action",):
         raise ValueError("Requires standard LeRobot data with the action sequence key 'action'")
-    if any(type(t) is not transforms.RepackTransform for t in data_config.repack_transforms.inputs):
+    repack, vectors = data_config.repack_transforms, data_config.data_transforms
+    visual_memory = getattr(data_config, "visual_memory", None)
+    if visual_memory is not None:
+        from openpi.training.visual_memory_options import current_frame_transforms
+
+        repack, vectors = current_frame_transforms(config.data, config.model)
+    if any(type(t) is not transforms.RepackTransform for t in repack.inputs):
         raise ValueError("Unsupported repack transforms")
-    if any(not supports_vector_statistics(t) for t in data_config.data_transforms.inputs):
+    if any(not supports_vector_statistics(t) for t in vectors.inputs):
         raise ValueError("Unsupported transforms: vector-only statistics require an image-independent transform")
     if data_config.asset_id is None:
         raise ValueError("A normalization asset_id is required")
@@ -125,8 +131,14 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
         sources.append((spec, root, info, episodes))
     specs_with_roots = tuple(replace(spec, root=str(root)) for spec, root, _, _ in sources)
     contract = norm_provenance.build_contract(config, dataset_specs=specs_with_roots)
-    transform = transforms.compose([*data_config.repack_transforms.inputs, *data_config.data_transforms.inputs])
-    reference = data_loader.create_torch_dataset(data_config, config.model.action_horizon, config.model)
+    transform = transforms.compose([*repack.inputs, *vectors.inputs])
+    reference_transform = transforms.compose(
+        [*data_config.repack_transforms.inputs, *data_config.data_transforms.inputs]
+    )
+    loader_options = {"sampling_mode": config.sampling_mode} if visual_memory is not None else {}
+    reference = data_loader.create_torch_dataset(
+        data_config, config.model.action_horizon, config.model, **loader_options
+    )
     stats = {key: normalize.RunningStats() for key in ("state", "actions")}
     norm_dim = (config.policy_metadata or {}).get("normalization_dim", config.model.action_dim)
     norm_dims = (config.policy_metadata or {}).get("normalization_dims", dict.fromkeys(stats, norm_dim))
@@ -152,7 +164,7 @@ def _compute(config: training_config.TrainConfig, *, batch_size: int, output: Pa
             for i, row in enumerate(rows):
                 raw = reference[offset + source_offset + int(row)]
                 assert int(raw["episode_index"]) == index
-                expected = transform(raw)
+                expected = reference_transform(raw)
                 for key in stats:
                     np.testing.assert_array_equal(actual[key][i], expected[key])
                 checked += 1

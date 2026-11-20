@@ -1,5 +1,10 @@
 # Tomato OpenPI 训练仓库
 
+本分支是整串番茄阶段指令动作训练入口，当前使用204条五阶段数据；旧93/100条实验入口保留。原误放在视觉Memory分支的T1/T2/T3、Train RTC、阶段/全局指令、三路/四路当前RGB、分组加权采样、缓存及有序CPU预读已迁移到此，未引入历史视觉模型或Agent。
+
+默认UI来源为 `in_hand204_current_rgb`：由204条四路B配置派生，保留batch256/FSDP8/20000步/每5000保存等参数。原 `in_hand204_b_crop` 与独立三路排队配置不改训练目标；新选项使用新实验名，改变输入或论文算法需独立统计及重新验收。缺数据只允许配置预览，正式检查/训练仍拒绝启动。服务器四路运行checkout与三路冻结快照继续使用原版本，本轮不向服务器同步源码。
+
+
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
 历史100条normal完整录制的四视图π₀.₅训练：原三路RGB＋当前局部RGB、58D state、阶段英文prompt，无深度、无π₀.₅ Memory。28服务器数据、独立100条统计及B主方案/A对照入口见[番茄训练说明](training_configs/experiments/tomato_sharpa/README.md)。视觉token1024、文本上限256，batch256/16000步/FSDP8，每4000完成步保存并保留checkpoint，原学习率保持。默认只检查：`bash scripts/python.sh -m scripts.tomato100_run check`；显式`start`才启动，拒绝占用中的GPU。2026-11-13已在28启动B：batch256实际训练通过，第10步loss1.6188，8卡各约64.6GiB显存；完整训练尚未完成。

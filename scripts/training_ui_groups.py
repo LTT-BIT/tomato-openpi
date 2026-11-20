@@ -2,12 +2,60 @@
 """Recover episode groups from explicit conversion provenance, without reading videos."""
 
 from collections import defaultdict
+import hashlib
 import json
 from pathlib import Path
 from pathlib import PurePosixPath
 
+from openpi.training.dataset_collection import collection_layout
+from openpi.training.sampling import complete_window_count
 
-def detect_groups(dataset_root: str) -> dict:
+
+def detect_bundle_groups(dataset_root: str, bundle_sha256: str, *, horizon: int) -> dict:
+    root = Path(dataset_root).resolve()
+    if not bundle_sha256:
+        raise FileNotFoundError("请在训练机上设置 PI05_IN_HAND204_BUNDLE 后读取分组。也可手动填写 episode 编号。")
+    contents = (root.parent / "bundle.json").read_bytes()
+    if hashlib.sha256(contents).hexdigest() != bundle_sha256:
+        raise ValueError("训练包来源记录已变化，请重新载入配置")
+    layout = collection_layout([root])[0]
+    lengths = {row["episode_index"]: row["length"] for row in layout["episodes"]}
+    groups = defaultdict(list)
+    seen = set()
+    for row in json.loads(contents)["mapping"]:
+        episode = row["episode_index"]
+        source = PurePosixPath(row["source_dataset"])
+        if episode not in lengths or episode in seen or lengths[episode] != row["length"]:
+            raise ValueError("训练包来源映射与 episode 元信息不一致")
+        if not source.is_absolute() or source.parent.name not in ("A", "B") or ".." in source.parts:
+            raise ValueError("训练包缺少明确的 A/B 来源目录，请手动填写分组")
+        seen.add(episode)
+        if complete_window_count(lengths[episode], horizon):
+            groups[source.parent].append(episode)
+    if seen != lengths.keys() or not groups:
+        raise ValueError("训练包映射未覆盖全部 episode，或没有可用动作窗口")
+    if len({path.parent for path in groups}) != 1:
+        raise ValueError("训练包 A/B 来源目录不唯一，请手动填写分组")
+    result = [
+        {
+            "name": path.name,
+            "source_root": str(path),
+            "episodes": sorted(episodes),
+            "frames": sum(lengths[episode] for episode in episodes),
+            "eligible_windows": sum(complete_window_count(lengths[episode], horizon) for episode in episodes),
+        }
+        for path, episodes in sorted(groups.items())
+    ]
+    return {
+        "dataset_root": str(root),
+        "episodes": sum(len(group["episodes"]) for group in result),
+        "frames": sum(group["frames"] for group in result),
+        "eligible_windows": sum(group["eligible_windows"] for group in result),
+        "groups": result,
+    }
+
+
+def detect_groups(dataset_root: str, *, horizon: int | None = None) -> dict:
     if not isinstance(dataset_root, str) or not dataset_root.strip():
         raise ValueError("请先填写数据集目录")
     root = Path(dataset_root).expanduser().resolve()
@@ -69,21 +117,29 @@ def detect_groups(dataset_root: str) -> dict:
                 if (key == "length" or key in metadata[episode]) and row.get(key) != metadata[episode].get(key):
                     raise ValueError(f"episode {episode} 的转换记录与元信息不一致: {key}")
             seen.add(episode)
-            groups[matches[0]].append(episode)
+            if complete_window_count(row["length"], horizon or 1):
+                groups[matches[0]].append(episode)
     missing = set(metadata) - seen
     if missing:
         raise ValueError(f"转换记录未覆盖全部 episode，缺少 {len(missing)} 条，请手动填写分组")
+    result = [
+        {
+            "name": names[i],
+            "source_root": str(sources[i]),
+            "episodes": sorted(episodes),
+            "frames": sum(metadata[e]["length"] for e in episodes),
+            **(
+                {"eligible_windows": sum(complete_window_count(metadata[e]["length"], horizon) for e in episodes)}
+                if horizon is not None
+                else {}
+            ),
+        }
+        for i, episodes in sorted(groups.items())
+    ]
     return {
         "dataset_root": str(root),
-        "episodes": len(metadata),
+        "episodes": sum(len(group["episodes"]) for group in result),
         "frames": info["total_frames"],
-        "groups": [
-            {
-                "name": names[i],
-                "source_root": str(sources[i]),
-                "episodes": sorted(episodes),
-                "frames": sum(metadata[e]["length"] for e in episodes),
-            }
-            for i, episodes in sorted(groups.items())
-        ],
+        "groups": result,
+        **({"eligible_windows": sum(group["eligible_windows"] for group in result)} if horizon is not None else {}),
     }

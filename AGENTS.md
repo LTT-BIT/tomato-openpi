@@ -1,5 +1,7 @@
 # 本仓库开发约定
 
+- 2026-11-20本轮用户授权：将误放Memory分支的6项通用训练改动迁到204条subtask分支，去除历史视觉依赖，完成本机验证与中文提交推送；Memory恢复5b5c350后验证。禁止更新27/28正在训练的共享checkout或三路冻结队列，不重启服务、不启动新训练；main/Fovea/FLASH/Mamba分支不改。
+
 - 本分支 `tomato-subtask-policy` 用于无 Agent 的整串番茄 A/B 训练；用户明确要求分支不使用 codex 前缀。在现有 `/home/user/tomato-openpi` 开发，27/28 共用 `/home/mengxiang/workspace/code/tomato-openpi-sharpa`，不另建 clone/worktree。本轮只准备、校验和同步，不启动正式训练，不改部署端。
 - 用户已授权验证通过后自动中文提交并推送 GitHub 对应分支；本分支推送 `github/tomato-subtask-policy`，不强推。数据和权重不纳入 Git。
 - 历史normal93实验固定 `records/normal93_20261109_selection.json`，已有配置、统计、数据和权重保留，不按目录扫描悄悄改变成员。

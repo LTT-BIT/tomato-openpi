@@ -104,9 +104,11 @@ def validate_config(config: cfg.TrainConfig) -> None:
 def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     """Check metadata/statistics without constructing models or downloading tokenizers."""
     validate_config(config)
+    metadata = config.policy_metadata
+    if metadata.get("subtask_variant") == "in_hand_b_coarse" and not metadata.get("bundle_sha256"):
+        raise FileNotFoundError("Prepare the frozen full204 four-view bundle and set PI05_IN_HAND204_BUNDLE")
     if len(config.data.lerobot_datasets) > 1:
         return preflight_collection(config, require_norm=require_norm)
-    metadata = config.policy_metadata
     root = Path(config.data.lerobot_datasets[0].root).expanduser().resolve()
     required = [root / "meta" / name for name in ("info.json", "episodes.jsonl", "tasks.jsonl")]
     for path in required:
@@ -123,7 +125,10 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     if features["observation.state"]["shape"] not in [[dim] for dim in metadata["raw_state_dims"]]:
         raise ValueError("Dataset raw state shape is not supported by the embodiment")
     joint_names = metadata.get("joint_names")
-    for key, source_names in (("observation.state", "source_state_joint_names"), ("action", "source_action_joint_names")):
+    for key, source_names in (
+        ("observation.state", "source_state_joint_names"),
+        ("action", "source_action_joint_names"),
+    ):
         expected_names = metadata.get(source_names, joint_names)
         if expected_names is not None and features[key].get("names") != expected_names:
             raise ValueError(f"Dataset {key} joint names/order differ from the embodiment protocol")
@@ -139,13 +144,16 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     if any(not prompt.isascii() or not re.search(r"[A-Za-z]", prompt) for prompt in prompts):
         raise ValueError("This workflow requires English ASCII prompts in tasks.jsonl")
     norm_dir = Path(config.data.assets.assets_dir or config.assets_dirs) / config.data.assets.asset_id
+    from openpi.training.current_rgb import fixed_global_prompt
+
+    global_prompt = fixed_global_prompt(config.data)
     result = {
         "dataset_root": str(root),
         "dataset_repo_id": config.data.repo_id,
         "source_datasets": metadata["source_datasets"],
         "frames": info["total_frames"],
         "episodes": info["total_episodes"],
-        "prompts": prompts,
+        "prompts": [global_prompt] if global_prompt else prompts,
         "norm_stats_path": str(norm_dir / "norm_stats.json"),
     }
     view = getattr(config.data.base_config, "task_view", None)
@@ -162,24 +170,17 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
         result["effective_prompt_examples"] = [selected.vectors(i)["prompt"] for i in (0, len(selected) - 1)]
     if config.sampling_mode == "weighted_replacement":
         if view is not None:
-            episode_ids = selected.ids[:, 0]
+            ids, counts = np.unique(selected.ids[:, 0], return_counts=True)
+            windows = dict(zip(ids.tolist(), counts.tolist(), strict=True))
         else:
-            episodes = [json.loads(line) for line in required[1].read_text().splitlines() if line.strip()]
-            episode_ids = np.array([row["episode_index"] for row in episodes], dtype=np.int64)
-        sampling.group_frame_weights(episode_ids, config.sampling_groups)
-        max_weight = max(group.weight for group in config.sampling_groups)
-        total_weight = sum(group.weight / max_weight for group in config.sampling_groups)
-        result["sampling"] = {
-            "mode": config.sampling_mode,
-            "groups": [
-                {
-                    "name": group.name,
-                    "episodes": list(group.episodes),
-                    "probability": (group.weight / max_weight) / total_weight,
-                }
-                for group in config.sampling_groups
-            ],
-        }
+            episodes = collection_layout([root])[0]["episodes"]
+            horizon = config.model.action_horizon if hasattr(config.data, "paper_contract") else 1
+            windows = {
+                row["episode_index"]: count
+                for row in episodes
+                if (count := sampling.complete_window_count(row["length"], horizon))
+            }
+        result["sampling"] = weighted_sampling_report(config.sampling_groups, windows)
     if require_norm:
         check_norm(config, result)
     return result
@@ -207,24 +208,48 @@ def preflight_collection(config, *, require_norm=True):
         "prompts": list(dict.fromkeys(p for row in reports for p in row["prompts"])),
         "episode_mappings": [{"root": item["root"], "local_to_global": item["mapping"]} for item in layout],
     }
-    if config.sampling_mode == "weighted_replacement":
-        ids = np.array([i for item in layout for i in item["mapping"].values()], dtype=np.int64)
-        sampling.group_frame_weights(ids, config.sampling_groups)
-        max_weight = max(g.weight for g in config.sampling_groups)
-        total_weight = sum(g.weight / max_weight for g in config.sampling_groups)
-        result["sampling"] = {
-            "mode": config.sampling_mode,
-            "groups": [
-                {"name": g.name, "episodes": list(g.episodes), "probability": (g.weight / max_weight) / total_weight}
-                for g in config.sampling_groups
-            ],
+    paper_windows = hasattr(config.data, "paper_contract")
+    if paper_windows or config.sampling_mode == "weighted_replacement":
+        horizon = config.model.action_horizon if paper_windows else 1
+        windows = {
+            item["mapping"][row["episode_index"]]: count
+            for item in layout
+            for row in item["episodes"]
+            if (count := sampling.complete_window_count(row["length"], horizon))
         }
+        if paper_windows:
+            result["training_windows"] = sum(windows.values())
+        if config.sampling_mode == "weighted_replacement":
+            result["sampling"] = weighted_sampling_report(config.sampling_groups, windows)
     if require_norm:
         check_norm(config, result)
     return result
 
 
+def weighted_sampling_report(groups, windows):
+    # One entry per episode suffices to check exact episode membership and valid probabilities.
+    sampling.group_frame_weights(np.asarray(list(windows), dtype=np.int64), groups)
+    return {
+        "mode": "weighted_replacement",
+        "eligible_windows": sum(windows.values()),
+        "groups": [
+            {
+                "name": group.name,
+                "episodes": list(group.episodes),
+                "weight": group.weight,
+                "probability": probability,
+                "eligible_windows": sum(windows[episode] for episode in group.episodes),
+            }
+            for group, probability in zip(groups, sampling.group_probabilities(groups).tolist(), strict=True)
+        ],
+    }
+
+
 def check_norm(config, result):
+    custom_validate = getattr(config.data, "validate_normalization", None)
+    if custom_validate is not None:
+        custom_validate(config, result)
+        return
     metadata = config.policy_metadata
     norm_dir = Path(config.data.assets.assets_dir or config.assets_dirs) / config.data.assets.asset_id
     result["norm_stats_path"] = str(norm_dir / "norm_stats.json")

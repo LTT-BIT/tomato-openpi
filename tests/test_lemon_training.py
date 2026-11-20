@@ -77,7 +77,13 @@ def dataset_and_config(tmp_path, monkeypatch):
         },
     }
     ds = LeRobotDataset.create(
-        config.data.repo_id, root=root, fps=10, robot_type="dual_ur_o30", features=features, use_videos=True
+        config.data.repo_id,
+        root=root,
+        fps=10,
+        robot_type="dual_ur_o30",
+        features=features,
+        use_videos=True,
+        video_backend=config.data.video_backend,
     )
     for episode in range(3):
         for frame in range(6):

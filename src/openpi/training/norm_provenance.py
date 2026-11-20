@@ -44,11 +44,14 @@ def build_contract(config: "cfg.TrainConfig", *, dataset_specs=None) -> dict:
     if builder is None:
         raise ValueError("The data adapter must implement create_vector_transforms for normalization provenance")
     repack, vectors = builder(config.model)
-    implementation = {
-        f"{type(config.data).__module__}.{type(config.data).__qualname__}": hashlib.sha256(
-            inspect.getsource(type(config.data)).encode()
-        ).hexdigest(),
-    }
+    adapter = type(config.data)
+    adapter_name = f"{adapter.__module__}.{adapter.__qualname__}"
+    adapter_source = inspect.getsource(adapter)
+    if adapter_name == "openpi.training.delta_paper.PaperSharpaCropData":
+        # The visual-history branch used this name before the two adapters coexisted.
+        adapter_name = "openpi.training.delta_paper.PaperSharpaData"
+        adapter_source = adapter_source.replace("class PaperSharpaCropData(", "class PaperSharpaData(", 1)
+    implementation = {adapter_name: hashlib.sha256(adapter_source.encode()).hexdigest()}
     for transform in (*repack.inputs, *vectors.inputs):
         module = inspect.getmodule(type(transform))
         implementation[module.__name__] = reproducibility.file_sha256(Path(module.__file__))
@@ -57,6 +60,13 @@ def build_contract(config: "cfg.TrainConfig", *, dataset_specs=None) -> dict:
         "vectors": vectors.inputs,
         "implementation": implementation,
     }
+    paper_contract = getattr(config.data, "paper_contract", None)
+    if paper_contract is not None:
+        transform_values["delta_paper"] = paper_contract()
+    from openpi.training.current_rgb import fixed_global_prompt
+
+    if global_prompt := fixed_global_prompt(config.data):
+        transform_values["global_prompt"] = global_prompt
     view = getattr(config.data.base_config, "task_view", None)
     if view is not None:
         from openpi.training import task_view
