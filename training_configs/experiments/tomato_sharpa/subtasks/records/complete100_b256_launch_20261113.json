@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-13",
+  "status": "training_running",
+  "code_commit": "34738e9f6b31349d7e5c07a692fbfb1a593dc39e",
+  "launcher_pid": 574858,
+  "training_pid": 575579,
+  "console": "/home/mengxiang/workspace/code/tomato-openpi-sharpa/logs/complete100_b256_s16000_c4000_20261113.console.log",
+  "manifest": "/home/mengxiang/workspace/code/tomato-openpi-sharpa/logs/pi05_sharpa_tomato_complete100_b_crop_fullft_delta_r1_offline_r11/tomato_complete100_b_crop_delta_r1_offline_r11_s42_b256_s16000_c4000/20261113_104112_778551_575579.json",
+  "checkpoint_dir": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/checkpoints/pi05_sharpa_tomato_complete100_b_crop_fullft_delta_r1_offline_r11/tomato_complete100_b_crop_delta_r1_offline_r11_s42_b256_s16000_c4000",
+  "config": {
+    "batch_size": 256,
+    "num_train_steps": 16000,
+    "fsdp_devices": 8,
+    "save_interval": 4000,
+    "keep_period": 4000,
+    "save_before_step": 1,
+    "save_steps_before": [],
+    "save_interval_after": 4000,
+    "lr_schedule": {
+      "fields": {
+        "decay_lr": 2.5e-06,
+        "decay_steps": 30000,
+        "peak_lr": 2.5e-05,
+        "warmup_steps": 1000
+      },
+      "type": "openpi.training.optimizer.CosineDecaySchedule"
+    },
+    "exp_name": "tomato_complete100_b_crop_delta_r1_offline_r11_s42_b256_s16000_c4000",
+    "name": "pi05_sharpa_tomato_complete100_b_crop_fullft_delta_r1_offline_r11"
+  },
+  "checkpoint_completed_steps": [
+    4000,
+    8000,
+    12000,
+    16000
+  ],
+  "inputs": {
+    "dataset_root": "/mnt/data/users/mengxiang/workspace/data/sharpa/no-block-more/complete100_rgb_crop_offline_r11/b_coarse",
+    "dataset_repo_id": "fr3_sharpa/tomato_complete100_rgb_crop_b_saved_labels_r1_offline_r11",
+    "source_datasets": [
+      "/mnt/data/users/mengxiang/workspace/data/sharpa/no-block-more/complete100_rgb_crop_offline_r11/crop_manifest.json",
+      "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json"
+    ],
+    "frames": 425556,
+    "episodes": 100,
+    "prompts": [
+      "Right hand grasps and lifts the truss to the center",
+      "Right hand holds truss while left hand picks tomatoes into left basket",
+      "Right hand returns the held object to the right plate",
+      "Right fingers reposition the truss on the right plate"
+    ],
+    "norm_stats_path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_offline_r11_delta_30hz/norm_stats.json",
+    "training_frames": 425556,
+    "training_episodes": 100,
+    "task_view": {
+      "split": "train",
+      "task_indices": [],
+      "prompt_overrides": [],
+      "phase_prompts": [],
+      "phase_arm_hold": false,
+      "task_boundary_hold": false,
+      "allow_unannotated": false,
+      "split_path_sha256": "c7c72028b05069eea727e1f4534bcf0b14fb7cd97f471ba304332ed1906f5ccf",
+      "phase_annotations_path_sha256": null
+    },
+    "effective_prompt_examples": [
+      "Right hand grasps and lifts the truss to the center",
+      "Right hand returns the held object to the right plate"
+    ],
+    "norm_provenance": "verified",
+    "norm_stats_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+    "norm_audit_sha256": "7e52dc86598b901a8a500a002161d77d3225740d4fd683c8a43ab2ea7e3c2e73"
+  },
+  "metrics": [
+    "Step 0: grad_norm=1.8457, loss=1.6016, param_norm=1802.2983, sampling/consumed_samples=256.0000, sampling/consumed_unique_frames=256.0000, sampling/consumed_coverage=0.0006",
+    "Step 10: grad_norm=1.8203, loss=1.6188, param_norm=1802.2987, sampling/consumed_samples=2816.0000, sampling/consumed_unique_frames=2816.0000, sampling/consumed_coverage=0.0066"
+  ],
+  "gpu_inventory": "0, 66187, 73415, 100\n1, 66181, 73415, 100\n2, 66181, 73415, 100\n3, 66181, 73415, 100\n4, 66181, 73415, 100\n5, 66181, 73415, 100\n6, 66181, 73415, 100\n7, 66181, 73415, 100\n",
+  "target_batch_executed": true,
+  "full_run_completed": false,
+  "tests_passed": 92
+}

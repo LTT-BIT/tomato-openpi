@@ -1,0 +1,370 @@
+"""Validate exact cached pixels, immutable resume inputs and the checkpoint4000 barrier."""
+
+import json
+from pathlib import Path
+from types import SimpleNamespace
+
+import numpy as np
+import pytest
+
+from openpi.training.input_migration import check_code_change
+from openpi.training.input_migration import fingerprint
+from openpi.training.input_migration import validate_migration
+
+
+def contracts():
+    old = {
+        "training": {"batch": 256},
+        "dataset_sha256": "data",
+        "norm_sha256": "norm",
+        "plan_indices_sha256": "plan",
+        "code": {"src/openpi/training/data_loader.py": "old", "src/openpi/models/pi0.py": "model"},
+    }
+    new = {
+        **old,
+        "code": {
+            **old["code"],
+            "src/openpi/training/data_loader.py": "new",
+            "src/openpi/training/frame_cache.py": "cache",
+        },
+    }
+    return old, new
+
+
+def test_only_reader_code_can_change_during_input_migration(tmp_path):
+    old, new = contracts()
+    changed = check_code_change(old, new)
+    cache = tmp_path / "cache"
+    cache.mkdir()
+    manifest = cache / "manifest.json"
+    manifest.write_text("{}")
+    from openpi.training.frame_cache import sha256
+
+    report = {
+        "status": "exact_input_acceleration_validated",
+        "old_contract_sha256": fingerprint(old),
+        "new_contract_sha256": fingerprint(new),
+        "changed_code_files": changed,
+        "checkpoint_step": 4000,
+        "cache_manifest_sha256": sha256(manifest),
+        "validation": {
+            "all_model_inputs_equal": True,
+            "episodes_checked": 100,
+            "samples_checked": 300,
+            "loader_batches": 32,
+            "steady_batch_seconds": 1.2,
+        },
+    }
+    path = tmp_path / "report.json"
+    path.write_text(json.dumps(report))
+    assert validate_migration(old, new, path, cache_path=cache) == report
+    manifest.write_text('{"changed":true}')
+    with pytest.raises(ValueError, match="manifest changed"):
+        validate_migration(old, new, path, cache_path=cache)
+
+
+@pytest.mark.parametrize("part", ["training", "dataset_sha256", "norm_sha256", "plan_indices_sha256"])
+def test_training_data_and_sampler_cannot_be_changed(part):
+    old, new = contracts()
+    new[part] = "changed"
+    with pytest.raises(ValueError, match="cannot change"):
+        check_code_change(old, new)
+
+
+def test_model_code_change_cannot_be_hidden_as_reader_migration():
+    old, new = contracts()
+    new["code"]["src/openpi/models/pi0.py"] = "changed"
+    with pytest.raises(ValueError, match="Unapproved code"):
+        check_code_change(old, new)
+
+
+def test_real_video_cache_matches_decoder_and_preserves_timestamp(tmp_path):
+    import av
+
+    from openpi.training.frame_cache import CachedLeRobotDataset
+    from scripts.build_rgb_frame_cache import build_video
+
+    source = tmp_path / "source.mp4"
+    with av.open(str(source), "w") as output:
+        stream = output.add_stream("libx264", rate=30)
+        stream.width = 20
+        stream.height = 16
+        stream.pix_fmt = "yuv420p"
+        for i in range(12):
+            frame = av.VideoFrame.from_ndarray(
+                np.random.default_rng(i).integers(0, 255, (16, 20, 3), dtype=np.uint8), format="rgb24"
+            )
+            for packet in stream.encode(frame):
+                output.mux(packet)
+        for packet in stream.encode():
+            output.mux(packet)
+    cache = tmp_path / "cache"
+    destination = cache / "cam0/episode_000000.npy"
+    entry = build_video((str(source), str(destination), 0, "cam0", 12, 30))
+    import torch
+
+    from openpi import transforms
+    from openpi.policies.fr3_sharpa_policy import _parse_image
+
+    with av.open(str(source)) as video:
+        first = next(video.decode(video.streams.video[0])).to_rgb().to_ndarray()
+    actual = transforms.ResizeImages(224, 224)(
+        {"image": {"cam0": _parse_image(torch.from_numpy(first).permute(2, 0, 1).float() / 255)}}
+    )["image"]["cam0"]
+    np.testing.assert_array_equal(np.load(destination, mmap_mode="r")[0], actual)
+    assert entry["exact_reference_samples"] == 5
+    assert not destination.stat().st_mode & 0o222
+    reader = object.__new__(CachedLeRobotDataset)
+    reader.meta = SimpleNamespace(fps=30)
+    reader.cache_root = cache
+    reader.cache_entries = {(0, "cam0"): entry}
+    reader._cache_maps = {}  # noqa: SLF001
+    reader.tolerance_s = 1e-4
+    value = reader._query_videos({"cam0": [float(np.float32(5 / 30))]}, 0)["cam0"]  # noqa: SLF001
+    np.testing.assert_array_equal(value, np.load(destination, mmap_mode="r")[5])
+    assert value.shape == (224, 224, 3)
+    assert reader.__getstate__()["_cache_maps"] == {}
+    pixels = reader._query_videos({"cam0": [0, 0.1, 0]}, 0)["cam0"]  # noqa: SLF001
+    np.testing.assert_array_equal(pixels, np.load(destination, mmap_mode="r")[[0, 3, 0]])
+    with pytest.raises(ValueError, match="timeline"):
+        reader._query_videos({"cam0": [-0.1]}, 0)  # noqa: SLF001
+
+
+def test_reused_pyav_decoder_matches_lerobot(tmp_path):
+    import av
+    from lerobot.common.datasets.video_utils import decode_video_frames
+
+    from openpi.training.frame_cache import _PyAVReader
+
+    source = tmp_path / "source.mp4"
+    with av.open(str(source), "w") as output:
+        stream = output.add_stream("libx264", rate=30)
+        stream.width, stream.height, stream.pix_fmt = 20, 16, "yuv420p"
+        for index in range(12):
+            pixels = np.random.default_rng(index).integers(0, 256, (16, 20, 3), dtype=np.uint8)
+            for packet in stream.encode(av.VideoFrame.from_ndarray(pixels, format="rgb24")):
+                output.mux(packet)
+        for packet in stream.encode():
+            output.mux(packet)
+
+    reader = _PyAVReader()
+    for timestamps in ([11 / 30], [0.0], [5 / 30, 2 / 30, 5 / 30], [1 / 60, 5 / 60]):
+        expected = decode_video_frames(source, timestamps, tolerance_s=0.02, backend="pyav")
+        np.testing.assert_array_equal(reader.read(source, timestamps, 0.02), expected)
+    assert reader.read(source, [1.0], 1e-4) is None
+
+
+def test_runtime_cache_tolerates_mtime_and_falls_back_per_camera(tmp_path, monkeypatch):
+    import json
+
+    from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+    from openpi_client import image_tools
+    import torch
+
+    from openpi.policies import fr3_sharpa_policy
+    from openpi.training.frame_cache import CachedLeRobotDataset
+    from openpi.training.frame_cache import sha256
+
+    cameras = ("kept", "corrected", "bad_cache")
+    cache = tmp_path / "cache"
+    cache.mkdir()
+    entries = []
+    for camera in cameras:
+        source = tmp_path / f"{camera}.mp4"
+        source.write_bytes(b"old stream")
+        pixels = np.full((3, 224, 224, 3), 7, np.uint8)
+        filename = cache / f"{camera}.npy"
+        np.save(filename, pixels[..., 0] if camera == "bad_cache" else pixels)
+        entries.append(
+            {
+                "camera": camera,
+                "episode": 0,
+                "frames": 3,
+                "cache_file": filename.name,
+                "exact_reference_samples": 3,
+                "source_sha256": sha256(source),
+                "mtime_ns": 1,
+            }
+        )
+    (tmp_path / "corrected.mp4").write_bytes(b"new stream")
+    (cache / "manifest.json").write_text(
+        json.dumps(
+            {
+                "schema": "rgb224_exact_pil_v2",
+                "complete": False,
+                "entries": entries,
+                "source_metadata": {"meta/info.json": "old-binding"},
+                "pixel_pipeline": {
+                    "parse_image": sha256(fr3_sharpa_policy.__file__),
+                    "resize": sha256(image_tools.__file__),
+                },
+            }
+        )
+    )
+
+    def init(dataset):
+        dataset.root = tmp_path
+        dataset.meta = SimpleNamespace(
+            episodes={0: {"length": 3}},
+            fps=30,
+            video_keys=cameras,
+            get_video_file_path=lambda ep, camera: f"{camera}.mp4",
+        )
+        dataset.tolerance_s = 1e-4
+        dataset.image_transforms = None
+
+    calls = []
+
+    def query(dataset, timestamps, episode):
+        calls.append((timestamps, episode))
+        return {camera: torch.zeros(3, 10, 10) for camera in timestamps}
+
+    monkeypatch.setattr(LeRobotDataset, "__init__", init)
+    monkeypatch.setattr(LeRobotDataset, "_query_videos", query)
+    reader = CachedLeRobotDataset(cache_root=cache)
+    assert (cache / "kept.npy").stat().st_mtime_ns != entries[0]["mtime_ns"]
+    result = reader._query_videos({camera: [0.0] for camera in cameras}, 0)  # noqa: SLF001
+    assert result["kept"].shape == (224, 224, 3)
+    assert np.all(np.asarray(result["kept"]) == 7)
+    assert calls == [({"corrected": [0.0], "bad_cache": [0.0]}, 0)]
+    assert set(reader.cache_entries) == {(0, "kept")}
+
+
+def test_actual_orbax_checkpoint4000_is_finalized_and_restores_optimizer(tmp_path):
+    import jax.numpy as jnp
+
+    from openpi.training.checkpoints import initialize_checkpoint_dir
+    from scripts.tomato100_cached_resume import checkpoint_ready
+
+    directory = tmp_path / "run"
+    manager, _ = initialize_checkpoint_dir(directory, keep_period=4000, overwrite=False, resume=False)
+    state = {"step": jnp.array(4000), "optimizer": {"count": jnp.array(4000), "moment": jnp.array([1.0, 2.0])}}
+    assert not checkpoint_ready(directory)
+    manager.save(4000, {"assets": lambda path: None, "train_state": state, "params": {"params": {"w": jnp.array(3.0)}}})
+    manager.wait_until_finished()
+    manager.close()
+    assert checkpoint_ready(directory)
+    manager, resuming = initialize_checkpoint_dir(directory, keep_period=4000, overwrite=False, resume=True)
+    try:
+        restored = manager.restore(4000, items={"train_state": state, "params": {"params": {"w": jnp.array(0.0)}}})
+        assert resuming
+        assert int(restored["train_state"]["step"]) == 4000
+        np.testing.assert_array_equal(restored["train_state"]["optimizer"]["moment"], [1.0, 2.0])
+    finally:
+        manager.close()
+
+
+def test_handoff_never_stops_before_finalized_checkpoint(tmp_path, monkeypatch):
+    from scripts import tomato100_cached_resume as handoff
+    from scripts import tomato100_run
+
+    monkeypatch.setattr(tomato100_run, "ROOT", tmp_path)
+    monkeypatch.setattr(handoff, "checkpoint_ready", lambda path: False)
+    monkeypatch.setattr(handoff, "validate_process", lambda *args: None)
+    monkeypatch.setattr(handoff, "choose_stop_signal", lambda pid: __import__("signal").SIGINT)
+    monkeypatch.setattr(handoff.os, "kill", lambda *args: pytest.fail("must not signal training"))
+    with pytest.raises(ValueError, match="not finalized"):
+        handoff.handoff(
+            SimpleNamespace(checkpoint_dir=tmp_path / "run", exp_name="run"),
+            {"status": "ready", "old_identity": "expected"},
+            tmp_path / "report.json",
+        )
+
+
+@pytest.mark.parametrize("recover_stopping", [False, True])
+def test_handoff_launches_one_resume_and_preserves_experiment(tmp_path, monkeypatch, recover_stopping):
+    import signal
+
+    from scripts import tomato100_cached_resume as handoff
+    from scripts import tomato100_run
+    from scripts import tomato_ab_run
+    from scripts import training_ui
+
+    monkeypatch.setattr(tomato100_run, "ROOT", tmp_path)
+    (tmp_path / "logs/complete100_preflight").mkdir(parents=True)
+    monkeypatch.setattr(handoff, "checkpoint_ready", lambda path: True)
+    monkeypatch.setattr(handoff, "validate_process", lambda *args: None)
+    monkeypatch.setattr(handoff, "choose_stop_signal", lambda pid: __import__("signal").SIGINT)
+    monkeypatch.setattr(training_ui, "process_identity", lambda pid: None)
+    monkeypatch.setattr(handoff.subprocess, "check_output", lambda *a, **k: str(handoff.OLD_PID) + "\n")
+    monkeypatch.setattr(tomato_ab_run, "gpu_inventory", list)
+    monkeypatch.setattr(tomato_ab_run, "validate_gpus", lambda *a, **k: None)
+    monkeypatch.setattr(training_ui, "attach_cli_job", lambda *a: {"id": "cachedjob"})
+    signals = []
+    calls = []
+    monkeypatch.setattr(handoff.os, "kill", lambda *args: signals.append(args))
+
+    class Child:
+        pid = 1234
+        returncode = 0
+
+        def poll(self):
+            return None
+
+        def wait(self):
+            return 0
+
+    def launch(command, **kwargs):
+        calls.append(command)
+        kwargs["stdout"].write(b"Run manifest: /tmp/new-run.json\n")
+        kwargs["stdout"].flush()
+        return Child()
+
+    monkeypatch.setattr(handoff.subprocess, "Popen", launch)
+    config = SimpleNamespace(checkpoint_dir=tmp_path / "checkpoint", exp_name="same_experiment")
+    status = {"status": "ready", "old_identity": "pinnedidentity"}
+    if recover_stopping:
+        (tmp_path / "logs/complete100_preflight/rgb_cache_handoff_4000.json").write_text(
+            json.dumps(
+                {
+                    "phase": "stopping_original_after_finalized4000",
+                    "old_identity": "pinnedidentity",
+                    "report": str(tmp_path / "report.json"),
+                    "handoff_pid": 999,
+                }
+            )
+        )
+    handoff.handoff(config, status, tmp_path / "report.json", recover_stopping=recover_stopping)
+    assert signals == [(handoff.OLD_PID, signal.SIGINT)]
+    assert len(calls) == 1
+    assert "--resume" in calls[0]
+    assert calls[0][calls[0].index("--exp-name") + 1] == "same_experiment"
+    handoff.handoff(config, status, tmp_path / "report.json")
+    assert len(calls) == 1
+    assert len(signals) == 1
+
+
+def test_nohup_signal_selection():
+    import signal
+
+    from scripts.tomato100_cached_resume import stop_signal_from_status
+
+    assert stop_signal_from_status("SigIgn: 0\nSigCgt: 0\n") == signal.SIGINT
+    assert stop_signal_from_status("SigIgn: 0000000001001007\nSigCgt: 0000000100010000\n") == signal.SIGTERM
+    with pytest.raises(ValueError, match="Both normal stop signals"):
+        stop_signal_from_status(f"SigIgn: {(1 << (signal.SIGINT - 1)) | (1 << (signal.SIGTERM - 1)):x}\n")
+
+
+def test_stopping_recovery_rejects_existing_resume(tmp_path, monkeypatch):
+    from scripts import tomato100_cached_resume as handoff
+    from scripts import tomato100_run
+
+    monkeypatch.setattr(tomato100_run, "ROOT", tmp_path)
+    directory = tmp_path / "logs/complete100_preflight"
+    directory.mkdir(parents=True)
+    (directory / "rgb_cache_handoff_4000.json").write_text(
+        json.dumps(
+            {
+                "phase": "cached_resume_started",
+                "new_pid": 123,
+                "old_identity": "expected",
+                "report": "report",
+                "handoff_pid": 1,
+            }
+        )
+    )
+    monkeypatch.setattr(handoff.os, "kill", lambda *a: pytest.fail("must not signal training"))
+    with pytest.raises(ValueError, match="Cannot recover"):
+        handoff.handoff(
+            SimpleNamespace(), {"status": "ready", "old_identity": "expected"}, Path("report"), recover_stopping=True
+        )

@@ -4,6 +4,14 @@
 
 V-JEPA独立训练/推理说明位于 `/home/user/vjepa2_training/docs/TOMATO_LOCAL_AGENT.md`。两模型不联合反向传播。本接口未改VLM/Action Expert、58D动作、50步窗口、A/B训练、Delta/Absolute、归一化、RTC或执行队列。
 
+## 与公共训练主线的关系
+
+本分支已整合 `main@b067d2e`，训练主线与 Agent 接口同时保留。Agent 不被训练入口自动加载，配置仍为关闭状态。本轮整理仅在本机执行，未同步服务器、启动训练或运行机器人。
+
+`phase_profile=tomato-seven-phase-v1` 固定对应下述七阶段流程，四分类预测协议本身不代表兼容任意阶段序列。`PredictionPromptProvider` 默认保留旧七阶段行为；显式传入其他 profile 会报错。当前119/204条手中调整五阶段协议尚未实现对应 Agent 适配，不能直接复用该状态机或据此宣称五阶段自动控制已接入。
+
+`memory_bridge` 是把独立操作结果作为语言条件的接口；`visual_memory_v1` 是历史图像输入。两者可存在于同一仓库，但当前没有自动组合或联合训练配置。
+
 ## 协议与状态
 
 协议 `tomato-stage-prediction-v1`。固定labels为pickup/harvest/return/adjust，响应同时带head logits和概率、预测模式、未来时距、有效标志、模型版本、session/observation ID及输入/结果Unix时间戳。具体字段由 `openpi.subtasks.agent_bridge.validate_prediction` 校验；七维、NaN、错误类别顺序、概率与logits不一致、错ID及过期时间戳被拒绝。
@@ -13,7 +21,9 @@ V-JEPA独立训练/推理说明位于 `/home/user/vjepa2_training/docs/TOMATO_LO
 ```python
 from openpi.subtasks.agent_bridge import PredictionPromptProvider, bind_chunk
 
-provider = PredictionPromptProvider(threshold=.8, confirmations=2, max_age_s=2.)
+provider = PredictionPromptProvider(
+    phase_profile="tomato-seven-phase-v1", threshold=.8, confirmations=2, max_age_s=2.
+)
 provider.reset("human-started-session")
 # response来自独立Agent进程，transport/timeout由调用方提供。
 context = provider.accept_prediction(response, observation_id=expected_id, now=unix_now)

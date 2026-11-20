@@ -14,6 +14,7 @@ import hashlib
 import importlib
 import json
 import logging
+import os
 import pathlib
 import re
 import shutil
@@ -68,10 +69,10 @@ def file_sha256(path: pathlib.Path) -> str:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def _inventory(root: pathlib.Path, files: list[pathlib.Path]) -> dict[str, str]:
+def _inventory(root: pathlib.Path, files: list[pathlib.Path], *, digest=file_sha256) -> dict[str, str]:
     result = {}
     for index, path in enumerate(sorted(files)):
-        result[path.relative_to(root).as_posix()] = file_sha256(path)
+        result[path.relative_to(root).as_posix()] = digest(path)
         if (index + 1) % 100 == 0:
             logging.info("Fingerprinting %s: %d/%d files", root, index + 1, len(files))
     return result
@@ -131,12 +132,20 @@ def _source_identity(data_config: _config.DataConfig, source: Any) -> tuple[dict
     if info["total_frames"] != getattr(source, "source_total_frames", len(source)):
         raise ValueError("Dataset metadata total_frames does not match the loaded table")
     view_identity = getattr(source, "view_identity", None)
+
+    def dataset_digest(path):
+        if path.is_relative_to(root / "videos"):
+            from openpi.training.frame_cache import source_video_sha256
+
+            return source_video_sha256(path)
+        return file_sha256(path)
+
     return {
         **({"task_view": view_identity} if view_identity is not None else {}),
         "repo_id": spec.repo_id,
         "frames": len(source),
         "episodes": info["total_episodes"],
-        "files": _inventory(root, files),
+        "files": _inventory(root, files, digest=dataset_digest),
         "tasks": [json.loads(line) for line in required[2].read_text().splitlines() if line.strip()],
         "frame_ids_sha256": hashlib.sha256(frame_ids.astype("<i8").tobytes()).hexdigest(),
     }, frame_ids
@@ -172,6 +181,10 @@ def _training_contract(config: _config.TrainConfig, data_config: _config.DataCon
         "use_quantile_norm": data_config.use_quantile_norm,
         "video_backend": data_config.video_backend,
     }
+    if global_prompt := getattr(data_config, "global_prompt", None):
+        values["data_transforms"]["global_prompt"] = global_prompt
+    if getattr(data_config, "paper_bundle_sha256", None):
+        values["paper_bundle_sha256"] = data_config.paper_bundle_sha256
     return json.loads(_json_bytes(values))
 
 
@@ -233,9 +246,20 @@ def prepare_run(
         manifest = json.loads((directory / "manifest.json").read_text())
         if manifest["contract"] != contract:
             changed = [key for key in contract if manifest["contract"].get(key) != contract[key]]
-            raise ValueError(
-                f"Reproducibility contract changed: {changed}. Use a new exp_name for a changed experiment."
-            )
+            migration_path = os.environ.get("PI05_INPUT_EXECUTION_MIGRATION")
+            if not resuming or not migration_path:
+                raise ValueError(
+                    f"Reproducibility contract changed: {changed}. Use a new exp_name for a changed experiment."
+                )
+            from openpi.training.input_migration import validate_migration
+
+            migration = validate_migration(manifest["contract"], contract, migration_path)
+            migration_dir = directory / "input_execution_migrations"
+            migration_dir.mkdir(exist_ok=True)
+            migration_file = migration_dir / (hashlib.sha256(_json_bytes(migration)).hexdigest() + ".json")
+            if not migration_file.exists():
+                migration_file.write_bytes(_json_bytes(migration))
+            logging.info("Verified pixel-equivalent input execution migration: %s", migration_file)
         for name, expected in manifest["artifacts"].items():
             if file_sha256(directory / name) != expected:
                 raise ValueError(f"Reproducibility artifact changed: {name}")

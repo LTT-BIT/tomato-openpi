@@ -1,8 +1,64 @@
 # Tomato OpenPI 训练仓库
 
+## Agent 分支入口
+
+`tomato-stage-agent` 在本机整合 `main@b067d2e` 的训练功能，保留独立的阶段 Agent 与语言操作结果记忆接口。Agent 配置为 `configs/tomato_vjepa_agent.json`，默认关闭、无 checkpoint，使用 `tomato-seven-phase-v1` 七阶段进度及四种动作指令；当前五阶段手中调整训练未接入此 Agent。接口、调用边界与验证范围见 [Agent 说明](docs/TOMATO_VJEPA_INTERFACE.md)。
+
+语言操作结果记忆使用 `configs/tomato_memory_experiment.json`，与 `visual_memory_v1` 的历史图像输入分别配置。合并代码不启用 Agent、记忆或正式训练。下面各历史实验的完成状态以其对应记录为准；本机整理不会更新服务器正在运行的 checkout。
+
+
+`main` 已集成基础 π0.5、Train RTC、逐时间步归一化和相关高斯噪声。Sharpa 论文训练使用 JAX、30 Hz 全参、双臂 Delta 和双手 Absolute。原三路 Sharpa 的多数据源 T3 使用完整窗口等权洗牌。下文的整串番茄视觉历史配置另支持三路或四路输入、阶段或全局指令，以及分组加权采样。
+
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
-Sharpa 整串番茄新增[粗阶段 A/B 实验与决策 agent](training_configs/experiments/tomato_sharpa/README.md#整串番茄粗阶段-ab-实验)：保留完整 episode，审核完全部数据后统一准备；A 使用总体目标，B 使用粗阶段英文。两者共用原始录制分组划分，输入仍为256 tokens。阶段 agent 仅判断阶段、提供指令，不发送机器人动作；当前未训练或实机验证。
+## 整串番茄视觉历史
+
+视觉历史方案在 `tomato-visual-memory` 分支开发，使用**采样历史图像＋空间池化视觉前缀**。训练配置入口为 `training_configs.experiments.tomato_sharpa.subtasks.visual_memory_v1`。
+
+默认使用当前四路图像及 t−45/t−30/t−15 的四路历史（30 Hz，跨度1.5秒）。当前图像各保留256个token，历史图像各池化为4×4个token，增加192个token，视觉前缀合计1216；显式加入相机/相对时间编码，沿用π0.5前缀注意力和动作flow损失。历史不包含state、动作目标、阶段真值或未来帧；**当前58D state保留**，动作仍为手臂Delta＋手部Absolute，预测50步。图像增强在同相机的各时间槽保持一致。此方案仍须逐帧编码历史，尚未做特征缓存或时延优化。
+
+数据复用已冻结的119条五阶段v3四视图B副本（357970帧），原 `subtask-roi`、旧实验与checkpoint不修改。所有录制仍属于动作训练数据，不能用其回放宣称独立泛化。历史严格在同一录制内按源帧ID取样，缺失历史置零并mask；阶段prompt变化不清空同一录制的视觉历史。现有第四路ROI有前后帧辅助坐标，**该数据不构成在线因果ROI验收**。
+
+设置实际数据路径后，可运行以下 CPU 数据检查。
+
+```bash
+export PI05_IN_HAND119_BUNDLE=/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_four_view_v3_r1
+export PI05_RGB_FRAME_CACHE=/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_rgb224_cache_v3_r1
+JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.check_visual_memory --workers 2
+```
+
+本版使用独立归一化资产 `tomato_visual_memory_v1_h4_s15_g4_delta_30hz`。首次准备且目标资产不存在时，执行 `JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.bind_visual_memory_norm --source-norm assets/tomato_in_hand119_rgb_crop_v3_r1_delta_30hz`：核验旧统计来源、完全相同的当前向量变换链及每条录制3个样本后，原值复制并建立新版本绑定，拒绝覆盖旧资产。`PI05_VISUAL_MEMORY_FRAMES=1` 为无历史对照；`PI05_VISUAL_MEMORY_STRIDE`、`PI05_VISUAL_MEMORY_GRID` 可改采样间隔及池化网格。每组设置生成独立实验名和资产ID，必须单独绑定；默认不复用旧训练UI的输入验收报告。
+
+运行 `bash scripts/python.sh -m scripts.training_ui` 打开整串番茄训练表单，默认使用已准备的 119 条五阶段数据、阶段指令和四路视频。可在“训练参数”中独立选择阶段指令或全局 Prompt、三路原始 RGB 或四路 RGB＋ROI，视觉历史跟随所选视频路数。两个选项都可与逐时间步归一化、相关高斯噪声及 Train RTC 组合。Train RTC 接受 `0 ≤ delay < action_horizon` 的整数动作步，0 为关闭。缺少正式训练包时，工作台可预览最终配置。训练数据、统计和启动条件见 [Sharpa 训练说明](training_configs/experiments/tomato_sharpa/README.md#可选逐时间步归一化相关噪声与-train-rtc)。
+
+“采样策略”可切换为按分组权重有放回抽样，支持与 T1/T2/T3 一起使用。训练工作台可从 119 条冻结训练包读取 A/B 分组，权重也支持按训练 episode 编号手动配置。
+
+119 条视觉历史工作台会使用可访问的 RGB 缓存，支持通过 `PI05_RGB_FRAME_CACHE` 指定目录。缓存按录制和相机匹配源视频，文件迁移造成的修改时间变化不会拦截。与源视频不匹配、缺失或无法读取的缓存逐路回退到源视频。历史时刻按相机合并读取，动作窗口只在当前帧加载一次。
+
+JAX 视觉历史训练会将同一训练批分给多个 CPU worker 预读，训练进程按采样顺序合批后再传入设备。断点续训仍以已完成步数恢复样本位置。回退到 PyAV 源视频时复用已打开的解码器，只对所需帧执行 RGB 色彩转换。
+
+`VisualHistory` 提供有界推理缓存，要求明确episode身份、单调的采集frame ID及timestamp，缺失的精确历史时刻保持mask，禁止把策略调用次数当30 Hz时间轴。`VisualMemoryPolicy` 是使用训练原始输入协议（116D原始state，经适配为58D）的离线策略包装器，要求匹配checkpoint内的 `assets/visual_memory_contract.json`；还没有接入机器人部署仓库的58D传输接口。按需在策略调用之间向历史缓存写入实际采集帧，新任务reset。
+
+2026-11-16：70项相关本地测试通过，包含小型CPU底座的真实训练更新、动作采样、参数兼容与单帧回归；服务器载入119条/357970帧索引，在6个位置验证历史像素/掩码与推理缓存一致，双worker组批通过。另对生产模型完成CPU抽象图检查：含文本前缀为 `[1,1472,2048]`，动作loss为 `[1,50]`，该检查不分配生产权重、不代表GPU容量验收。真实检查记录见 `training_configs/experiments/tomato_sharpa/subtasks/records/visual_memory_v1_h4_s15_g4_input_check_20261116.json`。配置继承batch256/FSDP8/30000步/每5000步保存，**本版GPU容量、完整训练、Memory收益及实机部署均未验证**；尚未启动正式训练。
+
+2026-11-18重新审计119条数据：357970帧标签、物理列与历史索引检查通过，1309个阶段边界/锚点完成15708次历史视图像素与mask对照；原三路视频哈希组合及state/action逐字节指纹未发现完全重复录制。本轮16项相关契约测试通过。全量476个缓存文件（215538093568字节）的SHA256与原验收一致，但迁移后的476个mtime均不匹配旧清单，**当时的生产缓存入口因此拒绝加载**；本轮使用全哈希验证后的只读审计入口，不改清单、不放宽生产保护。候选来源包整体划分为训练86条/264302帧、开发14条/37589帧、测试19条/56079帧，尚未启用；包名前缀只作为导出批次分组，不宣称真实采集日期或未见果串/场景。已核验另一个无Memory的全119条动作实验完成并保存30000步，其checkpoint不能用于这份候选划分的独立测试；新实验须从未使用待测录制的底座开始，归一化仅使用训练86条。事件结果与摘要标签仍缺失，本轮不测物理成功率或Memory收益、不启动训练。记录及候选成员见 `training_configs/experiments/tomato_sharpa/subtasks/records/visual_memory_all119_audit_20261118.json`；复查入口为 `scripts.check_visual_memory_data --report <新JSON路径>`，迁移缓存需显式加 `--verify-migrated-cache` 做全内容校验。
+
+以下保留既有基线与数据说明。
+
+
+当前 `tomato-subtask-policy` 分支准备100条normal完整录制的四视图π₀.₅训练：原三路RGB＋当前局部RGB、58D state、阶段英文prompt，无深度、无π₀.₅ Memory。28服务器数据、独立100条统计及B主方案/A对照入口见[番茄训练说明](training_configs/experiments/tomato_sharpa/README.md)。视觉token1024、文本上限256，batch256/16000步/FSDP8，每4000完成步保存并保留checkpoint，原学习率保持。默认只检查：`bash scripts/python.sh -m scripts.tomato100_run check`；显式`start`才启动，拒绝占用中的GPU。2026-11-13已在28启动B：batch256实际训练通过，第10步loss1.6188，8卡各约64.6GiB显存；完整训练尚未完成。
+
+旧normal93配置、数据与B checkpoint7999保留，旧入口`scripts.tomato_ab_run`不改。100条与旧93条有90条共同录制，移出3条、加入10条，并重新计算统计；因此不能把新旧结果当作仅增加crop的严格消融。r11裁剪坐标由前后帧辅助离线生成，图像始终来自当前帧；实时ROI与部署另行验证。
+
+新 `normal/speedup/full-block-more` 数据使用独立 `scripts.tomato_full_block_roi` 离线流程：先冻结原始文件SHA256，再逐批检测右手及邻近果串，以180像素为最小取景、300像素为局部上限规划平滑窗口，输出224×224局部RGB。前后帧只辅助坐标，像素始终取当前cam0；左手放果时保持右手果串为中心。`process --source <只读缓存根目录> --output <派生根目录> --category normal|speedup` 独立处理两种时间轴，保留逐帧坐标、检测距离、视频解码和几何检查。服务器 `publish --source <tomato_sharpa根目录> --output <同一根目录> --freeze <冻结清单>` 仅在各类别 `full-block-more/subtask-roi/A或B/原数据集名` 内复制原三路、state/action和元数据，并新增第四路及校验清单；不使用可写硬链接。原始数据前后哈希必须一致，冲突文件拒绝覆盖。该批数据不自动接入旧训练，不生成Subtask标签；视频完整性、抽帧语义复核和正式训练就绪状态分别记录。
+
+2026-11-13已发布normal 100条/301891帧、speedup 100条/223405帧至28上述目录，局部图覆盖全部525296帧，原始948个文件前后SHA256一致。原600路视频与新增200路均完整解码；200条各抽取3个中段时刻，并复核179段较长检测缺口的各6个时刻，未将抽帧复核声称逐帧语义准确率。Subtask标签及新批训练配置尚待后续工作，旧训练不变。结果见[本批校验记录](training_configs/experiments/tomato_sharpa/subtasks/records/full_block_more_roi_20261113_r1.json)。
+
+增量批次在 `freeze/process/publish` 中使用 `--datasets <精确源数据集名...>` 固定成员；名称不存在会报错，避免误处理其他批次。发布总清单合并保留既有数据包，并核对其包清单哈希；`raw_verification_datasets` 明确列出本次重新核验的原始目录，`raw_sha256_verified_files` 只统计本次选中来源，不把历史验收伪称为本次全量重验。ROI检测、框选、插值和平滑参数保持同版本。
+
+局部图清晰度可通过 `process --image-profile lanczos4_unsharp065_sigma085_crf14_v1` 显式启用：从当前cam0帧直接裁剪，Lanczos4一次缩放至224×224，Gaussian sigma0.85、unsharp amount0.65轻度锐化，H.264 CRF14编码。默认 `baseline` 仍为双三次缩放、CRF18；取框与时序规则不变。运行配置、逐帧记录及视频收据保存图像profile，已有输出与请求profile不符时拒绝复用。该处理不使用生成式超分，不能恢复源视频未记录的细节；新批次仍须检查遮挡、果串完整性与锐化伪影，不自动替换旧ROI或训练输入。
+
+2026-11-14新增A `1114_1056_1082` 14条、B `1114_1055_1079` 5条，normal/speedup各19条已补齐四路：56079/44822帧，共100901帧局部RGB，全量解码无黑帧。修复源图边缘1像素舍入余量造成的不可行约束；A7剔除3个支架误检锚点，A0/B0的normal及speedup部分时段使用明确记录的人工复核局部框，未扩大300像素上限。38条中段及74段较长定位缺口已抽帧复核，不代表逐帧语义100%。原始195个文件前后哈希一致，旧8个包清单未变；合并总清单为normal/speedup各119条。来源、人工修正及校验见[增量批次结果](training_configs/experiments/tomato_sharpa/subtasks/records/full_block_more_roi_20261114_r1.json)，数据侧记录位于各自 `subtask-roi/provenance/20261114_r1`，保留昨日记录。未生成Subtask标签或修改训练数据选择。
 
 本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。
 
@@ -34,6 +90,8 @@ export PI05_SHARED_ENV=/mnt/data/public_tools/training/environments/pi05/2026101
 bash scripts/python.sh -m wandb login
 bash scripts/python.sh -m scripts.training_ui --port 8765
 ```
+
+Sharpa multimodal 全参训练可在「03 训练参数 → 论文功能」直接勾选「逐时间步归一化」和「相关噪声」，两项同时选择为 T3；配合 Train RTC 最大延迟（例如10）即可使用融合训练，无需先运行个人配置生成命令。切换功能自动使用独立统计名称，并固定双臂 delta、双手 absolute 与无放回完整窗口采样；点击启动时保存可复现个人配置。已有个人配置会还原算法选项，单独修改 RTC 可复用匹配统计。当前完成的是配置与软件测试，尚不代表真实数据训练或实机验证完成。同步代码后须重启自己的 UI 进程并刷新页面。
 
 **在自己的电脑打开服务器 UI**：服务监听服务器的 `127.0.0.1:8765`，需要通过 SSH 转发到本地。
 
@@ -97,6 +155,8 @@ ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:18766:127.0.0.1:8766 zhiwei50002
 UI 流程日志和状态在 `logs/training_ui/<任务ID>/`；正式训练仍按现有规则写入 `logs/`、`checkpoints/`、`wandb/`，不会写入公共环境。GPU 占用检查用于提示，本仓库 UI 会预留自己任务使用的卡；其他 clone、其他用户及命令行训练仍需协调。运行期间不要修改正在使用的源码或配置。
 
 UI 只管理本仓库训练，不安装驱动或环境、不转换数据、不修改 W&B 登录凭据。除首次准备环境、登录 W&B 和启动 UI 外，日常数据准备检查、统计计算、参数选择及训练操作都可在页面完成。下面的命令行流程仍可使用。
+
+UI 启动 GPU 训练时默认传入 `XLA_PYTHON_CLIENT_PREALLOCATE=true` 和 `XLA_PYTHON_CLIENT_MEM_FRACTION=0.90`，无需每次手动 export；实际值记录在任务状态的 `training_environment` 和流程日志中。若启动 UI 的环境已显式设置这两个变量，则保留其值。此默认值仅作用于 UI 后续启动的 GPU 训练，不改变命令行入口、已有任务或 baseline 配置。预分配不能保证更大的 batch 能运行，仍须根据实际训练验证显存需求。
 
 ## 自己的电脑：安装本地环境
 
@@ -300,6 +360,28 @@ CUDA_VISIBLE_DEVICES=0 bash scripts/python.sh -u -m scripts.run_training \
 历史训练参数、checkpoint 与指标见 [历史实验记录](docs/records/历史实验记录.md)。本仓库不包含这些历史运行产物。
 
 GitLab 自动验证目前暂停。本地代码检查命令为 `bash scripts/check_training.sh`，协作与验证规则见 [多人开发 README](多人开发README.md)。本项目遵循 [LICENSE](LICENSE) 和 [Gemma 许可](LICENSE_GEMMA.txt)。
+
+## 显式选择的 Delta 论文训练实验
+
+Sharpa可在本地 `template/<负责人>/` 选择双臂Delta、逐未来时间位置归一化和Correlated Noise的新实验；八份baseline及recipe默认值不变。共享代码与个人配置分开，个人文件不提交、不上传；首次可用 `scripts.create_delta_paper_experiments --owner <负责人>` 在固定任务目录创建。对照设计、独立统计、训练命令和新权重部署限制见 [Sharpa论文算法实验](training_configs/experiments/tomato_sharpa/README.md#本地-delta-论文算法实验不修改-baseline)。目前仅完成离线代码验证，未执行真实数据完整训练。
+
+论文训练实验现支持原目录中的no-block-one六份摘番茄数据联合加载，逐源完整窗口、统一统计及独立个人配置；使用方法见[任务说明](training_configs/experiments/tomato_sharpa/README.md#no-block-one-六份摘番茄数据联合实验)。原baseline保持原样。
+
+## 同一 UI 中的普通训练、原始 trainRTC、T3 与 T3+RTC
+
+| 选择的配置 | `rtc_max_delay` | 实际训练路径 |
+| --- | ---: | --- |
+| 正式 Sharpa 全参 baseline / 非 Paper 个人配置 | 0 | 原生 Pi0、标准高斯、原始数据与统计路径 |
+| 同一非 Paper 配置 | 10 | 原生 trainRTC；不需要 Paper 统计或相关噪声 |
+| Paper T3 个人配置 | 0 | `timestamp_zscore_arms` + `paper_beta=0.5`，无 RTC |
+| 同一 Paper T3 配置、同一统计身份 | 10 | T3 相关高斯与主线 trainRTC 同时生效 |
+
+普通训练在配置列表选择正式全参 baseline，直接编辑原有“Train RTC 最大延迟”；T3 则先用个人配置生成器创建并选择 `delta_paper_t3`（六源版本为 `delta_paper_no_block_one_t3`），仍用同一字段切换 0/10，不新增全局 Paper 开关。配置摘要显示模型类型、有效 RTC、Paper mode/beta（仅 Paper）、动作监督、统计路径及 bundle 摘要。`paper_beta=0` 仅关闭相关噪声，仍是 Paper 数据/归一化路径，不能代替非 Paper 的原始 trainRTC。
+
+`10` 表示每条训练样本均匀采样 0～10 步干净前缀，含两端，并非固定10步。T3 噪声先生成完整相关块，再用真值覆盖前缀；仅监督后缀，按有效 token 总数归一化。模型只保留一份 `Pi0.compute_loss/sample_actions`，Paper 子类只改变噪声。**不实现论文第9页的 correlation-aware correction、条件协方差修正或 soft inpainting。** PyTorch 不支持此组合。
+
+仅改 RTC、实验名、batch 等可在合同一致时复用原 T3 的四个资产文件；改变 mode/beta/horizon/数据必须使用匹配的独立资产，不能覆盖或跳过摘要检查。新 RTC 实验必须使用新实验名，已有 T3 权重可作为新 run 的初始化，不能以 `resume` 强行切换算法。生成命令、资产校验、跨 chunk 物理前缀接口和验证边界见 [Sharpa T3+RTC 说明](training_configs/experiments/tomato_sharpa/README.md#t3--trainrtc-集成)。
+
 
 番茄 subtask A/B 数据准备工具 `openpi.subtasks.prepare` 在各模式的共享元数据完成后，为 `annotations/episode_*.json` 绑定该模式实际输出的数据哈希和新编号；原审定标签保存在 `provenance/source_annotations`，由 `source_migration` 记录上游来源及快照哈希。A/B 的 task_index/tasks 不同，标签各自校验，不得交叉复用。此步骤仅准备数据，不代表训练或实机验证完成。
 

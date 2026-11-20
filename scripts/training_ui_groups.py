@@ -2,9 +2,57 @@
 """Recover episode groups from explicit conversion provenance, without reading videos."""
 
 from collections import defaultdict
+import hashlib
 import json
 from pathlib import Path
 from pathlib import PurePosixPath
+
+from openpi.training.dataset_collection import collection_layout
+from openpi.training.sampling import complete_window_count
+
+
+def detect_bundle_groups(dataset_root: str, bundle_sha256: str, *, horizon: int) -> dict:
+    root = Path(dataset_root).resolve()
+    if not bundle_sha256:
+        raise FileNotFoundError("请在训练机上设置 PI05_IN_HAND119_BUNDLE 后读取分组。也可手动填写 episode 编号。")
+    contents = (root.parent / "bundle.json").read_bytes()
+    if hashlib.sha256(contents).hexdigest() != bundle_sha256:
+        raise ValueError("训练包来源记录已变化，请重新载入配置")
+    layout = collection_layout([root])[0]
+    lengths = {row["episode_index"]: row["length"] for row in layout["episodes"]}
+    groups = defaultdict(list)
+    seen = set()
+    for row in json.loads(contents)["mapping"]:
+        episode = row["episode_index"]
+        source = PurePosixPath(row["source_dataset"])
+        if episode not in lengths or episode in seen or lengths[episode] != row["length"]:
+            raise ValueError("训练包来源映射与 episode 元信息不一致")
+        if not source.is_absolute() or source.parent.name not in ("A", "B") or ".." in source.parts:
+            raise ValueError("训练包缺少明确的 A/B 来源目录，请手动填写分组")
+        seen.add(episode)
+        if complete_window_count(lengths[episode], horizon):
+            groups[source.parent].append(episode)
+    if seen != lengths.keys() or not groups:
+        raise ValueError("训练包映射未覆盖全部 episode，或没有可用动作窗口")
+    if len({path.parent for path in groups}) != 1:
+        raise ValueError("训练包 A/B 来源目录不唯一，请手动填写分组")
+    result = [
+        {
+            "name": path.name,
+            "source_root": str(path),
+            "episodes": sorted(episodes),
+            "frames": sum(lengths[episode] for episode in episodes),
+            "eligible_windows": sum(complete_window_count(lengths[episode], horizon) for episode in episodes),
+        }
+        for path, episodes in sorted(groups.items())
+    ]
+    return {
+        "dataset_root": str(root),
+        "episodes": sum(len(group["episodes"]) for group in result),
+        "frames": sum(group["frames"] for group in result),
+        "eligible_windows": sum(group["eligible_windows"] for group in result),
+        "groups": result,
+    }
 
 
 def detect_groups(dataset_root: str) -> dict:

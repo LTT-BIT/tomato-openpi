@@ -1,0 +1,388 @@
+{
+  "schema": "complete100_transport_roi_repair_validation_v1",
+  "date": "2026-11-12",
+  "selection": {
+    "path": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json",
+    "sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000"
+  },
+  "status": "all100_transport_repair_temporal_and_input_checks_passed_independent_semantic_accuracy_not_certified",
+  "episodes": 100,
+  "frames": 425556,
+  "algorithm_valid_frames": 415987,
+  "algorithm_invalid_local_crop_frames": 9569,
+  "algorithm_valid_fraction": 0.9775141227006552,
+  "invalid_reduction_fraction": 0.7677709015896129,
+  "source_data_policy": {
+    "raw_sources_modified": false,
+    "all100_action_train": true,
+    "frames_deleted": false,
+    "invalid_local_crop_masks_only_fourth_image": true,
+    "original3rgb_state_action_supervision_retained": true,
+    "depth": false,
+    "memory_to_pi05": false,
+    "agent_split_membership_unchanged": [
+      84,
+      8,
+      8
+    ]
+  },
+  "before_after": {
+    "frames": 425556,
+    "before_valid": 384351,
+    "after_valid": 415987,
+    "recovered": 34058,
+    "regressed": 2422,
+    "window_catching_up": 6944,
+    "required_hand_lost": 2625
+  },
+  "display_side_quantiles": {
+    "min": 220.0,
+    "p50": 326.0,
+    "p95": 380.0,
+    "max": 380.0
+  },
+  "longest_remaining_invalid_runs": [
+    {
+      "episode_index": 48,
+      "start": 752,
+      "end": 859,
+      "frames": 107
+    },
+    {
+      "episode_index": 51,
+      "start": 979,
+      "end": 1066,
+      "frames": 87
+    },
+    {
+      "episode_index": 48,
+      "start": 1099,
+      "end": 1181,
+      "frames": 82
+    },
+    {
+      "episode_index": 30,
+      "start": 483,
+      "end": 563,
+      "frames": 80
+    },
+    {
+      "episode_index": 61,
+      "start": 1169,
+      "end": 1234,
+      "frames": 65
+    },
+    {
+      "episode_index": 15,
+      "start": 608,
+      "end": 672,
+      "frames": 64
+    },
+    {
+      "episode_index": 86,
+      "start": 575,
+      "end": 638,
+      "frames": 63
+    },
+    {
+      "episode_index": 40,
+      "start": 1775,
+      "end": 1837,
+      "frames": 62
+    },
+    {
+      "episode_index": 64,
+      "start": 3245,
+      "end": 3302,
+      "frames": 57
+    },
+    {
+      "episode_index": 59,
+      "start": 2619,
+      "end": 2670,
+      "frames": 51
+    }
+  ],
+  "method": {
+    "detector": "Original strong detections preserved by role; repaired detector consulted only when original lacks a strong hand",
+    "original_model_threshold": 0.75,
+    "repair_threshold": 0.85,
+    "strong_current_detection_fast_path": 0.85,
+    "repair_training_frames": 12,
+    "repair_training_recordings": 8,
+    "original_locator_reference_frames": 134,
+    "locator_repair_steps": 500,
+    "annotation_author": "coding agent inspecting native RGB; not independent human labels",
+    "foreground_object_displacement_px": 12,
+    "foreground_hand_displacement_px": 8,
+    "foreground_confirmation_frames": 4,
+    "hand_center_ema": 0.35,
+    "no_foreground_reseeding_of_existing_track": true,
+    "current_attachment_miss_expiry_frames": 6,
+    "window_min_side_height_fraction": 0.55,
+    "window_max_side_min_dimension_fraction": 0.95,
+    "window_growth_limit_fraction": 0.02,
+    "window_shrink_limit_fraction": 0.008,
+    "window_center_speed_limit_fraction": 0.03,
+    "window_acceleration_limit_fraction": 0.008,
+    "window_shrink_delay_frames": 15,
+    "phase_or_future_inputs": false,
+    "continuous_current_pixels_even_on_invalid": true
+  },
+  "detector": {
+    "original_model": {
+      "path": "/home/user/datasets/derived/tomato_roi_locator_experiment_r2/model.pt",
+      "sha256": "19069cbd6fb9f1763798585685e3606bbe57e05f2a99ffdecd015e31bc04c305"
+    },
+    "repaired_model": {
+      "path": "/home/user/datasets/derived/tomato_roi_locator_hard_case_repair_r2/model.pt",
+      "sha256": "8b06ab9aa07e513e73d305b7c2f3ca5d060ee0a05ed5ab08a822df144a1d89fb"
+    },
+    "repair_receipt": {
+      "path": "/home/user/datasets/derived/tomato_roi_locator_hard_case_repair_r2/receipt.json",
+      "sha256": "3226b1bc60356abe76b91d47f84a9d09a3b17074ffa53c6d5f15d1264f6380aa"
+    },
+    "training_source_snapshot": {
+      "path": "/home/user/datasets/derived/tomato_roi_locator_hard_case_repair_r2/trainer_snapshot.py",
+      "sha256": "b4c0707a6f16477be030883a10574e5b8c0ade7041f760978df46dbdcaa22de0"
+    },
+    "hard_case_annotations": {
+      "path": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_roi_hard_cases_20261112_r1.json",
+      "sha256": "f7c9d225c79000e4c83fd359c4d757987e28eecfc2e696011d024afcc4d4a22f"
+    },
+    "detector_cache_contract": {
+      "path": "/home/user/datasets/derived/tomato_complete100_coverage_detector_cache_r4/contract.json",
+      "sha256": "939f901e00629415f22d55a2b86ab2ca592eea51bf9cce25bd7ecffe89bebd98"
+    }
+  },
+  "candidate_root": "/home/user/datasets/derived/tomato_complete100_transport_candidates_r5",
+  "candidate_manifests": [
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_transport_candidates_r5/shard0/candidate_manifest.json",
+      "sha256": "2bdafefc6baa13db36ea5ac4503ab0826f8fcc03d88528d427f5c7b3d0cf3c3c"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_transport_candidates_r5/shard1/candidate_manifest.json",
+      "sha256": "9e8377f55a4833422b59d0d4bb1a5a8c3159df6257ce38e3439bd64fe6fc010e"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_transport_candidates_r5/shard2/candidate_manifest.json",
+      "sha256": "e69ee8e646b27747cd556b3de626304ceea590c99cdebfb1005ec70ee4adfbf2"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_transport_candidates_r5/shard3/candidate_manifest.json",
+      "sha256": "4b16a24f0e0ef25fc152588f181837413ab74232696913e1b8d4a12f91705957"
+    }
+  ],
+  "four_view_bundle": "/home/user/datasets/derived/tomato_complete100_four_view_transport_candidate_r5",
+  "crop_manifest": {
+    "path": "/home/user/datasets/derived/tomato_complete100_four_view_transport_candidate_r5/crop_manifest.json",
+    "sha256": "041d642cb9f70e2357284011f58c56c4a7d6999dd8ca80c869e2b7cdaffd0e78"
+  },
+  "temporal_audit": {
+    "path": "/home/user/datasets/derived/tomato_complete100_transport_audit_r5/audit.json",
+    "sha256": "546b92ddea43aca372c8825acecaf5c36cd32562df5b0ce04170a920f18433d6"
+  },
+  "repair_accounting": {
+    "path": "/home/user/datasets/derived/tomato_complete100_transport_audit_r5/repair_accounting.json",
+    "sha256": "826c2281dc3fa772214139ae5c462c60bd1b93448b0cb7f67a469ead731cee5e"
+  },
+  "semantic_diagnostics": {
+    "path": "/home/user/datasets/derived/tomato_complete100_transport_audit_r5/semantic_review.json",
+    "sha256": "383915d56518866676ad9aef1fde5a8bb10380f1cf63ba7f0fa0a43d10586b22"
+  },
+  "temporal_checks": {
+    "decoded_frames": 425556,
+    "black_frames": 0,
+    "actual_current_pixel_samples": 2506,
+    "maximum_encoded_pixel_mae": 2.5206406781462585,
+    "center_jumps_over25pct": 0,
+    "side_changes_over25pct": 0,
+    "maximum_normalized_center_step": 0.03515254716804899,
+    "maximum_side_ratio": 1.023715415019763,
+    "fps": 30
+  },
+  "semantic_review": {
+    "previous_phase_consistency_flags": 514,
+    "rejected_intermediate_flags": 1600,
+    "current_phase_consistency_flags": 0,
+    "phase_flags_are_not_labeled_error_counts": true,
+    "previous_empty_left_reference_cases": 19,
+    "all19_now_right_hand_and_valid": true,
+    "manual_reference_display_coverage": {
+      "right_hand": {
+        "boxes": 103,
+        "mean": 0.9847497146814798,
+        "at_least90pct": 101
+      },
+      "truss": {
+        "boxes": 7,
+        "mean": 1.0,
+        "at_least90pct": 7
+      },
+      "left_hand": {
+        "boxes": 59,
+        "mean": 0.9538019104047047,
+        "at_least90pct": 55
+      },
+      "left_hand_and_carried_fruit": {
+        "boxes": 31,
+        "mean": 1.0,
+        "at_least90pct": 31
+      },
+      "target": {
+        "boxes": 27,
+        "mean": 1.0,
+        "at_least90pct": 27
+      },
+      "held_target": {
+        "boxes": 41,
+        "mean": 0.979564930784443,
+        "at_least90pct": 40
+      }
+    },
+    "reference_is_in_sample": true,
+    "independent_semantic_accuracy_assessed": false
+  },
+  "visual_review": {
+    "all100_samples": {
+      "path": "/home/user/datasets/derived/tomato_complete100_transport_visual_review_r5/samples.json",
+      "sha256": "98e025f9a39fc0f9e470fe8a80cc8de42baaa35f047f2dca1a09e1d1cab2b599"
+    },
+    "samples_viewed": 400,
+    "galleries_viewed": 10,
+    "failure_samples": {
+      "path": "/home/user/datasets/derived/tomato_complete100_transport_failure_review_r5/samples.json",
+      "sha256": "4b8d6ddb5f525ec8dd719a5867b652aaa5ff2a80210bd08b72d9794fe56263bc"
+    },
+    "failure_samples_viewed": 49,
+    "failure_galleries_viewed": 7,
+    "previous_failure_reference": {
+      "path": "/home/user/datasets/derived/tomato_complete100_coverage_failure_review_r4/samples.json",
+      "sha256": "a03a20c7917e0d10d89a382dd24ce60dc6e0e96b7624d1dfbf98e74d51decf80"
+    },
+    "comparison": {
+      "path": "/home/user/datasets/derived/tomato_complete100_transport_comparison_r5/receipt.json",
+      "sha256": "8a0b01308bc8602db6b4a3e18e719beadbcdc2102bc139cf296aa1c145161a75"
+    },
+    "comparison_midpoint_panels_viewed": 6
+  },
+  "actual_four_view_loader": {
+    "path": "/home/user/datasets/derived/tomato_complete100_four_view_transport_candidate_check_r5.json",
+    "sha256": "163aef3365da7a594834248c9f1dec6e4c63471dab733f2e1a134b028d09af2c"
+  },
+  "normalization_assets": [
+    {
+      "variant": "a",
+      "norm_stats": {
+        "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_transport_r5_delta_30hz/norm_stats.json",
+        "sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83"
+      },
+      "norm_metadata": {
+        "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_transport_r5_delta_30hz/norm_metadata.json",
+        "sha256": "fe1ff96ca46290e42a53c9d600262ba0b9e7b7a33dcd67a45407054325f2b7f6"
+      }
+    },
+    {
+      "variant": "b",
+      "norm_stats": {
+        "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_transport_r5_delta_30hz/norm_stats.json",
+        "sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83"
+      },
+      "norm_metadata": {
+        "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_transport_r5_delta_30hz/norm_metadata.json",
+        "sha256": "fa719f921a51a768e0dc5e042aac475082b1eac56684110e79c302fa309eb8fc"
+      }
+    }
+  ],
+  "roi_b1_benchmark": {
+    "path": "/home/user/datasets/derived/tomato_complete100_transport_b1_benchmark_r5_isolated/receipt.json",
+    "sha256": "ac1090276d22fb721d427533060cb426eac5a0f819d856200270ef69867052ee"
+  },
+  "model_mask_invariance_prior_architecture_check": {
+    "path": "/home/user/datasets/derived/tomato_complete100_masked_crop_full_model_check_r1/receipt.json",
+    "sha256": "a65832700ea7165f8bbca6ec4b8219174d6e3b58a6b2dd30c1220d69b90ce442"
+  },
+  "training_contract": {
+    "images": 4,
+    "visual_tokens": 1024,
+    "text_capacity": 256,
+    "state_dim": 58,
+    "action_dim": 58,
+    "action_horizon": 50,
+    "arm_delta_dimensions": 14,
+    "absolute_hand_dimensions": 44,
+    "batch_size": 512,
+    "steps": 8000,
+    "fsdp_devices": 8,
+    "target_batch_memory_accepted": false
+  },
+  "regression_tests": {
+    "passed": 151,
+    "failed": 0
+  },
+  "limitations": {
+    "algorithm_validity_is_not_accuracy": true,
+    "roi_supervision_agent_test_overlap": [
+      27,
+      66
+    ],
+    "independent_agent_holdout_requires_train_only_locator": true,
+    "agent_history_reader_trained": false,
+    "temporal_quality_accepted": true,
+    "semantic_quality_independently_certified": false,
+    "training_ready": false,
+    "formal_pi05_training_started": false,
+    "deployment_modified": false
+  },
+  "source_code": [
+    {
+      "path": "/home/user/tomato-openpi/scripts/tomato_coverage_roi.py",
+      "sha256": "dc14fe2e5f8e47118f474dbbb53da6881affd6956e5a628f29e70ddcd90669de"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/tomato_transport_roi.py",
+      "sha256": "8d967ccfee0caa9c8b321441960521b7575e3f9f609c61cd5c18fc3b93877bfa"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/tomato_repair_locator.py",
+      "sha256": "05d9d66d97b1cade598f04958c613f0c107623fbc41dea7b4c848dfc0da4ba0a"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/prepare_tomato100_coverage_crops.py",
+      "sha256": "f95ee5207685a59d7925f47c8d24fb6ac769ff4fdb94a25cd977657ee866891f"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/train_tomato_roi_repair.py",
+      "sha256": "8104adb28b4a25fea63b5a33a39a8215560abbf1b60e33cd257c2c97d50b9fd8"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/cache_tomato_coverage_detections.py",
+      "sha256": "20bf718e35520ad4f873b039c5704f409978630bfa81c27efb53366b739ca5b1"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/audit_tomato_roi_parallel.py",
+      "sha256": "298cc0d356d11be2a78fb32dc8ec9456d158cd5f93c220d6b18f29f4213ec972"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/profile_tomato_roi_repair.py",
+      "sha256": "b86db901cec0a62269e666fa42d4037bb7617cacf60f055c0fb21a5f72dc5982"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/review_tomato_roi_failures.py",
+      "sha256": "53a1a13314a11a96a27d98bc1ed84af4e4e47256ac92dc4d918d5b02312a669a"
+    },
+    {
+      "path": "/home/user/tomato-openpi/scripts/benchmark_tomato_coverage_roi.py",
+      "sha256": "350ca2d0a41f7ef1b688af8f1827a813e1b0ae221338410ea0ac6cb092fe044a"
+    }
+  ],
+  "rejected_intermediate_semantic_diagnostics": {
+    "path": "/home/user/datasets/derived/tomato_complete100_coverage_audit_r4/semantic_review.json",
+    "sha256": "7aca7dfbee01e4af2f696abd72eb102cd234ba39a16e6b46df97f6b6b6b8aa3a"
+  },
+  "intermediate_cleanup": {
+    "path": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_derived_cleanup_20261112_r2.json",
+    "sha256": "349158f15e21483e81142fd0a67de57f49423bfd1dcb6977d5abacfa58f8982b"
+  }
+}

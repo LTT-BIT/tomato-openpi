@@ -1,0 +1,117 @@
+{
+  "schema": "visual_memory_input_smoke_v1",
+  "config": "pi05_sharpa_in_hand119_visual_memory_v1_h4_s15_g4",
+  "experiment": "tomato_visual_memory_v1_h4_s15_g4_s42_b256_s30000_c5000",
+  "contract": {
+    "version": "tomato-visual-memory-pooled-v1",
+    "frames": 4,
+    "stride": 15,
+    "fps": 30,
+    "pool_grid": 4,
+    "image_keys": [
+      "base_0_rgb",
+      "left_wrist_0_rgb",
+      "right_wrist_0_rgb",
+      "interaction_0_rgb"
+    ],
+    "history_state": false,
+    "current_state": true,
+    "history_tokens": 192,
+    "history_span_seconds": 1.5,
+    "roi_source": "existing_offline_roi_may_use_future_annotation",
+    "method": "sampled_spatial_pool_visual_prefix"
+  },
+  "source": {
+    "dataset_root": "/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_four_view_v3_r1/b_coarse",
+    "dataset_repo_id": "fr3_sharpa/tomato_in_hand119_rgb_crop_v3_r1",
+    "source_datasets": [
+      "/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_four_view_v3_r1/bundle.json",
+      "/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_four_view_v3_r1/selection.json"
+    ],
+    "frames": 357970,
+    "episodes": 119,
+    "prompts": [
+      "Right hand grasps and lifts the truss to the center",
+      "Left hand picks tomatoes into left basket while right hand holds truss",
+      "Right hand adjusts tomato truss position and orientation at the center",
+      "Right hand returns the held object to the right plate"
+    ],
+    "norm_stats_path": "/tmp/tomato-visual-memory-x0zXHR86/assets/tomato_visual_memory_v1_h4_s15_g4_delta_30hz/norm_stats.json",
+    "norm_provenance": "verified",
+    "norm_stats_sha256": "8b06358841e0570ff842883ab8a49a0fd3c9be7b68b59820d93741cd8a06ccde",
+    "norm_audit_sha256": "81ecdecacadf955eb41632d42de2af82fbb248f58c5345f3442729e8c8490d1d"
+  },
+  "loaded_frames": 357970,
+  "loaded_episodes": 119,
+  "checks": [
+    {
+      "index": 0,
+      "episode": 0,
+      "frame": 0,
+      "valid_history_views": 0
+    },
+    {
+      "index": 45,
+      "episode": 0,
+      "frame": 45,
+      "valid_history_views": 12
+    },
+    {
+      "index": 178985,
+      "episode": 60,
+      "frame": 808,
+      "valid_history_views": 12
+    },
+    {
+      "index": 355467,
+      "episode": 117,
+      "frame": 2313,
+      "valid_history_views": 12
+    },
+    {
+      "index": 355468,
+      "episode": 118,
+      "frame": 0,
+      "valid_history_views": 0
+    },
+    {
+      "index": 357969,
+      "episode": 118,
+      "frame": 2501,
+      "valid_history_views": 12
+    }
+  ],
+  "workers": 2,
+  "worker_batch_actions": [
+    2,
+    50,
+    58
+  ],
+  "rgb_cache": "/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_rgb224_cache_v3_r1",
+  "batch256_gpu_capacity_verified": false,
+  "training_started": false,
+  "robot_executed": false,
+  "memory_benefit_measured": false,
+  "backend": "cpu",
+  "production_model_abstract_check": {
+    "prefix_shape": [
+      1,
+      1472,
+      2048
+    ],
+    "loss_shape": [
+      1,
+      50
+    ],
+    "dtype": "bfloat16",
+    "allocated_production_weights": false,
+    "gpu_capacity_verified": false
+  },
+  "normalization_equivalence": {
+    "reused_baseline_statistics": true,
+    "current_transform_chain_identical": true,
+    "vector_equivalence_samples": 357,
+    "source_norm_metadata_sha256": "60ea6588a6b5cbeb3e3aba8784d904954be148811aa95d34050828e5b782a106"
+  },
+  "independent_norm_metadata_sha256": "adef0cecd8c9d503ac9faa2d55d2c0349171dc4dccb5b4206930ef472bb9a799"
+}

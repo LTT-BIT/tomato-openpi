@@ -68,6 +68,7 @@ class Pi0(_model.BaseModel):
         super().__init__(config.action_dim, config.action_horizon, config.max_token_len)
         self.pi05 = config.pi05
         self.rtc_max_delay = config.rtc_max_delay
+        self.image_keys = config.image_keys
         paligemma_config = _gemma.get_config(config.paligemma_variant)
         action_expert_config = _gemma.get_config(config.action_expert_variant)
         # TODO: rewrite gemma in NNX. For now, use bridge.
@@ -111,7 +112,8 @@ class Pi0(_model.BaseModel):
         ar_mask = []
         tokens = []
         # embed images
-        for name in obs.images:
+        # Explicit camera order survives JAX PyTree dictionary key sorting.
+        for name in getattr(self, "image_keys", tuple(obs.images)):
             image_tokens, _ = self.PaliGemma.img(obs.images[name], train=False)
 
             tokens.append(image_tokens)
@@ -191,6 +193,10 @@ class Pi0(_model.BaseModel):
         ar_mask = jnp.array(ar_mask)
         return tokens, input_mask, ar_mask, adarms_cond
 
+    def noise(self, rng, shape):
+        """Return standard-normal action noise. Subclasses may customize the prior."""
+        return jax.random.normal(rng, shape)
+
     @override
     def compute_loss(
         self,
@@ -208,10 +214,12 @@ class Pi0(_model.BaseModel):
             preprocess_rng, noise_rng, time_rng = jax.random.split(rng, 3)
         if augmentation_rng is not None:
             preprocess_rng = augmentation_rng
-        observation = _model.preprocess_observation(preprocess_rng, observation, train=train)
+        observation = _model.preprocess_observation(
+            preprocess_rng, observation, train=train, image_keys=getattr(self, "image_keys", _model.IMAGE_KEYS)
+        )
 
         batch_shape = actions.shape[:-2]
-        noise = jax.random.normal(noise_rng, actions.shape)
+        noise = self.noise(noise_rng, actions.shape)
         time = jax.random.beta(time_rng, 1.5, 1, batch_shape) * 0.999 + 0.001
         if self.rtc_max_delay:
             delay = jax.random.randint(delay_rng, batch_shape, 0, self.rtc_max_delay + 1)
@@ -272,13 +280,15 @@ class Pi0(_model.BaseModel):
             self.action_dim,
         ):
             raise ValueError("prefix_actions must have shape (batch, action_horizon, action_dim)")
-        observation = _model.preprocess_observation(None, observation, train=False)
+        observation = _model.preprocess_observation(
+            None, observation, train=False, image_keys=getattr(self, "image_keys", _model.IMAGE_KEYS)
+        )
         # note that we use the convention more common in diffusion literature, where t=1 is noise and t=0 is the target
         # distribution. yes, this is the opposite of the pi0 paper, and I'm sorry.
         dt = -1.0 / num_steps
         batch_size = observation.state.shape[0]
         if noise is None:
-            noise = jax.random.normal(rng, (batch_size, self.action_horizon, self.action_dim))
+            noise = self.noise(rng, (batch_size, self.action_horizon, self.action_dim))
         action_prefix_mask = jnp.arange(self.action_horizon)[None, :] < prefix_length
         if prefix_length:
             noise = jnp.where(action_prefix_mask[..., None], prefix_actions, noise)

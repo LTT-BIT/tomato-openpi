@@ -9,10 +9,10 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
+from openpi.subtasks.binding import verify_annotation
 from openpi.subtasks.phase_model import canonical_state
 from openpi.subtasks.phase_model import history_indices
 from openpi.subtasks.phase_model import training_statistics
-from openpi.subtasks.binding import verify_annotation
 from openpi.subtasks.prepare import grouped_split
 from openpi.subtasks.prepare import inspect_plan
 from openpi.subtasks.prepare import prepare
@@ -205,11 +205,18 @@ def test_preparation_keeps_whole_episodes_and_all_physical_columns(plan, tmp_pat
     bundle = json.loads((output / "bundle.json").read_text())
     assert bundle["mapping"][0]["annotation_role"] == "upstream_reviewed_snapshot"
     for mode in ("a_goal", "b_coarse"):
-        derived = {"review_complete": True, "episodes": [
-            {**row, "dataset": str(output / mode), "episode_index": i,
-             "annotation": str(output / mode / f"annotations/episode_{i:06d}.json")}
-            for i, row in enumerate(plan["episodes"])
-        ]}
+        derived = {
+            "review_complete": True,
+            "episodes": [
+                {
+                    **row,
+                    "dataset": str(output / mode),
+                    "episode_index": i,
+                    "annotation": str(output / mode / f"annotations/episode_{i:06d}.json"),
+                }
+                for i, row in enumerate(plan["episodes"])
+            ],
+        }
         assert len(inspect_plan(derived)) == 20
         assert bundle["mapping"][0]["active_annotations"][mode]["dataset"] == str(output / mode)
     with pytest.raises(ValueError, match="new bundle"):
@@ -281,16 +288,184 @@ def test_preparation_requires_shared_metadata_hashes(plan):
 
 def test_seven_progress_states_select_four_action_prompts():
     from openpi.subtasks.tomato import ACTION_PROMPTS
-    assert len(PHASES) == 7 and len(set(PROMPTS)) == 4
-    assert PROMPTS[0] == PROMPTS[4] == ACTION_PROMPTS['pickup']
-    assert PROMPTS[1] == PROMPTS[5] == ACTION_PROMPTS['harvest']
-    assert PROMPTS[2] == PROMPTS[6] == ACTION_PROMPTS['return']
-    assert all(p.replace(' ', '').isalpha() for p in PROMPTS)
+
+    assert len(PHASES) == 7
+    assert len(set(PROMPTS)) == 4
+    assert PROMPTS[0] == PROMPTS[4] == ACTION_PROMPTS["pickup"]
+    assert PROMPTS[1] == PROMPTS[5] == ACTION_PROMPTS["harvest"]
+    assert PROMPTS[2] == PROMPTS[6] == ACTION_PROMPTS["return"]
+    assert all(p.replace(" ", "").isalpha() for p in PROMPTS)
     decision = PhaseDecision(confirmations=1)
     for index in range(7):
         probs = [float(i == index) for i in range(7)]
         result = decision.update(probs, float(index))
-        assert result['phase'] == PHASES[index]
-        assert result['action_class'] == COARSE_SEQUENCE[index]
-        assert result['prompt'] == ACTION_PROMPTS[result['action_class']]
-        assert result['task_complete'] is False
+        assert result["phase"] == PHASES[index]
+        assert result["action_class"] == COARSE_SEQUENCE[index]
+        assert result["prompt"] == ACTION_PROMPTS[result["action_class"]]
+        assert result["task_complete"] is False
+
+
+@pytest.fixture
+def frozen_selection(plan, tmp_path):
+    import shutil
+
+    from openpi.subtasks.prepare import digest
+
+    root = tmp_path / "inputs"
+    (root / "B").mkdir(parents=True)
+    dataset = root / "A/source"
+    shutil.copytree(plan["episodes"][0]["dataset"], dataset)
+    rows = []
+    for i, item in enumerate(plan["episodes"]):
+        annotation = dataset / f"annotations/subtasks/coarse/episode_{i:06d}.json"
+        annotation.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(item["annotation"], annotation)
+        rows.append(
+            {
+                "dataset": "A/source",
+                "episode_index": i,
+                "length": 14,
+                "source_recording_id": item["recording_group"],
+                "annotation_sha256": digest(annotation),
+            }
+        )
+    selection = tmp_path / "selection.json"
+    selection.write_text(json.dumps({"name": "test_normal20", "episodes": rows, "excluded": []}))
+    return root, selection
+
+
+def test_frozen_selection_rejects_changed_annotations_and_unknown_recordings(frozen_selection):
+    from scripts.prepare_tomato_ab import build_plan
+
+    root, selection = frozen_selection
+    selected = build_plan(root, selection)
+    assert len(selected["episodes"]) == 20
+    path = root / "A/source/meta/episodes.jsonl"
+    original = path.read_text()
+    path.write_text(original + json.dumps({"episode_index": 20}) + "\n")
+    with pytest.raises(ValueError, match="inventory"):
+        build_plan(root, selection)
+    path.write_text(original)
+    annotation = Path(selected["episodes"][0]["annotation"])
+    annotation.write_text(annotation.read_text() + "\n")
+    with pytest.raises(ValueError, match="annotation differs"):
+        build_plan(root, selection)
+
+
+def test_ab_config_binds_selection_splits_and_preserves_cross_phase_windows(frozen_selection, tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    import datasets
+
+    from openpi.training.task_view import TaskViewDataset
+    from scripts.prepare_tomato_ab import build_plan
+    from scripts.run_training import validate_config
+    from training_configs.experiments.tomato_sharpa.subtasks.common import build
+
+    root, selection = frozen_selection
+    bundle = prepare(build_plan(root, selection), tmp_path / "ab", SyntheticTokenizer())
+    monkeypatch.setenv("PI05_TOMATO_SUBTASK_BUNDLE", str(bundle))
+    for mode in ("a_goal", "b_coarse"):
+        config = build(mode, selection_path=selection)
+        validate_config(config)
+        assert config.fsdp_devices == 8
+        assert config.batch_size == 512
+        assert config.policy_metadata["agent_enabled"] is False
+        data_root = bundle / mode
+        files = sorted((data_root / "data/chunk-000").glob("*.parquet"))
+        hf = datasets.Dataset.from_parquet([str(p) for p in files])
+
+        class Source(SimpleNamespace):
+            def __len__(self):
+                return len(self.hf_dataset)
+
+        source = Source(
+            root=data_root,
+            hf_dataset=hf,
+            meta=SimpleNamespace(
+                get_data_file_path=lambda ep: f"data/chunk-000/episode_{ep:06d}.parquet",
+                tasks=[GOAL] if mode == "a_goal" else list(dict.fromkeys(PROMPTS)),
+            ),
+        )
+
+        view = TaskViewDataset(source, config.data.base_config.task_view, 50)
+        assert len(view) == len(hf)
+        assert set(view.ids[:, 0]) == set(range(20))
+        actions = np.asarray(pq.read_table(files[0])["action"].to_pylist(), dtype=np.float32)
+        for frame in (1, 2, 5, 6, 11, 12, 13):
+            sample = view.vectors(frame)
+            assert sample["prompt"] == (GOAL if mode == "a_goal" else PROMPTS[frame // 2])
+            np.testing.assert_array_equal(sample["action"], actions[np.minimum(frame + np.arange(50), 13)])
+    splits_path = bundle / "splits.json"
+    splits = json.loads(splits_path.read_text())
+    assert splits["splits"] == {"train": list(range(20))}
+    assert config.data.base_config.task_view.split == "train"
+    splits["splits"] = {"train": list(range(16)), "val": [16, 17], "test": [18, 19]}
+    splits_path.write_text(json.dumps(splits))
+    with pytest.raises(ValueError, match="all selected recordings"):
+        build("a_goal", selection_path=selection)
+
+
+def test_ab_ui_retains_all_data_and_rejects_dataset_or_supervision_changes(frozen_selection, tmp_path, monkeypatch):
+    from scripts import training_ui_config as editor
+    from scripts.prepare_tomato_ab import build_plan
+    from training_configs.experiments.tomato_sharpa.subtasks.common import build
+
+    root, selection = frozen_selection
+    bundle = prepare(build_plan(root, selection), tmp_path / "bundle_ui", SyntheticTokenizer())
+    monkeypatch.setenv("PI05_TOMATO_SUBTASK_BUNDLE", str(bundle))
+    config = build("b_coarse", selection_path=selection)
+    values = editor.config_values(config)
+    restored = editor.apply_overrides(config, values)
+    assert restored == config
+    assert editor.apply_overrides(config, {**values, "exp_name": "ui_new_run"}).data == config.data
+    for change in (
+        {"dataset_root": "/another_dataset"},
+        {"sampling_mode": "weighted_replacement"},
+        {"rtc_max_delay": 10},
+        {"action_semantics": "delta"},
+        {"asset_id": "old_stats"},
+    ):
+        with pytest.raises(ValueError, match="当前实验固定已验收"):
+            editor.apply_overrides(config, {**values, **change})
+    entries = editor.experiment_catalog()
+    assert entries[0]["id"] == editor.DEFAULT_AB_MODULE
+    modules = {entry["id"].rsplit(".", 1)[1] for entry in entries}
+    assert {"normal93_a_goal", "normal93_b_stage"} <= modules
+
+
+@pytest.mark.parametrize("mode", ["a_goal", "b_coarse"])
+def test_normal93_delta_arm_only_and_inverse(frozen_selection, tmp_path, monkeypatch, mode):
+    from openpi import transforms
+    from scripts import training_ui_config as editor
+    from scripts.prepare_tomato_ab import build_plan
+    from training_configs.experiments.tomato_sharpa.subtasks.common import build
+
+    root, selection = frozen_selection
+    bundle = prepare(build_plan(root, selection), tmp_path / "delta_bundle", SyntheticTokenizer())
+    monkeypatch.setenv("PI05_TOMATO_SUBTASK_BUNDLE", str(bundle))
+    absolute = build(mode, selection_path=selection)
+    delta = build(mode, selection_path=selection, action_semantics="delta")
+    assert delta.data.assets.asset_id != absolute.data.assets.asset_id
+    assert delta.name == absolute.name + "_delta"
+    assert delta.exp_name == absolute.exp_name + "_delta"
+    assert delta.policy_metadata["training_action_semantics"] == "delta_arm_joint_target_absolute_hand"
+    assert delta.batch_size == absolute.batch_size == 512
+    assert delta.num_train_steps == absolute.num_train_steps == 8000
+    assert delta.lr_schedule.decay_steps == 30000
+    assert delta.lr_schedule.warmup_steps == 1000
+    assert delta.lr_schedule.peak_lr == 2.5e-5
+    assert delta.data.base_config == absolute.data.base_config
+    assert editor.apply_overrides(delta, editor.config_values(delta)) == delta
+    _, vectors = delta.data.create_vector_transforms(delta.model)
+    forward = next(t for t in vectors.inputs if isinstance(t, transforms.DeltaActions))
+    inverse = next(t for t in vectors.outputs if isinstance(t, transforms.AbsoluteActions))
+    state = np.arange(58, dtype=np.float32) / 8
+    actions = np.arange(50 * 58, dtype=np.float32).reshape(50, 58) / 8
+    expected = actions.copy()
+    expected[:, :7] -= state[:7]
+    expected[:, 29:36] -= state[29:36]
+    transformed = forward({"state": state, "actions": actions.copy()})
+    np.testing.assert_array_equal(transformed["actions"], expected)
+    np.testing.assert_array_equal(inverse(transformed)["actions"], actions)
+    np.testing.assert_array_equal(transformed["state"], state)

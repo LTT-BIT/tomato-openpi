@@ -1,0 +1,401 @@
+{
+  "schema": "complete100_causal_four_view_validation_v1",
+  "date": "2026-11-11",
+  "status": "all100_candidate_data_and_numerical_preparation_complete_ROI_semantics_and_target_GPU_memory_pending",
+  "selection": {
+    "path": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_rgb_crop_20261111_saved_labels_r1.json",
+    "sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000"
+  },
+  "data_policy": {
+    "episodes": 100,
+    "frames": 425556,
+    "action_train_episodes": 100,
+    "action_val_test_episodes": 0,
+    "agent_split_unchanged": [
+      84,
+      8,
+      8
+    ]
+  },
+  "inputs": {
+    "rgb_only": true,
+    "depth": false,
+    "original_cameras": [
+      "cam0",
+      "cam2",
+      "cam1"
+    ],
+    "extra_crop_source": "native cam0",
+    "crop_shape": [
+      224,
+      224,
+      3
+    ],
+    "measured_state": 58,
+    "action_window": [
+      50,
+      58
+    ],
+    "action_semantics": "14 arm delta,44 hand absolute",
+    "memory_to_pi05": false
+  },
+  "source_integrity": {
+    "raw_sources_modified": false,
+    "original_video_parquet_metadata_annotation_hashes_verified": true,
+    "copied_original_video_hashes_checked": 600,
+    "original_AB_physical_columns_equal": true
+  },
+  "candidate_bundle": "/home/user/datasets/derived/tomato_complete100_four_view_candidate_r1",
+  "candidate_manifest": {
+    "path": "/home/user/datasets/derived/tomato_complete100_four_view_candidate_r1/crop_manifest.json",
+    "sha256": "7eff930f3221538f67436fc7d9b6d0f25fb26de4b9c4fb9a1a85e81c2b69fdbb"
+  },
+  "candidate_shards": [
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_causal_candidates_r3/shard0/candidate_manifest.json",
+      "sha256": "208a3ae19ce95d88a80b44e04c54a278db98cfa59552cb981e28b824d43676c5"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_causal_candidates_r3/shard1/candidate_manifest.json",
+      "sha256": "e53d347b2809287efc7b771a3467391a2a652f99d97e4f2f4942e94c58d43e4e"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_causal_candidates_r3/shard2/candidate_manifest.json",
+      "sha256": "971e70fdc40d32f474267a2de913844104d93f0cd7dddacafda67d865db3d8a4"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_causal_candidates_r3/shard3/candidate_manifest.json",
+      "sha256": "39e909b6a803d097e339a571a60db394d0aab5c6ad11c98a87fc66abcd5a9153"
+    }
+  ],
+  "generator_contract": {
+    "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+    "locator_sha256": "19069cbd6fb9f1763798585685e3606bbe57e05f2a99ffdecd015e31bc04c305",
+    "normalization_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+    "generator_sha256": "0eee109bb3084d684241ddcb4d6daa3752bfcb11f4c1c807141b37aa8fcec2a3",
+    "selector_sha256": "553806bd0ba857b8650640e526ddc0a71eb441e388c98823260afa26b927ee97"
+  },
+  "candidate_counts": {
+    "episodes": 100,
+    "frames": 425556,
+    "algorithm_valid_frames": 370399,
+    "invalid_frames": 55157,
+    "algorithm_valid_fraction": 0.8703883860173515,
+    "accuracy_not_measured": true
+  },
+  "candidate_export_elapsed_seconds": {
+    "per_episode_median": 29.02611776199774,
+    "per_episode_min": 15.939602350990754,
+    "per_episode_max": 86.3912974440027,
+    "concurrency": 4,
+    "scope": "Four concurrent local workers; includes decode, detector, crop, encode, sampled QA and decode verification. Not a single-worker speed guarantee."
+  },
+  "roi_locator": {
+    "model": {
+      "path": "/home/user/datasets/derived/tomato_roi_locator_experiment_r2/model.pt",
+      "sha256": "19069cbd6fb9f1763798585685e3606bbe57e05f2a99ffdecd015e31bc04c305"
+    },
+    "receipt": {
+      "path": "/home/user/datasets/derived/tomato_roi_locator_experiment_r2/receipt.json",
+      "sha256": "5cf7e5047ecf36908a384c5a542c5b842a45f83d857ae4020d7d267910072c22"
+    },
+    "source_selection_episode_index": 86,
+    "native_source_episode_index": 4,
+    "supervised_keyframes": 134,
+    "training_steps": 1200,
+    "batch": 4,
+    "formal_pi05_training": false,
+    "current_rgb_and_past_measured_state_only": true,
+    "phase_prompt_or_future_input": false,
+    "algorithm": "current RGB detector + normalized measured-motion role selector + nearby-red heuristic",
+    "semantic_quality_accepted": false
+  },
+  "quality_audit": {
+    "path": "/home/user/datasets/derived/tomato_complete100_causal_candidate_audit_r1/audit.json",
+    "sha256": "b2868c94614d2251c0c3bbd4fce177d774bf033e5839f24f8d13050689f02124"
+  },
+  "targeted_role_review": {
+    "path": "/home/user/datasets/derived/tomato_complete100_causal_candidate_audit_r1/targeted_role_review.json",
+    "sha256": "7820eb4966a2e239942798275ed0fd6838f356307610e1da0bdcd0f3c9d8769c"
+  },
+  "full425556_geometry_indices_passed": true,
+  "real_lerobot_verification": {
+    "path": "/home/user/datasets/derived/tomato_complete100_four_view_candidate_check_r2.json",
+    "sha256": "ff6ec33f736ac28f0597e58c0cddb23296e575fb6c87d5944c9aa422a20d0bd9"
+  },
+  "real_lerobot_samples": 300,
+  "independent_original_action_window_reference": true,
+  "normalization_source": {
+    "path": "/home/user/datasets/derived/tomato_complete100_vector_stats_r1/receipt.json",
+    "sha256": "7486854fcab82243b947c66fed0b5bf355e5a085e4b0c833d2ce308d3d763312"
+  },
+  "normalization": {
+    "state_vectors": 425556,
+    "action_vectors": 21277800,
+    "reused_old93": false,
+    "contracts_bound_to_actual_four_view_AB": true,
+    "assets": [
+      {
+        "variant": "a",
+        "norm_stats": {
+          "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_delta_30hz/norm_stats.json",
+          "sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83"
+        },
+        "norm_metadata": {
+          "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_delta_30hz/norm_metadata.json",
+          "sha256": "5d88990fdb2e547e9222233fcf8de59fb9a5f9c653e109bfe03253a6d2ea5d8a"
+        },
+        "provenance_validation": "verified schema2"
+      },
+      {
+        "variant": "b",
+        "norm_stats": {
+          "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_delta_30hz/norm_stats.json",
+          "sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83"
+        },
+        "norm_metadata": {
+          "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_delta_30hz/norm_metadata.json",
+          "sha256": "2d65de3eb9609ae3f40cb49ef8bcc11f0efb88ee550586515d66cdc2837d4516"
+        },
+        "provenance_validation": "verified schema2"
+      }
+    ]
+  },
+  "tokens": {
+    "visual": 1024,
+    "text_slots": 256,
+    "prefix_slots": 1280,
+    "action_positions": 50,
+    "total_slots": 1330,
+    "A": {
+      "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+      "normalization_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+      "tokenizer_sha256": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+      "prompt": "Harvest all tomatoes into the left basket and return stem to right plate.",
+      "rows": 425556,
+      "p50": 211.0,
+      "p95": 220.0,
+      "maximum": 233,
+      "exceeds_256": 0,
+      "truncation_performed": false,
+      "training_started": false,
+      "final_training_contract_bound": false
+    },
+    "B": {
+      "rows": 425556,
+      "p50": 209.0,
+      "p95": 219.0,
+      "maximum": 231,
+      "exceeds_256": 0,
+      "by_prompt": {
+        "Right fingers reposition the truss on the right plate": {
+          "rows": 59742,
+          "p50": 203.0,
+          "p95": 211.0,
+          "maximum": 215,
+          "exceeds_256": 0
+        },
+        "Right hand grasps and lifts the truss to the center": {
+          "rows": 55491,
+          "p50": 206.0,
+          "p95": 219.0,
+          "maximum": 231,
+          "exceeds_256": 0
+        },
+        "Right hand holds truss while left hand picks tomatoes into left basket": {
+          "rows": 281596,
+          "p50": 211.0,
+          "p95": 219.0,
+          "maximum": 230,
+          "exceeds_256": 0
+        },
+        "Right hand returns the held object to the right plate": {
+          "rows": 28727,
+          "p50": 208.0,
+          "p95": 216.0,
+          "maximum": 227,
+          "exceeds_256": 0
+        }
+      }
+    }
+  },
+  "full_model_benchmark": {
+    "receipt": {
+      "path": "/home/user/datasets/derived/tomato_complete100_four_view_gpu_benchmark_r3/receipt.json",
+      "sha256": "6a2c6205be4dafff3bf3e7a4204aac09296a8ab9c97885e4fea6ba87509220f5"
+    },
+    "scope": "Full architecture latency only.58D projections initialized; no claim of trained four-view behavior.",
+    "adapted_projection_parameters": [
+      {
+        "key": "action_in_proj/kernel",
+        "from_shape": [
+          32,
+          1024
+        ],
+        "to_shape": [
+          58,
+          1024
+        ]
+      },
+      {
+        "key": "action_out_proj/bias",
+        "from_shape": [
+          32
+        ],
+        "to_shape": [
+          58
+        ]
+      },
+      {
+        "key": "action_out_proj/kernel",
+        "from_shape": [
+          1024,
+          32
+        ],
+        "to_shape": [
+          1024,
+          58
+        ]
+      }
+    ],
+    "device": "NVIDIA GeForce RTX 5090",
+    "inference": {
+      "3": {
+        "views": 3,
+        "visual_tokens": 768,
+        "text_slots": 256,
+        "action_shape": [
+          1,
+          50,
+          58
+        ],
+        "denoising_steps": 10,
+        "samples": 30,
+        "cold_compile_and_first_call_seconds": 1.2097918530344032,
+        "p50_ms": 54.96206050156616,
+        "p95_ms": 56.22283962729853,
+        "p99_ms": 56.25375146337319,
+        "max_ms": 56.25912401592359
+      },
+      "4": {
+        "views": 4,
+        "visual_tokens": 1024,
+        "text_slots": 256,
+        "action_shape": [
+          1,
+          50,
+          58
+        ],
+        "denoising_steps": 10,
+        "samples": 30,
+        "cold_compile_and_first_call_seconds": 1.172927062958479,
+        "p50_ms": 61.578466003993526,
+        "p95_ms": 63.80459808569867,
+        "p99_ms": 64.94901814265177,
+        "max_ms": 65.40942098945379
+      }
+    },
+    "four_vs_three_p50_ratio": 1.1203813219891716,
+    "gradient": {
+      "batch_size": 1,
+      "loss": 1.8181002140045166,
+      "all_parameter_gradients_finite": true,
+      "parameter_gradient_l2": 4.865397930145264,
+      "fourth_image_gradient_l1": 2.6999282836914062,
+      "parameter_gradient_augmentation": true,
+      "crop_input_gradient_augmentation": false,
+      "compile_plus_run_seconds": 27.851416354009416,
+      "optimizer_step_performed": false,
+      "training_batch512_memory_accepted": false
+    },
+    "peak_jax_allocated_bytes": 15281886720,
+    "includes_decode_or_roi": false,
+    "checkpoint_manifest": [
+      {
+        "path": "/home/user/.cache/openpi/openpi-assets/checkpoints/pi05_base/params/_CHECKPOINT_METADATA",
+        "sha256": "7674d497b452e8336840e6d21eaa85725d68c53fc011a648121f2b29b1ce5a8a"
+      },
+      {
+        "path": "/home/user/.cache/openpi/openpi-assets/checkpoints/pi05_base/params/_METADATA",
+        "sha256": "250d0ad0f6540a5e4bdd70442d6864cef729724f2d23e2dd2cc669563a668d70"
+      },
+      {
+        "path": "/home/user/.cache/openpi/openpi-assets/checkpoints/pi05_base/params/manifest.ocdbt",
+        "sha256": "78b6898ea1f8897a0225022b0ab799455cff0e15158a9ca349d8efbbe044aa55"
+      }
+    ]
+  },
+  "roi_B1_benchmark": {
+    "receipt": {
+      "path": "/home/user/datasets/derived/tomato_complete100_roi_b1_benchmark_r1/receipt.json",
+      "sha256": "6f395527abcc07e1fc1052bc134c2ebf82447cef0597a232b888ff64f1ebf1a1"
+    },
+    "samples": 300,
+    "measurements": {
+      "locator_ms": {
+        "p50": 3.319300012663007,
+        "p95": 3.922588608111255,
+        "maximum": 5.015587026719004
+      },
+      "selector_ms": {
+        "p50": 1.1391784937586635,
+        "p95": 2.1004075941164047,
+        "maximum": 2.158962015528232
+      },
+      "crop_ms": {
+        "p50": 0.0484009797219187,
+        "p95": 0.40329908952116966,
+        "maximum": 0.43381599243730307
+      },
+      "total_ms": {
+        "p50": 4.544980474747717,
+        "p95": 5.899155998486094,
+        "maximum": 6.849327008239925
+      }
+    },
+    "scope": "First300 consecutive source frames, GPU synchronized, warmed B1, no decode/encode/policy."
+  },
+  "regression_tests": {
+    "passed": 126,
+    "failed": 0,
+    "environment": "/tmp/tomato-rgb-test-env",
+    "jax_platform": "cpu",
+    "modules": [
+      "tests/test_tomato_four_view.py",
+      "tests/test_tomato_roi_preparation.py",
+      "tests/test_tomato_rgb100.py",
+      "tests/test_tomato_subtasks.py",
+      "tests/test_tomato_prompt_probe.py",
+      "tests/test_tomato_interaction_preview.py",
+      "tests/test_sharpa_multimodal.py",
+      "tests/test_sharpa_training.py",
+      "src/openpi/models/pi0_rtc_test.py",
+      "tests/test_tomato_roi_probe.py",
+      "tests/test_tomato_manual_episode_roi.py",
+      "tests/test_tomato_causal_roi.py",
+      "tests/test_tomato_roi_locator.py",
+      "tests/test_tomato_four_view_materialization.py"
+    ]
+  },
+  "training_entries": {
+    "a": "training_configs.experiments.tomato_sharpa.subtasks.complete100_a_crop",
+    "b": "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop",
+    "batch_size": 512,
+    "num_train_steps": 8000,
+    "fsdp_devices": 8,
+    "warmup_steps": 1000,
+    "decay_steps": 30000,
+    "current_candidate_rejected": true
+  },
+  "remaining": [
+    "Correct/revalidate active-hand semantic errors and detector loss intervals; no stage-label based retrospective corrections.",
+    "Target GPU batch512/FSDP8 memory acceptance, target devices busy at read-only checks.",
+    "Agent joint history reader and 16x58 history integration; deployment and real cadence validation are separate future work."
+  ],
+  "full_roi_coverage": false,
+  "training_ready": false,
+  "formal_pi05_training_started": false,
+  "optimizer_step_performed": false,
+  "deployment_modified": false,
+  "robot_connected": false
+}

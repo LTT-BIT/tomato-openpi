@@ -3,8 +3,17 @@
   "enabled": false,
   "transport": "external_jsonl_bridge",
   "agent_checkpoint": null,
-  "labels": ["pickup", "harvest", "return", "adjust"],
-  "camera_order": ["cam0", "cam1", "cam2"],
+  "labels": [
+    "pickup",
+    "harvest",
+    "return",
+    "adjust"
+  ],
+  "camera_order": [
+    "cam0",
+    "cam1",
+    "cam2"
+  ],
   "history_frames": 16,
   "history_sample_hz": 10,
   "prediction_hz": 2,
@@ -24,5 +33,15 @@
     "prompt_updates": "caller_existing_safe_replan_boundary",
     "chunk_prompt_version_required": true,
     "robot_control_enabled": false
-  }
+  },
+  "phase_profile": "tomato-seven-phase-v1",
+  "phases": [
+    "pickup_1",
+    "harvest_1",
+    "return_truss",
+    "adjust",
+    "pickup_2",
+    "harvest_2",
+    "return_stem"
+  ]
 }

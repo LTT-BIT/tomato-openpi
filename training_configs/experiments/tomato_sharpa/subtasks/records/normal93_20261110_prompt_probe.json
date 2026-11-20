@@ -1,0 +1,470 @@
+{
+  "version": "tomato-paired-prompt-probe-v1",
+  "episodes": 93,
+  "anchors": 2881,
+  "chunks": 23048,
+  "paired_calls": 5762,
+  "seeds": [
+    42,
+    43
+  ],
+  "prompts": [
+    "pickup",
+    "harvest",
+    "return",
+    "adjust"
+  ],
+  "checkpoint": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/checkpoints/pi05_sharpa_tomato_truss_normal93_20261109_annotation_r2_all_sources_v2_b_coarse_fullft_v1_delta/mengxiang_tomato_truss_normal93_20261109_annotation_r2_all_sources_v2_b_coarse_v1_s42_delta_1109_134531/7999",
+  "checkpoint_metadata_sha256": "c97bc696c7598a1c618a4030578f690edd08c89875e142b6d37c7df960d59cff",
+  "code_sha256": "e1b6994cf3e83b19f9b1de12b64ec16d04472efa8ec4cfb3c94b934b933376e2",
+  "summary_code_sha256": "0e6fc525a6410b82d99f8983fcf2befd1becdba41d14c2c0aa8cae08eb6d835c",
+  "norm_sha256": "3f82a27ba53cb6a0553886d453c8e05ccb466354d131ee9c956cd0a12637350a",
+  "hosts": [
+    "dsw-795764-5878bc8ccd-9ft4h"
+  ],
+  "scope": "All93 were training data. Fixed-observation interventions only; no closed-loop or counterfactual target claims.",
+  "normalization": "Original checkpoint stats; roundtrip to canonical absolute targets tested per anchor",
+  "limitations": [
+    "All93 are training recordings, no held-out/generalization success claim.",
+    "Only original demonstration target exists; wrong-prompt correctness is unknown.",
+    "Fixed-observation query is not a closed-loop prompt-switch or hold-until-switch test.",
+    "Primary action prefixes stop at actual phase boundaries; no fabricated hold supervision.",
+    "Pickup1/2, harvest1/2, return1/2 have identical language codes in this checkpoint.",
+    "No new crop/phase-ID model was trained or deployed."
+  ],
+  "inputs": [
+    {
+      "path": "outputs/normal93_prompt_full_28_20261110/shard0",
+      "protocol_sha256": "21d7094234c9754246c9be7a4c5e236bd636c0659ef074f1473d4f89f8a7464d",
+      "metrics_sha256": "f17e59e3132e11a34db04d7159106696e72ab57f8d00645fc9a4a3f906d1a7c4"
+    },
+    {
+      "path": "outputs/normal93_prompt_full_28_20261110/shard1",
+      "protocol_sha256": "cec07c98bc5dc32a3d5f3bc54b66c4214145150b60563e4ba9e405a4760ebe24",
+      "metrics_sha256": "aa6ab173d7131ff78b7b717733e3c588c40883a321504c9b3536437374aa7e69"
+    },
+    {
+      "path": "outputs/normal93_prompt_full_28_20261110/shard2",
+      "protocol_sha256": "14815c423e10975a7cbfb6063fde4e1fbed0f80bcbbdff0a2d1f7aceeae6e02e",
+      "metrics_sha256": "e34aa643ffaf0216c6aa60f489ea16307f724b59ac1f733a503ba8f031d1374e"
+    },
+    {
+      "path": "outputs/normal93_prompt_full_28_20261110/shard3",
+      "protocol_sha256": "1631e1831fc092daa2d2849990dde14890f81bc3041bb5951696bdf3a16ed6dd",
+      "metrics_sha256": "f9fb0d77e1789ae6343fa06cfe0a0eb31a3222643a64311f65d24f2439deaf78"
+    }
+  ],
+  "date": "2026-11-10",
+  "server": "28",
+  "gpu_ids": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "full_report": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/outputs/normal93_prompt_full_28_20261110/summary_final.json",
+  "full_report_sha256": "541144c84e816bd468cceaff23e4008ddfa5e501fa40bbc8112a260947703da4",
+  "instruction_response_ratio_h15": {
+    "left_arm": {
+      "pickup_vs_return_rms_rad": {
+        "n": 2881,
+        "mean": 0.007011323823824367,
+        "p10": 0.003311860957182944,
+        "median": 0.00578747340478003,
+        "p90": 0.011602011043578386
+      },
+      "noise_rms_rad": {
+        "n": 2881,
+        "mean": 0.011046333118632477,
+        "p10": 0.006555770989507437,
+        "median": 0.010272822342813015,
+        "p90": 0.01656351611018181
+      },
+      "pickup_vs_return_to_noise_ratio": {
+        "n": 2881,
+        "mean": 0.6957864102165788,
+        "p10": 0.29487980352765025,
+        "median": 0.5695124807896859,
+        "p90": 1.1702883505567159
+      }
+    },
+    "left_hand": {
+      "pickup_vs_return_rms_rad": {
+        "n": 2881,
+        "mean": 0.008009668602551574,
+        "p10": 0.00438448041677475,
+        "median": 0.006948214955627918,
+        "p90": 0.011715305037796497
+      },
+      "noise_rms_rad": {
+        "n": 2881,
+        "mean": 0.010195950798577824,
+        "p10": 0.00697806803509593,
+        "median": 0.009483189322054386,
+        "p90": 0.013491695746779442
+      },
+      "pickup_vs_return_to_noise_ratio": {
+        "n": 2881,
+        "mean": 0.796112142185083,
+        "p10": 0.45440017571135427,
+        "median": 0.735005395228665,
+        "p90": 1.2019353656294591
+      }
+    },
+    "right_arm": {
+      "pickup_vs_return_rms_rad": {
+        "n": 2881,
+        "mean": 0.012698834269030436,
+        "p10": 0.002193251275457442,
+        "median": 0.008000742178410292,
+        "p90": 0.03140423074364662
+      },
+      "noise_rms_rad": {
+        "n": 2881,
+        "mean": 0.005025072551869194,
+        "p10": 0.0022293298970907927,
+        "median": 0.0045737214386463165,
+        "p90": 0.008423072285950184
+      },
+      "pickup_vs_return_to_noise_ratio": {
+        "n": 2881,
+        "mean": 2.723048034516363,
+        "p10": 0.6183812681199455,
+        "median": 1.6590852187024472,
+        "p90": 6.38101412691197
+      }
+    },
+    "right_hand": {
+      "pickup_vs_return_rms_rad": {
+        "n": 2881,
+        "mean": 0.014767055351994103,
+        "p10": 0.0035240461584180593,
+        "median": 0.007554125506430864,
+        "p90": 0.03447454236447811
+      },
+      "noise_rms_rad": {
+        "n": 2881,
+        "mean": 0.010133220471508985,
+        "p10": 0.005419753026217222,
+        "median": 0.008579381741583347,
+        "p90": 0.01716247759759426
+      },
+      "pickup_vs_return_to_noise_ratio": {
+        "n": 2881,
+        "mean": 1.322409577318985,
+        "p10": 0.5020241392060055,
+        "median": 0.9721977356354171,
+        "p90": 2.6594652062633717
+      }
+    }
+  },
+  "phase_instruction_response_ratio_h15": {
+    "0": {
+      "right_arm": {
+        "n": 279,
+        "mean": 4.404492298471204,
+        "p10": 0.6072829085553778,
+        "median": 3.9772276411989567,
+        "p90": 9.028032439011291
+      },
+      "right_hand": {
+        "n": 279,
+        "mean": 1.012905886149414,
+        "p10": 0.5059796228022194,
+        "median": 0.8107981517925099,
+        "p90": 1.6197074143319747
+      }
+    },
+    "1": {
+      "right_arm": {
+        "n": 465,
+        "mean": 1.3474635568476072,
+        "p10": 0.4485823044498224,
+        "median": 1.0632308410338696,
+        "p90": 2.6504891851161245
+      },
+      "right_hand": {
+        "n": 465,
+        "mean": 0.7287829458845998,
+        "p10": 0.4463062551717758,
+        "median": 0.6743795949995659,
+        "p90": 1.092996488965102
+      }
+    },
+    "2": {
+      "right_arm": {
+        "n": 463,
+        "mean": 3.2638800506525203,
+        "p10": 0.7785180174122566,
+        "median": 2.2331112983415817,
+        "p90": 7.337475109364176
+      },
+      "right_hand": {
+        "n": 463,
+        "mean": 1.500465954242759,
+        "p10": 0.4897436840427336,
+        "median": 1.2276452490213103,
+        "p90": 2.927063594849544
+      }
+    },
+    "3": {
+      "right_arm": {
+        "n": 465,
+        "mean": 1.4076600484312023,
+        "p10": 0.5072324897701911,
+        "median": 1.1919244766818102,
+        "p90": 2.5062356461757274
+      },
+      "right_hand": {
+        "n": 465,
+        "mean": 2.0355442446330443,
+        "p10": 1.1711781916389807,
+        "median": 1.9385612541274904,
+        "p90": 3.0688922518822164
+      }
+    },
+    "4": {
+      "right_arm": {
+        "n": 465,
+        "mean": 4.0704190375402485,
+        "p10": 0.8635048144022592,
+        "median": 2.5081041736011893,
+        "p90": 9.48582272640217
+      },
+      "right_hand": {
+        "n": 465,
+        "mean": 1.9667022342937148,
+        "p10": 0.7461227561222933,
+        "median": 1.6318659229316925,
+        "p90": 3.6033974845940904
+      }
+    },
+    "5": {
+      "right_arm": {
+        "n": 465,
+        "mean": 1.8048671579805842,
+        "p10": 0.632019118168204,
+        "median": 1.3451322909727441,
+        "p90": 3.3815635427967843
+      },
+      "right_hand": {
+        "n": 465,
+        "mean": 0.8048075393010276,
+        "p10": 0.47006158295202055,
+        "median": 0.7493339057516629,
+        "p90": 1.178931006834207
+      }
+    },
+    "6": {
+      "right_arm": {
+        "n": 279,
+        "mean": 3.9137312377929234,
+        "p10": 1.302465475854692,
+        "median": 3.1230844224846916,
+        "p90": 7.743783063661764
+      },
+      "right_hand": {
+        "n": 279,
+        "mean": 0.9260979386869266,
+        "p10": 0.42362403382355857,
+        "median": 0.7646902782843544,
+        "p90": 1.4954932096236153
+      }
+    }
+  },
+  "factual_lower_demo_error_fraction_h15": {
+    "left_arm": {
+      "summary_normalized": 0.4732731690385283,
+      "summary_physical_rad": 0.4274557445331482
+    },
+    "left_hand": {
+      "summary_normalized": 0.6296424852481777,
+      "summary_physical_rad": 0.517702186740715
+    },
+    "right_arm": {
+      "summary_normalized": 0.7091287747309962,
+      "summary_physical_rad": 0.6732037486983686
+    },
+    "right_hand": {
+      "summary_normalized": 0.6889968760846928,
+      "summary_physical_rad": 0.6391877820201319
+    }
+  },
+  "boundary_new_prompt_closer_to_expert": {
+    "1": {
+      "-45": {
+        "right_arm": 0.026881720430107527,
+        "right_hand": 0.44623655913978494
+      },
+      "-15": {
+        "right_arm": 0.6397849462365591,
+        "right_hand": 0.44623655913978494
+      },
+      "0": {
+        "right_arm": 0.7043010752688172,
+        "right_hand": 0.4838709677419355
+      },
+      "15": {
+        "right_arm": 0.6666666666666666,
+        "right_hand": 0.6774193548387096
+      }
+    },
+    "2": {
+      "-45": {
+        "right_arm": 0.06451612903225806,
+        "right_hand": 0.23655913978494625
+      },
+      "-15": {
+        "right_arm": 0.0913978494623656,
+        "right_hand": 0.1935483870967742
+      },
+      "0": {
+        "right_arm": 0.5376344086021505,
+        "right_hand": 0.34946236559139787
+      },
+      "15": {
+        "right_arm": 0.9354838709677419,
+        "right_hand": 0.5752688172043011
+      }
+    },
+    "3": {
+      "-45": {
+        "right_arm": 0.12365591397849462,
+        "right_hand": 0.010752688172043012
+      },
+      "-15": {
+        "right_arm": 0.12903225806451613,
+        "right_hand": 0.05913978494623656
+      },
+      "0": {
+        "right_arm": 0.41935483870967744,
+        "right_hand": 0.5913978494623656
+      },
+      "15": {
+        "right_arm": 0.8494623655913979,
+        "right_hand": 0.8010752688172043
+      }
+    },
+    "4": {
+      "-45": {
+        "right_arm": 0.1774193548387097,
+        "right_hand": 0.08602150537634409
+      },
+      "-15": {
+        "right_arm": 0.17204301075268819,
+        "right_hand": 0.27419354838709675
+      },
+      "0": {
+        "right_arm": 0.3870967741935484,
+        "right_hand": 0.5967741935483871
+      },
+      "15": {
+        "right_arm": 0.7956989247311828,
+        "right_hand": 0.8225806451612904
+      }
+    },
+    "5": {
+      "-45": {
+        "right_arm": 0.03225806451612903,
+        "right_hand": 0.34946236559139787
+      },
+      "-15": {
+        "right_arm": 0.7096774193548387,
+        "right_hand": 0.3548387096774194
+      },
+      "0": {
+        "right_arm": 0.7258064516129032,
+        "right_hand": 0.6290322580645161
+      },
+      "15": {
+        "right_arm": 0.7580645161290323,
+        "right_hand": 0.7365591397849462
+      }
+    },
+    "6": {
+      "-45": {
+        "right_arm": 0.043010752688172046,
+        "right_hand": 0.2956989247311828
+      },
+      "-15": {
+        "right_arm": 0.05913978494623656,
+        "right_hand": 0.1881720430107527
+      },
+      "0": {
+        "right_arm": 0.46236559139784944,
+        "right_hand": 0.40860215053763443
+      },
+      "15": {
+        "right_arm": 0.9516129032258065,
+        "right_hand": 0.5483870967741935
+      }
+    }
+  },
+  "inference_call_s_excluding_first_per_shard": {
+    "n": 5758,
+    "mean": 0.16924261582317235,
+    "p10": 0.16720938785001635,
+    "median": 0.16849569499026984,
+    "p90": 0.17277291053906083
+  },
+  "cross_phase_training_windows": {
+    "1": {
+      "count": 0,
+      "fraction": 0.0
+    },
+    "5": {
+      "count": 2232,
+      "fraction": 0.005437854483793634
+    },
+    "15": {
+      "count": 7812,
+      "fraction": 0.01903249069327772
+    },
+    "50": {
+      "count": 27342,
+      "fraction": 0.06661371742647203
+    }
+  },
+  "tests_python": 92,
+  "checkpoint_parameters_updated": false,
+  "default_configuration_changed": false,
+  "robot_connected": false,
+  "new_crop_or_stage_embedding_trained": false,
+  "crop_audit": {
+    "recordings": [
+      0,
+      46,
+      89
+    ],
+    "phase_midpoint_frames": 21,
+    "native_rgb_shapes": {
+      "cam0": [
+        400,
+        640,
+        3
+      ],
+      "cam1": [
+        480,
+        640,
+        3
+      ],
+      "cam2": [
+        480,
+        640,
+        3
+      ]
+    },
+    "findings": [
+      "Fixed center-half right-wrist crop can remove contact region near lower/right edge.",
+      "Additional image dict key is removed by default model preprocessor unless image_keys explicitly configured.",
+      "Candidate lower/right crop is visual feasibility only, no improvement claim."
+    ]
+  },
+  "conclusions": [
+    "Existing B responds to trained English phase prompts; token count alone does not establish weak language conditioning.",
+    "Right-hand conditioning relative to noise varies by phase; aggregate median ratio is not a grasp/release success rate.",
+    "Boundary observations require separate evaluation; b+0.5s comparison is not a measured switching latency.",
+    "No evidence yet that a crop, numeric labels or new phase embedding improves control; no default model replacement.",
+    "Closed-loop switch/hold behavior requires independent action execution validation and appropriate hold/switch demonstrations."
+  ]
+}

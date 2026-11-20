@@ -66,9 +66,86 @@ def process_identity(pid):
         return None
 
 
+def attach_cli_job(manifest_path, console_path, pid):
+    """Register an existing CLI run for read-only monitoring; never spawn training."""
+    root = common.repository_root().resolve()
+    manifest_path, console_path = Path(manifest_path).resolve(), Path(console_path).resolve()
+    for path in (manifest_path, console_path):
+        if not path.is_relative_to(root / "logs") or not path.is_file():
+            raise ValueError("CLI manifest and console must be existing repository logs")
+    manifest = json.loads(manifest_path.read_text())
+    config = manifest["config"]["fields"]
+    identity = process_identity(pid)
+    command = Path(f"/proc/{int(pid)}/cmdline").read_bytes().split(b"\0")
+    if not identity or b"scripts.run_training" not in command or config["exp_name"].encode() not in command:
+        raise ValueError("PID must identify the existing matching CLI training process")
+    if str(manifest_path) not in console_path.read_text(errors="replace"):
+        raise ValueError("Console does not belong to this run manifest")
+    job_id = uuid.uuid5(uuid.NAMESPACE_URL, str(manifest_path)).hex
+    directory = job_directory(job_id)
+    with submit_lock():
+        if directory.exists():
+            existing = read_job(job_id)
+            if existing.get("external_manifest") != str(manifest_path):
+                raise ValueError("Conflicting UI attachment")
+            return existing
+        directory.mkdir()
+        (directory / "console.log").symlink_to(console_path)
+        try:
+            created_at = (
+                datetime.strptime(manifest["started_at"], "%Y%m%d_%H%M%S_%f")
+                .replace(tzinfo=ZoneInfo("Asia/Shanghai"))
+                .isoformat(timespec="seconds")
+            )
+        except ValueError:
+            created_at = manifest["started_at"]
+        source = manifest.get("experiment_source", {})
+        config_path = source.get("original_path", "") if isinstance(source, dict) else source
+        state = {
+            "id": job_id,
+            "host": socket.gethostname(),
+            "status": "running",
+            "stage": "训练中 · CLI只读",
+            "created_at": created_at,
+            "updated_at": now(),
+            "exp_name": config["exp_name"],
+            "checkpoint_dir": manifest["checkpoint_dir"],
+            "config_path": config_path,
+            "resolved_config": manifest["config"],
+            "external_manifest": str(manifest_path),
+            "child_pid": int(pid),
+            "child_start": identity,
+            "read_only": True,
+        }
+        atomic_json(directory / "state.json", state)
+    return state
+
+
+def external_job_state(state):
+    manifest = json.loads(Path(state["external_manifest"]).read_text())
+    status = manifest.get("status")
+    if status == "training_completed":
+        status, stage = "completed", "训练完成 · CLI只读"
+    elif status == "failed":
+        status, stage = "failed", "训练失败 · CLI只读"
+    elif state.get("host") == socket.gethostname() and process_identity(state["child_pid"]) == state["child_start"]:
+        status, stage = "running", "训练中 · CLI只读"
+    else:
+        status, stage = "interrupted", "CLI进程已退出，请检查日志"
+    config = manifest["config"]["fields"]
+    return {
+        **state,
+        "status": status,
+        "stage": f"{stage} · batch{config['batch_size']} · {config['num_train_steps']}步",
+        "updated_at": now(),
+    }
+
+
 def read_job(job_id):
     path = job_directory(job_id) / "state.json"
     state = json.loads(path.read_text())
+    if state.get("external_manifest"):
+        return external_job_state(state)
     if (
         state["status"] not in TERMINAL
         and state.get("host") == socket.gethostname()
@@ -247,6 +324,9 @@ def start_job(request):
     from scripts import training_ui_config as config_ui
 
     config, path = build_request(request)
+    metadata = config.policy_metadata
+    if metadata.get("subtask_variant") == "in_hand_b_coarse" and not metadata.get("bundle_sha256"):
+        raise FileNotFoundError("请准备 119 条四路训练包并设置 PI05_IN_HAND119_BUNDLE")
     with submit_lock():
         validate_devices(request.get("gpus"), config, allow_busy=request.get("allow_busy", False))
         if any(job["status"] not in TERMINAL and job["checkpoint_dir"] == str(config.checkpoint_dir) for job in jobs()):
@@ -296,6 +376,8 @@ def start_job(request):
 def resume_job(request):
     with submit_lock():
         original = read_job(request["id"])
+        if original.get("read_only"):
+            raise ValueError("CLI接入任务仅供查看，请使用原CLI入口续训")
         if original.get("host") != socket.gethostname():
             raise ValueError("请在原训练服务器的 UI 中恢复任务")
         if original["status"] not in TERMINAL or original["status"] == "completed":
@@ -332,6 +414,8 @@ def resume_job(request):
 
 def stop_job(job_id):
     state = read_job(job_id)
+    if state.get("read_only"):
+        raise ValueError("CLI接入任务仅供查看，不由UI接管进程")
     if state.get("host") != socket.gethostname():
         raise ValueError("请在原训练服务器的 UI 中停止任务")
     if state["status"] in TERMINAL:
@@ -391,6 +475,30 @@ def job_config(state):
     return resolve_experiment(state["module"], job_overrides(state))
 
 
+def prepare_input_environment(config):
+    """Bind the selected experiment's optional RGB cache in this worker."""
+    metadata = config.policy_metadata or {}
+    report = metadata.get("input_acceptance_report")
+    if report:
+        from scripts.tomato_in_hand119_run import checked_config
+
+        bundle = Path(metadata["dataset_root"]).parent
+        cache = Path(metadata["rgb_frame_cache"])
+        checked_config(bundle, cache, Path(report), require_fresh=False)
+    else:
+        os.environ.pop("PI05_INPUT_EXECUTION_MIGRATION", None)
+        cache = None
+        if metadata.get("subtask_variant") == "in_hand_b_coarse" and metadata.get("visual_memory"):
+            root = os.environ.get("PI05_RGB_FRAME_CACHE") or metadata.get("rgb_frame_cache")
+            if root and (Path(root).expanduser() / "manifest.json").is_file():
+                cache = Path(root).expanduser().resolve()
+        if cache is None:
+            os.environ.pop("PI05_RGB_FRAME_CACHE", None)
+        else:
+            os.environ["PI05_RGB_FRAME_CACHE"] = str(cache)
+            print(f"RGB cache candidate: {cache}; incompatible streams use source video", flush=True)
+
+
 def worker(job_id):
     directory = job_directory(job_id)
     # The creator publishes the PID before releasing this handshake.
@@ -413,6 +521,7 @@ def worker(job_id):
             raise ValueError("保存后配置被修改，请新建实验")
         config = job_config(state)
         overrides = job_overrides(state)
+        prepare_input_environment(config)
         python = ["bash", str(common.repository_root() / "scripts/python.sh"), "-u", "-m"]
         cpu_env = {**os.environ, "JAX_PLATFORMS": "cpu", "CUDA_VISIBLE_DEVICES": "", "PYTHONUNBUFFERED": "1"}
         # Metadata validation is in a separate process so stop remains responsive.
@@ -448,11 +557,12 @@ def worker(job_id):
             [*python, "scripts.run_training", state["module"], *overrides, "--check"],
             cpu_env,
         )
-        env = {**os.environ, "CUDA_VISIBLE_DEVICES": ",".join(state["gpus"]), "PYTHONUNBUFFERED": "1"}
-        env.pop("JAX_PLATFORMS", None)
-        env.pop("JAX_PLATFORM_NAME", None)
-        # Fail if CUDA cannot initialize rather than accidentally training on CPU.
-        env["JAX_PLATFORMS"] = "cuda"
+        from scripts.training_environment import CUDA_SETTINGS
+        from scripts.training_environment import cuda_environment
+
+        env = cuda_environment(state["gpus"])
+        state["training_environment"] = {key: env[key] for key in (*CUDA_SETTINGS, "CUDA_VISIBLE_DEVICES")}
+        atomic_json(directory / "state.json", state)
         if hashlib.sha256(path.read_bytes()).hexdigest() != state["config_sha256"]:
             raise ValueError("准备过程中配置被修改，请新建实验")
         command = [*python, "scripts.run_training", state["module"], *overrides, "--wandb-mode", state["wandb_mode"]]
@@ -489,12 +599,25 @@ def browse(path):
 
 def detect_sampling_groups(request):
     from scripts import training_ui_config as config_ui
+    from scripts.training_ui_groups import detect_bundle_groups
     from scripts.training_ui_groups import detect_groups
 
     config = config_ui.source_config(request["baseline"])
     if getattr(config.data.base_config, "task_view", None) is not None:
         raise ValueError("当前配置有任务或阶段筛选，请按有效训练 episode 手动填写分组；自动读取目前用于全数据训练")
     roots = request.get("dataset_roots", [request["dataset_root"]])
+    if config.policy_metadata.get("subtask_variant") == "in_hand_b_coarse":
+        root = config.data.lerobot_datasets[0].root
+        if [Path(path).expanduser().resolve() for path in roots] != [Path(root).resolve()]:
+            raise ValueError("请使用已冻结的 119 条训练包读取 A/B 分组")
+        trial = request.get("paper_trial", config_ui.selected_trial(config))
+        if trial not in ("none", "t1", "t2", "t3"):
+            raise ValueError("未知的归一化与噪声组合")
+        return detect_bundle_groups(
+            root,
+            config.policy_metadata["bundle_sha256"],
+            horizon=config.model.action_horizon if trial != "none" else 1,
+        )
     if len(roots) > 1:
         from scripts.training_ui_datasets import dataset_groups
 
@@ -545,11 +668,18 @@ def handler_class(token):
 
                 query = {key: value[0] for key, value in parse_qs(url.query).items()}
                 if url.path == "/api/baselines":
+                    tomato_sources = {entry["id"] for entry in config_ui.experiment_catalog()}
+                    tomato = config_ui.DEFAULT_AB_MODULE if config_ui.DEFAULT_AB_MODULE in tomato_sources else None
+                    default = os.environ.get("PI05_UI_DEFAULT_BASELINE")
                     value = {
                         "baselines": config_ui.baseline_catalog(),
                         "personal": config_ui.personal_catalog(),
                         "repository": str(common.repository_root()),
                         "python": sys.executable,
+                        "host": socket.gethostname(),
+                        "server_label": os.environ.get("PI05_UI_SERVER_LABEL", socket.gethostname()),
+                        "tomato_baseline": tomato,
+                        "default_baseline": tomato if not default or default in tomato_sources else default,
                     }
                 elif url.path == "/api/baseline":
                     value = config_ui.defaults(query["id"])
@@ -611,9 +741,19 @@ def main():
     parser.add_argument("--worker", help=argparse.SUPPRESS)
     parser.add_argument("--validate-module", help=argparse.SUPPRESS)
     parser.add_argument("--ui-run", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--attach-manifest", type=Path)
+    parser.add_argument("--attach-console", type=Path)
+    parser.add_argument("--attach-pid", type=int)
     args = parser.parse_args()
     os.environ["JAX_PLATFORMS"] = "cpu"
     common.configure_environment()
+    if args.attach_manifest:
+        if args.attach_console is None or args.attach_pid is None:
+            parser.error("CLI接入需要 --attach-console 和 --attach-pid")
+        print(
+            json.dumps(attach_cli_job(args.attach_manifest, args.attach_console, args.attach_pid), ensure_ascii=False)
+        )
+        return
     if args.worker:
         worker(args.worker)
         return

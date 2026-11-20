@@ -1,0 +1,856 @@
+{
+  "schema": "visual_memory_all119_data_audit_v1",
+  "audit_date": "2026-11-18",
+  "timezone": "Asia/Shanghai",
+  "code_branch": "tomato-visual-memory",
+  "model_code_commit": "49252d2",
+  "inputs": {
+    "dataset_root": "/mnt/public_data/local-realrobot-train-data/checkpoints/mengxiang/data/sharpa/full-block-more/in_hand119_four_view_v3_r1/b_coarse",
+    "dataset_repo_id": "fr3_sharpa/tomato_in_hand119_rgb_crop_v3_r1",
+    "source_datasets": [
+      "/mnt/public_data/local-realrobot-train-data/checkpoints/mengxiang/data/sharpa/full-block-more/in_hand119_four_view_v3_r1/bundle.json",
+      "/mnt/public_data/local-realrobot-train-data/checkpoints/mengxiang/data/sharpa/full-block-more/in_hand119_four_view_v3_r1/selection.json"
+    ],
+    "frames": 357970,
+    "episodes": 119,
+    "prompts": [
+      "Right hand grasps and lifts the truss to the center",
+      "Left hand picks tomatoes into left basket while right hand holds truss",
+      "Right hand adjusts tomato truss position and orientation at the center",
+      "Right hand returns the held object to the right plate"
+    ],
+    "norm_stats_path": "/tmp/tomato-visual-memory-x0zXHR86/assets/tomato_visual_memory_v1_h4_s15_g4_delta_30hz/norm_stats.json",
+    "norm_provenance": "verified",
+    "norm_stats_sha256": "8b06358841e0570ff842883ab8a49a0fd3c9be7b68b59820d93741cd8a06ccde",
+    "norm_audit_sha256": "81ecdecacadf955eb41632d42de2af82fbb248f58c5345f3442729e8c8490d1d"
+  },
+  "bundle_sha256": "e0f0554ae45bd32e4327534726ff0a7bb1bded22a85d9bd34f72c5a744b3bb31",
+  "selection_sha256": "e9e56482e8b6e819487d6c3b5583e22b090ee0023e81490e849ea7b07b446e86",
+  "prepared_files_hash_verified": 839,
+  "recordings": 119,
+  "frames_checked": 357970,
+  "unique_recording_ids": 119,
+  "source_packages": {
+    "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal": 59,
+    "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal": 12,
+    "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal": 14,
+    "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal": 27,
+    "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1113_1018_1033_normal": 2,
+    "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1114_1055_1079_normal": 5
+  },
+  "reviewed_phase_intervals": 595,
+  "two_harvest_prompts_identical": true,
+  "annotation_fields": {
+    "inherited": 119,
+    "language": 119,
+    "prompt_profile": 119,
+    "revision": 119,
+    "saved_at": 119,
+    "schema_version": 119,
+    "segments": 119,
+    "source": 119,
+    "stage": 119,
+    "task_prompt": 119
+  },
+  "segment_fields": {
+    "end_frame": 595,
+    "end_seconds": 595,
+    "label": 595,
+    "reviewed": 595,
+    "segment_index": 595,
+    "start_frame": 595,
+    "start_seconds": 595,
+    "text": 595
+  },
+  "result_or_summary_labels_in_checked_schema": false,
+  "physical_source_columns_equal_checks": 714,
+  "historical_view_slots_valid": 4252800,
+  "historical_view_slots_masked": 42840,
+  "historical_indices_exhaustively_checked": true,
+  "boundary_and_anchor_observations": 1309,
+  "historical_view_pixel_mask_comparisons": 15708,
+  "current_prompt_samples": 1309,
+  "exact_duplicate_checks": {
+    "three_source_video_hashes": [],
+    "state_and_action_bytes": []
+  },
+  "completed_training_exposure": {
+    "verified": true,
+    "run": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/checkpoints/pi05_sharpa_in_hand119_b_crop_fullft_delta_v3_r1/mengxiang_tomato_in_hand119_b_crop_delta_v3_r1_s42_b256_s30000_c5000_1116_111434",
+    "identity_sha256": "10c097c99daa51cd066ea0ec86bc725695baa0a84590d55483bd383ad0dbc657",
+    "recordings": 119,
+    "frames": 357970,
+    "max_saved_step": 30000,
+    "session_status": "training_completed",
+    "existing_checkpoint_valid_for_proposed_test": false,
+    "effective_config_top_level_keys": [
+      "fields",
+      "type"
+    ]
+  },
+  "candidate_split": {
+    "status": "candidate_only_not_activated",
+    "grouping": "keep each of six source packages whole; use export-batch prefixes, not acquisition dates",
+    "requires_new_training_from_unexposed_base": true,
+    "requires_train_only_normalization": true,
+    "unseen_scene_or_object_identity_verified": false,
+    "summary": {
+      "train": {
+        "recordings": 86,
+        "frames": 264302,
+        "packages": 2
+      },
+      "development": {
+        "recordings": 14,
+        "frames": 37589,
+        "packages": 2
+      },
+      "test": {
+        "recordings": 19,
+        "frames": 56079,
+        "packages": 2
+      }
+    },
+    "assignments": {
+      "train": [
+        {
+          "episode_index": 0,
+          "recording_group": "b0f7213da83547b99aac45f6438b511e",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3779
+        },
+        {
+          "episode_index": 1,
+          "recording_group": "8de11b755ee3473597e31a22c79917de",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3661
+        },
+        {
+          "episode_index": 2,
+          "recording_group": "3a7a71385a3745dba5367e236012ebf0",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3902
+        },
+        {
+          "episode_index": 3,
+          "recording_group": "475504363e50470284e5e11e252003ed",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3842
+        },
+        {
+          "episode_index": 4,
+          "recording_group": "17a70dd599544a458b33c166950eca69",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3897
+        },
+        {
+          "episode_index": 5,
+          "recording_group": "c5196aa076664404917f5a25b1fc683b",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2939
+        },
+        {
+          "episode_index": 6,
+          "recording_group": "0c6f729a978e455d916b56dfce144a25",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3061
+        },
+        {
+          "episode_index": 7,
+          "recording_group": "6d79303bc6a644ddbdbc15f0c140b9e1",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3485
+        },
+        {
+          "episode_index": 8,
+          "recording_group": "97ec5de750fc42fb9cd3bae5ddf4f758",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2515
+        },
+        {
+          "episode_index": 9,
+          "recording_group": "63082bc2993c460289ad962ba8a2e4f8",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3382
+        },
+        {
+          "episode_index": 10,
+          "recording_group": "2a7d537763c9474490c572ecb52753e8",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2935
+        },
+        {
+          "episode_index": 11,
+          "recording_group": "74e92cd389314a5b89f771f62d4a1d35",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2284
+        },
+        {
+          "episode_index": 12,
+          "recording_group": "235cda579c724bdd8c71b58e247f91d8",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2450
+        },
+        {
+          "episode_index": 13,
+          "recording_group": "3e96608e087c46849742c323ab496c82",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2737
+        },
+        {
+          "episode_index": 14,
+          "recording_group": "8c4144b463d34e18af6b4f7e7f0c293d",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2536
+        },
+        {
+          "episode_index": 15,
+          "recording_group": "c437a6ec81e04030bc29d6743c579417",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 1798
+        },
+        {
+          "episode_index": 16,
+          "recording_group": "8fa7edbea3f94ec29636145fc69a4a73",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3067
+        },
+        {
+          "episode_index": 17,
+          "recording_group": "a8682783392744e49b2bd35e530cfae4",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3617
+        },
+        {
+          "episode_index": 18,
+          "recording_group": "41cefb6cb94c49508a377e82275e9b22",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2641
+        },
+        {
+          "episode_index": 19,
+          "recording_group": "0998779bed744ec8844411e012dd989a",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2535
+        },
+        {
+          "episode_index": 20,
+          "recording_group": "77315a5a720145808404789a8c9c10bc",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3274
+        },
+        {
+          "episode_index": 21,
+          "recording_group": "75c5e3edb9e2480cbc73f21085ec0484",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2605
+        },
+        {
+          "episode_index": 22,
+          "recording_group": "9b867a1b99c146cc974d4ac14f8bd8a3",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2869
+        },
+        {
+          "episode_index": 23,
+          "recording_group": "3ec75c86f6134b0b9492ec42d6ff3ec8",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2638
+        },
+        {
+          "episode_index": 24,
+          "recording_group": "727e0b5a5c87446aa25eb6234ea0adab",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2921
+        },
+        {
+          "episode_index": 25,
+          "recording_group": "bfe315d2efef4c4da406e134f60b64e4",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2626
+        },
+        {
+          "episode_index": 26,
+          "recording_group": "af714e2575644fb4a0609c30c7e1d0ab",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 4117
+        },
+        {
+          "episode_index": 27,
+          "recording_group": "b3a43d954c364e73a872b6e296a0f2ba",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 4099
+        },
+        {
+          "episode_index": 28,
+          "recording_group": "ee7aa63070e34ab296c9a3caf9c85711",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 4308
+        },
+        {
+          "episode_index": 29,
+          "recording_group": "738ab1f485894005b778f111a0b0a5d1",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2707
+        },
+        {
+          "episode_index": 30,
+          "recording_group": "94eb0ed2c15343ceaf6c6bcb30ebd5ae",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3400
+        },
+        {
+          "episode_index": 31,
+          "recording_group": "9157384e45a14347b684335b07f9f957",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3097
+        },
+        {
+          "episode_index": 32,
+          "recording_group": "11749c8013d445f7996e2701c43c5f80",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3279
+        },
+        {
+          "episode_index": 33,
+          "recording_group": "67a178d15d81478aa8f14c70a68c1f58",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3630
+        },
+        {
+          "episode_index": 34,
+          "recording_group": "d2dd5900ab3648e997f70d926535789e",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3246
+        },
+        {
+          "episode_index": 35,
+          "recording_group": "c1ff763044f244bb873b6e4b13035e99",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2780
+        },
+        {
+          "episode_index": 36,
+          "recording_group": "b112870dc2f247cb8c0b79475e951324",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3464
+        },
+        {
+          "episode_index": 37,
+          "recording_group": "72fe421e926843dba466e2639f9171b9",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3889
+        },
+        {
+          "episode_index": 38,
+          "recording_group": "407ce23b75564c988754ccdf5dc8b483",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2557
+        },
+        {
+          "episode_index": 39,
+          "recording_group": "315cec58e0994c4dad3f5b47871b8e3f",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3020
+        },
+        {
+          "episode_index": 40,
+          "recording_group": "ea0bdc35429f4f5f89d532daef372ee3",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3030
+        },
+        {
+          "episode_index": 41,
+          "recording_group": "9d1634e9c37d40ee9e71f42b7d24b0be",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2881
+        },
+        {
+          "episode_index": 42,
+          "recording_group": "d059ecb4330e400b8fdfe0abe60d5f16",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 1961
+        },
+        {
+          "episode_index": 43,
+          "recording_group": "e76988ce48664dceb9a7ebe24beb18f2",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2577
+        },
+        {
+          "episode_index": 44,
+          "recording_group": "4811cbf7979d4ca8ad77699ce6d1a3d4",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2435
+        },
+        {
+          "episode_index": 45,
+          "recording_group": "9acb6344e44541289cc0f20141c131e3",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2353
+        },
+        {
+          "episode_index": 46,
+          "recording_group": "f857c33ba11e4e9d98cb5235ba3df1d8",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2665
+        },
+        {
+          "episode_index": 47,
+          "recording_group": "bf4edbcd8bf844ad8223a9fefef9d79f",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2324
+        },
+        {
+          "episode_index": 48,
+          "recording_group": "3568ce04af7b478894d16122d2921352",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2655
+        },
+        {
+          "episode_index": 49,
+          "recording_group": "2684be8695754fb0910115926fc420aa",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2735
+        },
+        {
+          "episode_index": 50,
+          "recording_group": "035ae8598aa347bab67fc5274bc8aaaf",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2310
+        },
+        {
+          "episode_index": 51,
+          "recording_group": "50afc8e6b16242afa7e570d468d3f724",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 3121
+        },
+        {
+          "episode_index": 52,
+          "recording_group": "710aa75fc5294d3eab124ebf4fc7c755",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2734
+        },
+        {
+          "episode_index": 53,
+          "recording_group": "6ef0769dc7d74de992c54bbebdcff1a6",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2833
+        },
+        {
+          "episode_index": 54,
+          "recording_group": "eca858daabef4adda82ea608fb442a8c",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2795
+        },
+        {
+          "episode_index": 55,
+          "recording_group": "50332dc12c9645bd82b10970f5893931",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2621
+        },
+        {
+          "episode_index": 56,
+          "recording_group": "bbf51d1c948c401db369ed3e16cd7959",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2174
+        },
+        {
+          "episode_index": 57,
+          "recording_group": "3735560fe21b46cf94b09c680b2be1e6",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2842
+        },
+        {
+          "episode_index": 58,
+          "recording_group": "1bb6e88790ba4de0a9474bc90f470121",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1112_820_1014_normal",
+          "length": 2723
+        },
+        {
+          "episode_index": 85,
+          "recording_group": "4b1ae0e618d14710becb6e46ce34a8eb",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 3354
+        },
+        {
+          "episode_index": 86,
+          "recording_group": "644268fb45bd4184aa451222fbac1adf",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 4912
+        },
+        {
+          "episode_index": 87,
+          "recording_group": "11ebd1e5447249778bb37635c4a4c64d",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 3864
+        },
+        {
+          "episode_index": 88,
+          "recording_group": "71b7315f71df4f61b5bd2a5b00bac537",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 3609
+        },
+        {
+          "episode_index": 89,
+          "recording_group": "8543565aed2e49d9ae75ce4cc7b4a16b",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 4333
+        },
+        {
+          "episode_index": 90,
+          "recording_group": "fda7c3501e084f46bb50a6d2720ac669",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2525
+        },
+        {
+          "episode_index": 91,
+          "recording_group": "1b8dec7f9df9424ba8fff5d5458da301",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 3887
+        },
+        {
+          "episode_index": 92,
+          "recording_group": "071ca090d99c49f984acbb68268531df",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 3405
+        },
+        {
+          "episode_index": 93,
+          "recording_group": "39c58d3c81d54e05a411f9bfaf26992c",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2196
+        },
+        {
+          "episode_index": 94,
+          "recording_group": "5cde1ce81c714ebd87b609913e288f31",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 3548
+        },
+        {
+          "episode_index": 95,
+          "recording_group": "988cfbfe509c408ba4a16e99b40dea40",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2973
+        },
+        {
+          "episode_index": 96,
+          "recording_group": "06e8767cf0f04ee0bc584882ac3ed5ff",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2604
+        },
+        {
+          "episode_index": 97,
+          "recording_group": "4aca9d999abd4911a3dce1cc897c46ef",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 3706
+        },
+        {
+          "episode_index": 98,
+          "recording_group": "0ec1acd852cb4c42aa7c94e69a443413",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 5072
+        },
+        {
+          "episode_index": 99,
+          "recording_group": "4558ad79c020414f9a6b4d725b0ee0b6",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 3267
+        },
+        {
+          "episode_index": 100,
+          "recording_group": "75ef72db57174c779c284f59cf8ee81d",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 5457
+        },
+        {
+          "episode_index": 101,
+          "recording_group": "d2041afb620048d1a48e1c64bfa03547",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2706
+        },
+        {
+          "episode_index": 102,
+          "recording_group": "50cbff226a794c86a12925326674a1d4",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2786
+        },
+        {
+          "episode_index": 103,
+          "recording_group": "31b624bfd7d44443bf08164b7af006d3",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 1906
+        },
+        {
+          "episode_index": 104,
+          "recording_group": "325e52efd41b453c992a927546b6143f",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2605
+        },
+        {
+          "episode_index": 105,
+          "recording_group": "bc596856734649438e586eef9a0a6c30",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2432
+        },
+        {
+          "episode_index": 106,
+          "recording_group": "6b83404970b2428babca5c55d9ce4271",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2981
+        },
+        {
+          "episode_index": 107,
+          "recording_group": "1d01320367b046a7b9025f6d605771cb",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 3359
+        },
+        {
+          "episode_index": 108,
+          "recording_group": "e14493d36f264d7381e9ae218cd8d370",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2941
+        },
+        {
+          "episode_index": 109,
+          "recording_group": "8d57e981d3224370b8f0981d0c2e2343",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 3037
+        },
+        {
+          "episode_index": 110,
+          "recording_group": "db22b0ecd816405eacc3812b2b77c333",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2560
+        },
+        {
+          "episode_index": 111,
+          "recording_group": "456de20864b34f5e91f962625b2e0279",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1112_821_1011_normal",
+          "length": 2919
+        }
+      ],
+      "development": [
+        {
+          "episode_index": 59,
+          "recording_group": "c03971e9639d4d95b28565262aee20cc",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 2819
+        },
+        {
+          "episode_index": 60,
+          "recording_group": "33f525186cf64b19a68274e1a7022385",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 3009
+        },
+        {
+          "episode_index": 61,
+          "recording_group": "9d69571528fa41469f498447e873e324",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 2876
+        },
+        {
+          "episode_index": 62,
+          "recording_group": "72221cebdc334457bab0e6d546bb8fc9",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 2631
+        },
+        {
+          "episode_index": 63,
+          "recording_group": "5cd919966faf448990ced340502ae0c3",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 3155
+        },
+        {
+          "episode_index": 64,
+          "recording_group": "7e2f64168bcc4e3db75fdadfa824796c",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 2333
+        },
+        {
+          "episode_index": 65,
+          "recording_group": "3302429a50ca4a42a7c793429c372cba",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 1778
+        },
+        {
+          "episode_index": 66,
+          "recording_group": "7118f5914bef4b55bff929caecdebbf7",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 1880
+        },
+        {
+          "episode_index": 67,
+          "recording_group": "3b392d1148c443fcbc3ef272339394a0",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 3348
+        },
+        {
+          "episode_index": 68,
+          "recording_group": "174b3eb7661f461e8838254149f712e7",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 3406
+        },
+        {
+          "episode_index": 69,
+          "recording_group": "c30d725b313a496e955517d72ca04009",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 2694
+        },
+        {
+          "episode_index": 70,
+          "recording_group": "f50d23d45f9241a9addd805d7cf59fc2",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1113_1017_1049_normal",
+          "length": 2253
+        },
+        {
+          "episode_index": 112,
+          "recording_group": "beb9cb8932084ba98da999f24ab03259",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1113_1018_1033_normal",
+          "length": 3548
+        },
+        {
+          "episode_index": 113,
+          "recording_group": "5f63aa5195bb40ceb5189fe21e2c89d7",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1113_1018_1033_normal",
+          "length": 1859
+        }
+      ],
+      "test": [
+        {
+          "episode_index": 71,
+          "recording_group": "ca2d608c0d0f443b98879c64493f4c02",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 3428
+        },
+        {
+          "episode_index": 72,
+          "recording_group": "90b3a5f50d814d09b4fcad9bb58723f9",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 2959
+        },
+        {
+          "episode_index": 73,
+          "recording_group": "b4775cc12c9d4b3da5854c501bc22ae3",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 3417
+        },
+        {
+          "episode_index": 74,
+          "recording_group": "6fe3b3a543d44c3da8f9622ef6a2a2c3",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 2919
+        },
+        {
+          "episode_index": 75,
+          "recording_group": "3f085a6c3a294f35ab25c44fd5521103",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 2667
+        },
+        {
+          "episode_index": 76,
+          "recording_group": "dc5344fe9995470aa8b529f074f96578",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 3015
+        },
+        {
+          "episode_index": 77,
+          "recording_group": "90785b94502b48db9f3b76eced1d6b3d",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 3028
+        },
+        {
+          "episode_index": 78,
+          "recording_group": "cde9b0cce79044f790338b239b1b3f4c",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 2380
+        },
+        {
+          "episode_index": 79,
+          "recording_group": "42bb5deb909a4349b01babbc0d7fa982",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 2686
+        },
+        {
+          "episode_index": 80,
+          "recording_group": "1f605c1307ff48f489ba5dc2e52dff67",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 2566
+        },
+        {
+          "episode_index": 81,
+          "recording_group": "825818682d4c443db05d4f467328201d",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 2657
+        },
+        {
+          "episode_index": 82,
+          "recording_group": "9e985babb5fc472ca72b1e4aeb3f70ca",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 2631
+        },
+        {
+          "episode_index": 83,
+          "recording_group": "88a24bb59c29446aae5f99ba0d58eeae",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 2488
+        },
+        {
+          "episode_index": 84,
+          "recording_group": "2afd5994019f4303a207fa652bc368ad",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/A/1114_1056_1082_normal",
+          "length": 2222
+        },
+        {
+          "episode_index": 114,
+          "recording_group": "9125cccdfc62417197c311ba328287ab",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1114_1055_1079_normal",
+          "length": 4304
+        },
+        {
+          "episode_index": 115,
+          "recording_group": "8fa96e13725c431fb1caa7a2e9c14100",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1114_1055_1079_normal",
+          "length": 4858
+        },
+        {
+          "episode_index": 116,
+          "recording_group": "3e30a82ccfce408bb44aba4bf9acdbb7",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1114_1055_1079_normal",
+          "length": 3038
+        },
+        {
+          "episode_index": 117,
+          "recording_group": "52577b70bb5b4876908dadb5f3af4402",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1114_1055_1079_normal",
+          "length": 2314
+        },
+        {
+          "episode_index": 118,
+          "recording_group": "3040dfd24ed042dfae8fc61f5af3e6c4",
+          "source_dataset": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi/B/1114_1055_1079_normal",
+          "length": 2502
+        }
+      ]
+    }
+  },
+  "roi_uses_future_coordinates": true,
+  "physical_result_video_review_performed": false,
+  "trained_memory_model_evaluated": false,
+  "cache_content_audit": {
+    "manifest_sha256": "992da4fb3ddf5e98da5f91cfbdc39e06cc0ed6bec849256594ac1e16807ffa8d",
+    "files_sha256_verified": 476,
+    "bytes_sha256_verified": 215538093568,
+    "mtime_mismatches": 476,
+    "seconds": 56.786,
+    "original_manifest_modified": false,
+    "production_stat_guard_passed": false,
+    "reader_scope": "audit_only_full_hash_verified_not_training_acceptance"
+  },
+  "new_training_started": false,
+  "robot_executed": false,
+  "gpu_used": false,
+  "fresh_source_video_decode_performed": false,
+  "full_cache_file_sha256_performed": true,
+  "local_contract_regression_tests_passed": 16
+}

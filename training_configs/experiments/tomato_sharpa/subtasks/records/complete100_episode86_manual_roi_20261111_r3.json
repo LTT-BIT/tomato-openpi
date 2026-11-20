@@ -1,0 +1,3206 @@
+{
+  "schema_version": 1,
+  "paper": "https://arxiv.org/html/2610.20064v2#A1.SS4",
+  "source_episode": 86,
+  "source_recording": "B/1106_750_791_normal/episode_000004",
+  "fps": 30,
+  "source_size": [
+    640,
+    400
+  ],
+  "annotation_method": "Coding agent visually placed palm/finger/object and placement-contact rectangles in native RGB keyframes, then piecewise linear offline interpolation. Active roles change at manually judged contact/transport intervals. No detector or tracker; not independently reviewed human ground truth. Keyframes and midpoints reviewed, not every original frame.",
+  "source_sha256": {
+    "cam0": "af8135884c997058b644dacba78b3a8111f93a1ac7f9b6dfde35157010595f33",
+    "cam1": "43346b12ad5b80eda46eba77c61ca708e90b4ddeba7de52b314f237e751cd3ed",
+    "cam2": "0b17f851d48eece1082575182924779fec71db1b485b2ec3ff23d06cae8462b5"
+  },
+  "clips": [
+    {
+      "name": "pickup_right_hand_truss",
+      "start": 0,
+      "end": 168,
+      "roles": [
+        "right_hand",
+        "truss"
+      ],
+      "show_frames": [
+        83
+      ],
+      "keyframes": [
+        {
+          "frame": 0,
+          "boxes": {
+            "right_hand": [
+              425,
+              230,
+              500,
+              310
+            ],
+            "truss": [
+              400,
+              270,
+              450,
+              295
+            ]
+          },
+          "available_at_frame": 0
+        },
+        {
+          "frame": 30,
+          "boxes": {
+            "right_hand": [
+              420,
+              230,
+              500,
+              310
+            ],
+            "truss": [
+              400,
+              270,
+              445,
+              295
+            ]
+          },
+          "available_at_frame": 30
+        },
+        {
+          "frame": 60,
+          "boxes": {
+            "right_hand": [
+              420,
+              230,
+              500,
+              310
+            ],
+            "truss": [
+              400,
+              270,
+              445,
+              295
+            ]
+          },
+          "available_at_frame": 60
+        },
+        {
+          "frame": 90,
+          "boxes": {
+            "right_hand": [
+              420,
+              218,
+              497,
+              293
+            ],
+            "truss": [
+              402,
+              259,
+              453,
+              280
+            ]
+          },
+          "available_at_frame": 90
+        },
+        {
+          "frame": 120,
+          "boxes": {
+            "right_hand": [
+              378,
+              222,
+              470,
+              285
+            ],
+            "truss": [
+              358,
+              270,
+              428,
+              287
+            ]
+          },
+          "available_at_frame": 120
+        },
+        {
+          "frame": 150,
+          "boxes": {
+            "right_hand": [
+              338,
+              217,
+              433,
+              290
+            ],
+            "truss": [
+              320,
+              275,
+              404,
+              302
+            ]
+          },
+          "available_at_frame": 150
+        },
+        {
+          "frame": 167,
+          "boxes": {
+            "right_hand": [
+              338,
+              213,
+              436,
+              288
+            ],
+            "truss": [
+              320,
+              273,
+              403,
+              302
+            ]
+          },
+          "available_at_frame": 167
+        }
+      ],
+      "stage_index": 1
+    },
+    {
+      "name": "harvest_first_complete_right_168",
+      "stage_index": 2,
+      "start": 168,
+      "end": 210,
+      "roles": [
+        "right_hand",
+        "truss_and_picked_fruit"
+      ],
+      "show_frames": [
+        188
+      ],
+      "keyframes": [
+        {
+          "frame": 168,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 168
+        },
+        {
+          "frame": 180,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 180
+        },
+        {
+          "frame": 209,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 210
+        }
+      ]
+    },
+    {
+      "name": "harvest_first_complete_both_210",
+      "stage_index": 2,
+      "start": 210,
+      "end": 315,
+      "roles": [
+        "right_hand",
+        "left_hand",
+        "truss_and_picked_fruit"
+      ],
+      "show_frames": [
+        262
+      ],
+      "keyframes": [
+        {
+          "frame": 210,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              140.0,
+              208.0,
+              272.0,
+              282.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 210
+        },
+        {
+          "frame": 225,
+          "boxes": {
+            "right_hand": [
+              340.0,
+              202.0,
+              445.0,
+              280.0
+            ],
+            "left_hand": [
+              198.0,
+              220.0,
+              300.0,
+              305.0
+            ],
+            "truss_and_picked_fruit": [
+              320.0,
+              265.0,
+              405.0,
+              292.0
+            ]
+          },
+          "available_at_frame": 225
+        },
+        {
+          "frame": 240,
+          "boxes": {
+            "right_hand": [
+              340.0,
+              202.0,
+              445.0,
+              280.0
+            ],
+            "left_hand": [
+              208.0,
+              250.0,
+              334.0,
+              345.0
+            ],
+            "truss_and_picked_fruit": [
+              320.0,
+              265.0,
+              405.0,
+              292.0
+            ]
+          },
+          "available_at_frame": 240
+        },
+        {
+          "frame": 255,
+          "boxes": {
+            "right_hand": [
+              340.0,
+              202.0,
+              445.0,
+              280.0
+            ],
+            "left_hand": [
+              210.0,
+              245.0,
+              344.0,
+              339.0
+            ],
+            "truss_and_picked_fruit": [
+              320.0,
+              265.0,
+              405.0,
+              292.0
+            ]
+          },
+          "available_at_frame": 255
+        },
+        {
+          "frame": 270,
+          "boxes": {
+            "right_hand": [
+              340.0,
+              202.0,
+              445.0,
+              280.0
+            ],
+            "left_hand": [
+              221.0,
+              235.0,
+              346.0,
+              333.0
+            ],
+            "truss_and_picked_fruit": [
+              320.0,
+              265.0,
+              405.0,
+              292.0
+            ]
+          },
+          "available_at_frame": 270
+        },
+        {
+          "frame": 285,
+          "boxes": {
+            "right_hand": [
+              340.0,
+              202.0,
+              445.0,
+              280.0
+            ],
+            "left_hand": [
+              225.0,
+              238.0,
+              337.0,
+              333.0
+            ],
+            "truss_and_picked_fruit": [
+              310.0,
+              265.0,
+              405.0,
+              295.0
+            ]
+          },
+          "available_at_frame": 285
+        },
+        {
+          "frame": 300,
+          "boxes": {
+            "right_hand": [
+              340.0,
+              202.0,
+              445.0,
+              280.0
+            ],
+            "left_hand": [
+              211.0,
+              225.0,
+              308.0,
+              323.0
+            ],
+            "truss_and_picked_fruit": [
+              280.0,
+              265.0,
+              405.0,
+              295.0
+            ]
+          },
+          "available_at_frame": 300
+        },
+        {
+          "frame": 314,
+          "boxes": {
+            "right_hand": [
+              340.0,
+              202.0,
+              445.0,
+              280.0
+            ],
+            "left_hand": [
+              188.0,
+              218.0,
+              270.0,
+              293.0
+            ],
+            "truss_and_picked_fruit": [
+              240.0,
+              265.0,
+              405.0,
+              295.0
+            ]
+          },
+          "available_at_frame": 314
+        }
+      ]
+    },
+    {
+      "name": "harvest_first_complete_left_315",
+      "stage_index": 2,
+      "start": 315,
+      "end": 405,
+      "roles": [
+        "left_hand_and_carried_fruit",
+        "placement_contact"
+      ],
+      "show_frames": [
+        359
+      ],
+      "keyframes": [
+        {
+          "frame": 315,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              185.3125,
+              217.75,
+              267.9375,
+              291.875
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 330
+        },
+        {
+          "frame": 330,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              214.0,
+              237.0,
+              275.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 330
+        },
+        {
+          "frame": 360,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              214.0,
+              237.0,
+              275.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 360
+        },
+        {
+          "frame": 390,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              214.0,
+              237.0,
+              275.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 390
+        },
+        {
+          "frame": 404,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              162.73333333333335,
+              219.13333333333333,
+              267.3333333333333,
+              293.6666666666667
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 420
+        }
+      ]
+    },
+    {
+      "name": "harvest_first_complete_both_405",
+      "stage_index": 2,
+      "start": 405,
+      "end": 525,
+      "roles": [
+        "right_hand",
+        "left_hand",
+        "truss_and_picked_fruit"
+      ],
+      "show_frames": [
+        464
+      ],
+      "keyframes": [
+        {
+          "frame": 405,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              164.0,
+              219.5,
+              269.5,
+              295.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 420
+        },
+        {
+          "frame": 420,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              183.0,
+              225.0,
+              302.0,
+              315.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 420
+        },
+        {
+          "frame": 450,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              220.0,
+              245.0,
+              347.0,
+              336.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 450
+        },
+        {
+          "frame": 480,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              210.0,
+              240.0,
+              379.0,
+              342.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 480
+        },
+        {
+          "frame": 510,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              220.0,
+              243.0,
+              382.0,
+              345.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 510
+        },
+        {
+          "frame": 524,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              203.66666666666666,
+              230.86666666666667,
+              346.5333333333333,
+              320.26666666666665
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 540
+        }
+      ]
+    },
+    {
+      "name": "harvest_first_complete_left_525",
+      "stage_index": 2,
+      "start": 525,
+      "end": 630,
+      "roles": [
+        "left_hand_and_carried_fruit",
+        "placement_contact"
+      ],
+      "show_frames": [
+        577
+      ],
+      "keyframes": [
+        {
+          "frame": 525,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              202.5,
+              230.0,
+              344.0,
+              318.5
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 540
+        },
+        {
+          "frame": 540,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              185.0,
+              217.0,
+              306.0,
+              292.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 540
+        },
+        {
+          "frame": 570,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              221.0,
+              230.0,
+              278.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 570
+        },
+        {
+          "frame": 600,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              150.0,
+              217.0,
+              245.0,
+              282.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 600
+        },
+        {
+          "frame": 629,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              186.73333333333335,
+              210.23333333333332,
+              306.8666666666667,
+              284.9
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 630
+        }
+      ]
+    },
+    {
+      "name": "harvest_first_complete_both_630",
+      "stage_index": 2,
+      "start": 630,
+      "end": 735,
+      "roles": [
+        "right_hand",
+        "left_hand",
+        "truss_and_picked_fruit"
+      ],
+      "show_frames": [
+        682
+      ],
+      "keyframes": [
+        {
+          "frame": 630,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              188.0,
+              210.0,
+              309.0,
+              285.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 630
+        },
+        {
+          "frame": 660,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              190.0,
+              210.0,
+              311.0,
+              317.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 660
+        },
+        {
+          "frame": 690,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              235.0,
+              242.0,
+              381.0,
+              335.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 690
+        },
+        {
+          "frame": 720,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              235.0,
+              242.0,
+              381.0,
+              335.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 720
+        },
+        {
+          "frame": 734,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              221.93333333333334,
+              253.66666666666666,
+              370.26666666666665,
+              353.2
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 750
+        }
+      ]
+    },
+    {
+      "name": "harvest_first_complete_left_735",
+      "stage_index": 2,
+      "start": 735,
+      "end": 870,
+      "roles": [
+        "left_hand_and_carried_fruit",
+        "placement_contact"
+      ],
+      "show_frames": [
+        802
+      ],
+      "keyframes": [
+        {
+          "frame": 735,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              221.0,
+              254.5,
+              369.5,
+              354.5
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 750
+        },
+        {
+          "frame": 750,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              207.0,
+              267.0,
+              358.0,
+              374.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 750
+        },
+        {
+          "frame": 780,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              157.0,
+              217.0,
+              280.0,
+              284.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 780
+        },
+        {
+          "frame": 810,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              213.0,
+              245.0,
+              268.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 810
+        },
+        {
+          "frame": 840,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              216.0,
+              243.0,
+              275.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 840
+        },
+        {
+          "frame": 869,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              157.56666666666666,
+              213.1,
+              277.8,
+              278.8666666666667
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 870
+        }
+      ]
+    },
+    {
+      "name": "harvest_first_complete_both_870",
+      "stage_index": 2,
+      "start": 870,
+      "end": 1005,
+      "roles": [
+        "right_hand",
+        "left_hand",
+        "truss_and_picked_fruit"
+      ],
+      "show_frames": [
+        937
+      ],
+      "keyframes": [
+        {
+          "frame": 870,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              158.0,
+              213.0,
+              279.0,
+              279.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 870
+        },
+        {
+          "frame": 900,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              218.0,
+              248.0,
+              345.0,
+              350.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 900
+        },
+        {
+          "frame": 930,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              217.0,
+              247.0,
+              383.0,
+              358.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 930
+        },
+        {
+          "frame": 960,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              213.0,
+              253.0,
+              366.0,
+              363.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 960
+        },
+        {
+          "frame": 990,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              226.0,
+              253.0,
+              378.0,
+              350.0
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 990
+        },
+        {
+          "frame": 1004,
+          "boxes": {
+            "right_hand": [
+              338.0,
+              202.0,
+              445.0,
+              288.0
+            ],
+            "left_hand": [
+              197.53333333333333,
+              240.86666666666667,
+              335.06666666666666,
+              336.93333333333334
+            ],
+            "truss_and_picked_fruit": [
+              318.0,
+              260.0,
+              406.0,
+              300.0
+            ]
+          },
+          "available_at_frame": 1020
+        }
+      ]
+    },
+    {
+      "name": "harvest_first_complete_left_1005",
+      "stage_index": 2,
+      "start": 1005,
+      "end": 1129,
+      "roles": [
+        "left_hand_and_carried_fruit",
+        "placement_contact"
+      ],
+      "show_frames": [
+        1066
+      ],
+      "keyframes": [
+        {
+          "frame": 1005,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              195.5,
+              240.0,
+              332.0,
+              336.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 1020
+        },
+        {
+          "frame": 1020,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              165.0,
+              227.0,
+              286.0,
+              322.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 1020
+        },
+        {
+          "frame": 1050,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              213.0,
+              242.0,
+              271.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 1050
+        },
+        {
+          "frame": 1080,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              213.0,
+              242.0,
+              271.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 1080
+        },
+        {
+          "frame": 1110,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              213.0,
+              244.0,
+              274.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 1110
+        },
+        {
+          "frame": 1128,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              213.0,
+              244.0,
+              274.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 1128
+        }
+      ]
+    },
+    {
+      "name": "return_first",
+      "start": 1129,
+      "end": 1243,
+      "roles": [
+        "right_hand",
+        "target",
+        "support"
+      ],
+      "show_frames": [
+        1200
+      ],
+      "keyframes": [
+        {
+          "frame": 1129,
+          "boxes": {
+            "right_hand": [
+              338,
+              202,
+              445,
+              288
+            ],
+            "target": [
+              345,
+              265,
+              410,
+              299
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1129
+        },
+        {
+          "frame": 1140,
+          "boxes": {
+            "right_hand": [
+              338,
+              202,
+              445,
+              288
+            ],
+            "target": [
+              345,
+              265,
+              410,
+              299
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1140
+        },
+        {
+          "frame": 1170,
+          "boxes": {
+            "right_hand": [
+              359,
+              207,
+              445,
+              271
+            ],
+            "target": [
+              368,
+              248,
+              417,
+              278
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1170
+        },
+        {
+          "frame": 1200,
+          "boxes": {
+            "right_hand": [
+              412,
+              225,
+              480,
+              274
+            ],
+            "target": [
+              424,
+              254,
+              459,
+              278
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1200
+        },
+        {
+          "frame": 1230,
+          "boxes": {
+            "right_hand": [
+              408,
+              234,
+              481,
+              285
+            ],
+            "target": [
+              416,
+              269,
+              456,
+              297
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1230
+        },
+        {
+          "frame": 1242,
+          "boxes": {
+            "right_hand": [
+              409,
+              235,
+              480,
+              287
+            ],
+            "target": [
+              416,
+              269,
+              456,
+              297
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1242
+        }
+      ],
+      "stage_index": 3
+    },
+    {
+      "name": "adjust_on_plate",
+      "start": 1243,
+      "end": 1395,
+      "roles": [
+        "right_hand",
+        "target",
+        "support"
+      ],
+      "show_frames": [
+        1320
+      ],
+      "keyframes": [
+        {
+          "frame": 1243,
+          "boxes": {
+            "right_hand": [
+              409,
+              235,
+              480,
+              287
+            ],
+            "target": [
+              410,
+              264,
+              460,
+              297
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1243
+        },
+        {
+          "frame": 1260,
+          "boxes": {
+            "right_hand": [
+              404,
+              228,
+              480,
+              284
+            ],
+            "target": [
+              410,
+              264,
+              460,
+              297
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1260
+        },
+        {
+          "frame": 1290,
+          "boxes": {
+            "right_hand": [
+              410,
+              220,
+              488,
+              278
+            ],
+            "target": [
+              410,
+              264,
+              460,
+              297
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1290
+        },
+        {
+          "frame": 1320,
+          "boxes": {
+            "right_hand": [
+              419,
+              216,
+              495,
+              280
+            ],
+            "target": [
+              410,
+              264,
+              460,
+              297
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1320
+        },
+        {
+          "frame": 1350,
+          "boxes": {
+            "right_hand": [
+              422,
+              226,
+              491,
+              283
+            ],
+            "target": [
+              410,
+              264,
+              460,
+              297
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1350
+        },
+        {
+          "frame": 1380,
+          "boxes": {
+            "right_hand": [
+              421,
+              234,
+              495,
+              289
+            ],
+            "target": [
+              410,
+              264,
+              460,
+              297
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1380
+        },
+        {
+          "frame": 1394,
+          "boxes": {
+            "right_hand": [
+              417,
+              235,
+              490,
+              291
+            ],
+            "target": [
+              410,
+              264,
+              460,
+              297
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 1394
+        }
+      ],
+      "stage_index": 4
+    },
+    {
+      "name": "pickup_second",
+      "start": 1395,
+      "end": 1603,
+      "roles": [
+        "right_hand",
+        "target"
+      ],
+      "show_frames": [
+        1500
+      ],
+      "keyframes": [
+        {
+          "frame": 1395,
+          "boxes": {
+            "right_hand": [
+              417,
+              235,
+              490,
+              291
+            ],
+            "target": [
+              410,
+              266,
+              463,
+              297
+            ]
+          },
+          "available_at_frame": 1395
+        },
+        {
+          "frame": 1410,
+          "boxes": {
+            "right_hand": [
+              413,
+              239,
+              486,
+              293
+            ],
+            "target": [
+              412,
+              270,
+              460,
+              299
+            ]
+          },
+          "available_at_frame": 1410
+        },
+        {
+          "frame": 1440,
+          "boxes": {
+            "right_hand": [
+              415,
+              239,
+              489,
+              300
+            ],
+            "target": [
+              414,
+              275,
+              460,
+              301
+            ]
+          },
+          "available_at_frame": 1440
+        },
+        {
+          "frame": 1470,
+          "boxes": {
+            "right_hand": [
+              414,
+              235,
+              490,
+              301
+            ],
+            "target": [
+              413,
+              275,
+              459,
+              302
+            ]
+          },
+          "available_at_frame": 1470
+        },
+        {
+          "frame": 1500,
+          "boxes": {
+            "right_hand": [
+              415,
+              237,
+              486,
+              302
+            ],
+            "target": [
+              414,
+              277,
+              459,
+              303
+            ]
+          },
+          "available_at_frame": 1500
+        },
+        {
+          "frame": 1530,
+          "boxes": {
+            "right_hand": [
+              410,
+              220,
+              479,
+              282
+            ],
+            "target": [
+              409,
+              264,
+              433,
+              284
+            ]
+          },
+          "available_at_frame": 1530
+        },
+        {
+          "frame": 1560,
+          "boxes": {
+            "right_hand": [
+              355,
+              203,
+              444,
+              284
+            ],
+            "target": [
+              355,
+              264,
+              386,
+              289
+            ]
+          },
+          "available_at_frame": 1560
+        },
+        {
+          "frame": 1590,
+          "boxes": {
+            "right_hand": [
+              335,
+              193,
+              433,
+              270
+            ],
+            "target": [
+              333,
+              259,
+              363,
+              282
+            ]
+          },
+          "available_at_frame": 1590
+        },
+        {
+          "frame": 1602,
+          "boxes": {
+            "right_hand": [
+              334,
+              193,
+              433,
+              271
+            ],
+            "target": [
+              333,
+              259,
+              363,
+              282
+            ]
+          },
+          "available_at_frame": 1602
+        }
+      ],
+      "stage_index": 5
+    },
+    {
+      "name": "harvest_second_complete_right_1603",
+      "stage_index": 6,
+      "start": 1603,
+      "end": 1650,
+      "roles": [
+        "right_hand",
+        "held_target"
+      ],
+      "show_frames": [
+        1626
+      ],
+      "keyframes": [
+        {
+          "frame": 1603,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1603
+        },
+        {
+          "frame": 1620,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1620
+        },
+        {
+          "frame": 1649,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1650
+        }
+      ]
+    },
+    {
+      "name": "harvest_second_complete_both_1650",
+      "stage_index": 6,
+      "start": 1650,
+      "end": 2370,
+      "roles": [
+        "right_hand",
+        "left_hand",
+        "held_target"
+      ],
+      "show_frames": [
+        2009
+      ],
+      "keyframes": [
+        {
+          "frame": 1650,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              145.0,
+              217.0,
+              291.0,
+              283.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1650
+        },
+        {
+          "frame": 1680,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              216.0,
+              235.0,
+              334.0,
+              295.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1680
+        },
+        {
+          "frame": 1710,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              250.0,
+              251.0,
+              377.0,
+              315.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1710
+        },
+        {
+          "frame": 1740,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              250.0,
+              263.0,
+              378.0,
+              337.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1740
+        },
+        {
+          "frame": 1770,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              236.0,
+              271.0,
+              383.0,
+              372.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1770
+        },
+        {
+          "frame": 1800,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              236.0,
+              268.0,
+              383.0,
+              369.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1800
+        },
+        {
+          "frame": 1830,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              236.0,
+              254.0,
+              382.0,
+              352.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1830
+        },
+        {
+          "frame": 1860,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              237.0,
+              248.0,
+              383.0,
+              332.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1860
+        },
+        {
+          "frame": 1890,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              236.0,
+              248.0,
+              383.0,
+              332.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1890
+        },
+        {
+          "frame": 1920,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              236.0,
+              249.0,
+              383.0,
+              334.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1920
+        },
+        {
+          "frame": 1950,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              239.0,
+              263.0,
+              383.0,
+              358.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1950
+        },
+        {
+          "frame": 1980,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              238.0,
+              266.0,
+              383.0,
+              358.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 1980
+        },
+        {
+          "frame": 2010,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              236.0,
+              267.0,
+              383.0,
+              358.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2010
+        },
+        {
+          "frame": 2040,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              235.0,
+              281.0,
+              382.0,
+              368.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2040
+        },
+        {
+          "frame": 2070,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              235.0,
+              281.0,
+              382.0,
+              368.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2070
+        },
+        {
+          "frame": 2100,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              238.0,
+              270.0,
+              383.0,
+              359.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2100
+        },
+        {
+          "frame": 2130,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              238.0,
+              282.0,
+              383.0,
+              373.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2130
+        },
+        {
+          "frame": 2160,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              235.0,
+              271.0,
+              383.0,
+              368.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2160
+        },
+        {
+          "frame": 2190,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              233.0,
+              265.0,
+              382.0,
+              355.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2190
+        },
+        {
+          "frame": 2220,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              234.0,
+              249.0,
+              383.0,
+              341.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2220
+        },
+        {
+          "frame": 2250,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              234.0,
+              251.0,
+              383.0,
+              343.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2250
+        },
+        {
+          "frame": 2280,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              234.0,
+              252.0,
+              383.0,
+              345.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2280
+        },
+        {
+          "frame": 2310,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              234.0,
+              251.0,
+              383.0,
+              346.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2310
+        },
+        {
+          "frame": 2340,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              233.0,
+              256.0,
+              383.0,
+              351.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2340
+        },
+        {
+          "frame": 2369,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              193.36666666666667,
+              231.83333333333334,
+              315.3333333333333,
+              317.1666666666667
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2370
+        }
+      ]
+    },
+    {
+      "name": "harvest_second_complete_left_2370",
+      "stage_index": 6,
+      "start": 2370,
+      "end": 2520,
+      "roles": [
+        "left_hand_and_carried_fruit",
+        "placement_contact"
+      ],
+      "show_frames": [
+        2444
+      ],
+      "keyframes": [
+        {
+          "frame": 2370,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              192.0,
+              231.0,
+              313.0,
+              316.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 2370
+        },
+        {
+          "frame": 2400,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              219.0,
+              254.0,
+              282.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 2400
+        },
+        {
+          "frame": 2430,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              150.0,
+              218.0,
+              259.0,
+              285.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 2430
+        },
+        {
+          "frame": 2460,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              217.0,
+              249.0,
+              279.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 2460
+        },
+        {
+          "frame": 2490,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              217.0,
+              247.0,
+              280.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 2490
+        },
+        {
+          "frame": 2519,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              217.0,
+              285.6666666666667,
+              284.8333333333333
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 2520
+        }
+      ]
+    },
+    {
+      "name": "harvest_second_complete_both_2520",
+      "stage_index": 6,
+      "start": 2520,
+      "end": 2760,
+      "roles": [
+        "right_hand",
+        "left_hand",
+        "held_target"
+      ],
+      "show_frames": [
+        2639
+      ],
+      "keyframes": [
+        {
+          "frame": 2520,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              145.0,
+              217.0,
+              287.0,
+              285.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2520
+        },
+        {
+          "frame": 2550,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              207.0,
+              226.0,
+              337.0,
+              299.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2550
+        },
+        {
+          "frame": 2580,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              248.0,
+              231.0,
+              359.0,
+              301.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2580
+        },
+        {
+          "frame": 2610,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              248.0,
+              229.0,
+              370.0,
+              310.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2610
+        },
+        {
+          "frame": 2640,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              247.0,
+              230.0,
+              371.0,
+              310.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2640
+        },
+        {
+          "frame": 2670,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              247.0,
+              240.0,
+              372.0,
+              318.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2670
+        },
+        {
+          "frame": 2700,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              247.0,
+              239.0,
+              372.0,
+              319.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2700
+        },
+        {
+          "frame": 2730,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              247.0,
+              239.0,
+              372.0,
+              319.0
+            ],
+            "held_target": [
+              332.0,
+              254.0,
+              369.0,
+              293.0
+            ]
+          },
+          "available_at_frame": 2730
+        },
+        {
+          "frame": 2759,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "left_hand": [
+              213.16666666666666,
+              228.36666666666667,
+              334.3,
+              313.2
+            ],
+            "held_target": [
+              335.8666666666667,
+              244.33333333333334,
+              365.1333333333333,
+              284.3
+            ]
+          },
+          "available_at_frame": 2760
+        }
+      ]
+    },
+    {
+      "name": "harvest_second_complete_left_2760",
+      "stage_index": 6,
+      "start": 2760,
+      "end": 2820,
+      "roles": [
+        "left_hand_and_carried_fruit",
+        "placement_contact"
+      ],
+      "show_frames": [
+        2789
+      ],
+      "keyframes": [
+        {
+          "frame": 2760,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              212.0,
+              228.0,
+              333.0,
+              313.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 2760
+        },
+        {
+          "frame": 2790,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              205.0,
+              259.0,
+              269.0
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 2790
+        },
+        {
+          "frame": 2819,
+          "boxes": {
+            "left_hand_and_carried_fruit": [
+              145.0,
+              209.83333333333334,
+              244.5,
+              269.96666666666664
+            ],
+            "placement_contact": [
+              185,
+              245,
+              255,
+              325
+            ]
+          },
+          "available_at_frame": 2820
+        }
+      ]
+    },
+    {
+      "name": "harvest_second_complete_right_2820",
+      "stage_index": 6,
+      "start": 2820,
+      "end": 2908,
+      "roles": [
+        "right_hand",
+        "held_target"
+      ],
+      "show_frames": [
+        2863
+      ],
+      "keyframes": [
+        {
+          "frame": 2820,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "held_target": [
+              336.0,
+              244.0,
+              365.0,
+              284.0
+            ]
+          },
+          "available_at_frame": 2820
+        },
+        {
+          "frame": 2850,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "held_target": [
+              336.0,
+              244.0,
+              365.0,
+              284.0
+            ]
+          },
+          "available_at_frame": 2850
+        },
+        {
+          "frame": 2880,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "held_target": [
+              336.0,
+              244.0,
+              365.0,
+              284.0
+            ]
+          },
+          "available_at_frame": 2880
+        },
+        {
+          "frame": 2907,
+          "boxes": {
+            "right_hand": [
+              334.0,
+              193.0,
+              443.0,
+              283.0
+            ],
+            "held_target": [
+              336.0,
+              244.0,
+              365.0,
+              284.0
+            ]
+          },
+          "available_at_frame": 2907
+        }
+      ]
+    },
+    {
+      "name": "return_stem_final",
+      "start": 2908,
+      "end": 2990,
+      "roles": [
+        "right_hand",
+        "target",
+        "support"
+      ],
+      "show_frames": [
+        2940
+      ],
+      "keyframes": [
+        {
+          "frame": 2908,
+          "boxes": {
+            "right_hand": [
+              334,
+              193,
+              443,
+              283
+            ],
+            "target": [
+              336,
+              244,
+              365,
+              284
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 2908
+        },
+        {
+          "frame": 2910,
+          "boxes": {
+            "right_hand": [
+              334,
+              193,
+              443,
+              283
+            ],
+            "target": [
+              336,
+              244,
+              365,
+              284
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 2910
+        },
+        {
+          "frame": 2940,
+          "boxes": {
+            "right_hand": [
+              365,
+              194,
+              466,
+              272
+            ],
+            "target": [
+              375,
+              245,
+              412,
+              285
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 2940
+        },
+        {
+          "frame": 2970,
+          "boxes": {
+            "right_hand": [
+              407,
+              222,
+              483,
+              279
+            ],
+            "target": [
+              409,
+              270,
+              440,
+              300
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 2970
+        },
+        {
+          "frame": 2989,
+          "boxes": {
+            "right_hand": [
+              404,
+              227,
+              480,
+              284
+            ],
+            "target": [
+              408,
+              270,
+              440,
+              300
+            ],
+            "support": [
+              395,
+              254,
+              482,
+              309
+            ]
+          },
+          "available_at_frame": 2989
+        }
+      ],
+      "stage_index": 7
+    }
+  ],
+  "review_status": "coding_agent_keyframes_and_midpoints_reviewed; full_temporal_review_pending",
+  "parent_annotations": "normal93_20261110_interaction_preview_annotations.json",
+  "revision_reason": "Follow active left hand during fruit transport instead of retaining passive right hand in the tight ROI; preserve original 258 preview frames.",
+  "availability_policy": "Interpolated boundary keys retain the latest parent source keyframe; available_at is not reset to the new boundary frame."
+}
