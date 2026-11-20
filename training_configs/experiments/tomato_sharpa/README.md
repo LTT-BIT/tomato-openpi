@@ -6,6 +6,8 @@
 
 源发布目录只读；本次工作数据位于训练NAS `/mnt/data/users/mengxiang/workspace/training_data/sharpa/full-block-more`，避免旧data软链接指向对象存储。训练副本 `in_hand204_four_view_v3_r1`、归一化 `tomato_in_hand204_rgb_crop_v3_r1_delta_30hz`、缓存 `in_hand204_rgb224_cache_v3_r1`。旧缓存仅在像素流水线、源视频SHA、数组SHA/形状/类型匹配时只读复用；新视频完整解码并检查时间戳。准备后验证全204条阶段边界、输入等价和全帧黑图。`bash scripts/python.sh -m scripts.tomato_in_hand204_run check`默认只检查。验收报告绑定代码、数据、缓存和统计，未通过不能启动。全部204条训练，无独立验证集，训练loss不能代表泛化或实机成功率。
 
+204条实际准备与27 UI检查已通过：612组完整模型输入逐位等价，2040个阶段端点与588734帧监督正确；全588734张局部图黑帧0。新统计覆盖588734个state和29436700个动作位置，612次真实LeRobot对照通过；缓存816路/354.48GB，476路从归档按完整内容SHA独立复制验证，340路新视频完整解码，共4080次精确参考。32批CPU测试后24批平均0.115秒/batch（不含GPU计算），实际抽样文本189～231token。98项相关回归通过，1项跳过；GPU容量引用既有同形状batch256实训，本次未执行GPU训练。验收与UI证据见 `subtasks/records/in_hand204_server27_ui_20261120_r1.json`。UI `http://127.0.0.1:18767/` 已默认204条/20000步/offline并选0～7卡，未点击启动。
+
 旧119源码配置可从Git历史恢复；已归档权重不改。下文旧批次说明保留历史背景，不能用作当前204条验收结论。
 
 # FR3 + Sharpa 番茄训练

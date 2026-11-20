@@ -1,0 +1,106 @@
+{
+  "date": "2026-11-20",
+  "server": "27",
+  "host": "dsw-797192-78fff84cd4-q56gq",
+  "branch": "tomato-subtask-policy",
+  "validated_code_commit": "f62f8d1",
+  "status": "ready_for_manual_ui_start",
+  "training_started": false,
+  "source": "/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi",
+  "previous_recordings": 119,
+  "added_recordings": 85,
+  "previous_members_removed": 0,
+  "previous_annotation_and_source_hashes_unchanged": true,
+  "episodes": 204,
+  "frames": 588734,
+  "all_episodes_train": true,
+  "module": "training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_crop",
+  "settings": {
+    "batch_size": 256,
+    "num_train_steps": 20000,
+    "save_interval": 5000,
+    "keep_period": 5000,
+    "save_interval_after": 5000,
+    "fsdp_devices": 8,
+    "warmup_steps": 1000,
+    "peak_lr": 2.5e-05,
+    "decay_steps": 30000,
+    "decay_lr": 2.5e-06,
+    "action_horizon": 50,
+    "rtc_max_delay": 0
+  },
+  "wandb_mode": "offline",
+  "initial_weights": "/mnt/data/public_ckpt/pi05/pi05_base/params",
+  "resume": false,
+  "input_contract": {
+    "rgb_views": 4,
+    "model_state_dim": 58,
+    "model_action_dim": 58,
+    "arm_delta_dims": 14,
+    "hand_absolute_dims": 44,
+    "visual_tokens": 1024,
+    "max_text_tokens": 256,
+    "depth": false,
+    "agent": false,
+    "memory": false
+  },
+  "ui": {
+    "local_url": "http://127.0.0.1:18767/",
+    "server_port": 8768,
+    "selected_gpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "data_statistics_check": "已验证，可复用",
+    "start_clicked": false
+  },
+  "cache": {
+    "entries": 816,
+    "bytes": 354483910656,
+    "reused_content_verified_arrays": 476,
+    "new_sequentially_decoded_videos": 340,
+    "exact_reference_samples": 4080
+  },
+  "regression": {
+    "passed": 98,
+    "skipped": 1
+  },
+  "acceptance_report": "logs/in_hand204_preflight/accepted_20261120_s20000_c5000.json",
+  "acceptance": {
+    "bundle": "/mnt/data/users/mengxiang/workspace/training_data/sharpa/full-block-more/in_hand204_four_view_v3_r1",
+    "cache": "/mnt/data/users/mengxiang/workspace/training_data/sharpa/full-block-more/in_hand204_rgb224_cache_v3_r1",
+    "bundle_sha256": "2cbecb9fc1cf2bf2c216eb239fac18d1bbfee6dda9dcf29af85ffbf3fa51c01f",
+    "selection_sha256": "f043fe0fbd6cb78bd3ffaaf25b5e2136050544b063fcd4c96b2fc7db7565dc99",
+    "cache_manifest_sha256": "be0fb41b093c2b2b0cd0a43ab416b63b9d140f46c0ac531a20a0077a03c88eb9",
+    "all_model_inputs_equal": true,
+    "model_samples_checked": 612,
+    "phase_boundary_samples_checked": 2040,
+    "per_frame_prompts_checked": 588734,
+    "original_sources_unchanged": true,
+    "physical_columns_equal": true,
+    "loader_batches": 32,
+    "steady_batch_seconds": 0.11495332967024297,
+    "actual_token_lengths": {
+      "min": 189,
+      "max": 231,
+      "samples": 612
+    },
+    "crop_frames_checked": 588734,
+    "black_crop_frames": 0,
+    "offline_roi_uses_future_coordinates": true,
+    "independent_semantic_accuracy_measured": false,
+    "gpu_capacity": "not_exercised_this_run; prior four-view batch256 verified separately"
+  },
+  "normalization": {
+    "norm_stats_path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/assets/tomato_in_hand204_rgb_crop_v3_r1_delta_30hz/norm_stats.json",
+    "norm_stats_sha256": "a623ccc815822fe086d66e8c2ce6f65d0f948189bb28ca49fb875506e95f5386",
+    "norm_audit_sha256": "4fce144ec30d176b7693eabfbfe0b83b4134bdbc0a09f3029c14f577faf7296c",
+    "norm_provenance": "verified"
+  }
+}
