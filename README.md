@@ -6,6 +6,8 @@
 
 当前 `tomato-subtask-policy` 已沿用手中调整五阶段方案更新为normal全204条/588734帧（原119条加85条）：27服务器，四路当前RGB、58D state、同一套四种阶段指令，batch256/FSDP8、20000步，每5000完成步保存并保留，W&B默认offline，由用户在UI手动启动。入口 `training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_crop`；204条重新计算归一化并验收精确RGB缓存后才允许启动。旧119源码配置由Git历史留存，其已归档权重不变。当前仅准备与检查，不等于已训练或实机验证。
 
+2026-11-20增加三路RGB＋相同subtask对照：`in_hand204_b_three_rgb`沿用204条、batch256/FSDP8/20000步/每5000保存及全部非图像设置，只移除interaction视觉输入（768视觉token）。源数据及第四路视频都保留。以无.git的冻结执行代码快照准备、验收和排队，当前四路运行checkout不改；只有指定四路任务正常完成20000步、checkpoint完整提交且8卡空闲后才自动从pi05_base开训，失败/停止则不启动。队列显示于同一训练UI，可取消；准备或排队不代表三路训练已完成。
+
 旧normal93配置、数据与B checkpoint7999保留，旧入口`scripts.tomato_ab_run`不改。100条与旧93条有90条共同录制，移出3条、加入10条，并重新计算统计；因此不能把新旧结果当作仅增加crop的严格消融。r11裁剪坐标由前后帧辅助离线生成，图像始终来自当前帧；实时ROI与部署另行验证。
 
 新 `normal/speedup/full-block-more` 数据使用独立 `scripts.tomato_full_block_roi` 离线流程：先冻结原始文件SHA256，再逐批检测右手及邻近果串，以180像素为最小取景、300像素为局部上限规划平滑窗口，输出224×224局部RGB。前后帧只辅助坐标，像素始终取当前cam0；左手放果时保持右手果串为中心。`process --source <只读缓存根目录> --output <派生根目录> --category normal|speedup` 独立处理两种时间轴，保留逐帧坐标、检测距离、视频解码和几何检查。服务器 `publish --source <tomato_sharpa根目录> --output <同一根目录> --freeze <冻结清单>` 仅在各类别 `full-block-more/subtask-roi/A或B/原数据集名` 内复制原三路、state/action和元数据，并新增第四路及校验清单；不使用可写硬链接。原始数据前后哈希必须一致，冲突文件拒绝覆盖。该批数据不自动接入旧训练，不生成Subtask标签；视频完整性、抽帧语义复核和正式训练就绪状态分别记录。

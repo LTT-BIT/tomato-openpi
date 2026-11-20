@@ -174,3 +174,55 @@ def test_ui_exposes204_profile_and_accepted_cache(tmp_path,frozen,monkeypatch):
     from types import SimpleNamespace
     training_ui.prepare_input_environment(SimpleNamespace(policy_metadata={}))
     assert 'PI05_RGB_FRAME_CACHE' not in __import__('os').environ
+
+
+def test_three_rgb_view_preserves_sources_and_all_other_training_settings(tmp_path,frozen,monkeypatch):
+    selection,_=frozen;source=tmp_path/'four';materialize(selection,source,Tokenizer())
+    monkeypatch.setenv('PI05_IN_HAND204_BUNDLE',str(source))
+    from scripts.prepare_in_hand204_three_rgb import prepare
+    from training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_three_rgb import build_config
+    from training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_crop import build_config as crop
+    old_cache=tmp_path/'old_cache';entries=[]
+    for ep in range(2):
+        for cam in c.CAMERAS:
+            p=old_cache/cam/f'episode_{ep:06d}.npy';p.parent.mkdir(parents=True,exist_ok=True)
+            np.save(p,np.zeros((10,224,224,3),dtype=np.uint8));p.chmod(0o444)
+            entries.append(dict(episode=ep,camera=cam,frames=10,cache_file=str(p.relative_to(old_cache)),
+                cache_sha256=digest(p),source_sha256=digest(source/f'b_coarse/videos/chunk-000/{cam}/episode_{ep:06d}.mp4'),
+                bytes=p.stat().st_size,mtime_ns=p.stat().st_mtime_ns,exact_reference_samples=5))
+    write_json(old_cache/'manifest.json',dict(complete=True,schema='rgb224_exact_pil_v2',entries=entries))
+    before={str(p):digest(p) for p in source.rglob('*') if p.is_file()}
+    view=tmp_path/'three';cache=tmp_path/'three_cache';prepare(source,old_cache,view,cache)
+    assert before=={str(p):digest(p) for p in source.rglob('*') if p.is_file()}
+    assert len(list((view/'videos').rglob('*.mp4')))==6
+    assert (source/'b_coarse/videos/chunk-000/observation.images.interaction/episode_000000.mp4').exists()
+    assert len(json.loads((cache/'manifest.json').read_text())['entries'])==6
+    for ep in range(2):
+        assert digest(view/f'data/chunk-000/episode_{ep:06d}.parquet')==digest(source/f'b_coarse/data/chunk-000/episode_{ep:06d}.parquet')
+    monkeypatch.setenv('PI05_IN_HAND204_THREE_VIEW',str(view));a=build_config();b=crop()
+    assert len(a.model.image_keys)==3 and a.policy_metadata['visual_tokens']==768
+    assert a.data.extra_delta_transform and a.model.action_dim==58 and a.model.action_horizon==50
+    for field in ['batch_size','num_train_steps','fsdp_devices','keep_period','save_interval_after','lr_schedule','optimizer','sampling_mode','data_seed','augmentation_seed']:
+        assert getattr(a,field)==getattr(b,field)
+    assert a.policy_metadata['prompts']==b.policy_metadata['prompts']
+    assert a.weight_loader==b.weight_loader and a.data.assets.asset_id!=b.data.assets.asset_id
+
+
+def test_three_rgb_queue_waits_for_success_and_committed_checkpoint(tmp_path):
+    from scripts.queue_in_hand204_three_rgb import predecessor_ready,gpu_indices
+    binding=dict(id='a',host='h',exp_name='crop',checkpoint_dir=str(tmp_path),child_pid=1,child_start='123',gpus=['GPU'+str(i) for i in range(8)])
+    current={**binding,'status':'running'}
+    assert not predecessor_ready(current,binding,'123')
+    current['status']='completed'
+    assert not predecessor_ready(current,binding,None)
+    write_json(tmp_path/'20000/_CHECKPOINT_METADATA',dict(commit_timestamp_nsecs=1))
+    for name in ['params','train_state']:write_json(tmp_path/'20000'/name/'_METADATA',{})
+    (tmp_path/'20000/assets').mkdir()
+    assert predecessor_ready(current,binding,None)
+    assert not predecessor_ready(current,binding,'123')
+    for status in ['failed','stopped','interrupted']:
+        with pytest.raises(ValueError,match='successfully'):predecessor_ready({**current,'status':status},binding,None)
+    with pytest.raises(ValueError,match='identity'):predecessor_ready({**current,'child_start':'other'},binding,None)
+    devices=[dict(index=str(i),uuid='GPU'+str(i)) for i in range(8)]
+    assert gpu_indices(devices,binding['gpus'])==[str(i) for i in range(8)]
+    with pytest.raises(ValueError,match='UUID'):gpu_indices(devices,['wrong'])

@@ -1,3 +1,11 @@
+## 204条三路RGB＋相同subtask对照
+
+用户于2026-11-20授权排在当前四路B训练之后自动运行。`in_hand204_b_three_rgb`使用同204条及逐帧subtask、state/action；模型原三路RGB（cam0全局、cam2左腕、cam1右腕），768视觉token、文本上限256、58D state、50×58动作。仅去掉第四路视觉，阶段prompt/采样/种子/归一化数值/Delta语义与超参数保持一致；batch256/FSDP8/20000步/每5000保存且保留/offline，从pi05_base重新训练。
+
+原始发布数据、四路训练副本与局部视频均不删除或改写。三路逻辑视图复制元数据和相同Parquet，原三路视频只读引用，精确缓存只读复用原三路数组；统计使用独立asset/provenance并核验数值与四路相同。`scripts.check_in_hand204_three_rgb`逐条验证612组原始/缓存/去crop四路模型输入一致、2040个subtask端点及32批供数；`scripts.queue_in_hand204_three_rgb`默认只在显式enqueue时登记。
+
+为保持当前训练代码指纹不变，共享checkout保持1826aeb；新代码使用Git archive生成的无.git冻结执行快照（不是另建clone/worktree）。运行时日志、统计、checkpoint目录映射到同一共享工程，UI可见排队任务。队列绑定前序job/PID启动身份/GPU UUID和20000完整提交；前序正常完成、进程退出、GPU空闲才自动启动，不中断原训练、不抢其他进程。UI停止队列只取消该对照，不停止前序。队列失败不自动重试或覆盖checkpoint。
+
 ## 当前手中调整五阶段：204条四路RGB
 
 2026-11-20沿用原119条方案直接更新为204条/588734帧，来源为共享盘 `/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi`。任务仍为pickup/harvest/adjust/harvest/return，四条英文prompt相同；存储state116经具名适配得到state58，action58保持手臂14维Delta、手部44维Absolute。224四路RGB、视觉1024token、文本上限256、50步动作窗口、RTC0，无深度/Agent/Memory。
