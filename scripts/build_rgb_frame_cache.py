@@ -1,11 +1,13 @@
 """Sequentially decode immutable videos to exact uint8 training-size frame arrays."""
 import argparse
 from concurrent.futures import ProcessPoolExecutor, as_completed
+import errno
 import hashlib
 import json
 import multiprocessing
 import os
 from pathlib import Path
+import shutil
 import time
 
 
@@ -46,15 +48,27 @@ def build_video(job):
         if (old['source_sha256'] != source_sha or old['frames'] != frames
                 or old.get('exact_reference_samples', 0) < 3
                 or old_file.stat().st_size != old['bytes']
-                or old_file.stat().st_mode & 0o222
                 or sha256(old_file) != old['cache_sha256']):
             raise ValueError('Reusable cache failed source/content verification')
         array = np.load(old_file, mmap_mode='r', allow_pickle=False)
         if array.dtype != np.uint8 or array.shape != (frames, 224, 224, 3):
             raise ValueError('Reusable cache shape/dtype differs')
         del array
-        # Immutable arrays can share storage; receipts and metadata are independent.
-        os.link(old_file, destination)
+        # Archived object storage may expose writable modes and cannot hard-link.
+        # In that case copy independently and verify the complete target bytes.
+        copied = bool(old_file.stat().st_mode & 0o222)
+        if not copied:
+            try:
+                os.link(old_file, destination)
+            except OSError as error:
+                if error.errno != errno.EXDEV:
+                    raise
+                copied = True
+        if copied:
+            shutil.copyfile(old_file, destination)
+            destination.chmod(0o444)
+            if sha256(destination) != old['cache_sha256']:
+                raise ValueError('Copied reusable cache content changed')
         stat = destination.stat()
         result = {**old, 'episode': episode, 'camera': camera,
             'cache_file': str(destination.relative_to(destination.parents[1])),

@@ -66,6 +66,13 @@ def test_real_video_cache_matches_decoder_and_preserves_timestamp(tmp_path):
     assert reused['episode']==4 and reused['source_sha256']==entry['source_sha256']
     assert reused_path.stat().st_ino==destination.stat().st_ino
     np.testing.assert_array_equal(np.load(reused_path),np.load(destination))
+    writable=tmp_path/'archive.npy'
+    __import__('shutil').copyfile(destination,writable)
+    copied_path=tmp_path/'copied/cam0/episode_000005.npy'
+    build_video((str(source),str(copied_path),5,'cam0',12,30,(str(writable),entry)))
+    assert copied_path.stat().st_ino!=writable.stat().st_ino
+    assert not copied_path.stat().st_mode & 0o222
+    np.testing.assert_array_equal(np.load(copied_path),np.load(destination))
     bad={**entry,'cache_sha256':'changed'}
     with pytest.raises(ValueError,match='verification'):
         build_video((str(source),str(tmp_path/'bad/cam0/episode_000000.npy'),0,'cam0',12,30,(str(destination),bad)))
