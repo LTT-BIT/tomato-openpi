@@ -12,7 +12,10 @@ from training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_three_rgb 
 
 def release_frame_maps(*datasets):
     """Bound audit file descriptors while comparing multiple full camera sets."""
-    for dataset in datasets:dataset._cache_maps.clear()
+    from openpi.training.data_loader import TransformedDataset
+    for dataset in datasets:
+        while isinstance(dataset,TransformedDataset):dataset=dataset._dataset
+        dataset._cache_maps.clear()
 
 
 def check():

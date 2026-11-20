@@ -71,6 +71,7 @@ def test_audit_releases_episode_maps_and_file_descriptors(tmp_path):
     a=SimpleNamespace(_cache_maps={i:np.load(p,mmap_mode='r') for i,p in enumerate(files[:6])})
     b=SimpleNamespace(_cache_maps={i:np.load(p,mmap_mode='r') for i,p in enumerate(files[6:])})
     count=lambda:len(os.listdir('/proc/self/fd'))
-    before=count();release_frame_maps(a,b)
+    from openpi.training.data_loader import TransformedDataset
+    before=count();release_frame_maps(TransformedDataset(TransformedDataset(a,[]),[]),TransformedDataset(b,[]))
     assert not a._cache_maps and not b._cache_maps
     assert count()<=before-12
