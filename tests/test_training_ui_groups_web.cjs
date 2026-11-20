@@ -6,11 +6,12 @@ const vm = require('node:vm');
 const {test} = require('node:test');
 
 class Element {
-  constructor(tag) { this.tag=tag; this.children=[]; this.dataset={}; this.value=''; this.classList={add(){},remove(){}}; }
+  constructor(tag) { this.tag=tag; this.children=[]; this.dataset={}; this.value=''; this.classList={add(){},remove(){},toggle(){}}; }
   append(...children) { this.children.push(...children); }
   replaceChildren(...children) { this.children=children; }
   addEventListener() {}
   dispatchEvent() {}
+  querySelector(selector) { return this.children.find(el=>selector===`[value=${el.value}]`); }
   querySelectorAll(tag) { return this.children.flatMap(el=>[...((el.tag===tag||(tag==='input:checked'&&el.tag==='input'&&el.checked))?[el]:[]),...el.querySelectorAll(tag)]); }
 }
 function setup() {
@@ -128,4 +129,29 @@ test('launch request carries every selected root in order while one root keeps l
   assert.equal(run('request().values.dataset_root'),'/a');
   run("fields.get('dataset_root').input.value='/a'");
   assert.equal(run('request().values.dataset_roots'),undefined);
+});
+
+test('T3 on the ordinary form preserves selected roots, RTC and group weights',()=>{
+  const {elements,run}=setup();
+  for(const id of ['paper-fields','paper-timestamp','paper-correlated','paper-summary','discover-datasets','new-stats','detect-groups','group-source-help']){
+    elements.set(id,new Element('div'));
+  }
+  run(`initial={dataset_root:'/original',action_semantics:'absolute',action_horizon:50,paper_trial:'none'};
+    protocol={paper_available:true};renderProtocol=()=>{};
+    fields.get('dataset_root').input.value='/different location\\n/other/source';
+    independentStats=()=>{};
+    for(const [key,value] of Object.entries({exp_name:'experiment_absolute',action_horizon:'50',rtc_max_delay:'10',action_semantics:'absolute'})){
+      fields.set(key,{input:Object.assign(document.createElement('input'),{value})});
+    }
+    fields.get('action_semantics').input.append(Object.assign(document.createElement('option'),{value:'absolute'}));`);
+  const before=run('JSON.stringify(groupInputs())');
+  elements.get('paper-timestamp').checked=true;
+  elements.get('paper-correlated').checked=true;
+  run('changePaperFeatures()');
+  assert.equal(run('paperTrial'),'t3');
+  assert.equal(run("fields.get('action_semantics').input.value"),'delta');
+  assert.equal(run("fields.get('rtc_max_delay').input.value"),'10');
+  assert.equal(run("fields.get('dataset_root').input.value"),'/different location\n/other/source');
+  assert.equal(run('JSON.stringify(groupInputs())'),before);
+  assert.equal(elements.get('sampling-mode').value,'weighted_replacement');
 });

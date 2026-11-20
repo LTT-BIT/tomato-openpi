@@ -208,9 +208,19 @@ def preflight_collection(config, *, require_norm=True):
         "prompts": list(dict.fromkeys(p for row in reports for p in row["prompts"])),
         "episode_mappings": [{"root": item["root"], "local_to_global": item["mapping"]} for item in layout],
     }
-    if config.sampling_mode == "weighted_replacement":
-        windows = {item["mapping"][row["episode_index"]]: row["length"] for item in layout for row in item["episodes"]}
-        result["sampling"] = weighted_sampling_report(config.sampling_groups, windows)
+    paper_windows = hasattr(config.data, "paper_contract")
+    if paper_windows or config.sampling_mode == "weighted_replacement":
+        horizon = config.model.action_horizon if paper_windows else 1
+        windows = {
+            item["mapping"][row["episode_index"]]: count
+            for item in layout
+            for row in item["episodes"]
+            if (count := sampling.complete_window_count(row["length"], horizon))
+        }
+        if paper_windows:
+            result["training_windows"] = sum(windows.values())
+        if config.sampling_mode == "weighted_replacement":
+            result["sampling"] = weighted_sampling_report(config.sampling_groups, windows)
     if require_norm:
         check_norm(config, result)
     return result

@@ -21,6 +21,7 @@ from openpi.subtasks.tomato import GOAL
 from openpi.subtasks.tomato_in_hand import TASKS
 from openpi.training import config as cfg
 from openpi.training import data_loader
+from openpi.training import frame_cache
 from openpi.training import sampling
 from openpi.training import utils
 from openpi.training.delta_paper_stats import compute
@@ -29,6 +30,34 @@ from scripts import training_ui_config as ui
 from scripts.train import train_step
 
 PREFIX = "training_configs.experiments.tomato_sharpa.subtasks."
+SHARPA_BASE = "training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_fullft_v1"
+
+
+@pytest.mark.parametrize("source_count", [1, 3])
+def test_sharpa_baseline_t3_rtc_and_weighted_sampling_accept_selected_paths(tmp_path, source_count):
+    defaults = ui.defaults(SHARPA_BASE)
+    assert defaults["protocol"]["paper_available"]
+    assert defaults["values"]["action_semantics"] == "absolute"
+    roots = [str(tmp_path / f"arbitrary location {i}" / "recording") for i in range(source_count)]
+    values = {
+        **defaults["values"],
+        "dataset_root": roots[0],
+        "dataset_roots": roots,
+        "sources": roots,
+        "asset_id": "arbitrary_paths_t3",
+        "action_semantics": "delta",
+        "paper_trial": "t3",
+        "rtc_max_delay": 10,
+        "sampling_mode": "weighted_replacement",
+        "sampling_groups": [{"name": "selected", "episodes": list(range(source_count)), "weight": 1}],
+    }
+    config = ui.config_from_source(ui.personal_source(SHARPA_BASE, "test", values), SHARPA_BASE, "saved.py")
+    assert [spec.root for spec in config.data.lerobot_datasets] == roots
+    assert config.model.paper_mode == "timestamp_zscore_arms"
+    assert config.model.paper_beta == 0.5
+    assert config.model.rtc_max_delay == 10
+    assert config.sampling_mode == "weighted_replacement"
+    assert config.sampling_groups[0].episodes == tuple(range(source_count))
 
 
 @pytest.mark.parametrize("prompt_mode", ["stage", "global"])
@@ -200,7 +229,7 @@ def test_visual_memory_t3_statistics_loading_and_jitted_rtc_update(tmp_path, mon
             return samples[index]
 
     monkeypatch.setattr(data_loader.lerobot_dataset, "LeRobotDatasetMetadata", lambda *a, **kw: metadata)
-    monkeypatch.setattr(data_loader.lerobot_dataset, "LeRobotDataset", lambda *a, **kw: SyntheticSource())
+    monkeypatch.setattr(frame_cache, "CachedLeRobotDataset", lambda *a, **kw: SyntheticSource())
 
     def tokenize(values):
         return {

@@ -5,22 +5,34 @@ import json
 from pathlib import Path
 
 from openpi.training.dataset_collection import collection_layout
+from openpi.training.sampling import complete_window_count
 
 
-def dataset_groups(roots):
+def dataset_groups(roots, *, horizon=None):
     layout = collection_layout(roots)
-    return {
-        "episodes": sum(len(item["mapping"]) for item in layout),
-        "frames": sum(item["info"]["total_frames"] for item in layout),
-        "groups": [
+    groups = []
+    for i, item in enumerate(layout):
+        windows = {
+            item["mapping"][row["episode_index"]]: count
+            for row in item["episodes"]
+            if (count := complete_window_count(row["length"], horizon or 1))
+        }
+        if not windows:
+            continue
+        groups.append(
             {
                 "name": f"{i + 1}:{Path(item['root']).parent.name}/{Path(item['root']).name}",
                 "source_root": item["root"],
-                "episodes": list(item["mapping"].values()),
+                "episodes": sorted(windows),
                 "frames": item["info"]["total_frames"],
+                **({"eligible_windows": sum(windows.values())} if horizon is not None else {}),
             }
-            for i, item in enumerate(layout)
-        ],
+        )
+    return {
+        "episodes": sum(len(group["episodes"]) for group in groups),
+        "frames": sum(item["info"]["total_frames"] for item in layout),
+        "groups": groups,
+        **({"eligible_windows": sum(group["eligible_windows"] for group in groups)} if horizon is not None else {}),
     }
 
 

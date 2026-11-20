@@ -23,7 +23,7 @@ from openpi.training.visual_memory_options import VisualMemoryOptionsView
 class CompleteWindows:
     """Select only complete source-FPS windows and retain sampling/audit IDs."""
 
-    def __init__(self, dataset, horizon):
+    def __init__(self, dataset, horizon, *, allow_empty=False):
         self.dataset = dataset
         self.source_total_frames = len(dataset)
         self.root = dataset.root
@@ -38,7 +38,7 @@ class CompleteWindows:
                 raise ValueError("Paper training requires contiguous episode frames")
             indices.extend(positions[: complete_window_count(len(positions), horizon)])
         self.indices = np.sort(np.asarray(indices, np.int64))
-        if not len(self.indices):
+        if not len(self.indices) and not allow_empty:
             raise ValueError("Dataset contains no complete action windows")
         self.hf_dataset = dataset.hf_dataset.select(self.indices.tolist())
         self.view_identity = {"version": paper.VERSION, "complete_horizon": horizon}
@@ -88,13 +88,13 @@ class PaperNormalizationConfig:
             or not np.isfinite(self.paper_std_floor)
             or self.paper_std_floor <= 0
             or self.correlation_max_windows < 2
-            or len(self.lerobot_datasets) != 1
+            or not self.lerobot_datasets
             or any(spec.weight != 1.0 for spec in self.lerobot_datasets)
             or not self.extra_delta_transform
             or self.action_hz != 30
             or getattr(self.base_config, "task_view", None) is not None
         ):
-            raise ValueError("Paper statistics require one unweighted 30Hz Sharpa Delta source and complete windows")
+            raise ValueError("Paper statistics require compatible 30Hz Sharpa Delta data and complete windows")
 
     def paper_contract(self):
         # The statistics and Gaussian prior use uniform windows, independent of the training sampler.
@@ -197,6 +197,11 @@ class PaperNormalizationConfig:
         from openpi.training.delta_paper_stats import compute
 
         return compute(config, batch_size=batch_size)
+
+
+@dataclass(frozen=True)
+class PaperMultimodalData(PaperNormalizationConfig, cfg.LeRobotFr3SharpaMultimodalDataConfig):
+    pass
 
 
 @dataclass(frozen=True)

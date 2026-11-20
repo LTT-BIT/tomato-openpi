@@ -107,7 +107,7 @@ class WeightedConcatDataset(torch.utils.data.ConcatDataset):
 class CollectionDataset(torch.utils.data.ConcatDataset):
     """Concatenate independent windows, with collision-free IDs for sampling/audit."""
 
-    def __init__(self, datasets, specs):
+    def __init__(self, datasets, specs, *, complete_horizon=1):
         super().__init__(datasets)
         self.sources = []
         ids = []
@@ -121,11 +121,21 @@ class CollectionDataset(torch.utils.data.ConcatDataset):
             columns = source.hf_dataset.select_columns(["episode_index", "frame_index"]).with_format("numpy")[:]
             episodes = np.asarray(columns["episode_index"], dtype=np.int64)
             unique, counts = np.unique(episodes, return_counts=True)
-            expected = {row["episode_index"]: row["length"] for row in layout["episodes"]}
-            if dict(zip(unique.tolist(), counts.tolist(), strict=True)) != expected or len(episodes) != len(source):
-                raise ValueError("Loaded collection episode lengths differ from metadata")
+            expected = {
+                row["episode_index"]: count
+                for row in layout["episodes"]
+                if (count := _sampling.complete_window_count(row["length"], complete_horizon))
+            }
+            if (
+                dict(zip(unique.tolist(), counts.tolist(), strict=True)) != expected
+                or len(episodes) != len(source)
+                or getattr(source, "source_total_frames", len(source)) != layout["info"]["total_frames"]
+            ):
+                raise ValueError("Loaded collection windows differ from episode metadata")
             ids.append(np.column_stack(([layout["mapping"][int(e)] for e in episodes], columns["frame_index"])))
         self.frame_ids = np.concatenate(ids).astype(np.int64)
+        if not len(self.frame_ids):
+            raise ValueError("Dataset collection contains no complete action windows")
 
 
 class IterableTransformedDataset(IterableDataset[T_co]):
@@ -306,6 +316,8 @@ def create_torch_dataset(
     if data_config.local_dataset_loader is not None:
         return _create_local_dataset(data_config, action_horizon)
 
+    complete_windows = getattr(data_config, "paper_complete_windows", False)
+
     def create_one(
         dataset_repo_id: str, dataset_root: str | None = None
     ) -> tuple[Dataset, lerobot_dataset.LeRobotDatasetMetadata]:
@@ -349,12 +361,12 @@ def create_torch_dataset(
                 if memory.image_keys == THREE_VIEWS
                 else FastVisualMemoryDataset(dataset, memory, data_config.history_mask_key)
             )
-        if getattr(data_config, "paper_complete_windows", False):
+        if complete_windows:
             from openpi.training.delta_paper import CompleteWindows
 
             if action_hz != dataset_meta.fps:
                 raise ValueError("Paper windows require source-rate action sampling")
-            dataset = CompleteWindows(dataset, action_horizon)
+            dataset = CompleteWindows(dataset, action_horizon, allow_empty=len(data_config.lerobot_datasets) > 1)
         view = getattr(data_config, "task_view", None)
         if view is not None:
             from openpi.training.task_view import TaskViewDataset
@@ -400,7 +412,9 @@ def create_torch_dataset(
         ),
     )
     if sampling_mode in _sampling.PLAN_MODES:
-        return CollectionDataset(datasets, data_config.lerobot_datasets)
+        return CollectionDataset(
+            datasets, data_config.lerobot_datasets, complete_horizon=action_horizon if complete_windows else 1
+        )
     return WeightedConcatDataset(datasets, [spec.weight for spec in data_config.lerobot_datasets])
 
 

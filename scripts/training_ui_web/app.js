@@ -4,7 +4,7 @@ const fragment = new URLSearchParams(location.hash.slice(1));
 if (fragment.get('token')) { sessionStorage.setItem('training-token', fragment.get('token')); history.replaceState(null, '', location.pathname); }
 let sourceHash = null;
 let baseline = null, initial = null, protocol = null, currentJob = null, gpuData = [], browseTarget = null, browseState = null, loadingVersion = 0;
-let paperTrial = 'none';
+let paperTrial = 'none', paperAutoDelta = false;
 let tomatoBaseline = null, featureSuffix = '';
 const fields = new Map();
 const terminal = new Set(['completed', 'failed', 'stopped', 'interrupted']);
@@ -72,6 +72,7 @@ function fillForm(result) {
   $('groups-result').textContent='';
   initial=result.values;sourceHash=result.source_sha256;protocol=result.protocol;fields.clear();
   paperTrial=initial.paper_trial||'none';
+  paperAutoDelta=false;
   featureSuffix='';
   $('training-input-options').classList.toggle('hidden',!('prompt_mode' in initial));
   $('prompt-mode').value=initial.prompt_mode??'stage';
@@ -131,6 +132,8 @@ function syncPaperControls(){
     input.disabled=locked.has(key);
     if(browseButton)browseButton.disabled=input.disabled;
   }
+  const action=fields.get('action_semantics').input;
+  action.querySelector('[value=absolute]').disabled=active;
   for(const id of ['discover-datasets','apply-datasets'])$(id).disabled=locked.has('dataset_root');
   $('new-stats').disabled=locked.has('asset_id');
   $('sampling-mode').disabled=locked.has('sampling_mode');
@@ -143,8 +146,23 @@ function changePaperFeatures(){
   const timestamp=$('paper-timestamp').checked, correlated=$('paper-correlated').checked;
   const wasPaper=paperTrial!=='none';
   paperTrial=timestamp?(correlated?'t3':'t1'):(correlated?'t2':'none');
-  if(wasPaper!==(paperTrial!=='none')&&protocol.bundle_grouping&&$('sampling-mode').value==='weighted_replacement'){
-    $('groups-result').textContent='可用动作窗口规则已变更，可重新读取 A/B 或检查数据与统计。';
+  const active=paperTrial!=='none';
+  if(wasPaper!==active){
+    const action=fields.get('action_semantics').input;
+    const name=fields.get('exp_name').input;
+    if(active&&action.value==='absolute'){
+      paperAutoDelta=true;
+      action.value='delta';
+      name.value=name.value.replace(/_absolute(?=_|$)/,'_delta');
+    }else if(!active&&paperAutoDelta){
+      paperAutoDelta=false;
+      action.value='absolute';
+      name.value=name.value.replace(/_delta(?=_|$)/,'_absolute');
+    }
+    action.dispatchEvent(new Event('input'));
+    if($('sampling-mode').value==='weighted_replacement'){
+      $('groups-result').textContent='可用动作窗口规则已变更，请核对分组或检查数据与统计。';
+    }
   }
   updateFeatureSelection();
 }
@@ -155,7 +173,10 @@ function updateFeatureSelection(){
   if(featureSuffix&&name.value.endsWith(featureSuffix))name.value=name.value.slice(0,-featureSuffix.length);
   featureSuffix=changes.length?'_'+changes.join('_'):'';
   name.value+=featureSuffix;
-  if(!changes.length){
+  const sameData=datasetPaths(fields.get('dataset_root').input.value).join('\n')===(initial.dataset_roots||[initial.dataset_root]).join('\n');
+  const sameStatistics=sameData&&fields.get('action_semantics').input.value===initial.action_semantics
+    &&Number(fields.get('action_horizon').input.value)===initial.action_horizon;
+  if(!changes.length&&sameStatistics){
     for(const key of ['assets_dir','asset_id'])fields.get(key).input.value=initial[key];
     fields.get('asset_id').input.dispatchEvent(new Event('input'));
   }else independentStats();
@@ -223,10 +244,11 @@ async function detectGroups(){
   if(!baseline)throw Error('请先选择配置');
   const module=baseline, version=loadingVersion, root=fields.get('dataset_root').input.value.trim(), previous=groupInputs();
   const mode=$('sampling-mode').value, trial=paperTrial;
+  const horizon=fields.get('action_horizon')?.input.value;
   $('groups-result').textContent='正在读取并核对来源记录…';
   try{
-    const roots=datasetPaths(root);const result=await api('/api/sampling-groups',{baseline:module,dataset_root:roots[0],dataset_roots:roots,paper_trial:trial});
-    if(version!==loadingVersion||baseline!==module||fields.get('dataset_root').input.value.trim()!==root||$('sampling-mode').value!==mode||paperTrial!==trial||JSON.stringify(groupInputs())!==JSON.stringify(previous))throw Error('读取期间配置、目录或分组已修改，请重新读取。');
+    const roots=datasetPaths(root);const result=await api('/api/sampling-groups',{baseline:module,dataset_root:roots[0],dataset_roots:roots,paper_trial:trial,...(trial==='none'?{}:{action_horizon:Number(horizon)})});
+    if(version!==loadingVersion||baseline!==module||fields.get('dataset_root').input.value.trim()!==root||$('sampling-mode').value!==mode||paperTrial!==trial||fields.get('action_horizon')?.input.value!==horizon||JSON.stringify(groupInputs())!==JSON.stringify(previous))throw Error('读取期间配置、目录或分组已修改，请重新读取。');
     const weights=new Map(previous.map(g=>[g.name.trim(),Number(g.weight)]));
     $('groups').replaceChildren();
     for(const group of result.groups){const weight=weights.get(group.name);addGroup({...group,episode_text:formatIds(group.episodes),weight:Number.isFinite(weight)&&weight>0?weight:1});}

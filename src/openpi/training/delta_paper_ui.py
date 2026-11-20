@@ -10,6 +10,8 @@ from openpi.models.pi0_delta_paper import PaperWeightLoader
 from openpi.models.pi0_visual_memory import VisualMemoryConfig
 from openpi.shared import delta_paper as paper
 from openpi.training.config import LeRobotFr3SharpaCropDataConfig
+from openpi.training.config import LeRobotFr3SharpaMultimodalDataConfig
+from openpi.training.delta_paper import PaperMultimodalData
 from openpi.training.delta_paper import PaperSharpaData
 from openpi.training.delta_paper import PaperVisualMemoryData
 from openpi.training.delta_paper import PaperVisualMemoryOptionsData
@@ -36,9 +38,11 @@ def paper_available(config):
     return (
         type(config.data)
         in (
+            LeRobotFr3SharpaMultimodalDataConfig,
             LeRobotFr3SharpaCropDataConfig,
             LeRobotVisualMemoryDataConfig,
             LeRobotVisualMemoryOptionsDataConfig,
+            PaperMultimodalData,
             PaperSharpaData,
             PaperVisualMemoryData,
             PaperVisualMemoryOptionsData,
@@ -50,8 +54,7 @@ def paper_available(config):
         and "lora" not in config.model.paligemma_variant
         and "lora" not in config.model.action_expert_variant
         and config.data.action_hz == 30
-        and config.data.extra_delta_transform
-        and len(config.data.lerobot_datasets) == 1
+        and bool(config.data.lerobot_datasets)
         and not getattr(config.data.base_config, "task_view", None)
     )
 
@@ -64,7 +67,7 @@ def select_trial(source, config, trial):
         raise ValueError("逐时间步归一化和相关高斯噪声仅支持兼容的 30 Hz Sharpa π0.5 全参配置")
     if trial != previous and config.data.assets.asset_id == source.data.assets.asset_id:
         raise ValueError("切换论文功能需要独立的统计 asset_id")
-    if not config.data.extra_delta_transform or config.sampling_mode not in PLAN_MODES:
+    if trial != "none" and (not config.data.extra_delta_transform or config.sampling_mode not in PLAN_MODES):
         raise ValueError("论文功能要求双臂 delta、双手 absolute 和可复现采样")
 
     def inherited(cls, obj):
@@ -76,9 +79,12 @@ def select_trial(source, config, trial):
     elif isinstance(config.model, VisualMemoryConfig):
         data_cls, model_cls = LeRobotVisualMemoryDataConfig, VisualMemoryConfig
         paper_data_cls, paper_model_cls = PaperVisualMemoryData, PaperVisualMemoryConfig
-    else:
+    elif isinstance(config.data, LeRobotFr3SharpaCropDataConfig):
         data_cls, model_cls = LeRobotFr3SharpaCropDataConfig, Pi0Config
         paper_data_cls, paper_model_cls = PaperSharpaData, PaperPi0Config
+    else:
+        data_cls, model_cls = LeRobotFr3SharpaMultimodalDataConfig, Pi0Config
+        paper_data_cls, paper_model_cls = PaperMultimodalData, PaperPi0Config
     metadata = dict(config.policy_metadata)
     loader_args = inherited(PartialCheckpointWeightLoader, config.weight_loader)
     model_args = inherited(model_cls, config.model)

@@ -13,6 +13,7 @@ from openpi.shared.local_storage import new_artifact_directory
 from openpi.training import data_loader
 from openpi.training import norm_provenance
 from openpi.training.dataset_collection import collection_layout
+from openpi.training.dataset_collection import validate_collection_features
 from openpi.training.delta_paper import PaperDataView
 from openpi.training.delta_paper import PaperNormalizationConfig
 from openpi.training.sampling import PLAN_MODES
@@ -33,6 +34,7 @@ def compute(config, *, batch_size=128):
 def _compute(config, *, batch_size, output):
     data, horizon = config.data, config.model.action_horizon
     layout = collection_layout([spec.root for spec in data.lerobot_datasets])
+    validate_collection_features([item["info"] for item in layout])
     if any(item["info"]["fps"] != 30 for item in layout):
         raise ValueError("Paper episode metadata/FPS mismatch")
     total = sum(complete_window_count(row["length"], horizon) for item in layout for row in item["episodes"])
@@ -49,10 +51,14 @@ def _compute(config, *, batch_size, output):
     if total < 2:
         raise ValueError("Paper statistics require at least two complete training windows")
     contract = norm_provenance.build_contract(config)
-    repack, vectors = current_frame_transforms(data, config.model)
-    vector = transforms.compose([*repack.inputs, *vectors.inputs])
     actual_repack, actual_vectors = data.create_vector_transforms(config.model)
     training_vector = transforms.compose([*actual_repack.inputs, *actual_vectors.inputs])
+    memory = getattr(config.model, "memory", None)
+    vector = training_vector
+    if memory is not None:
+        repack, vectors = current_frame_transforms(data, config.model)
+        vector = transforms.compose([*repack.inputs, *vectors.inputs])
+    interaction_mask_key = getattr(data, "interaction_mask_key", None)
     cameras = config.policy_metadata["camera_keys"]
     dummy = np.zeros((1, 1, 3), np.uint8)
     source_view = PaperDataView(
@@ -62,8 +68,8 @@ def _compute(config, *, batch_size, output):
         action_hz=30,
         prompt_from_task=True,
         video_backend=data.video_backend,
-        visual_memory=getattr(config.model, "memory", None),
-        history_mask_key=data.interaction_mask_key,
+        visual_memory=memory,
+        history_mask_key=interaction_mask_key,
         global_prompt=getattr(data, "global_prompt", None),
     )
     reference = data_loader.create_torch_dataset(source_view, horizon, config.model, sampling_mode="epoch_shuffle")
@@ -105,7 +111,7 @@ def _compute(config, *, batch_size, output):
                     "observation.state": state[rows],
                     "action": action[rows[:, None] + np.arange(horizon)],
                     "prompt": "",
-                    data.interaction_mask_key: np.False_,
+                    **({interaction_mask_key: np.False_} if interaction_mask_key else {}),
                     **dict.fromkeys(cameras, dummy),
                 }
                 values = vector(inputs)
