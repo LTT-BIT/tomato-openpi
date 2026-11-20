@@ -1,0 +1,127 @@
+{
+  "date": "2026-11-20",
+  "server": "27",
+  "status": "queued_waiting_for_crop",
+  "three_view_training_started": false,
+  "queue_job_id": "e182a1d559ba50f4b7f1e2dba4692546",
+  "queue_worker_pid": 129974,
+  "queue_worker_start": "164903112",
+  "queue_worker_identity_verified": true,
+  "predecessor": {
+    "id": "dcb792446ccb40e4b2350271d861d960",
+    "host": "dsw-797192-78fff84cd4-q56gq",
+    "exp_name": "mengxiang_tomato_in_hand204_b_crop_delta_v3_r1_s42_b256_s20000_c5000_1120_141024",
+    "checkpoint_dir": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/checkpoints/pi05_sharpa_in_hand204_b_crop_fullft_delta_v3_r1/mengxiang_tomato_in_hand204_b_crop_delta_v3_r1_s42_b256_s20000_c5000_1120_141024",
+    "child_pid": 3413691,
+    "child_start": "164571452",
+    "gpus": [
+      "GPU-9c8fc8ee-18c7-875b-78b1-fcecbd168a90",
+      "GPU-589bd426-6474-b99d-c4fe-7992a3e1fd4e",
+      "GPU-1afa9aab-2840-8243-4ec6-0621f4f545e5",
+      "GPU-e3d61e8a-6975-4c6c-2aa9-dc597a9545d1",
+      "GPU-7c255b8f-77e9-5381-359f-44791ff1db6b",
+      "GPU-b9347698-aff0-7b37-76da-9aaae7ff4d05",
+      "GPU-b3fe80ac-1c1c-346c-551e-6d757c592655",
+      "GPU-51c94e1b-97e0-6058-f60b-8d9c89fae764"
+    ]
+  },
+  "shared_checkout_unchanged": "1826aebc8fd345f5c93f32722fc69ff11e0ccb0e",
+  "runtime_root": "/mnt/data/users/mengxiang/workspace/training_runtimes/in_hand204_three_rgb_f4d9f16",
+  "runtime_source_commit": "f4d9f16d7f676c7d7dc42128772b3741ce51b9db",
+  "experiment": "tomato_in_hand204_b_three_rgb_delta_v3_r1_s42_b256_s20000_c5000_after_crop_1120",
+  "module": "training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_three_rgb",
+  "checkpoint_dir": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/checkpoints/pi05_sharpa_in_hand204_b_three_rgb_fullft_delta_v3_r1/tomato_in_hand204_b_three_rgb_delta_v3_r1_s42_b256_s20000_c5000_after_crop_1120",
+  "data": {
+    "episodes": 204,
+    "frames": 588734,
+    "rgb_views": 3,
+    "visual_tokens": 768,
+    "max_text_tokens": 256,
+    "subtasks": "same four prompts and five-phase labels",
+    "state_dim": 58,
+    "actions": [
+      50,
+      58
+    ],
+    "state_action_and_subtask_parquet_byte_equal": true,
+    "original_data_deleted": false,
+    "original_data_payload_modified": false,
+    "interaction_videos_retained": true
+  },
+  "settings": {
+    "batch_size": 256,
+    "num_train_steps": 20000,
+    "fsdp_devices": 8,
+    "save_interval": 5000,
+    "save_interval_after": 5000,
+    "keep_period": 5000,
+    "model_seed": 42,
+    "data_seed": 42001,
+    "augmentation_seed": 42002
+  },
+  "wandb_mode": "offline",
+  "initial_weights": "/mnt/data/public_ckpt/pi05/pi05_base/params",
+  "resume": false,
+  "acceptance": {
+    "status": "three_rgb204_accepted",
+    "model_samples_checked": 612,
+    "phase_boundary_samples_checked": 2040,
+    "all_original_pixels_equal": true,
+    "only_removed_interaction": true,
+    "normalization_values_equal": true,
+    "view_sha256": "feacd7213cce23a206fad681a71481f88497be4449e78f1b9e0da265ecbeb5ea",
+    "cache_manifest_sha256": "c71062cab7b2ddfa8b4b08e6684b872e4cfc1ee5dd4062ec620bdb1ed5c67151",
+    "steady_batch_seconds": 0.3627524574500664,
+    "actual_token_lengths": {
+      "min": 189,
+      "max": 231
+    },
+    "loader_batches": 32,
+    "queue_supervisor_revalidation": {
+      "source_report": "logs/in_hand204_three_rgb/accepted_input_audit_0e151d6.json",
+      "source_report_sha256": "62259a3005a8c6e1e5a376cb2249993d5a4aef5c22c718e5e8cb024b1bb56d80",
+      "changed_code_files": [
+        "scripts/queue_in_hand204_three_rgb.py"
+      ],
+      "old_code": {
+        "scripts/queue_in_hand204_three_rgb.py": "7f1c97a6cfa042fbe437778beef043f1a73e987b43ddc41352e5320704b69d8d"
+      },
+      "new_code": {
+        "scripts/queue_in_hand204_three_rgb.py": "3d819461233f42b695f178529265050fb9079cf75c70d96ee2b9bbd01f53e9f3"
+      },
+      "learner_and_input_code_unchanged": true,
+      "data_cache_norm_unchanged": true
+    }
+  },
+  "normalization": {
+    "norm_stats_sha256": "a623ccc815822fe086d66e8c2ce6f65d0f948189bb28ca49fb875506e95f5386",
+    "norm_audit_sha256": "4fce144ec30d176b7693eabfbfe0b83b4134bdbc0a09f3029c14f577faf7296c",
+    "norm_provenance": "verified"
+  },
+  "report": "logs/in_hand204_three_rgb/accepted.json",
+  "start_conditions": [
+    "bound predecessor completes normally",
+    "20000 checkpoint fully committed",
+    "predecessor process exited",
+    "same 8 GPU UUIDs are free",
+    "fresh target checkpoint and unchanged accepted inputs/code"
+  ],
+  "ui": {
+    "url": "http://127.0.0.1:18767/",
+    "status_shown": "等待中 · 等待四路训练完成20000步并释放8卡",
+    "queue_can_be_cancelled_without_stopping_predecessor": true
+  },
+  "validation_scope": "CPU inputs and queue supervisor simulation; no three-view GPU training has run yet",
+  "regression": {
+    "passed": 93,
+    "queue_cases": [
+      "success once",
+      "cancel without touching predecessor",
+      "predecessor failure blocks launch",
+      "busy GPU blocks launch",
+      "UI run identity binding",
+      "non-supervisor code change rejects audit reuse",
+      "real dataset wrapper releases mmap descriptors"
+    ]
+  }
+}

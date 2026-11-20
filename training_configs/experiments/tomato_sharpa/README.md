@@ -6,6 +6,10 @@
 
 为保持当前训练代码指纹不变，共享checkout保持1826aeb；新代码使用Git archive生成的无.git冻结执行快照（不是另建clone/worktree）。运行时日志、统计、checkpoint目录映射到同一共享工程，UI可见排队任务。队列绑定前序job/PID启动身份/GPU UUID和20000完整提交；前序正常完成、进程退出、GPU空闲才自动启动，不中断原训练、不抢其他进程。UI停止队列只取消该对照，不停止前序。队列失败不自动重试或覆盖checkpoint。
 
+2026-11-20三路对照实际已验收并排队：612组原视频/精确缓存/去crop四路输入逐位一致，2040个subtask端点正确，state/action归一化数值SHA与四路完全相同；32批后24批CPU供数均值0.363秒/batch（当前四路GPU训练继续运行中）。验收逐条释放真实Prompt包装下的帧映射，避免联合对照累积句柄；排队登记兼容并严格核验UI run.json的实验名、module和配置SHA。仅队列监督器的后续身份检查调整通过单文件差异重验，原完整输入审计保留为accepted_input_audit_0e151d6.json，其学习器/输入代码未变。
+
+队列job `e182a1d559ba50f4b7f1e2dba4692546`、冻结运行源 `f4d9f16`；前序四路job `dcb792446ccb40e4b2350271d861d960`，PID3413691仍在运行，shared checkout仍1826aeb。UI已显示“等待中 · 等待四路训练完成20000步并释放8卡”；不需再次点击启动，关闭页面或SSH不影响服务器队列。尚未执行三路GPU训练。证据见 `subtasks/records/in_hand204_three_rgb_queue_20261120_r1.json`。
+
 ## 当前手中调整五阶段：204条四路RGB
 
 2026-11-20沿用原119条方案直接更新为204条/588734帧，来源为共享盘 `/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi`。任务仍为pickup/harvest/adjust/harvest/return，四条英文prompt相同；存储state116经具名适配得到state58，action58保持手臂14维Delta、手部44维Absolute。224四路RGB、视觉1024token、文本上限256、50步动作窗口、RTC0，无深度/Agent/Memory。
