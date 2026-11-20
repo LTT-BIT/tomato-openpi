@@ -163,6 +163,7 @@ def test_current_rgb_t3_statistics_loading_and_jitted_rtc_update(tmp_path, monke
     monkeypatch.setenv("PI05_VISUAL_MEMORY_STRIDE", "1")
     module = ui.DEFAULT_AB_MODULE
     source = ui.source_config(module)
+    source = replace(source, policy_metadata={**source.policy_metadata, "dataset_release_required": False})
     root = tmp_path / "data"
     for name in ("meta", "data"):
         (root / name).mkdir(parents=True)

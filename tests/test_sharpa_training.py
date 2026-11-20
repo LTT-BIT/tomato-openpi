@@ -8,7 +8,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from examples.fr3_wuji import compute_norm_stats
 from openpi import transforms
 from openpi.models import model
 from openpi.policies import fr3_sharpa_policy
@@ -18,7 +17,7 @@ from openpi.policies.fr3_sharpa_multimodal_policy import SOURCE_STATE_NAMES
 from openpi.shared import normalize
 from openpi.training import config as cfg
 from openpi.training import data_loader
-from openpi.training.reproducibility import serialize_config
+from scripts import compute_robot_norm_stats as compute_norm_stats
 from scripts import run_training
 from training_configs import common
 from training_configs.embodiments.fr3_sharpa import Fr3Sharpa
@@ -28,29 +27,20 @@ BASE = "training_configs.experiments.tomato_sharpa.baseline."
 
 @pytest.mark.parametrize("scheme", ["lora", "fullft"])
 def test_sharpa_changes_only_adapter_and_experiment_identity(scheme):
-    wuji = run_training.load_experiment(f"training_configs.experiments.tomato_wuji.baseline.tomato_fr3_{scheme}_v1")
+    from training_configs.embodiments.fr3_sharpa_multimodal import FR3_SHARPA_MULTIMODAL
+    from training_configs.experiments.tomato_sharpa.baseline.dataset import build_dataset
+    from training_configs.recipes import pi05_fullft_v1
+    from training_configs.recipes import pi05_lora_v1
+
     sharpa = run_training.load_experiment(BASE + f"tomato_fr3_sharpa_{scheme}_v1")
-    run_training.validate_config(sharpa)
-    assert sharpa.num_train_steps == wuji.num_train_steps == 30_000
-    wuji_fields = json.loads(serialize_config(wuji))["fields"]
-    sharpa_fields = json.loads(serialize_config(sharpa))["fields"]
-    for key in ("name", "exp_name", "data", "policy_metadata"):
-        wuji_fields.pop(key)
-        sharpa_fields.pop(key)
-    assert sharpa_fields["model"]["fields"]["action_dim"] == 58
-    sharpa_fields["model"]["fields"]["action_dim"] = 54
+    recipe = pi05_lora_v1 if scheme == "lora" else pi05_fullft_v1
+    reference = recipe.build_config(
+        name=sharpa.name, exp_name=sharpa.exp_name, embodiment=FR3_SHARPA_MULTIMODAL, dataset=build_dataset()
+    )
     if scheme == "fullft":
-        assert sharpa_fields.pop("batch_size") == 32
-        assert sharpa_fields.pop("fsdp_devices") == 8
-        wuji_fields.pop("batch_size")
-        wuji_fields.pop("fsdp_devices")
-    assert sharpa_fields == wuji_fields
-    wuji_data = json.loads(serialize_config(wuji.data))["fields"]
-    sharpa_data = json.loads(serialize_config(sharpa.data))["fields"]
-    for key in ("repo_id", "assets", "lerobot_datasets"):
-        wuji_data.pop(key)
-        sharpa_data.pop(key)
-    assert sharpa_data == wuji_data
+        reference = replace(reference, batch_size=32, fsdp_devices=8)
+    assert sharpa == replace(reference, policy_metadata=sharpa.policy_metadata)
+    run_training.validate_config(sharpa)
     assert sharpa.policy_metadata["raw_state_dims"] == [116]
     assert sharpa.policy_metadata["dataset_version"] == "tomato_sharpa_1016_2_multimodal_rgb_absolute_v1_30hz"
     assert sharpa.policy_metadata["prompt_example"].isascii()

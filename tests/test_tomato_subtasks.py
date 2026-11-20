@@ -429,9 +429,9 @@ def test_ab_ui_retains_all_data_and_rejects_dataset_or_supervision_changes(froze
         with pytest.raises(ValueError, match="当前实验固定已验收"):
             editor.apply_overrides(config, {**values, **change})
     entries = editor.experiment_catalog()
-    assert entries[0]["id"] == editor.DEFAULT_AB_MODULE
+    assert editor.DEFAULT_AB_MODULE in {entry["id"] for entry in entries}
     modules = {entry["id"].rsplit(".", 1)[1] for entry in entries}
-    assert {"normal93_a_goal", "normal93_b_stage", "in_hand204_b_crop", "in_hand204_current_rgb"} <= modules
+    assert modules == {"single_pick", "truss_plate", "truss_in_hand"}
 
 
 @pytest.mark.parametrize("mode", ["a_goal", "b_coarse"])

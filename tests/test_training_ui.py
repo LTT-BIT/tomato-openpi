@@ -22,7 +22,7 @@ from scripts import training_ui as ui
 from scripts import training_ui_config as editor
 from training_configs import common
 
-BASE = "training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1"
+BASE = "training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1"
 
 
 @pytest.mark.parametrize("entry", editor.baseline_catalog(), ids=lambda entry: entry["id"].split(".")[-1])
@@ -95,7 +95,7 @@ def test_rtc_fullft_ui_and_cli_preserve_dataset_and_trainable_scope(entry):
     assert editor.apply_overrides(baseline, legacy) == baseline
 
 
-@pytest.mark.parametrize(("task", "dimension", "second_arm"), [("tomato_wuji", 54, 27), ("tomato_sharpa", 58, 29)])
+@pytest.mark.parametrize(("task", "dimension", "second_arm"), [("tomato_sharpa", 58, 29)])
 @pytest.mark.parametrize("method", ["lora", "fullft"])
 def test_ui_delta_selection_preserves_arm_and_hand_semantics(task, dimension, second_arm, method):
     module = next(entry["id"] for entry in editor.baseline_catalog() if entry["task"] == task and method in entry["id"])
@@ -141,13 +141,6 @@ def test_ui_delta_rejects_old_stats_and_unsupported_tasks():
         editor.apply_overrides(baseline, {**values, "action_semantics": "unknown"})
     legacy = {key: value for key, value in values.items() if key != "action_semantics"}
     assert editor.apply_overrides(baseline, legacy) == baseline
-    cup = next(entry["id"] for entry in editor.baseline_catalog() if entry["task"] == "cup_grasping")
-    assert not editor.defaults(cup)["protocol"]["delta_available"]
-    with pytest.raises(ValueError, match="仅番茄"):
-        editor.apply_overrides(
-            editor.baseline_config(cup),
-            {**editor.defaults(cup)["values"], "action_semantics": "delta", "asset_id": "new"},
-        )
 
 
 def test_grouped_sampling_and_data_identity_are_saved():
@@ -273,7 +266,7 @@ def test_ui_delta_launch_records_mode_and_independent_statistics(workspace, fake
 def test_config_path_rejects_escape_and_symlink(workspace, tmp_path):
     with pytest.raises(ValueError, match="用户名"):
         editor.personal_path(BASE, "../bob", "trial")
-    task = tmp_path / "training_configs/experiments/tomato_wuji/template"
+    task = tmp_path / "training_configs/experiments/tomato_sharpa/template"
     task.mkdir(parents=True)
     (task / "alice").symlink_to(tmp_path.parent, target_is_directory=True)
     with pytest.raises(ValueError, match="符号链接"):
@@ -584,7 +577,7 @@ def test_source_change_after_form_load_is_rejected(workspace):
 
 
 def test_personal_catalog_skips_broken_and_external_files(workspace, tmp_path):
-    directory = tmp_path / "training_configs/experiments/tomato_wuji/template/alice"
+    directory = tmp_path / "training_configs/experiments/tomato_sharpa/template/alice"
     directory.mkdir(parents=True)
     (directory / "broken.py").write_text("def broken(")
     (directory / "helper.py").write_text("VALUE = 1")
@@ -647,7 +640,7 @@ def test_gui_paper_features_save_reload_without_generator(tmp_path, trial, delay
     assert editor.source_config(module) == original
 
 
-@pytest.mark.parametrize(("task", "method"), [("tomato_wuji", "fullft"), ("tomato_sharpa", "lora")])
+@pytest.mark.parametrize(("task", "method"), [("tomato_sharpa", "lora")])
 def test_gui_rejects_unsupported_paper_recipes(task, method):
     module = next(e["id"] for e in editor.baseline_catalog() if e["task"] == task and method in e["id"])
     assert not editor.defaults(module)["protocol"]["paper_available"]

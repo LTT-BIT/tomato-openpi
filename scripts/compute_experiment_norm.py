@@ -1,4 +1,4 @@
-"""Compute FR3/Wuji or FR3/Sharpa statistics from the same experiment as training."""
+"""Compute Sharpa statistics from the same experiment as training."""
 
 import argparse
 
@@ -17,7 +17,7 @@ def main():
     if custom_compute is not None:
         custom_compute(config, batch_size=args.stats_batch_size)
         return
-    from examples.fr3_wuji.compute_norm_stats import compute
+    from scripts.compute_robot_norm_stats import compute
 
     compute(config, batch_size=args.stats_batch_size)
 

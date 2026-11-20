@@ -105,6 +105,23 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     """Check metadata/statistics without constructing models or downloading tokenizers."""
     validate_config(config)
     metadata = config.policy_metadata
+    if metadata.get("dataset_release_required"):
+        raise FileNotFoundError("Select a prepared dataset release for this tomato task")
+    if metadata.get("dataset_manifest"):
+        from training_configs.experiments.tomato_sharpa.tasks.dataset import load_release
+
+        release = load_release(
+            metadata["dataset_manifest"], metadata["task_profile"], metadata["dataset_manifest_sha256"]
+        )
+        specs = config.data.lerobot_datasets
+        if (
+            len(specs) != 1
+            or str(Path(specs[0].root).expanduser().resolve()) != release["root"]
+            or config.data.repo_id != release["repo_id"]
+            or metadata["dataset_version"] != release["version"]
+            or config.data.extra_delta_transform != (release["action_semantics"] == "delta")
+        ):
+            raise ValueError("Training dataset/semantics differ from the selected release")
     if metadata.get("subtask_variant") == "in_hand_b_coarse" and not metadata.get("bundle_sha256"):
         raise FileNotFoundError("Prepare the frozen full204 four-view bundle and set PI05_IN_HAND204_BUNDLE")
     if len(config.data.lerobot_datasets) > 1:

@@ -300,7 +300,7 @@ def test_cross_chunk_physical_prefix_uses_new_origin_and_timestamp(prepared):
 
 @pytest.mark.parametrize("prepared", [50], indirect=True)
 def test_ui_four_modes_catalog_snapshot_preflight_and_stat_reuse(prepared, monkeypatch, tmp_path):
-    from examples.fr3_wuji.compute_norm_stats import compute as standard_stats
+    from scripts.compute_robot_norm_stats import compute as standard_stats
 
     build, _, _ = prepared
     baseline_path = tmp_path / "training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_fullft_v1.py"

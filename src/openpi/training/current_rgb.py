@@ -1,4 +1,4 @@
-"""Current-frame input options for the frozen Sharpa five-phase bundle."""
+"""Current-frame input options shared by Sharpa tomato task profiles."""
 
 from dataclasses import dataclass
 

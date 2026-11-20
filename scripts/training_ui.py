@@ -490,9 +490,9 @@ def prepare_input_environment(config):
     else:
         os.environ.pop("PI05_INPUT_EXECUTION_MIGRATION", None)
         cache = None
-        if metadata.get("subtask_variant") == "in_hand_b_coarse" and (
-            isinstance(config.data.base_config, CurrentRgbView)
-        ):
+        if (
+            metadata.get("subtask_variant") == "in_hand_b_coarse" or metadata.get("task_profile") == "truss_in_hand"
+        ) and (isinstance(config.data.base_config, CurrentRgbView)):
             root = os.environ.get("PI05_RGB_FRAME_CACHE") or metadata.get("rgb_frame_cache")
             if root and (Path(root).expanduser() / "manifest.json").is_file():
                 cache = Path(root).expanduser().resolve()
@@ -681,14 +681,14 @@ def handler_class(token):
                     tomato = config_ui.DEFAULT_AB_MODULE if config_ui.DEFAULT_AB_MODULE in tomato_sources else None
                     default = os.environ.get("PI05_UI_DEFAULT_BASELINE")
                     value = {
-                        "baselines": config_ui.baseline_catalog(),
+                        "baselines": config_ui.experiment_catalog(),
                         "personal": config_ui.personal_catalog(),
                         "repository": str(common.repository_root()),
                         "python": sys.executable,
                         "host": socket.gethostname(),
                         "server_label": os.environ.get("PI05_UI_SERVER_LABEL", socket.gethostname()),
                         "tomato_baseline": tomato,
-                        "default_baseline": tomato if not default or default in tomato_sources else default,
+                        "default_baseline": default or tomato,
                     }
                 elif url.path == "/api/baseline":
                     value = config_ui.defaults(query["id"])
@@ -714,12 +714,16 @@ def handler_class(token):
             if not self.authenticated() or self.headers.get("Content-Type", "").split(";")[0] != "application/json":
                 return self.reply({"error": "未授权或请求格式不正确"}, 403)
             try:
+                from scripts import training_ui_config as config_ui
+
                 length = int(self.headers.get("Content-Length", "0"))
                 if not 0 < length <= 1024 * 1024:
                     raise ValueError("请求大小无效")
                 request = json.loads(self.rfile.read(length))
                 path = urlsplit(self.path).path
-                if path == "/api/preview":
+                if path == "/api/dataset-release":
+                    result = config_ui.defaults(request["id"], dataset_manifest=request["path"])
+                elif path == "/api/preview":
                     result = preview(request)
                 elif path == "/api/sampling-groups":
                     result = detect_sampling_groups(request)

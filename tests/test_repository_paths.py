@@ -17,15 +17,20 @@ def test_defaults_use_checkout_even_with_old_runtime_setting(tmp_path, monkeypat
     repository = Path(__file__).resolve().parents[1]
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv("PI05_RUNTIME_DIR", str(tmp_path / "old-mount"))
-    for key in ("PI05_FULLTASK_DATASET_ROOT", "PI05_FULLTASK_ASSETS_DIR", "PI05_SOURCE_DATA_DIR"):
+    for key in (
+        "PI05_SHARPA_MULTIMODAL_DATASET_ROOT",
+        "PI05_SHARPA_MULTIMODAL_ASSETS_DIR",
+        "PI05_SHARPA_DATASET_ROOT",
+        "PI05_SHARPA_ASSETS_DIR",
+    ):
         monkeypatch.delenv(key, raising=False)
     assert common.repository_root() == repository
-    config = load_experiment("training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1")
+    config = load_experiment("training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1")
     assert Path(config.checkpoint_base_dir) == repository / "checkpoints"
-    assert Path(config.data.lerobot_datasets[0].root) == repository / "data/tomato_fulltask_v1"
-    assert Path(config.data.assets.assets_dir) == repository / "assets/fulltask_c0"
-    fullft = load_experiment("training_configs.experiments.tomato_wuji.baseline.tomato_fr3_fullft_v1")
-    assert fullft.policy_metadata["source_datasets"][0] == str(repository / "data/harvest-tomato/0925/A")
+    assert config.data.lerobot_datasets[0].root.endswith("10.16_2_data_lerobot")
+    assert Path(config.data.assets.assets_dir) == repository / "assets"
+    fullft = load_experiment("training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_fullft_v1")
+    assert fullft.policy_metadata["source_datasets"][0].startswith("sshfs://")
     assert Path(download.DEFAULT_CACHE_DIR) == repository / ".cache/openpi"
 
 

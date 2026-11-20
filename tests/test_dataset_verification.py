@@ -8,7 +8,7 @@ import pyarrow.parquet as pq
 import pytest
 import torch
 
-from examples.fr3_wuji import verify_dataset
+from scripts import verify_dataset
 
 
 @pytest.mark.parametrize("case", ["matching", "wrong_vectors", "shifted_images", "static_images"])

@@ -43,7 +43,7 @@ function addField(container, definition, value, original) {
   const input=document.createElement(['lines','paths'].includes(type)?'textarea':type==='action-semantics'?'select':'input');input.id='field-'+key;input.name=key;
   if(type==='action-semantics'){
     for(const [mode,text] of [['absolute','absolute · 原始绝对目标'],['delta','delta · 手臂目标减当前状态，手部保持绝对目标']]){const option=node('option',text);option.value=mode;input.append(option);}
-    if(!protocol.delta_available){input.querySelector('[value=delta]').disabled=true;wrapper.append(node('small','当前仅番茄 Wuji / Sharpa 支持 delta。','default'));}
+    if(!protocol.delta_available){input.querySelector('[value=delta]').disabled=true;wrapper.append(node('small','当前仅 Sharpa 支持 delta。','default'));}
     input.querySelector('[value=absolute]').disabled=paperTrial!=='none';
   }
   if(['int','float','optional-int'].includes(type)){input.type='number';input.step=type==='float'?'any':'1';}
@@ -79,6 +79,11 @@ function fillForm(result) {
   $('training-input-options').classList.toggle('hidden',!('prompt_mode' in initial));
   $('prompt-mode').value=initial.prompt_mode??'stage';
   $('video-views').value=String(initial.video_views??4);
+  $('training-method').value=initial.training_method??'fullft';
+  $('training-method').parentElement.classList.toggle('hidden',!('training_method' in initial));
+  for(const option of $('video-views').options)option.disabled=!(protocol.available_video_views||[3,4]).includes(Number(option.value));
+  $('dataset-release-options').classList.toggle('hidden',!protocol.task_profile);
+  $('dataset-release-path').value=protocol.dataset_manifest||'';
   for(const [section,defs] of Object.entries(definitions)){
     const container=$(section+'-fields');container.replaceChildren();
     for(const definition of defs){const key=definition[0];if(section==='advanced'&&!(key in initial))continue;let value=initial[key];if(key==='dataset_root')value=(initial.dataset_roots||[initial.dataset_root]).join('\n');if(key==='owner')value=result.owner;if(key==='exp_name')value=result.suggested_exp_name;if(key==='stats_batch_size')value=512;addField(container,definition,value,initial[key]);}
@@ -107,11 +112,11 @@ function renderProtocol(){
   const current=key=>fields.get(key)?.input.value??initial[key], paper=paperAlgorithm();
   $('protocol').append(node('div',`${paper?'Paper 专用配置':'普通 π0.5'} · RTC 最大延迟 ${current('rtc_max_delay')} 步 · 动作监督 ${current('action_semantics')}`),node('div','统计资产：'+current('assets_dir')+'/'+current('asset_id')));
   if(paper)$('protocol').append(node('div',`Paper mode=${paper.mode} · beta=${paper.beta} · bundle SHA256=${paper.asset_sha256||'待计算'}`));
-  if(protocol.subtask_variant){
-    const episodeCount=protocol.training_episodes||93, frameCount=protocol.training_frames||410456;
+  if(protocol.subtask_variant||protocol.task_profile){
+    const episodeCount=protocol.training_episodes??'待载入', frameCount=protocol.training_frames??'待载入';
     $('protocol').append(node('div',`${protocol.prompt_profile||'revision2'} · 全部${episodeCount}条 / ${frameCount}帧训练 · 无验证测试留出 · 无Agent · ${initial.action_horizon}步动作窗口`));
     $('protocol').append(node('div','训练环境：JAX=cuda · PREALLOCATE=false · MEM_FRACTION=0.90 · 公共NCCL 2.31.2'));
-    if(protocol.bundle_missing)$('protocol').append(node('div','当前机器缺少已准备的 204 条训练包。可预览配置，训练需设置 PI05_IN_HAND204_BUNDLE。'));
+    if(protocol.bundle_missing)$('protocol').append(node('div','当前机器尚未绑定已准备的数据版本。可预览参数，请载入对应流程的数据版本清单后训练。'));
     const texts=global?[]:Object.values(protocol.action_prompts||{});
     if(texts.length)for(const [i,text] of texts.entries())$('protocol').append(node('div',`${i+1}. ${text}`));
   }else if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。'));
@@ -121,12 +126,14 @@ function inputChanges(){
   const changes=[];
   if($('prompt-mode').value!==initial.prompt_mode)changes.push($('prompt-mode').value);
   if(Number($('video-views').value)!==initial.video_views)changes.push('rgb'+$('video-views').value);
+  if('training_method' in initial&&$('training-method').value!==initial.training_method)changes.push($('training-method').value);
   return changes;
 }
 function syncPaperControls(){
   const active=paperTrial!=='none';
   const lockSampling=active&&!protocol.paper_weighted_sampling;
-  $('paper-fields').classList.toggle('hidden',!protocol.paper_available);
+  const paperAvailable=protocol.task_profile?$('training-method')?.value!=='lora':protocol.paper_available;
+  $('paper-fields').classList.toggle('hidden',!paperAvailable);
   $('paper-timestamp').checked=['t1','t3'].includes(paperTrial);
   $('paper-correlated').checked=['t2','t3'].includes(paperTrial);
   for(const id of ['paper-timestamp','paper-correlated'])$(id).disabled=paperTrial==='custom';
@@ -290,6 +297,8 @@ function request(){
   if(initial&&'prompt_mode' in initial){
     values.prompt_mode=$('prompt-mode').value;
     values.video_views=Number($('video-views').value);
+    if('training_method' in initial)values.training_method=$('training-method').value;
+    if('dataset_manifest' in initial){values.dataset_manifest=initial.dataset_manifest;values.dataset_manifest_sha256=initial.dataset_manifest_sha256;}
   }
   values.sampling_mode=$('sampling-mode').value;values.sampling_groups=[];
   if(values.sampling_mode==='weighted_replacement')for(const row of $('groups').children){values.sampling_groups.push({name:row.querySelector('[data-key=name]').value.trim(),weight:Number(row.querySelector('[data-key=weight]').value),episodes:parseIds(row.querySelector('[data-key=episodes]').value)});}
@@ -372,5 +381,23 @@ async function refreshCatalog(){
   return info;
 }
 $('refresh-configs').addEventListener('click',()=>perform(refreshCatalog,$('refresh-configs')));
-perform(async()=>{const info=await refreshCatalog();const selected=info.default_baseline||info.baselines.find(e=>e.id.includes('tomato_wuji')&&e.id.includes('lora'))?.id||info.baselines[0]?.id;if(selected)await chooseBaseline(selected);await Promise.all([refreshGPUs(),refreshJobs()]);});
+perform(async()=>{const info=await refreshCatalog();const selected=info.default_baseline||info.baselines[0]?.id;if(selected)await chooseBaseline(selected);await Promise.all([refreshGPUs(),refreshJobs()]);});
 let polling=false;setInterval(async()=>{if(polling||document.hidden)return;polling=true;try{if(currentJob)await showJob(currentJob);await refreshJobs();}catch(error){notice('连接中断：'+error.message,true);}finally{polling=false;}},5000);
+
+$('load-dataset-release').addEventListener('click',()=>perform(async()=>{
+  const path=$('dataset-release-path').value.trim();
+  if(!path)throw Error('请填写数据版本清单路径');
+  const selected=baseline, version=++loadingVersion;
+  const result=await api('/api/dataset-release',{id:selected,path});
+  if(selected!==baseline||version!==loadingVersion)return;
+  fillForm(result);notice('已载入数据版本，训练将绑定此清单及其校验值。');
+},$('load-dataset-release')));
+$('training-method').addEventListener('change',()=>{
+  if($('training-method').value==='lora'&&paperTrial!=='none'){
+    $('training-method').value='fullft';notice('请先关闭逐时间步归一化和相关噪声，再切换 LoRA。',true);return;
+  }
+  const method=$('training-method').value;
+  fields.get('batch_size').input.value=method==='lora'?8:(protocol.task_profile==='single_pick'?32:256);
+  fields.get('fsdp_devices').input.value=method==='lora'?1:8;
+  updateFeatureSelection();
+});

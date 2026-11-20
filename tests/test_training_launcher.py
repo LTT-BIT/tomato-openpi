@@ -19,7 +19,10 @@ from training_configs import common
 @pytest.fixture
 def prepared(tmp_path, monkeypatch):
     monkeypatch.setattr(common, "repository_root", lambda: tmp_path)
-    config = run_training.load_experiment("training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1")
+    monkeypatch.setenv("PI05_SHARPA_MULTIMODAL_DATASET_ROOT", str(tmp_path / "dataset"))
+    config = run_training.load_experiment(
+        "training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1"
+    )
     root = Path(config.data.lerobot_datasets[0].root)
     (root / "meta").mkdir(parents=True)
     (root / "data").mkdir()
@@ -31,8 +34,8 @@ def prepared(tmp_path, monkeypatch):
         "total_frames": 2,
         "total_episodes": 1,
         "features": {
-            "action": {"shape": [54]},
-            "observation.state": {"shape": [108]},
+            "action": {"shape": [58], "names": config.policy_metadata["source_action_joint_names"]},
+            "observation.state": {"shape": [116], "names": config.policy_metadata["source_state_joint_names"]},
             **{key: {"shape": [8, 8, 3]} for key in config.policy_metadata["camera_keys"]},
         },
     }
@@ -40,7 +43,7 @@ def prepared(tmp_path, monkeypatch):
     (root / "meta/episodes.jsonl").write_text('{"episode_index": 0, "length": 2}\n')
     (root / "meta/tasks.jsonl").write_text('{"task_index": 0, "task": "Pick the tomato."}\n')
     norm_dir = Path(config.data.assets.assets_dir) / config.data.assets.asset_id
-    stats = normalize.NormStats(mean=np.zeros(54), std=np.ones(54), q01=-np.ones(54), q99=np.ones(54))
+    stats = normalize.NormStats(mean=np.zeros(58), std=np.ones(58), q01=-np.ones(58), q99=np.ones(58))
     normalize.save(norm_dir, {"state": stats, "actions": stats})
     (norm_dir / "norm_metadata.json").write_text(
         json.dumps(
@@ -122,9 +125,9 @@ def test_launch_writes_local_log_snapshot_and_explicit_offline_mode(prepared, mo
     manifest = json.loads(next(directory.glob("*.json")).read_text())
     assert manifest["status"] == "training_completed"
     assert manifest["wandb_mode"] == "offline"
-    assert manifest["config"]["fields"]["model"]["fields"]["action_dim"] == 54
+    assert manifest["config"]["fields"]["model"]["fields"]["action_dim"] == 58
     source = manifest["experiment_source"]
-    assert source["module"] == "training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1"
+    assert source["module"] == "training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1"
     assert Path(source["snapshot_path"]).is_file()
     assert source["sha256"] == reproducibility.file_sha256(Path(source["snapshot_path"]))
     assert Path(source["snapshot_path"]).read_bytes() == Path(source["original_path"]).read_bytes()

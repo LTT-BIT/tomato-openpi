@@ -1,31 +1,12 @@
-# Tomato OpenPI 训练仓库
+# Sharpa 番茄 π0.5 训练仓库
 
-本分支是整串番茄阶段指令动作训练入口，当前使用204条五阶段数据；旧93/100条实验入口保留。原误放在视觉Memory分支的T1/T2/T3、Train RTC、阶段/全局指令、三路/四路当前RGB、分组加权采样、缓存及有序CPU预读已迁移到此，未引入历史视觉模型或Agent。
+`tomato-subtask-policy` 只维护 FR3＋Sharpa 番茄采摘。一个训练工作台，三个按流程命名的入口：单颗采摘、整串托盘调整、整串手中调整。数据增加时发布新版本清单，入口名称和代码不随条数变化。
 
-默认UI来源为 `in_hand204_current_rgb`：由204条四路B配置派生，保留batch256/FSDP8/20000步/每5000保存等参数。原 `in_hand204_b_crop` 与独立三路排队配置不改训练目标；新选项使用新实验名，改变输入或论文算法需独立统计及重新验收。缺数据只允许配置预览，正式检查/训练仍拒绝启动。服务器四路运行checkout与三路冻结快照继续使用原版本，本轮不向服务器同步源码。
+UI默认手中调整流程，可选择数据版本、整体／数据指令、三路／四路RGB、全参／LoRA，以及兼容的RTC、归一化和采样选项。Wuji、杯子和柠檬的实验配置已移除。公共模型及底层适配保留给共享训练代码使用。
 
+使用和数据增量流程见 [Sharpa训练说明](training_configs/experiments/tomato_sharpa/README.md)。旧数量命名配置退出日常菜单，继续供历史任务复现；原始数据、统计和checkpoint不删除。
 
-基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
-
-历史100条normal完整录制的四视图π₀.₅训练：原三路RGB＋当前局部RGB、58D state、阶段英文prompt，无深度、无π₀.₅ Memory。28服务器数据、独立100条统计及B主方案/A对照入口见[番茄训练说明](training_configs/experiments/tomato_sharpa/README.md)。视觉token1024、文本上限256，batch256/16000步/FSDP8，每4000完成步保存并保留checkpoint，原学习率保持。默认只检查：`bash scripts/python.sh -m scripts.tomato100_run check`；显式`start`才启动，拒绝占用中的GPU。2026-11-13已在28启动B：batch256实际训练通过，第10步loss1.6188，8卡各约64.6GiB显存；完整训练尚未完成。
-
-当前 `tomato-subtask-policy` 已沿用手中调整五阶段方案更新为normal全204条/588734帧（原119条加85条）：27服务器，四路当前RGB、58D state、同一套四种阶段指令，batch256/FSDP8、20000步，每5000完成步保存并保留，W&B默认offline，由用户在UI手动启动。入口 `training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_crop`；204条重新计算归一化并验收精确RGB缓存后才允许启动。旧119源码配置由Git历史留存，其已归档权重不变。当前仅准备与检查，不等于已训练或实机验证。
-
-2026-11-20增加三路RGB＋相同subtask对照：`in_hand204_b_three_rgb`沿用204条、batch256/FSDP8/20000步/每5000保存及全部非图像设置，只移除interaction视觉输入（768视觉token）。源数据及第四路视频都保留。以无.git的冻结执行代码快照准备、验收和排队，当前四路运行checkout不改；只有指定四路任务正常完成20000步、checkpoint完整提交且8卡空闲后才自动从pi05_base开训，失败/停止则不启动。队列显示于同一训练UI，可取消；准备或排队不代表三路训练已完成。
-
-旧normal93配置、数据与B checkpoint7999保留，旧入口`scripts.tomato_ab_run`不改。100条与旧93条有90条共同录制，移出3条、加入10条，并重新计算统计；因此不能把新旧结果当作仅增加crop的严格消融。r11裁剪坐标由前后帧辅助离线生成，图像始终来自当前帧；实时ROI与部署另行验证。
-
-新 `normal/speedup/full-block-more` 数据使用独立 `scripts.tomato_full_block_roi` 离线流程：先冻结原始文件SHA256，再逐批检测右手及邻近果串，以180像素为最小取景、300像素为局部上限规划平滑窗口，输出224×224局部RGB。前后帧只辅助坐标，像素始终取当前cam0；左手放果时保持右手果串为中心。`process --source <只读缓存根目录> --output <派生根目录> --category normal|speedup` 独立处理两种时间轴，保留逐帧坐标、检测距离、视频解码和几何检查。服务器 `publish --source <tomato_sharpa根目录> --output <同一根目录> --freeze <冻结清单>` 仅在各类别 `full-block-more/subtask-roi/A或B/原数据集名` 内复制原三路、state/action和元数据，并新增第四路及校验清单；不使用可写硬链接。原始数据前后哈希必须一致，冲突文件拒绝覆盖。该批数据不自动接入旧训练，不生成Subtask标签；视频完整性、抽帧语义复核和正式训练就绪状态分别记录。
-
-2026-11-13已发布normal 100条/301891帧、speedup 100条/223405帧至28上述目录，局部图覆盖全部525296帧，原始948个文件前后SHA256一致。原600路视频与新增200路均完整解码；200条各抽取3个中段时刻，并复核179段较长检测缺口的各6个时刻，未将抽帧复核声称逐帧语义准确率。Subtask标签及新批训练配置尚待后续工作，旧训练不变。结果见[本批校验记录](training_configs/experiments/tomato_sharpa/subtasks/records/full_block_more_roi_20261113_r1.json)。
-
-增量批次在 `freeze/process/publish` 中使用 `--datasets <精确源数据集名...>` 固定成员；名称不存在会报错，避免误处理其他批次。发布总清单合并保留既有数据包，并核对其包清单哈希；`raw_verification_datasets` 明确列出本次重新核验的原始目录，`raw_sha256_verified_files` 只统计本次选中来源，不把历史验收伪称为本次全量重验。ROI检测、框选、插值和平滑参数保持同版本。
-
-2026-11-14新增A `1114_1056_1082` 14条、B `1114_1055_1079` 5条，normal/speedup各19条已补齐四路：56079/44822帧，共100901帧局部RGB，全量解码无黑帧。修复源图边缘1像素舍入余量造成的不可行约束；A7剔除3个支架误检锚点，A0/B0的normal及speedup部分时段使用明确记录的人工复核局部框，未扩大300像素上限。38条中段及74段较长定位缺口已抽帧复核，不代表逐帧语义100%。原始195个文件前后哈希一致，旧8个包清单未变；合并总清单为normal/speedup各119条。来源、人工修正及校验见[增量批次结果](training_configs/experiments/tomato_sharpa/subtasks/records/full_block_more_roi_20261114_r1.json)，数据侧记录位于各自 `subtask-roi/provenance/20261114_r1`，保留昨日记录。未生成Subtask标签或修改训练数据选择。
-
-本页说明下载安装和运行；本地个人配置、公共 baseline 变更和多人协作见 [多人开发 README](多人开发README.md)。
-
-多人在同一服务器训练时，各自在自己的目录独立 clone。日常训练直接使用公共 baseline，或在本地 `template/<负责人>/` 保存个人配置；个人配置已被 Git 忽略，不创建分支、不提交、不上传。只有团队决定新增或修改公共 baseline 时才进入公共开发流程。目录和配置类的组合关系见[开发结构说明](多人开发README.md#目录与配置的组合关系)。
+当前整理只在本机进行，服务器正在运行的四路训练和三路冻结队列继续使用原代码。待训练结束后再同步，不向运行中的共享checkout推送文件。
 
 ## 500028 服务器：复用公共环境
 
@@ -93,7 +74,7 @@ ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:18766:127.0.0.1:8766 zhiwei50002
 
 1. **选择配置**：可选公共 baseline 或本地 `template/<用户名>/*.py` 中已有个人配置，包含手写配置和 UI 创建的配置。点击“刷新配置”发现新文件；选择后读取实际参数、本体维度、频率和英文 prompt。高级模型及 subtask 设置沿用来源配置。
 2. **选择数据**：可多次浏览添加目录，或在数据目录框每行输入一个路径。选择父目录后点击“识别目录内的数据集”，核对勾选并点击“应用选中数据集”；默认不把同级 `full` 和 `subtasks` 同时选入。路径属于运行 UI 的训练机器，浏览器不上传本机数据。确认数据版本、repo_id、来源和统计位置；应用选择会填写实际来源并建议独立统计目录。仅搬迁完全相同的数据可校验复用原统计；换数据组合需重新计算统计。
-3. **修改参数**：可修改 batch、步数、学习率计划、workers、FSDP、随机种子、保存间隔、基础权重和 W&B 项目。支持 A/B 权重及 episode 分组有放回采样。番茄 Wuji / Sharpa 可选 absolute 或 delta 动作监督；其他本体保持 absolute。本体维度、模型结构和任务视图沿用所选 baseline。
+3. **修改参数**：可修改 batch、步数、学习率计划、workers、FSDP、随机种子、保存间隔、基础权重和 W&B 项目。支持 A/B 权重及 episode 分组有放回采样。Sharpa 可选 absolute 或 delta 动作监督；其他本体保持 absolute。本体维度、模型结构和任务视图沿用所选 baseline。
 4. **选择 GPU 和 W&B 模式**：界面读取 `nvidia-smi` 的显存和利用率，可多选。全局 batch 必须能被卡数整除；卡数必须能被 FSDP 分片数整除。online 需要预先在终端登录，offline 明确保留本地记录，之后按下文同步。
 5. **启动实验**：最终训练参数与来源相同时复用原配置；修改训练参数才保存新的个人 Python 文件。每次启动自动记录独立实验，后台依次校验数据、缺少时计算统计、核对统计绑定并启动训练。可先点击“检查数据与统计”，它只核验所填数据目录的 LeRobot 元信息、频率、维度、相机、英文 prompt 和已有归一化统计，不会训练或生成统计；进度与错误显示在页面下方“运行详情”。“查看最终配置”用于核对实际生效参数。任何阶段失败都会显示错误和日志，不继续下一阶段。
 
@@ -144,33 +125,15 @@ bash scripts/setup_training_env.sh --local
 
 baseline 默认基础权重为服务器路径 `/mnt/data/public_ckpt/pi05/pi05_base/params`。自己的电脑若没有该挂载，在 UI 的“基础权重”中填写已下载的本地 `params` 目录，或明确填写 `gs://openpi-assets/checkpoints/pi05_base/params` 以下载官方权重；命令行可用 `--weight-loader.params-path` 覆盖。离线训练前还需准备 tokenizer 缓存。默认不会自动下载基础权重。
 
-## 任务与 baseline
+## 采摘流程
 
-| 任务 | 说明和配置 | 当前状态 |
-| --- | --- | --- |
-| 番茄-Wuji | [tomato_wuji](training_configs/experiments/tomato_wuji/README.md) | LoRA / 全参 v1 baseline |
-| 番茄-Sharpa | [tomato_sharpa](training_configs/experiments/tomato_sharpa/README.md) | 统一使用 baseline 下的 LoRA / 全参配置，支持转换器 116D→58D RGB 输入；完整训练和实机待验证 |
-| 铲柠檬 | [lemon_scooping](training_configs/experiments/lemon_scooping/README.md) | 双 UR/O30 LoRA / 全参 v1 baseline；209 条有效数据全部训练 |
-| 抓取杯子 | [cup_grasping](training_configs/experiments/cup_grasping/README.md) | 单臂 Franka LoRA / 全参 v1 baseline；v2.1 数据待准备 |
+| 流程 | 稳定模块 |
+| --- | --- |
+| 单颗采摘 | `training_configs.experiments.tomato_sharpa.tasks.single_pick` |
+| 整串采摘 · 托盘调整 | `training_configs.experiments.tomato_sharpa.tasks.truss_plate` |
+| 整串采摘 · 手中调整 | `training_configs.experiments.tomato_sharpa.tasks.truss_in_hand` |
 
-每个任务下的 `baseline/` 存放团队发布的参考配置，`template/` 供每个人在自己的机器上保存个人实验配置。`template/` 内容由 `.gitignore` 排除，不上传 GitLab；数据、统计和训练结果也不随仓库分发。
-
-当前八份 baseline：
-
-| 任务 / 方案 | baseline 文件 | 动作维度 | 总步数 | 默认数据目录 |
-| --- | --- | ---: | ---: | --- |
-| 番茄-Wuji LoRA | [tomato_fr3_lora_v1.py](training_configs/experiments/tomato_wuji/baseline/tomato_fr3_lora_v1.py) | 54 | 30,000 | `data/tomato_fulltask_v1` |
-| 番茄-Wuji 全参 | [tomato_fr3_fullft_v1.py](training_configs/experiments/tomato_wuji/baseline/tomato_fr3_fullft_v1.py) | 54 | 30,000 | `data/tomato_all_full_v1` |
-| 番茄-Sharpa LoRA | [tomato_fr3_sharpa_lora_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_lora_v1.py) | 58 | 30,000 | `/mnt/data/users/tairan/workspace/data/10.16_2_data_lerobot` |
-| 番茄-Sharpa 全参 | [tomato_fr3_sharpa_fullft_v1.py](training_configs/experiments/tomato_sharpa/baseline/tomato_fr3_sharpa_fullft_v1.py) | 58 | 30,000 | `/mnt/data/users/tairan/workspace/data/10.16_2_data_lerobot` |
-| 抓取杯子 LoRA | [cup_single_franka_lora_v1.py](training_configs/experiments/cup_grasping/baseline/cup_single_franka_lora_v1.py) | 7（模型补零至 32） | 30,000 | `data/cup_grasping_v1` |
-| 抓取杯子 全参 | [cup_single_franka_fullft_v1.py](training_configs/experiments/cup_grasping/baseline/cup_single_franka_fullft_v1.py) | 7（模型补零至 32） | 30,000 | `data/cup_grasping_v1` |
-| 铲柠檬 LoRA | [lemon_ur_o30_lora_v1.py](training_configs/experiments/lemon_scooping/baseline/lemon_ur_o30_lora_v1.py) | 12（模型 32，状态 52） | 30,000 | `data/lemon_wrist_reset_v1` |
-| 铲柠檬 全参 | [lemon_ur_o30_fullft_v1.py](training_configs/experiments/lemon_scooping/baseline/lemon_ur_o30_fullft_v1.py) | 12（模型 32，状态 52） | 30,000 | `data/lemon_wrist_reset_v1` |
-
-番茄与杯子配置采用以下公共训练参数；Sharpa 全参覆盖为 batch 32、FSDP 8（默认 8 卡），Sharpa LoRA 保持 batch 8、FSDP 1，两者从转换器 116D 状态提取 58D 位置并重排动作，详见 [Sharpa 说明](training_configs/experiments/tomato_sharpa/README.md)。柠檬 LoRA 复用公共训练配方，柠檬全参学习率与公共配方一致，日志与 checkpoint 保存设置沿用来源任务记录，详见[柠檬说明](training_configs/experiments/lemon_scooping/README.md)。以下公共参数中的频率与动作语义以各任务协议为准。
-
-本体协议、数据身份、统计及英文 prompt 见对应任务说明。
+完整的数据发布、统计、配置选项和历史兼容说明见 [Sharpa训练说明](training_configs/experiments/tomato_sharpa/README.md)。`baseline/` 下两份Sharpa配置仅保留为普通训练参考，日常界面通过上述流程入口选择全参／LoRA，不重复列出。
 
 ## π0.5 全参微调加入 Train RTC
 
@@ -182,10 +145,10 @@ JAX 入口支持 training-time RTC，依据 [Physical Intelligence 官方实现�
 
 **图形界面**：选择对应任务的全参 baseline 或个人全参配置，在“Train RTC 最大延迟（动作步，0=关闭）”填写上限，并使用新的实验名称。修改会保存到独立个人配置、最终配置预览和运行记录中。只改变 RTC 不改变数据变换，因此数据、horizon、动作语义均相同时可继续使用经过来源校验的原归一化统计；同时更换数据、horizon 或 absolute/delta 时仍需按现有规则重新统计。
 
-**命令行**：以下以 Wuji 全参为例，Sharpa / 杯子 / 柠檬替换为各自全参模块。先按任务说明准备数据、英文 `tasks.jsonl` 和归一化统计，再检查最终配置：
+**命令行**：以下以 Sharpa 全参为例。先按任务说明准备数据、英文 `tasks.jsonl` 和归一化统计，再检查最终配置：
 
 ```bash
-export MODULE=training_configs.experiments.tomato_wuji.baseline.tomato_fr3_fullft_v1
+export MODULE=training_configs.experiments.tomato_sharpa.tasks.single_pick
 export EXP=tomato_fullft_rtc_d10_s42_run01
 bash scripts/python.sh -m scripts.run_training "$MODULE" \
   --exp-name "$EXP" --model.rtc-max-delay 10 --dry-run
@@ -232,17 +195,17 @@ config = replace(
 | 日志 / checkpoint | log_interval=10、save_interval=2,000、keep_period=10,000 |
 | W&B | 启用，project=openpi；联网 online，离线显式 offline |
 
-番茄 Wuji / Sharpa 的 UI“动作监督”默认 absolute。选择 delta 时，仅将左右机械臂各 7 维绝对关节目标减去当前 state，手部目标仍为 absolute；两种模式均要求原始数据的 action 是绝对目标，不能把已经是 delta 的原始数据再转换一次。切换模式会生成新的个人配置和实验名，并要求新的 asset_id 与独立归一化统计；UI 会自动建议独立统计名称。必须核对数据语义后重新统计和开始新实验，不能复用另一模式的统计或 checkpoint。杯子与柠檬暂不提供切换。
+Sharpa 的 UI“动作监督”默认 absolute。选择 delta 时，仅将左右机械臂各 7 维绝对关节目标减去当前 state，手部目标仍为 absolute；两种模式均要求原始数据的 action 是绝对目标，不能把已经是 delta 的原始数据再转换一次。切换模式会生成新的个人配置和实验名，并要求新的 asset_id 与独立归一化统计；UI 会自动建议独立统计名称。必须核对数据语义后重新统计和开始新实验，不能复用另一模式的统计或 checkpoint。
 
 需要 A/B 按 7:3 等比例有放回采样时，只需在本地个人配置中设置 `sampling_mode="weighted_replacement"` 和 `sampling_groups`，见[采样配置示例](多人开发README.md#可选-ab-采样比例)。不设置时沿用 baseline 的逐轮打乱采样。
 
 LoRA 和全参默认均训练 30,000 步，学习率计划的 decay_steps 同为 30,000；步数不随数据量自动调整。个人实验可按实际训练计划覆盖。
 
-以下以 Wuji LoRA 为例，选择模块并展开配置，无需数据、权重或 GPU：
+以下以 Sharpa 普通训练为例，选择模块并展开配置，无需数据、权重或 GPU：
 
 ```bash
-export MODULE=training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1
-export EXP=alice_tomato_wuji_lora_s42_run01
+export MODULE=training_configs.experiments.tomato_sharpa.tasks.single_pick
+export EXP=alice_tomato_sharpa_fullft_s42_run01
 bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry-run
 ```
 
@@ -252,7 +215,7 @@ bash scripts/python.sh -m scripts.run_training "$MODULE" --exp-name "$EXP" --dry
 
 将数据仓库产出的 LeRobot v2.1 数据放入 `data/`，包含 `meta/`、`data/`、`videos/`。在所选实验的 `build_dataset()` 中确认 root、repo_id、来源、版本、assets_dir、asset_id 和英文 prompt 示例。`root` 是实际目录，`repo_id` 是数据身份；训练实际英文指令来自 `meta/tasks.jsonl`。
 
-数据应满足任务的关节顺序、单位、相机映射和采样频率：番茄与杯子为 30 Hz，柠檬为 10 Hz。新数据使用新的版本和 asset_id；同一内容仅搬迁路径时保留身份。
+数据应满足任务的关节顺序、单位、相机映射和采样频率：Sharpa 为 30 Hz。新数据使用新的版本和 asset_id；同一内容仅搬迁路径时保留身份。
 
 新数据先计算统计：
 
@@ -262,9 +225,9 @@ bash scripts/python.sh -m scripts.compute_experiment_norm "$MODULE" --stats-batc
 
 统计保存到 `<assets_dir>/<asset_id>/`，包含 `norm_stats.json` 和 `norm_metadata.json`。已有配套统计时跳过计算，迁移时两个文件一起复制。不要提前创建最终 asset_id 目录：工具拒绝覆盖已有目录，包括空目录；同一目标的重复计算进程也会被拒绝。
 
-统计绑定数据文件、输入变换和 horizon。改变这些内容后重新计算；仅改学习率或 batch 可复用。常量关节允许 std=0，归一化使用 epsilon。番茄 Wuji / Sharpa 已切换为 absolute，四份 baseline 使用带 absolute 的新 asset_id 与默认实验名。必须重新计算统计，不能复用旧 delta 统计或对旧 checkpoint 直接 resume。
+统计绑定数据文件、输入变换和 horizon。改变这些内容后重新计算；仅改学习率或 batch 可复用。常量关节允许 std=0，归一化使用 epsilon。Sharpa 已切换为 absolute，四份 baseline 使用带 absolute 的新 asset_id 与默认实验名。必须重新计算统计，不能复用旧 delta 统计或对旧 checkpoint 直接 resume。
 
-任务仓库自定义输入变换若需使用快速向量统计，须在具体变换类上显式声明 `vector_statistics_image_independent = True`，并保证 state/actions 不依赖图像像素。统计程序仍逐 episode 抽样，将快速计算的向量与真实 LeRobot 样本的变换结果比较；未经声明的自定义变换会被拒绝。铲柠檬的 12 维 arm-only 任务变换已按此接口接入；统计准备通过不等于完成训练或实机验证。
+任务仓库自定义输入变换若需使用快速向量统计，须在具体变换类上显式声明 `vector_statistics_image_independent = True`，并保证 state/actions 不依赖图像像素。统计程序仍逐 episode 抽样，将快速计算的向量与真实 LeRobot 样本的变换结果比较；未经声明的自定义变换会被拒绝。统计准备通过不等于完成训练或实机验证。
 
 ## 本机检查与训练
 

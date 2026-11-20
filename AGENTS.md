@@ -1,5 +1,7 @@
 # 本仓库开发约定
 
+- 2026-11-20最新授权：本机将此分支整理为Sharpa番茄专用工程，统一按任务流程命名的入口和数据版本清单，移除Wuji/杯子/柠檬实验配置；验证后中文提交并推送GitHub。仅本机开发，禁止同步27/28共享checkout、冻结队列或部署；待训练结束后另行同步。旧数量命名模块只用于历史实验兼容，不再列入日常菜单。
+
 - 2026-11-20本轮用户授权：将误放Memory分支的6项通用训练改动迁到204条subtask分支，去除历史视觉依赖，完成本机验证与中文提交推送；Memory恢复5b5c350后验证。禁止更新27/28正在训练的共享checkout或三路冻结队列，不重启服务、不启动新训练；main/Fovea/FLASH/Mamba分支不改。
 
 - 本分支 `tomato-subtask-policy` 用于无 Agent 的整串番茄 A/B 训练；用户明确要求分支不使用 codex 前缀。在现有 `/home/user/tomato-openpi` 开发，27/28 共用 `/home/mengxiang/workspace/code/tomato-openpi-sharpa`，不另建 clone/worktree。本轮只准备、校验和同步，不启动正式训练，不改部署端。

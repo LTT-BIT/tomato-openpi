@@ -9,11 +9,11 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
-from examples.fr3_wuji import compute_norm_stats
 from openpi import transforms
 from openpi.policies import lemon_policy
 from openpi.shared import normalize
 from openpi.training import config as cfg
+from scripts import compute_robot_norm_stats as compute_norm_stats
 from scripts import run_training
 from training_configs import common
 
@@ -36,11 +36,11 @@ def test_task_vector_statistics_opt_in_is_explicit():
 
 
 @pytest.mark.parametrize("all_constant", [False, True])
-@pytest.mark.parametrize("module", ["tomato_fr3_lora_v1", "tomato_fr3_sharpa_lora_v1"])
+@pytest.mark.parametrize("module", ["tomato_fr3_sharpa_lora_v1"])
 def test_statistics_save_constant_joints_and_bind_to_vectors(tmp_path, monkeypatch, caplog, all_constant, module):
     monkeypatch.setattr(common, "repository_root", lambda: tmp_path)
     monkeypatch.setenv("PI05_SHARPA_MULTIMODAL_DATASET_ROOT", str(tmp_path / "sharpa_dataset"))
-    task = "tomato_sharpa" if "_sharpa_" in module else "tomato_wuji"
+    task = "tomato_sharpa"
     config = run_training.load_experiment(f"training_configs.experiments.{task}.baseline.{module}")
     config = replace(config, model=replace(config.model, action_horizon=3))
     root = Path(config.data.lerobot_datasets[0].root)

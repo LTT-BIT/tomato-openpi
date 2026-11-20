@@ -33,12 +33,8 @@ from scripts.run_training import load_experiment
 from scripts.run_training import validate_config
 from training_configs import common
 
-TASK_LABELS = {
-    "tomato_wuji": "番茄 · Wuji",
-    "tomato_sharpa": "番茄 · Sharpa",
-    "lemon_scooping": "铲柠檬 · UR/O30",
-    "cup_grasping": "抓取杯子 · Franka",
-}
+TASK_LABELS = {"tomato_sharpa": "番茄 · Sharpa"}
+
 TRAIN_INTS = (
     "batch_size",
     "num_train_steps",
@@ -65,7 +61,7 @@ TEXT_FIELDS = (
     "weight_path",
     "project_name",
 )
-DEFAULT_AB_MODULE = "training_configs.experiments.tomato_sharpa.subtasks.in_hand204_current_rgb"
+DEFAULT_AB_MODULE = "training_configs.experiments.tomato_sharpa.tasks.truss_in_hand"
 AB_LOCKED_FIELDS = (
     "dataset_root",
     "repo_id",
@@ -85,12 +81,11 @@ def experiment_catalog():
     root = common.repository_root()
     entries = []
     for stem, label in (
-        ("in_hand204_current_rgb", "整串番茄 · 五阶段 · 204条 · 当前帧 RGB"),
-        ("in_hand204_b_crop", "整串番茄 · 手中调整五阶段 · 204条四路RGB · B · 20000步"),
-        ("normal93_b_stage", "整串番茄 · B 阶段指令 · 手臂Delta · 全93条 · 全参"),
-        ("normal93_a_goal", "整串番茄 · A 总体目标 · 手臂Delta · 全93条 · 全参"),
+        ("single_pick", "单颗采摘"),
+        ("truss_plate", "整串采摘 · 托盘调整"),
+        ("truss_in_hand", "整串采摘 · 手中调整"),
     ):
-        path = Path("training_configs/experiments/tomato_sharpa/subtasks") / f"{stem}.py"
+        path = Path("training_configs/experiments/tomato_sharpa/tasks") / f"{stem}.py"
         if (root / path).is_file():
             entries.append(
                 {"id": ".".join(path.with_suffix("").parts), "label": label, "task": "tomato_sharpa", "file": str(path)}
@@ -98,10 +93,32 @@ def experiment_catalog():
     return entries
 
 
+def legacy_catalog():
+    """Resolve saved jobs and historical CLI experiments without listing them in the UI."""
+    names = (
+        "normal93_a_goal",
+        "normal93_b_stage",
+        "complete100_a_crop",
+        "complete100_b_crop",
+        "coarse_a_goal_v1",
+        "coarse_b_stage_v1",
+        "in_hand204_b_crop",
+        "in_hand204_current_rgb",
+        "in_hand204_b_three_rgb",
+    )
+    return [
+        {
+            "id": f"training_configs.experiments.tomato_sharpa.subtasks.{name}",
+            "file": f"training_configs/experiments/tomato_sharpa/subtasks/{name}.py",
+        }
+        for name in names
+    ]
+
+
 def baseline_catalog() -> list[dict]:
     root = common.repository_root()
     entries = []
-    for path in sorted((root / "training_configs/experiments").glob("*/baseline/*.py")):
+    for path in sorted((root / "training_configs/experiments").glob("tomato_sharpa/baseline/*.py")):
         if not any(
             isinstance(node, ast.FunctionDef) and node.name == "build_config"
             for node in ast.parse(path.read_text()).body
@@ -128,7 +145,7 @@ def baseline_config(module: str):
 def personal_catalog() -> list[dict]:
     root = common.repository_root().resolve()
     entries = []
-    for path in sorted((root / "training_configs/experiments").glob("*/template/*/**/*.py")):
+    for path in sorted((root / "training_configs/experiments").glob("tomato_sharpa/template/*/**/*.py")):
         if path.name.startswith("_") or not path.resolve().is_relative_to(root):
             continue
         try:
@@ -152,7 +169,7 @@ def personal_catalog() -> list[dict]:
 
 
 def source_path(module: str) -> Path:
-    entries = baseline_catalog() + experiment_catalog() + personal_catalog()
+    entries = baseline_catalog() + experiment_catalog() + personal_catalog() + legacy_catalog()
     entry = next((item for item in entries if item["id"] == module), None)
     if entry is None:
         raise ValueError("请选择当前仓库的 baseline 或个人配置")
@@ -169,7 +186,7 @@ def config_from_source(source: str, module: str, filename: str):
 def source_config(module: str):
     if module in {item["id"] for item in baseline_catalog()}:
         return baseline_config(module)
-    if module in {item["id"] for item in experiment_catalog()}:
+    if module in {item["id"] for item in experiment_catalog() + legacy_catalog()}:
         return load_experiment(module)
     path = source_path(module)
     config = config_from_source(path.read_text(), module, str(path))
@@ -190,7 +207,7 @@ def changed_parameters(module: str, values: dict) -> list[str]:
 
 
 def delta_supported(config) -> bool:
-    return isinstance(config.data, train_config.LeRobotFr3WujiDataConfig | train_config.LeRobotFr3SharpaDataConfig)
+    return isinstance(config.data, train_config.LeRobotFr3SharpaDataConfig)
 
 
 def input_values(config):
@@ -200,6 +217,11 @@ def input_values(config):
     return {
         "prompt_mode": "global" if data.global_prompt else "stage",
         "video_views": data.video_views,
+        **(
+            {"training_method": config.policy_metadata["training_method"]}
+            if config.policy_metadata.get("task_profile")
+            else {}
+        ),
     }
 
 
@@ -215,8 +237,10 @@ def input_suffix(options):
 def apply_training_inputs(config, before, after):
     if before == after:
         return config
-    global_prompt = GOAL if after["prompt_mode"] == "global" else None
+    global_prompt = config.policy_metadata.get("goal", GOAL) if after["prompt_mode"] == "global" else None
     camera_count = after["video_views"]
+    if camera_count not in config.policy_metadata.get("available_video_views", (3, 4)):
+        raise ValueError("所选数据版本没有对应的局部图，不能选择四路输入")
     current_fields = {field.name: getattr(config.data, field.name) for field in fields(config.data)}
     current_fields["base_config"] = replace(
         config.data.base_config, global_prompt=global_prompt, video_views=camera_count
@@ -228,19 +252,44 @@ def apply_training_inputs(config, before, after):
         cls = PaperCurrentRgbThreeData if trial != "none" else LeRobotCurrentRgbThreeDataConfig
     paper_suffix = f"_paper_{trial}" if trial != "none" else ""
     name = config.name.removesuffix(paper_suffix).removesuffix(input_suffix(before))
+    model = replace(config.model, image_keys=IMAGE_KEYS[:camera_count])
+    method = after.get("training_method")
+    recipe_metadata = {}
+    if method:
+        if method == "lora" and trial != "none":
+            raise ValueError("LoRA 不支持当前的归一化与相关噪声扩展")
+        model = replace(
+            model,
+            paligemma_variant="gemma_2b_lora" if method == "lora" else "gemma_2b",
+            action_expert_variant="gemma_300m_lora" if method == "lora" else "gemma_300m",
+        )
+        name = name.replace("_fullft", "").replace("_lora", "") + f"_{method}"
+        recipe_metadata = {
+            "training_method": method,
+            "recipe_version": f"pi05_{method}_v1",
+            "baseline_version": f"pi05_{method}_v1",
+            "source_baseline": "fulltask_c0_v2" if method == "lora" else "fulltask_c0_v3_fullft",
+        }
     return replace(
         config,
         name=f"{name}{input_suffix(after)}{paper_suffix}",
-        model=replace(config.model, image_keys=IMAGE_KEYS[:camera_count]),
+        model=model,
+        freeze_filter=model.get_freeze_filter(),
         data=cls(**current_fields),
         policy_metadata={
             **config.policy_metadata,
             **after,
+            **recipe_metadata,
             "camera_keys": list(CAMERAS[:camera_count]),
             "visual_tokens": camera_count * 256,
-            "offline_roi_uses_future_annotation": camera_count == 4,
-            "prompt_example": global_prompt or TASKS[1],
-            "prompts": [global_prompt] if global_prompt else list(TASKS),
+            "offline_roi_uses_future_annotation": camera_count == 4
+            and config.policy_metadata.get(
+                "dataset_offline_roi_uses_future_annotation",
+                config.policy_metadata.get("offline_roi_uses_future_annotation", True),
+            ),
+            "model_image_keys": list(IMAGE_KEYS[:camera_count]),
+            "prompt_example": global_prompt or config.policy_metadata.get("dataset_prompts", TASKS)[0],
+            "prompts": [global_prompt] if global_prompt else list(config.policy_metadata.get("dataset_prompts", TASKS)),
             "prompt_source": "fixed_global_prompt" if global_prompt else "meta/tasks.jsonl",
         },
     )
@@ -248,6 +297,14 @@ def apply_training_inputs(config, before, after):
 
 def locked_fields(config, trial, *, inputs_changed=False):
     metadata = config.policy_metadata
+    if metadata.get("task_profile") and (
+        metadata.get("dataset_manifest") or metadata.get("task_profile") != "single_pick"
+    ):
+        return [
+            key
+            for key in AB_LOCKED_FIELDS
+            if key not in ("rtc_max_delay", "sampling_mode", "sampling_groups", "assets_dir", "asset_id")
+        ]
     if metadata.get("subtask_variant") == "in_hand_b_coarse":
         editable = {"rtc_max_delay", "sampling_mode", "sampling_groups"}
         if trial != "none" or selected_trial(config) != "none" or inputs_changed:
@@ -280,14 +337,25 @@ def config_values(config) -> dict:
     )
     if len(config.data.lerobot_datasets) > 1:
         values["dataset_roots"] = [spec.root for spec in config.data.lerobot_datasets]
+    if config.policy_metadata.get("task_profile"):
+        values.update(
+            dataset_manifest=config.policy_metadata.get("dataset_manifest", ""),
+            dataset_manifest_sha256=config.policy_metadata.get("dataset_manifest_sha256"),
+        )
     values.update(input_values(config))
     return values
 
 
-def defaults(module: str) -> dict:
+def defaults(module: str, *, dataset_manifest=None) -> dict:
     from openpi.subtasks.tomato import ACTION_PROMPTS
 
     config = source_config(module)
+    if dataset_manifest is not None:
+        from training_configs.experiments.tomato_sharpa.tasks.common import build_config
+
+        if not config.policy_metadata.get("task_profile"):
+            raise ValueError("请选择番茄任务流程")
+        config = build_config(config.policy_metadata["task_profile"], dataset_manifest=dataset_manifest)
     values = config_values(config)
     owner = re.sub(r"\W", "_", getpass.getuser())
     if not owner or owner[0].isdigit():
@@ -305,8 +373,11 @@ def defaults(module: str) -> dict:
             "action_hz": config.data.action_hz,
             "cameras": config.policy_metadata["camera_keys"],
             "prompt": config.policy_metadata["prompt_example"],
-            "global_prompt": GOAL if input_values(config) else None,
-            "stage_prompt": TASKS[1] if input_values(config) else None,
+            "global_prompt": config.policy_metadata.get("goal", GOAL) if input_values(config) else None,
+            "stage_prompt": config.policy_metadata.get("dataset_prompts", TASKS)[0] if input_values(config) else None,
+            "available_video_views": config.policy_metadata.get("available_video_views", [3, 4]),
+            "task_profile": config.policy_metadata.get("task_profile"),
+            "dataset_manifest": config.policy_metadata.get("dataset_manifest"),
             "task_view": asdict(config.data.base_config.task_view)
             if getattr(config.data.base_config, "task_view", None)
             else None,
@@ -325,9 +396,12 @@ def defaults(module: str) -> dict:
             "locked_fields": locked_fields(config, values["paper_trial"]),
             "paper_available": paper_available(config),
             "paper_weighted_sampling": paper_supports_weighted_sampling(config),
-            "bundle_missing": config.policy_metadata.get("subtask_variant") == "in_hand_b_coarse"
-            and not config.policy_metadata.get("bundle_sha256"),
-            "bundle_grouping": config.policy_metadata.get("subtask_variant") == "in_hand_b_coarse",
+            "bundle_missing": config.policy_metadata.get("dataset_release_required", False)
+            or (
+                config.policy_metadata.get("subtask_variant") == "in_hand_b_coarse"
+                and not config.policy_metadata.get("bundle_sha256")
+            ),
+            "bundle_grouping": bool(config.policy_metadata.get("bundle_sha256")),
             "action_prompts": config.policy_metadata.get(
                 "action_prompts", ACTION_PROMPTS if config.policy_metadata.get("subtask_variant") == "b_coarse" else {}
             ),
@@ -346,6 +420,14 @@ def identifier(value: str, label: str) -> str:
 
 def apply_overrides(config, values: dict):
     """Only allow presentation fields; preserve embodiment, task view and freeze filter."""
+    if config.policy_metadata.get("task_profile") and values.get("dataset_manifest"):
+        from training_configs.experiments.tomato_sharpa.tasks.common import build_config
+
+        config = build_config(
+            config.policy_metadata["task_profile"],
+            dataset_manifest=values["dataset_manifest"],
+            expected_sha256=values.get("dataset_manifest_sha256"),
+        )
     allowed = set(TRAIN_INTS + LR_FIELDS + OPT_FIELDS + TEXT_FIELDS + SCHEDULE_FIELDS) | {
         "action_horizon",
         "rtc_max_delay",
@@ -357,6 +439,9 @@ def apply_overrides(config, values: dict):
         "paper_trial",
         "prompt_mode",
         "video_views",
+        "training_method",
+        "dataset_manifest",
+        "dataset_manifest_sha256",
     }
     if unknown := set(values) - allowed:
         raise ValueError(f"不支持的参数: {sorted(unknown)}")
@@ -378,6 +463,7 @@ def apply_overrides(config, values: dict):
     after_inputs = {key: values.get(key, value) for key, value in before_inputs.items()}
     if after_inputs and (
         after_inputs["prompt_mode"] not in ("stage", "global")
+        or after_inputs.get("training_method", "fullft") not in ("fullft", "lora")
         or type(after_inputs["video_views"]) is not int
         or after_inputs["video_views"] not in (3, 4)
     ):
@@ -403,7 +489,12 @@ def apply_overrides(config, values: dict):
     action_semantics = values.get("action_semantics", source_semantics)
     if action_semantics not in ("absolute", "delta"):
         raise ValueError("动作监督只能选择 absolute 或 delta")
-    if paper_trial != "none" and not paper_available(config):
+    eligibility = config
+    if after_inputs.get("training_method") == "fullft":
+        eligibility = replace(
+            config, model=replace(config.model, paligemma_variant="gemma_2b", action_expert_variant="gemma_300m")
+        )
+    if paper_trial != "none" and not paper_available(eligibility):
         raise ValueError("逐时间步归一化和相关高斯噪声仅支持兼容的 30 Hz Sharpa π0.5 全参配置")
     validate_trial_options(
         config,
@@ -414,7 +505,7 @@ def apply_overrides(config, values: dict):
     )
     delta_available = delta_supported(config)
     if action_semantics == "delta" and not delta_available:
-        raise ValueError("当前仅番茄 Wuji / Sharpa 支持 delta 动作监督")
+        raise ValueError("当前仅 Sharpa 支持 delta 动作监督")
     if action_semantics != source_semantics and values["asset_id"] == config.data.assets.asset_id:
         raise ValueError("切换动作监督后必须使用新的 asset_id，并重新计算归一化统计")
     for key in TEXT_FIELDS:
@@ -570,8 +661,12 @@ def apply_overrides(config, values: dict):
             "source_datasets": values["sources"],
         },
     )
+    trial_source = config
+    if after_inputs.get("training_method") == "lora" and paper_trial == "none" and selected_trial(result) != "none":
+        result = select_trial(config, result, "none")
+        trial_source = result
     result = apply_training_inputs(result, before_inputs, after_inputs)
-    result = select_trial(config, result, paper_trial)
+    result = select_trial(trial_source, result, paper_trial)
     validate_config(result)
     return result
 

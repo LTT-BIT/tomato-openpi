@@ -8,12 +8,12 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from examples.fr3_wuji import compute_norm_stats
 from openpi import transforms
 from openpi.training import config as cfg
 from openpi.training import data_loader
 from openpi.training.dataset_collection import collection_layout
 from openpi.training.sampling import SamplingGroup
+from scripts import compute_robot_norm_stats as compute_norm_stats
 from scripts import run_training
 from scripts import training_ui_config as editor
 from scripts.training_ui_datasets import dataset_groups
@@ -25,7 +25,7 @@ def drop_prompt(data):
     return {key: value for key, value in data.items() if key != "prompt"}
 
 
-BASE = "training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1"
+BASE = "training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1"
 
 
 def metadata(root, *, episode=0):
@@ -108,8 +108,12 @@ def test_real_collection_windows_norm_audit_and_resume(tmp_path, monkeypatch, mo
         lerobot_dataset, "encode_video_frames", functools.partial(lerobot_dataset.encode_video_frames, vcodec="h264")
     )
     features = {
-        "observation.state": {"dtype": "float32", "shape": (108,), "names": None},
-        "action": {"dtype": "float32", "shape": (54,), "names": None},
+        "observation.state": {
+            "dtype": "float32",
+            "shape": (116,),
+            "names": config.policy_metadata["source_state_joint_names"],
+        },
+        "action": {"dtype": "float32", "shape": (58,), "names": config.policy_metadata["source_action_joint_names"]},
         **{
             key: {"dtype": "video", "shape": (64, 64, 3), "names": ["height", "width", "channel"]}
             for key in config.policy_metadata["camera_keys"]
@@ -122,8 +126,8 @@ def test_real_collection_windows_norm_audit_and_resume(tmp_path, monkeypatch, mo
         for j in range(i + 2):
             ds.add_frame(
                 {
-                    "observation.state": np.full(108, i + j / 10, np.float32),
-                    "action": np.full(54, i + j / 10, np.float32),
+                    "observation.state": np.full(116, i + j / 10, np.float32),
+                    "action": np.full(58, i + j / 10, np.float32),
                     "task": "Pick tomato." if i == 0 else "Place tomato.",
                     **{key: np.zeros((64, 64, 3), np.uint8) for key in config.policy_metadata["camera_keys"]},
                 }

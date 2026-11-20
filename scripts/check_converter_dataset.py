@@ -8,19 +8,18 @@ from pathlib import Path
 
 import numpy as np
 
-from examples.fr3_wuji import compute_norm_stats
 from openpi import transforms
 from openpi.training import data_loader
+from scripts import compute_robot_norm_stats as compute_norm_stats
 from scripts.run_training import load_experiment
 from scripts.run_training import preflight
 
 
 def check(robot, root, assets_root):
     root = root.resolve(strict=True)
-    if robot == "sharpa":
-        module = "training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1"
-    else:
-        module = "training_configs.experiments.tomato_wuji.baseline.tomato_fr3_lora_v1"
+    if robot != "sharpa":
+        raise ValueError("This branch supports only Sharpa")
+    module = "training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_lora_v1"
     config = load_experiment(module)
     config = replace(
         config,
@@ -117,7 +116,7 @@ def check(robot, root, assets_root):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--robot", required=True, choices=("sharpa", "wuji"))
+    parser.add_argument("--robot", required=True, choices=("sharpa",))
     parser.add_argument("--dataset", required=True, type=Path)
     parser.add_argument("--norm-assets", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
