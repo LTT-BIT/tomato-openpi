@@ -20,8 +20,8 @@ EPISODES = 119
 FRAMES = 357970
 VERSION = 'tomato_in_hand119_rgb_crop_v3_r1'
 DEFAULT_SOURCE = '/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi'
-DEFAULT_BUNDLE = '/home/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_four_view_v3_r1'
-DEFAULT_CACHE = '/home/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_rgb224_cache_v3_r1'
+DEFAULT_BUNDLE = '/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_four_view_v3_r1'
+DEFAULT_CACHE = '/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_rgb224_cache_v3_r1'
 ASSET_ID = VERSION + '_delta_30hz'
 REPO_ID = 'fr3_sharpa/' + VERSION
 

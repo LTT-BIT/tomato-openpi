@@ -10,7 +10,7 @@
 
 运行 `bash scripts/python.sh -m scripts.training_ui` 打开训练工作台。可独立选择阶段指令或全局 Prompt、三路原始 RGB 或四路 RGB＋ROI，并组合逐时间步归一化、相关高斯噪声、Train RTC 和分组加权采样。默认四路阶段指令使用原有当前帧归一化资产；切换输入或论文选项时使用独立统计资产和实验名。
 
-通过 `PI05_IN_HAND119_BUNDLE` 指定正式训练数据，通过 `PI05_RGB_FRAME_CACHE` 指定可选缓存。缺失或无法匹配源视频的缓存逐路回退到 PyAV。多 CPU worker 保序预读，断点续训以已完成步数恢复采样位置。训练数据、统计和启动条件见 [Sharpa 训练说明](training_configs/experiments/tomato_sharpa/README.md#可选逐时间步归一化相关噪声与-train-rtc)。
+默认训练包和缓存使用共享 NAS 路径。通过 `PI05_IN_HAND119_BUNDLE` 指定训练数据，通过 `PI05_RGB_FRAME_CACHE` 指定可选缓存。缺失或无法匹配源视频的缓存逐路回退到 PyAV。多 CPU worker 保序预读，断点续训以已完成步数恢复采样位置。训练数据、统计和启动条件见 [Sharpa 训练说明](training_configs/experiments/tomato_sharpa/README.md#可选逐时间步归一化相关噪声与-train-rtc)。
 
 `visual_memory_v1` 和历史 checkpoint 保留用于归档及离线核对。当前训练入口拒绝读取历史 RGB 的旧配置。
 
