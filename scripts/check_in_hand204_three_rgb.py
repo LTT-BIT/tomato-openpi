@@ -10,6 +10,11 @@ from openpi.subtasks.prepare import digest,write_json
 from training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_three_rgb import MODULE,REPORT
 
 
+def release_frame_maps(*datasets):
+    """Bound audit file descriptors while comparing multiple full camera sets."""
+    for dataset in datasets:dataset._cache_maps.clear()
+
+
 def check():
     import jax
     import numpy as np
@@ -37,8 +42,8 @@ def check():
     cached=create_torch_dataset(data,50,config.model,sampling_mode=config.sampling_mode)
     crop_data=crop.data.create(crop.assets_dirs,crop.model)
     os.environ['PI05_RGB_FRAME_CACHE']=crop.policy_metadata['rgb_frame_cache']
-    four=create_torch_dataset(crop_data,50,crop.model,sampling_mode=crop.sampling_mode)
-    originals,three,four=transform_dataset(raw,data),transform_dataset(cached,data),transform_dataset(four,crop_data)
+    four_cached=create_torch_dataset(crop_data,50,crop.model,sampling_mode=crop.sampling_mode)
+    originals,three,four=transform_dataset(raw,data),transform_dataset(cached,data),transform_dataset(four_cached,crop_data)
     def equal(a,b):
         la,ta=jax.tree_util.tree_flatten(a);lb,tb=jax.tree_util.tree_flatten(b)
         if ta!=tb:raise ValueError('Input structure differs')
@@ -62,6 +67,7 @@ def check():
             if set(a['image'])!=set(config.model.image_keys) or len(a['image'])!=3:raise ValueError('Not exactly three RGB inputs')
             lengths.append(int(np.asarray(a['tokenized_prompt_mask']).sum()));checked+=1
         offset+=length
+        release_frame_maps(cached,four_cached)
         if (ep+1)%10==0:print('Three RGB exact inputs',ep+1,'/204',flush=True)
     os.environ['PI05_RGB_FRAME_CACHE']=str(cache)
     loader=TorchDataLoader(three,config.batch_size,num_workers=config.num_workers,seed=config.data_seed,
