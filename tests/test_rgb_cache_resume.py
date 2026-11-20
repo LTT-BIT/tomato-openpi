@@ -61,6 +61,14 @@ def test_real_video_cache_matches_decoder_and_preserves_timestamp(tmp_path):
     actual=transforms.ResizeImages(224,224)({'image':{'cam0':_parse_image(torch.from_numpy(first).permute(2,0,1).float()/255)}})['image']['cam0']
     np.testing.assert_array_equal(np.load(destination,mmap_mode='r')[0],actual)
     assert entry['exact_reference_samples']==5 and not destination.stat().st_mode & 0o222
+    reused_path=tmp_path/'reused/cam0/episode_000004.npy'
+    reused=build_video((str(source),str(reused_path),4,'cam0',12,30,(str(destination),entry)))
+    assert reused['episode']==4 and reused['source_sha256']==entry['source_sha256']
+    assert reused_path.stat().st_ino==destination.stat().st_ino
+    np.testing.assert_array_equal(np.load(reused_path),np.load(destination))
+    bad={**entry,'cache_sha256':'changed'}
+    with pytest.raises(ValueError,match='verification'):
+        build_video((str(source),str(tmp_path/'bad/cam0/episode_000000.npy'),0,'cam0',12,30,(str(destination),bad)))
     reader=object.__new__(CachedLeRobotDataset);reader.meta=SimpleNamespace(fps=30)
     reader.cache_root=cache;reader.cache_entries={(0,'cam0'):entry};reader._cache_maps={};reader.tolerance_s=1e-4
     value=reader._query_videos({'cam0':[float(np.float32(5/30))]},0)['cam0']

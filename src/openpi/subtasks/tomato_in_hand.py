@@ -16,12 +16,12 @@ ACTION_PROMPTS = {
 PROMPTS = tuple(ACTION_PROMPTS[k] for k in SEQUENCE)
 TASKS = tuple(dict.fromkeys(PROMPTS))
 CAMERAS = tuple(f'observation.images.cam{i}' for i in range(3)) + ('observation.images.interaction',)
-EPISODES = 119
-FRAMES = 357970
-VERSION = 'tomato_in_hand119_rgb_crop_v3_r1'
+EPISODES = 204
+FRAMES = 588734
+VERSION = 'tomato_in_hand204_rgb_crop_v3_r1'
 DEFAULT_SOURCE = '/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi'
-DEFAULT_BUNDLE = '/home/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_four_view_v3_r1'
-DEFAULT_CACHE = '/home/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_rgb224_cache_v3_r1'
+DEFAULT_BUNDLE = '/home/mengxiang/workspace/data/sharpa/full-block-more/in_hand204_four_view_v3_r1'
+DEFAULT_CACHE = '/home/mengxiang/workspace/data/sharpa/full-block-more/in_hand204_rgb224_cache_v3_r1'
 ASSET_ID = VERSION + '_delta_30hz'
 REPO_ID = 'fr3_sharpa/' + VERSION
 
@@ -116,7 +116,7 @@ def freeze(source):
                 roi_manifest_sha256=digest(root/'roi_manifest.json'),entry=e))
             print(f'Frozen {len(records)}/{EPISODES}',flush=True)
     if len(records) != EPISODES or sum(r['length'] for r in records) != FRAMES:
-        raise ValueError('Expected exactly119 recordings/357970frames; reversion selection explicitly')
+        raise ValueError('Expected exactly204 recordings/588734frames; reversion selection explicitly')
     return dict(version=VERSION,source=str(source),publication_sha256=digest(source/'manifest.json'),
         episodes=records,frames=FRAMES,profile=PROFILE,data_policy='all_sources',
         source_files_verified=True,offline_roi_uses_future_coordinates=True,

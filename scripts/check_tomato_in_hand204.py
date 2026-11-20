@@ -1,4 +1,4 @@
-"""CPU-only full119 source, phase, model-input and cached-loader acceptance."""
+"""CPU-only full204 source, phase, model-input and cached-loader acceptance."""
 import argparse
 import json
 import os
@@ -8,7 +8,7 @@ import time
 
 from openpi.subtasks import tomato_in_hand as contract
 
-MODULE='training_configs.experiments.tomato_sharpa.subtasks.in_hand119_b_crop'
+MODULE='training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_crop'
 
 
 def check(bundle,cache,out):
@@ -20,7 +20,7 @@ def check(bundle,cache,out):
     from openpi.subtasks.prepare import digest
     from openpi.training.data_loader import create_torch_dataset,transform_dataset,TorchDataLoader
     torch.set_num_threads(1)
-    os.environ['PI05_IN_HAND119_BUNDLE']=str(bundle.resolve())
+    os.environ['PI05_IN_HAND204_BUNDLE']=str(bundle.resolve())
     config=load_experiment(MODULE);validate_config(config);inputs=preflight(config)
     manifest=json.loads((bundle/'bundle.json').read_text())
     # Verify the complete training copy including every video, annotation and physical table.
@@ -72,7 +72,7 @@ def check(bundle,cache,out):
             token_lengths.append(int(np.asarray(b['tokenized_prompt_mask']).sum()))
             checked+=1
         offset+=length
-        if (ep+1)%10==0:print('Exact inputs',ep+1,'/119',flush=True)
+        if (ep+1)%10==0:print('Exact inputs',ep+1,'/204',flush=True)
     loader=TorchDataLoader(new_inputs,config.batch_size,num_workers=config.num_workers,
         seed=config.data_seed,framework='pytorch',sampling_mode=config.sampling_mode,
         num_train_steps=config.num_train_steps,num_batches=32)
@@ -92,10 +92,10 @@ def check(bundle,cache,out):
             crop_frames+=len(values)
         del array
     if crop_frames!=contract.FRAMES or black_crop_frames:
-        raise ValueError('Full119 local RGB contains missing/black frames')
+        raise ValueError('Full204 local RGB contains missing/black frames')
     from openpi.subtasks.prepare import write_json
     from openpi.training import reproducibility
-    report=dict(status='in_hand119_training_inputs_accepted',training_started=False,
+    report=dict(status='in_hand204_training_inputs_accepted',training_started=False,
         episodes=contract.EPISODES,frames=contract.FRAMES,bundle=str(bundle.resolve()),cache=str(cache.resolve()),
         bundle_sha256=digest(bundle/'bundle.json'),selection_sha256=digest(bundle/'selection.json'),
         cache_manifest_sha256=digest(cache/'manifest.json'),norm=inputs,

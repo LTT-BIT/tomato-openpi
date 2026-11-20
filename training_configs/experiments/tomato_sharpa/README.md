@@ -1,3 +1,13 @@
+## 当前手中调整五阶段：204条四路RGB
+
+2026-11-20沿用原119条方案直接更新为204条/588734帧，来源为共享盘 `/mnt/data/train_platform/datasets/tomato_sharpa/normal/full-block-more/subtask-roi`。任务仍为pickup/harvest/adjust/harvest/return，四条英文prompt相同；存储state116经具名适配得到state58，action58保持手臂14维Delta、手部44维Absolute。224四路RGB、视觉1024token、文本上限256、50步动作窗口、RTC0，无深度/Agent/Memory。
+
+入口 `training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_crop`，27服务器，batch256/FSDP8，20000步，每5000完成步保存并保留5000/10000/15000/20000。学习率仍warmup1000、peak2.5e-5、decay_steps30000、end2.5e-6；只调整总步数，未改学习率曲线。默认W&B offline，由用户通过UI手动启动。从pi05_base全参微调，不能隐式接续旧119 checkpoint。
+
+源发布目录只读；训练副本 `in_hand204_four_view_v3_r1`、归一化 `tomato_in_hand204_rgb_crop_v3_r1_delta_30hz`、缓存 `in_hand204_rgb224_cache_v3_r1`。旧缓存仅在像素流水线、源视频SHA、数组SHA/形状/类型匹配时只读复用；新视频完整解码并检查时间戳。准备后验证全204条阶段边界、输入等价和全帧黑图。`bash scripts/python.sh -m scripts.tomato_in_hand204_run check`默认只检查。验收报告绑定代码、数据、缓存和统计，未通过不能启动。全部204条训练，无独立验证集，训练loss不能代表泛化或实机成功率。
+
+旧119源码配置可从Git历史恢复；已归档权重不改。下文旧批次说明保留历史背景，不能用作当前204条验收结论。
+
 # FR3 + Sharpa 番茄训练
 
 ## complete100 RGB＋局部crop：训练准备

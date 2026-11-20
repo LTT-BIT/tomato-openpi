@@ -461,7 +461,7 @@ def prepare_input_environment(config):
     metadata=config.policy_metadata or {}
     report=metadata.get('input_acceptance_report')
     if report:
-        from scripts.tomato_in_hand119_run import checked_config
+        from scripts.tomato_in_hand204_run import checked_config
         bundle=Path(metadata['dataset_root']).parent
         cache=Path(metadata['rgb_frame_cache'])
         checked_config(bundle,cache,Path(report))

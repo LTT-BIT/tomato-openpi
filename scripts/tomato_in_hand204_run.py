@@ -1,4 +1,4 @@
-"""Guarded check/start for the independent in-hand119 B run. Default is check."""
+"""Guarded check/start for the independent in-hand204 B run. Default is check."""
 import argparse
 from datetime import datetime
 import fcntl
@@ -10,18 +10,18 @@ import time
 from zoneinfo import ZoneInfo
 
 from openpi.subtasks import tomato_in_hand as contract
-from scripts.check_tomato_in_hand119 import MODULE
+from scripts.check_tomato_in_hand204 import MODULE
 from scripts.tomato_ab_run import gpu_inventory,validate_gpus
 
 ROOT=Path(__file__).resolve().parents[1]
-REPORT=ROOT/'logs/in_hand119_preflight/accepted_20261116_s30000_c5000.json'
+REPORT=ROOT/'logs/in_hand204_preflight/accepted_20261120_s20000_c5000.json'
 
 
 def checked_config(bundle,cache,report_path):
     from openpi.subtasks.prepare import digest
     from scripts.run_training import load_experiment,preflight,validate_config
     report=json.loads(report_path.read_text())
-    if (report.get('status')!='in_hand119_training_inputs_accepted'
+    if (report.get('status')!='in_hand204_training_inputs_accepted'
             or report.get('episodes')!=contract.EPISODES or report.get('frames')!=contract.FRAMES
             or report.get('all_model_inputs_equal') is not True or report.get('original_sources_unchanged') is not True
             or report.get('model_samples_checked')!=3*contract.EPISODES
@@ -30,8 +30,8 @@ def checked_config(bundle,cache,report_path):
             or report.get('bundle')!=str(bundle.resolve()) or report.get('cache')!=str(cache.resolve())
             or report.get('bundle_sha256')!=digest(bundle/'bundle.json')
             or report.get('cache_manifest_sha256')!=digest(cache/'manifest.json')):
-        raise ValueError('Full119 source/phase/input/cache acceptance is required')
-    os.environ['PI05_IN_HAND119_BUNDLE']=str(bundle.resolve());os.environ['PI05_RGB_FRAME_CACHE']=str(cache.resolve())
+        raise ValueError('Full204 source/phase/input/cache acceptance is required')
+    os.environ['PI05_IN_HAND204_BUNDLE']=str(bundle.resolve());os.environ['PI05_RGB_FRAME_CACHE']=str(cache.resolve())
     os.environ.pop('PI05_INPUT_EXECUTION_MIGRATION',None)
     config=load_experiment(MODULE);validate_config(config);inputs=preflight(config)
     from openpi.training import reproducibility
@@ -64,7 +64,7 @@ def main():
         from scripts.training_environment import cuda_environment
         from scripts.training_ui import attach_cli_job
         stamp=datetime.now(ZoneInfo('Asia/Shanghai')).strftime('%Y%m%d_%H%M%S')
-        console=ROOT/'logs'/f'in_hand119_b256_{stamp}.console.log'
+        console=ROOT/'logs'/f'in_hand204_b256_{stamp}.console.log'
         command=['bash',str(ROOT/'scripts/python.sh'),'-u','-m','scripts.run_training',MODULE,
             '--exp-name',config.exp_name,'--wandb-mode','offline']
         with console.open('xb') as stream:

@@ -27,7 +27,7 @@ def build_video(job):
 
     torch.set_num_threads(1)
     torchvision.set_video_backend('pyav')
-    source, destination, episode, camera, frames, fps = job
+    source, destination, episode, camera, frames, fps, *reuse = job
     source, destination = Path(source), Path(destination)
     receipt = destination.with_suffix('.json')
     source_sha = sha256(source)
@@ -40,6 +40,28 @@ def build_video(job):
     if destination.exists():
         raise FileExistsError(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
+    if reuse and reuse[0] is not None:
+        old_file, old = reuse[0]
+        old_file = Path(old_file)
+        if (old['source_sha256'] != source_sha or old['frames'] != frames
+                or old.get('exact_reference_samples', 0) < 3
+                or old_file.stat().st_size != old['bytes']
+                or old_file.stat().st_mode & 0o222
+                or sha256(old_file) != old['cache_sha256']):
+            raise ValueError('Reusable cache failed source/content verification')
+        array = np.load(old_file, mmap_mode='r', allow_pickle=False)
+        if array.dtype != np.uint8 or array.shape != (frames, 224, 224, 3):
+            raise ValueError('Reusable cache shape/dtype differs')
+        del array
+        # Immutable arrays can share storage; receipts and metadata are independent.
+        os.link(old_file, destination)
+        stat = destination.stat()
+        result = {**old, 'episode': episode, 'camera': camera,
+            'cache_file': str(destination.relative_to(destination.parents[1])),
+            'bytes': stat.st_size, 'mtime_ns': stat.st_mtime_ns,
+            'reused_from': str(old_file), 'seconds': 0.0}
+        receipt.write_text(json.dumps(result, indent=2)+'\n')
+        return result
     temp = destination.with_suffix('.partial.npy')
     if temp.exists():
         raise FileExistsError(temp)
@@ -101,6 +123,8 @@ def main():
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--workers', type=int, default=8)
     parser.add_argument('--episodes', type=int, nargs='*')
+    parser.add_argument('--reuse-cache', type=Path,
+        help='Reuse read-only exact arrays only after pipeline/source/content verification')
     args = parser.parse_args()
     from openpi.training.frame_cache import sha256
     from lerobot.common.datasets.lerobot_dataset import LeRobotDatasetMetadata
@@ -118,9 +142,23 @@ def main():
     elif any(args.out.iterdir()):
         raise ValueError('Unbound partial cache; use a fresh output directory')
     selected = args.episodes if args.episodes is not None else sorted(meta.episodes)
+    reusable = {}
+    if args.reuse_cache is not None:
+        reuse_root = args.reuse_cache.resolve(strict=True)
+        previous = json.loads((reuse_root/'manifest.json').read_text())
+        if (previous.get('complete') is not True or previous.get('schema') != 'rgb224_exact_pil_v2'
+                or previous.get('pixel_pipeline') != pipeline):
+            raise ValueError('Reusable cache pipeline is incompatible')
+        for item in previous['entries']:
+            path = (reuse_root/item['cache_file']).resolve(strict=True)
+            if not path.is_relative_to(reuse_root):
+                raise ValueError('Reusable cache path escapes its root')
+            reusable[(item['source_sha256'], item['frames'])] = (str(path), item)
     jobs = [(str(args.source/meta.get_video_file_path(ep, cam)),
              str(args.out/cam/f'episode_{ep:06d}.npy'),ep,cam,meta.episodes[ep]['length'],meta.fps)
             for ep in selected for cam in meta.video_keys]
+    if reusable:
+        jobs = [(*job, reusable.get((sha256(job[0]), job[4]))) for job in jobs]
     context = multiprocessing.get_context('spawn')
     cpu_queue = context.Queue()
     cpus = sorted(os.sched_getaffinity(0))

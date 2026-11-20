@@ -1,4 +1,4 @@
-"""Fresh five-phase in-hand119 B experiment; independent from seven-phase100."""
+"""Fresh five-phase in-hand204 B experiment; independent from seven-phase100."""
 from dataclasses import fields,replace
 import json
 import os
@@ -13,7 +13,7 @@ from training_configs.recipes.pi05_fullft_v1 import build_config as recipe
 
 
 def build_config():
-    root=Path(os.environ.get('PI05_IN_HAND119_BUNDLE',contract.DEFAULT_BUNDLE)).expanduser().resolve()
+    root=Path(os.environ.get('PI05_IN_HAND204_BUNDLE',contract.DEFAULT_BUNDLE)).expanduser().resolve()
     manifest=json.loads((root/'bundle.json').read_text());dataset_root=root/'b_coarse'
     info=json.loads((dataset_root/'meta/info.json').read_text());contract.validate_info(info)
     tasks=[json.loads(l)['task'] for l in (dataset_root/'meta/tasks.jsonl').read_text().splitlines() if l]
@@ -24,17 +24,17 @@ def build_config():
             or manifest.get('data_policy')!='all_sources' or tasks!=list(contract.TASKS)
             or info['total_episodes']!=contract.EPISODES or info['total_frames']!=contract.FRAMES
             or info['features'].get('observation.interaction_available',{}).get('dtype')!='bool'):
-        raise ValueError('Frozen full119 v3 four-view B bundle required')
+        raise ValueError('Frozen full204 v3 four-view B bundle required')
     for name in ['selection.json','b_coarse/meta/info.json','b_coarse/meta/episodes.jsonl','b_coarse/meta/tasks.jsonl']:
         if digest(root/name)!=manifest['files'][name]:raise ValueError('Prepared metadata changed')
     dataset=common.Dataset(version=contract.VERSION,repo_id=contract.REPO_ID,root=str(dataset_root),
         assets_dir=str(common.repository_root()/'assets'),asset_id=contract.ASSET_ID,
         sources=(str(root/'bundle.json'),str(root/'selection.json')),prompt_example=contract.TASKS[1])
-    config=recipe(name='pi05_sharpa_in_hand119_b_crop_fullft_delta_v3_r1',
-        exp_name='tomato_in_hand119_b_crop_delta_v3_r1_s42_b256_s30000_c5000',embodiment=FR3_SHARPA_CROP,dataset=dataset)
+    config=recipe(name='pi05_sharpa_in_hand204_b_crop_fullft_delta_v3_r1',
+        exp_name='tomato_in_hand204_b_crop_delta_v3_r1_s42_b256_s20000_c5000',embodiment=FR3_SHARPA_CROP,dataset=dataset)
     config=replace(config,model=replace(config.model,image_keys=IMAGE_KEYS,max_token_len=256),
         data=replace(config.data,extra_delta_transform=True,interaction_mask_key='observation.interaction_available'),
-        batch_size=256,num_train_steps=30000,fsdp_devices=8,save_interval=5000,keep_period=5000,
+        batch_size=256,num_train_steps=20000,fsdp_devices=8,save_interval=5000,keep_period=5000,
         policy_metadata={**config.policy_metadata,'subtask_variant':'in_hand_b_coarse','prompt_profile':contract.PROFILE,
             'training_action_semantics':'delta_arm_joint_target_absolute_hand','data_policy':'all_sources',
             'selection_sha256':digest(root/'selection.json'),'bundle_sha256':digest(root/'bundle.json'),
@@ -43,7 +43,7 @@ def build_config():
             'training_episodes':contract.EPISODES,'training_frames':contract.FRAMES,
             'action_prompts':dict(contract.ACTION_PROMPTS),
             'rgb_frame_cache':contract.DEFAULT_CACHE,
-            'input_acceptance_report':str(common.repository_root()/'logs/in_hand119_preflight/accepted_20261116_s30000_c5000.json'),
+            'input_acceptance_report':str(common.repository_root()/'logs/in_hand204_preflight/accepted_20261120_s20000_c5000.json'),
             'memory_to_pi05':False,'agent_enabled':False,'gpu_memory_preflight_required':True})
     return ScheduledTrainConfig(**{f.name:getattr(config,f.name) for f in fields(config)},
         save_before_step=1,save_steps_before=(),save_interval_after=5000)

@@ -1,4 +1,4 @@
-"""Freeze and materialize a NEW full119 five-phase four-RGB B training bundle."""
+"""Freeze and materialize a NEW full204 five-phase four-RGB B training bundle."""
 import argparse
 import copy
 import json
@@ -17,7 +17,7 @@ def materialize(selection, output, tokenizer):
     from openpi.subtasks.prepare import digest, safe_file, stats, write_json, write_jsonl
     if (selection.get('version') != contract.VERSION or not selection.get('source_files_verified')
             or len(selection['episodes']) != contract.EPISODES or selection['frames'] != contract.FRAMES):
-        raise ValueError('Verified full119 frozen selection required')
+        raise ValueError('Verified full204 frozen selection required')
     output = output.resolve()
     roots = [Path(r['source_dataset']).resolve() for r in selection['episodes']]
     if any(output.is_relative_to(r) or r.is_relative_to(output) for r in roots):
