@@ -1,40 +1,18 @@
 # Tomato OpenPI 训练仓库
 
-`main` 已集成基础 π0.5、Train RTC、逐时间步归一化和相关高斯噪声。Sharpa 论文训练使用 JAX、30 Hz 全参、双臂 Delta 和双手 Absolute。原三路 Sharpa 的多数据源 T3 使用完整窗口等权洗牌。下文的整串番茄视觉历史配置另支持三路或四路输入、阶段或全局指令，以及分组加权采样。
+`main` 已集成基础 π0.5、Train RTC、逐时间步归一化和相关高斯噪声。Sharpa 论文训练使用 JAX、30 Hz 全参、双臂 Delta 和双手 Absolute。普通三路 Sharpa 支持多目录 T3、Train RTC 和分组加权采样。整串番茄配置支持三路或四路输入、阶段或全局指令。
 
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
-## 整串番茄视觉历史
+## 整串番茄当前帧训练
 
-视觉历史方案在 `tomato-visual-memory` 分支开发，使用**采样历史图像＋空间池化视觉前缀**。训练配置入口为 `training_configs.experiments.tomato_sharpa.subtasks.visual_memory_v1`。
+默认配置 `training_configs.experiments.tomato_sharpa.subtasks.in_hand119_current_rgb` 使用已冻结的 119 条五阶段录制，每个样本读取当前帧。训练沿用原生 π0.5、当前 58D state、双臂 Delta、双手 Absolute 和 50 步动作窗口。默认 batch256、FSDP8、30000 步、每 5000 个完成步保存并保留 checkpoint。
 
-默认使用当前四路图像及 t−45/t−30/t−15 的四路历史（30 Hz，跨度1.5秒）。当前图像各保留256个token，历史图像各池化为4×4个token，增加192个token，视觉前缀合计1216；显式加入相机/相对时间编码，沿用π0.5前缀注意力和动作flow损失。历史不包含state、动作目标、阶段真值或未来帧；**当前58D state保留**，动作仍为手臂Delta＋手部Absolute，预测50步。图像增强在同相机的各时间槽保持一致。此方案仍须逐帧编码历史，尚未做特征缓存或时延优化。
+运行 `bash scripts/python.sh -m scripts.training_ui` 打开训练工作台。可独立选择阶段指令或全局 Prompt、三路原始 RGB 或四路 RGB＋ROI，并组合逐时间步归一化、相关高斯噪声、Train RTC 和分组加权采样。默认四路阶段指令使用原有当前帧归一化资产；切换输入或论文选项时使用独立统计资产和实验名。
 
-数据复用已冻结的119条五阶段v3四视图B副本（357970帧），原 `subtask-roi`、旧实验与checkpoint不修改。所有录制仍属于动作训练数据，不能用其回放宣称独立泛化。历史严格在同一录制内按源帧ID取样，缺失历史置零并mask；阶段prompt变化不清空同一录制的视觉历史。现有第四路ROI有前后帧辅助坐标，**该数据不构成在线因果ROI验收**。
+通过 `PI05_IN_HAND119_BUNDLE` 指定正式训练数据，通过 `PI05_RGB_FRAME_CACHE` 指定可选缓存。缺失或无法匹配源视频的缓存逐路回退到 PyAV。多 CPU worker 保序预读，断点续训以已完成步数恢复采样位置。训练数据、统计和启动条件见 [Sharpa 训练说明](training_configs/experiments/tomato_sharpa/README.md#可选逐时间步归一化相关噪声与-train-rtc)。
 
-设置实际数据路径后，可运行以下 CPU 数据检查。
-
-```bash
-export PI05_IN_HAND119_BUNDLE=/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_four_view_v3_r1
-export PI05_RGB_FRAME_CACHE=/mnt/data/users/mengxiang/workspace/data/sharpa/full-block-more/in_hand119_rgb224_cache_v3_r1
-JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.check_visual_memory --workers 2
-```
-
-本版使用独立归一化资产 `tomato_visual_memory_v1_h4_s15_g4_delta_30hz`。首次准备且目标资产不存在时，执行 `JAX_PLATFORMS=cpu bash scripts/python.sh -m scripts.bind_visual_memory_norm --source-norm assets/tomato_in_hand119_rgb_crop_v3_r1_delta_30hz`：核验旧统计来源、完全相同的当前向量变换链及每条录制3个样本后，原值复制并建立新版本绑定，拒绝覆盖旧资产。`PI05_VISUAL_MEMORY_FRAMES=1` 为无历史对照；`PI05_VISUAL_MEMORY_STRIDE`、`PI05_VISUAL_MEMORY_GRID` 可改采样间隔及池化网格。每组设置生成独立实验名和资产ID，必须单独绑定；默认不复用旧训练UI的输入验收报告。
-
-运行 `bash scripts/python.sh -m scripts.training_ui` 打开整串番茄训练表单，默认使用已准备的 119 条五阶段数据、阶段指令和四路视频。可在“训练参数”中独立选择阶段指令或全局 Prompt、三路原始 RGB 或四路 RGB＋ROI，视觉历史跟随所选视频路数。两个选项都可与逐时间步归一化、相关高斯噪声及 Train RTC 组合。Train RTC 接受 `0 ≤ delay < action_horizon` 的整数动作步，0 为关闭。缺少正式训练包时，工作台可预览最终配置。训练数据、统计和启动条件见 [Sharpa 训练说明](training_configs/experiments/tomato_sharpa/README.md#可选逐时间步归一化相关噪声与-train-rtc)。
-
-“采样策略”可切换为按分组权重有放回抽样，支持与 T1/T2/T3 一起使用。训练工作台可从 119 条冻结训练包读取 A/B 分组，权重也支持按训练 episode 编号手动配置。
-
-119 条视觉历史工作台会使用可访问的 RGB 缓存，支持通过 `PI05_RGB_FRAME_CACHE` 指定目录。缓存按录制和相机匹配源视频，文件迁移造成的修改时间变化不会拦截。与源视频不匹配、缺失或无法读取的缓存逐路回退到源视频。历史时刻按相机合并读取，动作窗口只在当前帧加载一次。
-
-JAX 视觉历史训练会将同一训练批分给多个 CPU worker 预读，训练进程按采样顺序合批后再传入设备。断点续训仍以已完成步数恢复样本位置。回退到 PyAV 源视频时复用已打开的解码器，只对所需帧执行 RGB 色彩转换。
-
-`VisualHistory` 提供有界推理缓存，要求明确episode身份、单调的采集frame ID及timestamp，缺失的精确历史时刻保持mask，禁止把策略调用次数当30 Hz时间轴。`VisualMemoryPolicy` 是使用训练原始输入协议（116D原始state，经适配为58D）的离线策略包装器，要求匹配checkpoint内的 `assets/visual_memory_contract.json`；还没有接入机器人部署仓库的58D传输接口。按需在策略调用之间向历史缓存写入实际采集帧，新任务reset。
-
-2026-11-16：70项相关本地测试通过，包含小型CPU底座的真实训练更新、动作采样、参数兼容与单帧回归；服务器载入119条/357970帧索引，在6个位置验证历史像素/掩码与推理缓存一致，双worker组批通过。另对生产模型完成CPU抽象图检查：含文本前缀为 `[1,1472,2048]`，动作loss为 `[1,50]`，该检查不分配生产权重、不代表GPU容量验收。真实检查记录见 `training_configs/experiments/tomato_sharpa/subtasks/records/visual_memory_v1_h4_s15_g4_input_check_20261116.json`。配置继承batch256/FSDP8/30000步/每5000步保存，**本版GPU容量、完整训练、Memory收益及实机部署均未验证**；尚未启动正式训练。
-
-2026-11-18重新审计119条数据：357970帧标签、物理列与历史索引检查通过，1309个阶段边界/锚点完成15708次历史视图像素与mask对照；原三路视频哈希组合及state/action逐字节指纹未发现完全重复录制。本轮16项相关契约测试通过。全量476个缓存文件（215538093568字节）的SHA256与原验收一致，但迁移后的476个mtime均不匹配旧清单，**当时的生产缓存入口因此拒绝加载**；本轮使用全哈希验证后的只读审计入口，不改清单、不放宽生产保护。候选来源包整体划分为训练86条/264302帧、开发14条/37589帧、测试19条/56079帧，尚未启用；包名前缀只作为导出批次分组，不宣称真实采集日期或未见果串/场景。已核验另一个无Memory的全119条动作实验完成并保存30000步，其checkpoint不能用于这份候选划分的独立测试；新实验须从未使用待测录制的底座开始，归一化仅使用训练86条。事件结果与摘要标签仍缺失，本轮不测物理成功率或Memory收益、不启动训练。记录及候选成员见 `training_configs/experiments/tomato_sharpa/subtasks/records/visual_memory_all119_audit_20261118.json`；复查入口为 `scripts.check_visual_memory_data --report <新JSON路径>`，迁移缓存需显式加 `--verify-migrated-cache` 做全内容校验。
+`visual_memory_v1` 和历史 checkpoint 保留用于归档及离线核对。当前训练入口拒绝读取历史 RGB 的旧配置。
 
 以下保留既有基线与数据说明。
 
@@ -84,7 +62,7 @@ bash scripts/python.sh -m wandb login
 bash scripts/python.sh -m scripts.training_ui --port 8765
 ```
 
-Sharpa multimodal 全参训练可在「03 训练参数 → 论文功能」直接勾选「逐时间步归一化」和「相关噪声」，两项同时选择为 T3；配合 Train RTC 最大延迟（例如10）即可使用融合训练，无需先运行个人配置生成命令。切换功能自动使用独立统计名称，并固定双臂 delta、双手 absolute 与无放回完整窗口采样；点击启动时保存可复现个人配置。已有个人配置会还原算法选项，单独修改 RTC 可复用匹配统计。当前完成的是配置与软件测试，尚不代表真实数据训练或实机验证完成。同步代码后须重启自己的 UI 进程并刷新页面。
+Sharpa multimodal 全参训练可在「03 训练参数 → 论文功能」直接勾选「逐时间步归一化」和「相关噪声」，两项同时选择为 T3；配合 Train RTC 最大延迟（例如10）即可使用融合训练，无需先运行个人配置生成命令。切换功能自动使用独立统计名称，并固定双臂 delta、双手 absolute 与完整动作窗口，可选择逐轮等权打乱或分组加权采样；点击启动时保存可复现个人配置。已有个人配置会还原算法选项，单独修改 RTC 可复用匹配统计。当前完成的是配置与软件测试，尚不代表真实数据训练或实机验证完成。同步代码后须重启自己的 UI 进程并刷新页面。
 
 **在自己的电脑打开服务器 UI**：服务监听服务器的 `127.0.0.1:8765`，需要通过 SSH 转发到本地。
 

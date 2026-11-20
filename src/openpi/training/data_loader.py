@@ -107,7 +107,7 @@ class WeightedConcatDataset(torch.utils.data.ConcatDataset):
 class CollectionDataset(torch.utils.data.ConcatDataset):
     """Concatenate independent windows, with collision-free IDs for sampling/audit."""
 
-    def __init__(self, datasets, specs):
+    def __init__(self, datasets, specs, *, complete_horizon=1):
         super().__init__(datasets)
         self.sources = []
         ids = []
@@ -121,11 +121,21 @@ class CollectionDataset(torch.utils.data.ConcatDataset):
             columns = source.hf_dataset.select_columns(["episode_index", "frame_index"]).with_format("numpy")[:]
             episodes = np.asarray(columns["episode_index"], dtype=np.int64)
             unique, counts = np.unique(episodes, return_counts=True)
-            expected = {row["episode_index"]: row["length"] for row in layout["episodes"]}
-            if dict(zip(unique.tolist(), counts.tolist(), strict=True)) != expected or len(episodes) != len(source):
-                raise ValueError("Loaded collection episode lengths differ from metadata")
+            expected = {
+                row["episode_index"]: count
+                for row in layout["episodes"]
+                if (count := _sampling.complete_window_count(row["length"], complete_horizon))
+            }
+            if (
+                dict(zip(unique.tolist(), counts.tolist(), strict=True)) != expected
+                or len(episodes) != len(source)
+                or getattr(source, "source_total_frames", len(source)) != layout["info"]["total_frames"]
+            ):
+                raise ValueError("Loaded collection windows differ from episode metadata")
             ids.append(np.column_stack(([layout["mapping"][int(e)] for e in episodes], columns["frame_index"])))
         self.frame_ids = np.concatenate(ids).astype(np.int64)
+        if not len(self.frame_ids):
+            raise ValueError("Dataset collection contains no complete action windows")
 
 
 class IterableTransformedDataset(IterableDataset[T_co]):
@@ -306,6 +316,8 @@ def create_torch_dataset(
     if data_config.local_dataset_loader is not None:
         return _create_local_dataset(data_config, action_horizon)
 
+    complete_windows = getattr(data_config, "paper_complete_windows", False)
+
     def create_one(
         dataset_repo_id: str, dataset_root: str | None = None
     ) -> tuple[Dataset, lerobot_dataset.LeRobotDatasetMetadata]:
@@ -321,8 +333,9 @@ def create_torch_dataset(
             round(t * dataset_meta.fps / action_hz) / dataset_meta.fps for t in range(action_horizon)
         ]
         memory = getattr(data_config, "visual_memory", None)
+        video_views = getattr(data_config, "video_views", None)
         cache_root = os.environ.get("PI05_RGB_FRAME_CACHE")
-        reuse_pyav = memory is not None and data_config.video_backend == "pyav"
+        reuse_pyav = (memory is not None or video_views is not None) and data_config.video_backend == "pyav"
         dataset_type = lerobot_dataset.LeRobotDataset
         cache_options = {}
         if cache_root or reuse_pyav:
@@ -337,6 +350,12 @@ def create_torch_dataset(
             video_backend=data_config.video_backend,
             **cache_options,
         )
+        if video_views == 3:
+            # This metadata instance is private to the loader. Skip the ROI stream entirely.
+            features = {
+                key: spec for key, spec in dataset.meta.features.items() if key != "observation.images.interaction"
+            }
+            dataset.meta.info = {**dataset.meta.info, "features": features}
         if memory is not None:
             from openpi.subtasks.visual_memory import THREE_VIEWS
             from openpi.training.visual_memory_execution import FastVisualMemoryDataset
@@ -349,12 +368,12 @@ def create_torch_dataset(
                 if memory.image_keys == THREE_VIEWS
                 else FastVisualMemoryDataset(dataset, memory, data_config.history_mask_key)
             )
-        if getattr(data_config, "paper_complete_windows", False):
+        if complete_windows:
             from openpi.training.delta_paper import CompleteWindows
 
             if action_hz != dataset_meta.fps:
                 raise ValueError("Paper windows require source-rate action sampling")
-            dataset = CompleteWindows(dataset, action_horizon)
+            dataset = CompleteWindows(dataset, action_horizon, allow_empty=len(data_config.lerobot_datasets) > 1)
         view = getattr(data_config, "task_view", None)
         if view is not None:
             from openpi.training.task_view import TaskViewDataset
@@ -400,11 +419,9 @@ def create_torch_dataset(
         ),
     )
     if sampling_mode in _sampling.PLAN_MODES:
-        if getattr(data_config, "paper_complete_windows", False):
-            from openpi.training.delta_paper import PaperCollectionDataset
-
-            return PaperCollectionDataset(datasets, data_config.lerobot_datasets)
-        return CollectionDataset(datasets, data_config.lerobot_datasets)
+        return CollectionDataset(
+            datasets, data_config.lerobot_datasets, complete_horizon=action_horizon if complete_windows else 1
+        )
     return WeightedConcatDataset(datasets, [spec.weight for spec in data_config.lerobot_datasets])
 
 
@@ -623,7 +640,11 @@ def create_torch_data_loader(
         framework=framework,
         sampling_mode=sampling_mode,
         num_train_steps=num_train_steps,
-        split_worker_batches=framework == "jax" and getattr(data_config, "visual_memory", None) is not None,
+        split_worker_batches=framework == "jax"
+        and (
+            getattr(data_config, "visual_memory", None) is not None
+            or getattr(data_config, "video_views", None) is not None
+        ),
     )
 
     return DataLoaderImpl(data_config, data_loader, source_dataset=source_dataset)
@@ -785,7 +806,7 @@ class TorchDataLoader:
             batches = torch.utils.data.BatchSampler(sampler, local_batch_size, drop_last=True)
             batch_options = {"batch_sampler": _WorkerBatchSampler(batches, self._worker_chunks, local_batch_size)}
             logging.info(
-                "Visual history prefetch: %d ordered worker tasks per batch with %d CPU workers",
+                "Ordered prefetch: %d worker tasks per batch with %d CPU workers",
                 self._worker_chunks,
                 num_workers,
             )

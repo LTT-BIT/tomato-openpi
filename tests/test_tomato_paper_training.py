@@ -24,18 +24,48 @@ from openpi.training import data_loader
 from openpi.training import frame_cache
 from openpi.training import sampling
 from openpi.training import utils
+from openpi.training.current_rgb import fixed_global_prompt
 from openpi.training.delta_paper_stats import compute
 from scripts import run_training
 from scripts import training_ui_config as ui
 from scripts.train import train_step
 
 PREFIX = "training_configs.experiments.tomato_sharpa.subtasks."
+SHARPA_BASE = "training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_fullft_v1"
+
+
+@pytest.mark.parametrize("source_count", [1, 3])
+def test_sharpa_baseline_t3_rtc_and_weighted_sampling_accept_selected_paths(tmp_path, source_count):
+    defaults = ui.defaults(SHARPA_BASE)
+    assert defaults["protocol"]["paper_available"]
+    assert defaults["values"]["action_semantics"] == "absolute"
+    roots = [str(tmp_path / f"arbitrary location {i}" / "recording") for i in range(source_count)]
+    values = {
+        **defaults["values"],
+        "dataset_root": roots[0],
+        "dataset_roots": roots,
+        "sources": roots,
+        "asset_id": "arbitrary_paths_t3",
+        "action_semantics": "delta",
+        "paper_trial": "t3",
+        "rtc_max_delay": 10,
+        "sampling_mode": "weighted_replacement",
+        "sampling_groups": [{"name": "selected", "episodes": list(range(source_count)), "weight": 1}],
+    }
+    config = ui.config_from_source(ui.personal_source(SHARPA_BASE, "test", values), SHARPA_BASE, "saved.py")
+    assert [spec.root for spec in config.data.lerobot_datasets] == roots
+    assert config.model.paper_mode == "timestamp_zscore_arms"
+    assert config.model.paper_beta == 0.5
+    assert config.model.rtc_max_delay == 10
+    assert config.sampling_mode == "weighted_replacement"
+    assert config.sampling_groups[0].episodes == tuple(range(source_count))
 
 
 @pytest.mark.parametrize("prompt_mode", ["stage", "global"])
 @pytest.mark.parametrize("video_views", [3, 4])
 def test_training_input_options_survive_paper_and_personal_configs(prompt_mode, video_views, tmp_path, monkeypatch):
     monkeypatch.setenv("PI05_IN_HAND119_BUNDLE", str(tmp_path / "missing"))
+    monkeypatch.setenv("PI05_VISUAL_MEMORY_FRAMES", "4")
     module = ui.DEFAULT_AB_MODULE
     source = ui.source_config(module)
     defaults = ui.defaults(module)
@@ -48,9 +78,9 @@ def test_training_input_options_survive_paper_and_personal_configs(prompt_mode, 
     values.update(asset_id="smoke_config", paper_trial="t3")
     saved = ui.personal_source(module, "test", values)
     config = ui.config_from_source(saved, module, "saved.py")
-    assert len(config.model.memory.image_keys) == len(config.policy_metadata["camera_keys"]) == video_views
-    assert len(config.model.image_keys) == video_views * config.model.memory.frames
-    assert getattr(config.data, "global_prompt", None) == (GOAL if prompt_mode == "global" else None)
+    assert len(config.model.image_keys) == len(config.policy_metadata["camera_keys"]) == video_views
+    assert not hasattr(config.model, "memory")
+    assert fixed_global_prompt(config.data) == (GOAL if prompt_mode == "global" else None)
     assert config.model.rtc_max_delay == 8
     assert config.model.paper_beta == 0.5
     reverted = ui.apply_overrides(
@@ -65,10 +95,10 @@ def test_training_input_options_survive_paper_and_personal_configs(prompt_mode, 
     )
     assert reverted.name == source.name
     assert reverted.model.image_keys == source.model.image_keys
-    assert not hasattr(reverted.data, "global_prompt")
+    assert fixed_global_prompt(reverted.data) is None
 
 
-@pytest.mark.parametrize("recipe", ["in_hand119_b_crop", "visual_memory_v1"])
+@pytest.mark.parametrize("recipe", ["in_hand119_b_crop", "in_hand119_current_rgb"])
 def test_paper_ui_preserves_recipe_and_checks_independent_stats(recipe, tmp_path, monkeypatch):
     monkeypatch.setenv("PI05_IN_HAND119_BUNDLE", str(tmp_path / "missing"))
     defaults = ui.defaults(PREFIX + recipe)
@@ -126,12 +156,24 @@ def test_paper_ui_preserves_recipe_and_checks_independent_stats(recipe, tmp_path
     assert resolved.sampling_mode == "weighted_replacement"
 
 
-def test_visual_memory_t3_statistics_loading_and_jitted_rtc_update(tmp_path, monkeypatch):
+def test_historical_recipe_cannot_train(tmp_path, monkeypatch):
+    from scripts import train
+
+    monkeypatch.setenv("PI05_IN_HAND119_BUNDLE", str(tmp_path / "missing"))
+    monkeypatch.setenv("PI05_VISUAL_MEMORY_FRAMES", "4")
+    archived = run_training.load_experiment(PREFIX + "visual_memory_v1")
+    with pytest.raises(ValueError, match="Historical RGB training is retired"):
+        run_training.validate_config(archived)
+    with pytest.raises(ValueError, match="Historical RGB training is retired"):
+        train.main(archived)
+
+
+def test_current_rgb_t3_statistics_loading_and_jitted_rtc_update(tmp_path, monkeypatch):
     monkeypatch.delenv("PI05_RGB_FRAME_CACHE", raising=False)
     monkeypatch.setenv("PI05_IN_HAND119_BUNDLE", str(tmp_path / "missing"))
     monkeypatch.setenv("PI05_VISUAL_MEMORY_FRAMES", "2")
     monkeypatch.setenv("PI05_VISUAL_MEMORY_STRIDE", "1")
-    module = PREFIX + "visual_memory_v1"
+    module = ui.DEFAULT_AB_MODULE
     source = ui.source_config(module)
     root = tmp_path / "data"
     for name in ("meta", "data"):
@@ -247,7 +289,8 @@ def test_visual_memory_t3_statistics_loading_and_jitted_rtc_update(tmp_path, mon
         == report["paper_bundle_sha256"]
     )
     data = config.data.create(config.assets_dirs, config.model)
-    assert data.visual_memory == source.model.memory
+    assert data.visual_memory is None
+    assert data.video_views == 4
     assert data.norm_stats["actions"].mean.shape == (3, 58)
     assert np.all(np.diff(data.norm_stats["actions"].mean[:, 0]) > 0)
     raw = data_loader.create_torch_dataset(data, 3, config.model, sampling_mode="epoch_shuffle")

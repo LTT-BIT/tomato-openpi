@@ -17,6 +17,7 @@ class Element {
 function setup() {
   const elements=new Map(['groups','groups-result','sampling-mode','dataset-candidates','apply-datasets','wandb-mode','auto-norm','allow-busy'].map(id=>[id,new Element('div')]));
   elements.get('sampling-mode').value='weighted_replacement';
+  elements.get('sampling-mode').append(Object.assign(new Element('option'),{value:'weighted_replacement'}));
   const context=vm.createContext({URLSearchParams,Event:class {},location:{hash:''},document:{
     getElementById:id=>elements.get(id), createElement:tag=>new Element(tag), querySelectorAll:()=>[],
   }});
@@ -163,9 +164,9 @@ test('GUI checkboxes select T1/T2/T3, lock sampling, rotate assets and restore n
   const {run,elements,context}=setup();
   for(const id of ['paper-timestamp','paper-correlated','paper-fields','paper-summary','protocol','groups-panel','discover-datasets','new-stats','detect-groups','group-source-help'])elements.set(id,new Element('div'));
   elements.get('sampling-mode').append(Object.assign(new Element('option'),{value:'weighted_replacement'}));
-  run(`initial={paper_trial:'none',asset_id:'ordinary',assets_dir:'/assets'};
+  run(`initial={paper_trial:'none',asset_id:'ordinary',assets_dir:'/assets',dataset_root:'/data',action_semantics:'absolute',action_horizon:50};
     protocol={paper_available:true,action_dim:58,model_action_dim:58,action_hz:30,cameras:['base','left','right'],prompt:'Pick tomato.'};
-    for(const [key,value] of Object.entries({exp_name:'run01',asset_id:'ordinary',assets_dir:'/assets',rtc_max_delay:'10'}))fields.set(key,{input:Object.assign(document.createElement('input'),{value})});
+    for(const [key,value] of Object.entries({exp_name:'run01',asset_id:'ordinary',assets_dir:'/assets',action_horizon:'50',rtc_max_delay:'10'}))fields.set(key,{input:Object.assign(document.createElement('input'),{value})});
     `);
   const input=new Element('select');input.value='absolute';input.append(Object.assign(new Element('option'),{value:'absolute'}));
   context.inputForTest=input;
@@ -188,4 +189,29 @@ test('GUI checkboxes select T1/T2/T3, lock sampling, rotate assets and restore n
   assert.equal(input.querySelector('[value=absolute]').disabled,false);
   assert.equal(run("fields.get('asset_id').input.value"),'ordinary');
   assert.equal(run('request().values.paper_trial'),'none');
+});
+
+test('T3 on the ordinary form preserves selected roots, RTC and group weights',()=>{
+  const {elements,run}=setup();
+  for(const id of ['paper-fields','paper-timestamp','paper-correlated','paper-summary','discover-datasets','new-stats','detect-groups','group-source-help']){
+    elements.set(id,new Element('div'));
+  }
+  run(`initial={dataset_root:'/original',action_semantics:'absolute',action_horizon:50,paper_trial:'none'};
+    protocol={paper_available:true,paper_weighted_sampling:true};renderProtocol=()=>{};
+    fields.get('dataset_root').input.value='/different location\\n/other/source';
+    independentStats=()=>{};
+    for(const [key,value] of Object.entries({exp_name:'experiment_absolute',action_horizon:'50',rtc_max_delay:'10',action_semantics:'absolute'})){
+      fields.set(key,{input:Object.assign(document.createElement('input'),{value})});
+    }
+    fields.get('action_semantics').input.append(Object.assign(document.createElement('option'),{value:'absolute'}));`);
+  const before=run('JSON.stringify(groupInputs())');
+  elements.get('paper-timestamp').checked=true;
+  elements.get('paper-correlated').checked=true;
+  run('changePaperFeatures()');
+  assert.equal(run('paperTrial'),'t3');
+  assert.equal(run("fields.get('action_semantics').input.value"),'delta');
+  assert.equal(run("fields.get('rtc_max_delay').input.value"),'10');
+  assert.equal(run("fields.get('dataset_root').input.value"),'/different location\n/other/source');
+  assert.equal(run('JSON.stringify(groupInputs())'),before);
+  assert.equal(elements.get('sampling-mode').value,'weighted_replacement');
 });

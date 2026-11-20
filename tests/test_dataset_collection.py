@@ -49,6 +49,8 @@ def test_discovery_parents_deduplication_and_full_subtasks_choice(tmp_path):
     groups = dataset_groups(selected)
     assert [g["episodes"] for g in groups["groups"]] == [[0], [1], [2]]
     assert groups["frames"] == 6
+    assert dataset_groups(selected, horizon=2)["eligible_windows"] == 3
+    assert dataset_groups(selected, horizon=3)["groups"] == []
 
 
 def test_collection_ids_noncontiguous_and_symlink_duplicates(tmp_path):

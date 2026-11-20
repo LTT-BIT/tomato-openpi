@@ -882,6 +882,12 @@ class ScheduledTrainConfig(TrainConfig):
 
 
 # Use `get_config` if you need to get a config by name in your code.
+def require_current_frame_training(config: TrainConfig) -> None:
+    memory = getattr(config.model, "memory", None)
+    if memory is not None and memory.frames > 1:
+        raise ValueError("Historical RGB training is retired; use the current-frame training recipe")
+
+
 _CONFIGS = [
     #
     # Fine-tuning Libero configs.

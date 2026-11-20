@@ -12,6 +12,7 @@ from openpi.shared import normalize
 from openpi.shared.local_storage import new_artifact_directory
 from openpi.training import data_loader
 from openpi.training import norm_provenance
+from openpi.training.current_rgb import fixed_global_prompt
 from openpi.training.dataset_collection import collection_layout
 from openpi.training.dataset_collection import validate_collection_features
 from openpi.training.delta_paper import PaperDataView
@@ -76,7 +77,8 @@ def _compute(config, *, batch_size, output):
         video_backend=data.video_backend,
         visual_memory=memory,
         history_mask_key=interaction_mask_key,
-        global_prompt=getattr(data, "global_prompt", None),
+        global_prompt=fixed_global_prompt(data),
+        video_views=getattr(data.base_config, "video_views", None),
     )
     reference = data_loader.create_torch_dataset(source_view, horizon, config.model, sampling_mode="epoch_shuffle")
     if len(reference) != total:

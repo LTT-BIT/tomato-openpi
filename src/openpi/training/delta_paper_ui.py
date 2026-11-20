@@ -12,6 +12,9 @@ from openpi.models.pi0_visual_memory import VisualMemoryConfig
 from openpi.shared import delta_paper as paper
 from openpi.training.config import LeRobotFr3SharpaCropDataConfig
 from openpi.training.config import LeRobotFr3SharpaMultimodalDataConfig
+from openpi.training.current_rgb import LeRobotCurrentRgbThreeDataConfig
+from openpi.training.delta_paper import PaperCurrentRgbThreeData
+from openpi.training.delta_paper import PaperMultimodalData
 from openpi.training.delta_paper import PaperSharpaCropData
 from openpi.training.delta_paper import PaperSharpaData
 from openpi.training.delta_paper import PaperVisualMemoryData
@@ -38,7 +41,9 @@ def selected_trial(config):
 
 
 def paper_supports_weighted_sampling(config):
-    return isinstance(config.data, LeRobotFr3SharpaCropDataConfig)
+    return isinstance(config.data, LeRobotFr3SharpaMultimodalDataConfig) and not isinstance(
+        config.data, PaperSharpaData
+    )
 
 
 def validate_trial_options(config, trial, *, action_semantics, sampling_mode, sampling_groups):
@@ -53,19 +58,20 @@ def validate_trial_options(config, trial, *, action_semantics, sampling_mode, sa
 
 
 def paper_available(config):
-    legacy = type(config.data) in (LeRobotFr3SharpaMultimodalDataConfig, PaperSharpaData)
     return (
-        (
-            legacy
-            or type(config.data)
-            in (
-                LeRobotFr3SharpaCropDataConfig,
-                LeRobotVisualMemoryDataConfig,
-                LeRobotVisualMemoryOptionsDataConfig,
-                PaperSharpaCropData,
-                PaperVisualMemoryData,
-                PaperVisualMemoryOptionsData,
-            )
+        type(config.data)
+        in (
+            LeRobotFr3SharpaMultimodalDataConfig,
+            LeRobotFr3SharpaCropDataConfig,
+            LeRobotCurrentRgbThreeDataConfig,
+            LeRobotVisualMemoryDataConfig,
+            LeRobotVisualMemoryOptionsDataConfig,
+            PaperCurrentRgbThreeData,
+            PaperMultimodalData,
+            PaperSharpaCropData,
+            PaperSharpaData,
+            PaperVisualMemoryData,
+            PaperVisualMemoryOptionsData,
         )
         and type(config.model) in (Pi0Config, VisualMemoryConfig, PaperPi0Config, PaperVisualMemoryConfig)
         and isinstance(config.weight_loader, PartialCheckpointWeightLoader)
@@ -74,11 +80,7 @@ def paper_available(config):
         and "lora" not in config.model.paligemma_variant
         and "lora" not in config.model.action_expert_variant
         and config.data.action_hz == 30
-        and (
-            bool(config.data.lerobot_datasets)
-            if legacy
-            else (config.data.extra_delta_transform and len(config.data.lerobot_datasets) == 1)
-        )
+        and bool(config.data.lerobot_datasets)
         and not getattr(config.data.base_config, "task_view", None)
     )
 
@@ -98,7 +100,7 @@ def select_trial(source, config, trial):
         sampling_mode=config.sampling_mode,
         sampling_groups=config.sampling_groups,
     )
-    legacy = not paper_supports_weighted_sampling(config)
+    legacy = isinstance(config.data, PaperSharpaData)
 
     def inherited(cls, obj):
         return {field.name: getattr(obj, field.name) for field in fields(cls)}
@@ -109,12 +111,18 @@ def select_trial(source, config, trial):
     elif isinstance(config.model, VisualMemoryConfig):
         data_cls, model_cls = LeRobotVisualMemoryDataConfig, VisualMemoryConfig
         paper_data_cls, paper_model_cls = PaperVisualMemoryData, PaperVisualMemoryConfig
-    elif not legacy:
+    elif isinstance(config.data, LeRobotCurrentRgbThreeDataConfig):
+        data_cls, model_cls = LeRobotCurrentRgbThreeDataConfig, Pi0Config
+        paper_data_cls, paper_model_cls = PaperCurrentRgbThreeData, PaperPi0Config
+    elif isinstance(config.data, LeRobotFr3SharpaCropDataConfig):
         data_cls, model_cls = LeRobotFr3SharpaCropDataConfig, Pi0Config
         paper_data_cls, paper_model_cls = PaperSharpaCropData, PaperPi0Config
-    else:
+    elif legacy:
         data_cls, model_cls = LeRobotFr3SharpaMultimodalDataConfig, Pi0Config
         paper_data_cls, paper_model_cls = PaperSharpaData, PaperPi0Config
+    else:
+        data_cls, model_cls = LeRobotFr3SharpaMultimodalDataConfig, Pi0Config
+        paper_data_cls, paper_model_cls = PaperMultimodalData, PaperPi0Config
     metadata = dict(config.policy_metadata)
     loader_args = inherited(PartialCheckpointWeightLoader, config.weight_loader)
     model_args = inherited(model_cls, config.model)

@@ -19,16 +19,16 @@ from openpi.subtasks.tomato_in_hand import CAMERAS
 from openpi.subtasks.tomato_in_hand import TASKS
 from openpi.subtasks.visual_memory import IMAGE_KEYS
 from openpi.training import config as train_config
-from openpi.training.delta_paper import PaperVisualMemoryData
-from openpi.training.delta_paper import PaperVisualMemoryOptionsData
+from openpi.training.current_rgb import CurrentRgbView
+from openpi.training.current_rgb import LeRobotCurrentRgbThreeDataConfig
+from openpi.training.delta_paper import PaperCurrentRgbThreeData
+from openpi.training.delta_paper import PaperSharpaCropData
 from openpi.training.delta_paper_ui import paper_available
 from openpi.training.delta_paper_ui import paper_supports_weighted_sampling
 from openpi.training.delta_paper_ui import select_trial
 from openpi.training.delta_paper_ui import selected_trial
 from openpi.training.delta_paper_ui import validate_trial_options
 from openpi.training.sampling import SamplingGroup
-from openpi.training.visual_memory import LeRobotVisualMemoryDataConfig
-from openpi.training.visual_memory_options import LeRobotVisualMemoryOptionsDataConfig
 from scripts.run_training import load_experiment
 from scripts.run_training import validate_config
 from training_configs import common
@@ -65,7 +65,7 @@ TEXT_FIELDS = (
     "weight_path",
     "project_name",
 )
-DEFAULT_AB_MODULE = "training_configs.experiments.tomato_sharpa.subtasks.visual_memory_v1"
+DEFAULT_AB_MODULE = "training_configs.experiments.tomato_sharpa.subtasks.in_hand119_current_rgb"
 AB_LOCKED_FIELDS = (
     "dataset_root",
     "repo_id",
@@ -85,7 +85,7 @@ def experiment_catalog():
     root = common.repository_root()
     entries = []
     for stem, label in (
-        ("visual_memory_v1", "整串番茄 · 五阶段 · 119条四路RGB + 视觉历史"),
+        ("in_hand119_current_rgb", "整串番茄 · 五阶段 · 119条 · 当前帧 RGB"),
         ("in_hand119_b_crop", "整串番茄 · 手中调整五阶段 · 119条四路RGB · B · 30000步"),
         ("normal93_b_stage", "整串番茄 · B 阶段指令 · 手臂Delta · 全93条 · 全参"),
         ("normal93_a_goal", "整串番茄 · A 总体目标 · 手臂Delta · 全93条 · 全参"),
@@ -194,13 +194,12 @@ def delta_supported(config) -> bool:
 
 
 def input_values(config):
-    if config.policy_metadata.get("subtask_variant") != "in_hand_b_coarse" or not isinstance(
-        config.data, LeRobotVisualMemoryDataConfig
-    ):
+    data = config.data.base_config
+    if not isinstance(data, CurrentRgbView):
         return {}
     return {
-        "prompt_mode": "global" if getattr(config.data, "global_prompt", None) else "stage",
-        "video_views": len(config.model.memory.image_keys),
+        "prompt_mode": "global" if data.global_prompt else "stage",
+        "video_views": data.video_views,
     }
 
 
@@ -218,28 +217,27 @@ def apply_training_inputs(config, before, after):
         return config
     global_prompt = GOAL if after["prompt_mode"] == "global" else None
     camera_count = after["video_views"]
-    memory = replace(config.model.memory, image_keys=IMAGE_KEYS[:camera_count])
     current_fields = {field.name: getattr(config.data, field.name) for field in fields(config.data)}
+    current_fields["base_config"] = replace(
+        config.data.base_config, global_prompt=global_prompt, video_views=camera_count
+    )
     trial = selected_trial(config)
-    if after == {"prompt_mode": "stage", "video_views": 4}:
-        cls = PaperVisualMemoryData if trial != "none" else LeRobotVisualMemoryDataConfig
-        current_fields.pop("global_prompt", None)
+    if camera_count == 4:
+        cls = PaperSharpaCropData if trial != "none" else train_config.LeRobotFr3SharpaCropDataConfig
     else:
-        cls = PaperVisualMemoryOptionsData if trial != "none" else LeRobotVisualMemoryOptionsDataConfig
-        current_fields["global_prompt"] = global_prompt
+        cls = PaperCurrentRgbThreeData if trial != "none" else LeRobotCurrentRgbThreeDataConfig
     paper_suffix = f"_paper_{trial}" if trial != "none" else ""
     name = config.name.removesuffix(paper_suffix).removesuffix(input_suffix(before))
     return replace(
         config,
         name=f"{name}{input_suffix(after)}{paper_suffix}",
-        model=replace(config.model, memory=memory),
+        model=replace(config.model, image_keys=IMAGE_KEYS[:camera_count]),
         data=cls(**current_fields),
         policy_metadata={
             **config.policy_metadata,
             **after,
             "camera_keys": list(CAMERAS[:camera_count]),
-            "visual_memory": memory.contract(),
-            "visual_tokens": camera_count * 256 + len(memory.history_keys) * memory.pool_grid**2,
+            "visual_tokens": camera_count * 256,
             "offline_roi_uses_future_annotation": camera_count == 4,
             "prompt_example": global_prompt or TASKS[1],
             "prompts": [global_prompt] if global_prompt else list(TASKS),

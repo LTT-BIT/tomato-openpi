@@ -55,7 +55,7 @@ def detect_bundle_groups(dataset_root: str, bundle_sha256: str, *, horizon: int)
     }
 
 
-def detect_groups(dataset_root: str) -> dict:
+def detect_groups(dataset_root: str, *, horizon: int | None = None) -> dict:
     if not isinstance(dataset_root, str) or not dataset_root.strip():
         raise ValueError("请先填写数据集目录")
     root = Path(dataset_root).expanduser().resolve()
@@ -117,21 +117,29 @@ def detect_groups(dataset_root: str) -> dict:
                 if (key == "length" or key in metadata[episode]) and row.get(key) != metadata[episode].get(key):
                     raise ValueError(f"episode {episode} 的转换记录与元信息不一致: {key}")
             seen.add(episode)
-            groups[matches[0]].append(episode)
+            if complete_window_count(row["length"], horizon or 1):
+                groups[matches[0]].append(episode)
     missing = set(metadata) - seen
     if missing:
         raise ValueError(f"转换记录未覆盖全部 episode，缺少 {len(missing)} 条，请手动填写分组")
+    result = [
+        {
+            "name": names[i],
+            "source_root": str(sources[i]),
+            "episodes": sorted(episodes),
+            "frames": sum(metadata[e]["length"] for e in episodes),
+            **(
+                {"eligible_windows": sum(complete_window_count(metadata[e]["length"], horizon) for e in episodes)}
+                if horizon is not None
+                else {}
+            ),
+        }
+        for i, episodes in sorted(groups.items())
+    ]
     return {
         "dataset_root": str(root),
-        "episodes": len(metadata),
+        "episodes": sum(len(group["episodes"]) for group in result),
         "frames": info["total_frames"],
-        "groups": [
-            {
-                "name": names[i],
-                "source_root": str(sources[i]),
-                "episodes": sorted(episodes),
-                "frames": sum(metadata[e]["length"] for e in episodes),
-            }
-            for i, episodes in sorted(groups.items())
-        ],
+        "groups": result,
+        **({"eligible_windows": sum(group["eligible_windows"] for group in result)} if horizon is not None else {}),
     }

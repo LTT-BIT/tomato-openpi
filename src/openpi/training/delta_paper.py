@@ -13,6 +13,7 @@ from openpi import transforms
 from openpi.shared import delta_paper as paper
 from openpi.shared import normalize
 from openpi.training import config as cfg
+from openpi.training.current_rgb import LeRobotCurrentRgbThreeDataConfig
 from openpi.training.sampling import PLAN_MODES
 from openpi.training.sampling import complete_window_count
 from openpi.training.visual_memory import LeRobotVisualMemoryDataConfig
@@ -23,7 +24,7 @@ from openpi.training.visual_memory_options import VisualMemoryOptionsView
 class CompleteWindows:
     """Select only complete source-FPS windows and retain sampling/audit IDs."""
 
-    def __init__(self, dataset, horizon):
+    def __init__(self, dataset, horizon, *, allow_empty=False):
         self.dataset = dataset
         self.source_total_frames = len(dataset)
         self.root = dataset.root
@@ -38,7 +39,7 @@ class CompleteWindows:
                 raise ValueError("Paper training requires contiguous episode frames")
             indices.extend(positions[: complete_window_count(len(positions), horizon)])
         self.indices = np.sort(np.asarray(indices, np.int64))
-        if not len(self.indices):
+        if not len(self.indices) and not allow_empty:
             raise ValueError("Dataset contains no complete action windows")
         self.hf_dataset = dataset.hf_dataset.select(self.indices.tolist())
         self.view_identity = {"version": paper.VERSION, "complete_horizon": horizon}
@@ -50,49 +51,9 @@ class CompleteWindows:
         return self.dataset[int(self.indices[index])]
 
 
-class PaperCollectionDataset:
-    """Complete windows per source; local episode IDs map only in memory."""
-
-    def __init__(self, datasets, specs):
-        from torch.utils.data import ConcatDataset
-
-        from openpi.training.data_loader import TransformedDataset
-        from openpi.training.dataset_collection import collection_layout
-        from openpi.training.dataset_collection import validate_collection_features
-
-        self.dataset = ConcatDataset(datasets)
-        self.sources = []
-        self.layout = collection_layout([spec.root for spec in specs])
-        validate_collection_features([item["info"] for item in self.layout])
-        ids = []
-        for dataset, layout in zip(datasets, self.layout, strict=True):
-            source = dataset
-            while isinstance(source, TransformedDataset):
-                source = source._dataset  # noqa: SLF001
-            if not isinstance(source, CompleteWindows):
-                raise ValueError("Paper collection requires complete-window sources")
-            self.sources.append(source)
-            columns = source.hf_dataset.select_columns(["episode_index", "frame_index"]).with_format("numpy")[:]
-            episodes = np.asarray(columns["episode_index"], np.int64)
-            horizon = source.view_identity["complete_horizon"]
-            for row in layout["episodes"]:
-                frames = np.asarray(columns["frame_index"])[episodes == row["episode_index"]]
-                if not np.array_equal(frames, np.arange(max(0, row["length"] - horizon + 1))):
-                    raise ValueError("Paper collection windows differ from episode metadata")
-            if source.source_total_frames != layout["info"]["total_frames"]:
-                raise ValueError("Paper source frame count differs from metadata")
-            ids.append(np.column_stack(([layout["mapping"][int(e)] for e in episodes], columns["frame_index"])))
-        self.frame_ids = np.concatenate(ids).astype(np.int64)
-
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, index):
-        return self.dataset[index]
-
-
 @dataclass(frozen=True)
 class PaperDataView(VisualMemoryOptionsView):
+    video_views: int | None = None
     paper_complete_windows: bool = True
     paper_asset_dir: str = ""
     paper_bundle_sha256: str = ""
@@ -129,13 +90,13 @@ class PaperNormalizationConfig:
             or not np.isfinite(self.paper_std_floor)
             or self.paper_std_floor <= 0
             or self.correlation_max_windows < 2
-            or len(self.lerobot_datasets) != 1
+            or not self.lerobot_datasets
             or any(spec.weight != 1.0 for spec in self.lerobot_datasets)
             or not self.extra_delta_transform
             or self.action_hz != 30
             or getattr(self.base_config, "task_view", None) is not None
         ):
-            raise ValueError("Paper statistics require one unweighted 30Hz Sharpa Delta source and complete windows")
+            raise ValueError("Paper statistics require compatible 30Hz Sharpa Delta data and complete windows")
 
     def paper_contract(self):
         # The statistics and Gaussian prior use uniform windows, independent of the training sampler.
@@ -238,6 +199,16 @@ class PaperNormalizationConfig:
         from openpi.training.delta_paper_stats import compute
 
         return compute(config, batch_size=batch_size)
+
+
+@dataclass(frozen=True)
+class PaperMultimodalData(PaperNormalizationConfig, cfg.LeRobotFr3SharpaMultimodalDataConfig):
+    pass
+
+
+@dataclass(frozen=True)
+class PaperCurrentRgbThreeData(PaperNormalizationConfig, LeRobotCurrentRgbThreeDataConfig):
+    pass
 
 
 @dataclass(frozen=True)

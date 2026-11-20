@@ -80,6 +80,7 @@ def validate_config(config: cfg.TrainConfig) -> None:
         raise ValueError("Record all independent model/data/augmentation seeds")
     metadata = config.policy_metadata or {}
     memory = getattr(config.model, "memory", None)
+    cfg.require_current_frame_training(config)
     if memory is not None and metadata.get("visual_memory") != memory.contract():
         raise ValueError("Visual memory settings differ from the experiment contract; use a versioned configuration")
     physical_dim = metadata.get("physical_action_dim")
@@ -147,13 +148,16 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     if any(not prompt.isascii() or not re.search(r"[A-Za-z]", prompt) for prompt in prompts):
         raise ValueError("This workflow requires English ASCII prompts in tasks.jsonl")
     norm_dir = Path(config.data.assets.assets_dir or config.assets_dirs) / config.data.assets.asset_id
+    from openpi.training.current_rgb import fixed_global_prompt
+
+    global_prompt = fixed_global_prompt(config.data)
     result = {
         "dataset_root": str(root),
         "dataset_repo_id": config.data.repo_id,
         "source_datasets": metadata["source_datasets"],
         "frames": info["total_frames"],
         "episodes": info["total_episodes"],
-        "prompts": [config.data.global_prompt] if getattr(config.data, "global_prompt", None) else prompts,
+        "prompts": [global_prompt] if global_prompt else prompts,
         "norm_stats_path": str(norm_dir / "norm_stats.json"),
     }
     view = getattr(config.data.base_config, "task_view", None)
@@ -208,9 +212,19 @@ def preflight_collection(config, *, require_norm=True):
         "prompts": list(dict.fromkeys(p for row in reports for p in row["prompts"])),
         "episode_mappings": [{"root": item["root"], "local_to_global": item["mapping"]} for item in layout],
     }
-    if config.sampling_mode == "weighted_replacement":
-        windows = {item["mapping"][row["episode_index"]]: row["length"] for item in layout for row in item["episodes"]}
-        result["sampling"] = weighted_sampling_report(config.sampling_groups, windows)
+    paper_windows = hasattr(config.data, "paper_contract")
+    if paper_windows or config.sampling_mode == "weighted_replacement":
+        horizon = config.model.action_horizon if paper_windows else 1
+        windows = {
+            item["mapping"][row["episode_index"]]: count
+            for item in layout
+            for row in item["episodes"]
+            if (count := sampling.complete_window_count(row["length"], horizon))
+        }
+        if paper_windows:
+            result["training_windows"] = sum(windows.values())
+        if config.sampling_mode == "weighted_replacement":
+            result["sampling"] = weighted_sampling_report(config.sampling_groups, windows)
     if require_norm:
         check_norm(config, result)
     return result

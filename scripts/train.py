@@ -203,6 +203,7 @@ def local_camera_views(images: dict[str, at.Array], *, max_images: int = 5) -> l
 
 
 def main(config: _config.TrainConfig):
+    _config.require_current_frame_training(config)
     init_logging()
     logging.info(f"Running on: {platform.node()}")
 
