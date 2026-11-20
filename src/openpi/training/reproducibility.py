@@ -122,6 +122,10 @@ def _source_identity(data_config: _config.DataConfig, source: Any) -> tuple[dict
         if not path.is_file():
             raise FileNotFoundError(f"Sampling audit requires {path}")
     files = [path for folder in ("meta", "data", "videos") for path in (root / folder).rglob("*") if path.is_file()]
+    if getattr(data_config, "prompt_mode", None) == "stage":
+        from openpi.training.current_rgb import stage_annotations
+
+        files.extend(stage_annotations(root))
     logging.info("Hashing %d dataset files (including videos) under %s", len(files), root)
     # Read IDs from the loaded table, rather than assuming metadata/file ordering.
     columns = source.hf_dataset.select_columns(["episode_index", "frame_index"]).with_format("numpy")[:]
@@ -183,6 +187,8 @@ def _training_contract(config: _config.TrainConfig, data_config: _config.DataCon
     }
     if global_prompt := getattr(data_config, "global_prompt", None):
         values["data_transforms"]["global_prompt"] = global_prompt
+    if prompt_mode := getattr(data_config, "prompt_mode", None):
+        values["data_transforms"]["prompt_mode"] = prompt_mode
     if getattr(data_config, "paper_bundle_sha256", None):
         values["paper_bundle_sha256"] = data_config.paper_bundle_sha256
     return json.loads(_json_bytes(values))

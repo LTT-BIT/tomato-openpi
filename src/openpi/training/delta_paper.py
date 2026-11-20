@@ -54,6 +54,7 @@ class CompleteWindows:
 @dataclass(frozen=True)
 class PaperDataView(VisualMemoryOptionsView):
     video_views: int | None = None
+    prompt_mode: str | None = None
     paper_complete_windows: bool = True
     paper_asset_dir: str = ""
     paper_bundle_sha256: str = ""

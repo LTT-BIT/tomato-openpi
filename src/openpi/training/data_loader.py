@@ -368,6 +368,10 @@ def create_torch_dataset(
                 if memory.image_keys == THREE_VIEWS
                 else FastVisualMemoryDataset(dataset, memory, data_config.history_mask_key)
             )
+        if getattr(data_config, "video_views", None) is not None:
+            from openpi.training.current_rgb import StagePromptDataset
+
+            dataset = StagePromptDataset(dataset, stage=getattr(data_config, "prompt_mode", None) == "stage")
         if complete_windows:
             from openpi.training.delta_paper import CompleteWindows
 
@@ -385,7 +389,7 @@ def create_torch_dataset(
             from openpi.training.visual_memory_options import FixedGlobalPrompt
 
             dataset = TransformedDataset(dataset, [FixedGlobalPrompt(global_prompt)])
-        elif data_config.prompt_from_task:
+        elif data_config.prompt_from_task and getattr(data_config, "prompt_mode", None) != "stage":
             dataset = TransformedDataset(dataset, [_transforms.PromptFromLeRobotTask(dataset_meta.tasks)])
         return dataset, dataset_meta
 

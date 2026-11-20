@@ -379,8 +379,23 @@ def test_ui_four_modes_catalog_snapshot_preflight_and_stat_reuse(prepared, monke
         editor.apply_overrides(
             previous, {**editor.config_values(previous), "action_semantics": "absolute", "asset_id": "new_stats"}
         )
-    with pytest.raises(ValueError, match="仅支持epoch_shuffle"):
+    with pytest.raises(ValueError, match="asset_id"):
         editor.apply_overrides(previous, {**editor.config_values(previous), "sampling_mode": "weighted_replacement"})
+    roots = [str(tmp_path / "other_A"), str(tmp_path / "other_B")]
+    migrated = editor.apply_overrides(
+        previous,
+        {
+            **editor.config_values(previous),
+            "dataset_root": roots[0],
+            "dataset_roots": roots,
+            "sampling_mode": "weighted_replacement",
+            "asset_id": "migrated_t3",
+            "sampling_groups": [{"name": "all", "episodes": [0, 1], "weight": 1}],
+        },
+    )
+    assert [spec.root for spec in migrated.data.lerobot_datasets] == roots
+    assert not isinstance(migrated.data, PaperSharpaData)
+    assert migrated.model.paper_beta == 0.5
     with pytest.raises(ValueError, match="shape differs"):
         editor.apply_overrides(previous, {**editor.config_values(previous), "action_horizon": 49})
     with pytest.raises(ValueError, match="mode differs"):

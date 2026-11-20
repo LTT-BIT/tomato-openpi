@@ -141,7 +141,7 @@ def select_trial(source, config, trial):
             policy_metadata=metadata,
         )
 
-    if isinstance(source.data, PaperSharpaData):
+    if isinstance(source.data, PaperSharpaData) and isinstance(config.data, PaperSharpaData):
         before = [Path(spec.root).resolve() for spec in source.data.lerobot_datasets]
         after = [Path(spec.root).resolve() for spec in config.data.lerobot_datasets]
         if (

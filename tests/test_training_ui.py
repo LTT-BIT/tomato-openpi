@@ -597,7 +597,7 @@ def test_personal_catalog_skips_broken_and_external_files(workspace, tmp_path):
 def test_gui_paper_features_save_reload_without_generator(tmp_path, trial, delay):
     from openpi.models.pi0_config import Pi0Config
     from openpi.models.pi0_delta_paper import PaperPi0Config
-    from openpi.training.delta_paper import PaperMultimodalData
+    from openpi.training.delta_paper import PaperCurrentRgbThreeData
 
     module = next(e["id"] for e in editor.baseline_catalog() if e["task"] == "tomato_sharpa" and "fullft" in e["id"])
     original = editor.source_config(module)
@@ -617,7 +617,7 @@ def test_gui_paper_features_save_reload_without_generator(tmp_path, trial, delay
     config = editor.apply_overrides(original, values)
     is_paper = trial != "none"
     assert type(config.model) is (PaperPi0Config if is_paper else Pi0Config)
-    assert isinstance(config.data, PaperMultimodalData) == is_paper
+    assert isinstance(config.data, PaperCurrentRgbThreeData) == is_paper
     assert config.model.rtc_max_delay == delay
     assert [spec.root for spec in config.data.lerobot_datasets] == values["dataset_roots"]
     assert config.policy_metadata["dataset_version"] == "gui_two_sources_v1"
@@ -642,7 +642,7 @@ def test_gui_paper_features_save_reload_without_generator(tmp_path, trial, delay
         # Disabling Paper creates an ordinary recipe with independent statistics.
         off = editor.apply_overrides(config, {**editor.config_values(config), "paper_trial": "none", "asset_id": "off"})
         assert type(off.model) is Pi0Config
-        assert not isinstance(off.data, PaperMultimodalData)
+        assert not isinstance(off.data, PaperCurrentRgbThreeData)
         assert "paper_algorithm" not in off.policy_metadata
     assert editor.source_config(module) == original
 

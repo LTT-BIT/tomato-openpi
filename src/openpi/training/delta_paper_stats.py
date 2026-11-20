@@ -79,6 +79,7 @@ def _compute(config, *, batch_size, output):
         history_mask_key=interaction_mask_key,
         global_prompt=fixed_global_prompt(data),
         video_views=getattr(data.base_config, "video_views", None),
+        prompt_mode=getattr(data.base_config, "prompt_mode", None),
     )
     reference = data_loader.create_torch_dataset(source_view, horizon, config.model, sampling_mode="epoch_shuffle")
     if len(reference) != total:

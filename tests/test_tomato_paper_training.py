@@ -69,10 +69,19 @@ def test_training_input_options_survive_paper_and_personal_configs(prompt_mode, 
     module = ui.DEFAULT_AB_MODULE
     source = ui.source_config(module)
     defaults = ui.defaults(module)
-    assert defaults["values"]["prompt_mode"] == "stage"
-    assert defaults["values"]["video_views"] == 4
-    values = {**defaults["values"], "prompt_mode": prompt_mode, "video_views": video_views, "rtc_max_delay": 8}
-    if (prompt_mode, video_views) != ("stage", 4):
+    assert defaults["values"]["prompt_mode"] == "global"
+    assert defaults["values"]["video_views"] == 3
+    roots = [str(tmp_path / "A"), str(tmp_path / "B")]
+    values = {
+        **defaults["values"],
+        "prompt_mode": prompt_mode,
+        "video_views": video_views,
+        "rtc_max_delay": 8,
+        "action_semantics": "delta",
+        "dataset_root": roots[0],
+        "dataset_roots": roots,
+    }
+    if (prompt_mode, video_views) != ("global", 3):
         with pytest.raises(ValueError, match="asset_id"):
             ui.apply_overrides(source, values)
     values.update(asset_id="smoke_config", paper_trial="t3")
@@ -80,22 +89,40 @@ def test_training_input_options_survive_paper_and_personal_configs(prompt_mode, 
     config = ui.config_from_source(saved, module, "saved.py")
     assert len(config.model.image_keys) == len(config.policy_metadata["camera_keys"]) == video_views
     assert not hasattr(config.model, "memory")
-    assert fixed_global_prompt(config.data) == (GOAL if prompt_mode == "global" else None)
+    assert fixed_global_prompt(config.data) == (
+        source.policy_metadata["prompt_example"] if prompt_mode == "global" else None
+    )
+    assert [spec.root for spec in config.data.lerobot_datasets] == roots
+    assert ui.defaults(module)["protocol"]["locked_fields"] == []
     assert config.model.rtc_max_delay == 8
     assert config.model.paper_beta == 0.5
+    record = tmp_path / "run.json"
+    record.write_text(
+        json.dumps(
+            {
+                "module": module,
+                "config_sha256": defaults["source_sha256"],
+                "values": ui.config_values(config),
+            }
+        )
+    )
+    launched = run_training.resolve_experiment(module, ["--ui-run", str(record)])
+    assert launched.data == config.data
+    assert launched.model == config.model
+    assert launched.name == config.name
     reverted = ui.apply_overrides(
         config,
         {
             **ui.config_values(config),
-            "prompt_mode": "stage",
-            "video_views": 4,
+            "prompt_mode": "global",
+            "video_views": 3,
             "paper_trial": "none",
             "asset_id": "smoke_reverted",
         },
     )
-    assert reverted.name == source.name
+    assert not hasattr(reverted.model, "memory")
     assert reverted.model.image_keys == source.model.image_keys
-    assert fixed_global_prompt(reverted.data) is None
+    assert fixed_global_prompt(reverted.data) == source.policy_metadata["prompt_example"]
 
 
 @pytest.mark.parametrize("recipe", ["in_hand119_b_crop", "in_hand119_current_rgb"])
@@ -103,7 +130,7 @@ def test_paper_ui_preserves_recipe_and_checks_independent_stats(recipe, tmp_path
     monkeypatch.setenv("PI05_IN_HAND119_BUNDLE", str(tmp_path / "missing"))
     defaults = ui.defaults(PREFIX + recipe)
     source = ui.source_config(PREFIX + recipe)
-    assert defaults["protocol"]["bundle_missing"]
+    assert not defaults["protocol"]["locked_fields"]
     assert defaults["protocol"]["paper_available"]
     assert "rtc_max_delay" not in defaults["protocol"]["locked_fields"]
     assert {"sampling_mode", "sampling_groups"}.isdisjoint(defaults["protocol"]["locked_fields"])
@@ -136,7 +163,7 @@ def test_paper_ui_preserves_recipe_and_checks_independent_stats(recipe, tmp_path
         assert restored.model == config.model
         assert restored.data == config.data
         assert restored.sampling_groups == config.sampling_groups
-        with pytest.raises(FileNotFoundError, match="full119"):
+        with pytest.raises(FileNotFoundError, match="full119|Missing prepared LeRobot data"):
             run_training.preflight(config, require_norm=False)
     with pytest.raises(ValueError, match="rtc_max_delay"):
         ui.apply_overrides(source, {**defaults["values"], "rtc_max_delay": source.model.action_horizon})
@@ -168,12 +195,43 @@ def test_historical_recipe_cannot_train(tmp_path, monkeypatch):
         train.main(archived)
 
 
+def test_stage_annotations_override_global_tasks_without_reloading(tmp_path, monkeypatch):
+    from openpi.training.current_rgb import StagePromptDataset
+
+    directory = tmp_path / "annotations/subtasks/coarse"
+    directory.mkdir(parents=True)
+    path = directory / "episode_000000.json"
+    path.write_text(
+        json.dumps(
+            {
+                "segments": [
+                    {"start_frame": 0, "end_frame": 2, "text": TASKS[0]},
+                    {"start_frame": 2, "end_frame": 4, "text": TASKS[1]},
+                ]
+            }
+        )
+    )
+
+    class Source:
+        root = tmp_path
+        meta = SimpleNamespace(episodes={0: {"length": 4}}, tasks={0: GOAL})
+
+        def __getitem__(self, index):
+            return {"episode_index": 0, "frame_index": index, "task_index": 0, "action": index}
+
+    source = StagePromptDataset(Source())
+    path.unlink()
+    assert [source[i]["prompt"] for i in range(4)] == [TASKS[0], TASKS[0], TASKS[1], TASKS[1]]
+    assert [source[i]["action"] for i in range(4)] == list(range(4))
+    assert StagePromptDataset(Source())[0]["prompt"] == GOAL
+
+
 def test_current_rgb_t3_statistics_loading_and_jitted_rtc_update(tmp_path, monkeypatch):
     monkeypatch.delenv("PI05_RGB_FRAME_CACHE", raising=False)
     monkeypatch.setenv("PI05_IN_HAND119_BUNDLE", str(tmp_path / "missing"))
     monkeypatch.setenv("PI05_VISUAL_MEMORY_FRAMES", "2")
     monkeypatch.setenv("PI05_VISUAL_MEMORY_STRIDE", "1")
-    module = ui.DEFAULT_AB_MODULE
+    module = PREFIX + "in_hand119_current_rgb"
     source = ui.source_config(module)
     root = tmp_path / "data"
     for name in ("meta", "data"):
@@ -225,6 +283,8 @@ def test_current_rgb_t3_statistics_loading_and_jitted_rtc_update(tmp_path, monke
                 "observation.state": states[frame],
                 "action": actions[np.minimum(frame + np.arange(3), length - 1)],
                 "task_index": min(frame, 3),
+                "episode_index": episode,
+                "frame_index": frame,
                 "observation.interaction_available": np.bool_(frame != 0),
                 **{key: np.full((16, 16, 3), 10 + frame, np.uint8) for key in cameras},
             }

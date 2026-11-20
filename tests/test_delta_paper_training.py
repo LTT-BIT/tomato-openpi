@@ -89,6 +89,8 @@ def prepared(tmp_path, monkeypatch, request):
     (root / "meta/episodes.jsonl").write_text("".join(json.dumps(row) + "\n" for row in episodes))
     (root / "meta/tasks.jsonl").write_text('{"task_index": 0, "task": "Pick the tomato."}\n')
     metadata = SimpleNamespace(
+        info=info,
+        episodes={row["episode_index"]: row for row in episodes},
         fps=30,
         tasks={0: "Pick the tomato."},
         features=info["features"],
@@ -119,6 +121,7 @@ def prepared(tmp_path, monkeypatch, request):
 
     monkeypatch.setattr(data_loader.lerobot_dataset, "LeRobotDatasetMetadata", lambda *a, **kw: metadata)
     monkeypatch.setattr(data_loader.lerobot_dataset, "LeRobotDataset", Source)
+    monkeypatch.setattr("openpi.training.frame_cache.CachedLeRobotDataset", Source)
     monkeypatch.setattr(cfg.ModelTransformFactory, "__call__", lambda *args: transforms.Group(inputs=(numeric_prompt,)))
 
     def build(trial="fixture", mode="global_quantile", beta=0):
@@ -589,15 +592,14 @@ def test_six_original_directories_joint_stats_loader_and_audit(prepared, tmp_pat
     fresh = editor.apply_overrides(current, changed)
     assert fresh.model.paper_asset_dir == str(Path(changed["assets_dir"]) / changed["asset_id"])
     assert fresh.model.paper_asset_sha256 is None
-    with pytest.raises(ValueError, match="个人配置"):
-        editor.apply_overrides(
-            current,
-            {
-                **changed,
-                "dataset_roots": list(reversed(changed["dataset_roots"])),
-                "dataset_root": changed["dataset_roots"][-1],
-            },
-        )
+    reordered_roots = list(reversed(changed["dataset_roots"]))
+    reordered = editor.apply_overrides(
+        current,
+        {**changed, "dataset_roots": reordered_roots, "dataset_root": reordered_roots[0]},
+    )
+    assert [spec.root for spec in reordered.data.lerobot_datasets] == reordered_roots
+    assert reordered.model.paper_asset_sha256 is None
+    assert editor.config_values(current)["dataset_roots"] == changed["dataset_roots"]
     directory = current.data.asset_directory(current.assets_dirs)
     manifest, arrays = paper.load_bundle(
         directory, mode="timestamp_zscore_arms", beta=beta, horizon=horizon, std_floor=1e-4

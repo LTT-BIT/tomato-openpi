@@ -4,15 +4,15 @@
 
 基于 OpenPI 的 π0.5 训练仓库，使用统一 JAX 入口，支持 FR3/Wuji、FR3/Sharpa、单臂 Franka、双 UR/O30 的 LoRA 与全参数微调。数据转换在独立仓库完成，这里负责数据校验、归一化统计和训练。
 
-## 整串番茄当前帧训练
+## Sharpa 当前帧训练
 
-默认配置 `training_configs.experiments.tomato_sharpa.subtasks.in_hand119_current_rgb` 使用已冻结的 119 条五阶段录制，每个样本读取当前帧。训练沿用原生 π0.5、当前 58D state、双臂 Delta、双手 Absolute 和 50 步动作窗口。默认 batch256、FSDP8、30000 步、每 5000 个完成步保存并保留 checkpoint。
+启动 `bash scripts/python.sh -m scripts.training_ui` 后，在同一页面选择普通「番茄 · Sharpa / 全参」或个人配置。训练参数中的两个下拉框始终显示，可选择三路原始 RGB 或四路 RGB＋ROI，以及全局 Prompt 或阶段指令。输入使用原生 π0.5 的当前图像和当前 state。
 
-运行 `bash scripts/python.sh -m scripts.training_ui` 打开训练工作台。可独立选择阶段指令或全局 Prompt、三路原始 RGB 或四路 RGB＋ROI，并组合逐时间步归一化、相关高斯噪声、Train RTC 和分组加权采样。默认四路阶段指令使用原有当前帧归一化资产；切换输入或论文选项时使用独立统计资产和实验名。
+数据目录可自由选择一个或多个兼容 LeRobot 目录，各模式共用所选目录。阶段模式优先读取各目录的 `annotations/subtasks/coarse/episode_*.json`，兼容 `annotations/episode_*.json`。没有阶段文件的录制继续使用逐帧 `task_index` 对应的英文任务。全局模式使用所选配置的总体任务指令。检查数据会显示实际读取的指令。
 
-默认训练包和缓存使用共享 NAS 路径。通过 `PI05_IN_HAND119_BUNDLE` 指定训练数据，通过 `PI05_RGB_FRAME_CACHE` 指定可选缓存。缺失或无法匹配源视频的缓存逐路回退到 PyAV。多 CPU worker 保序预读，断点续训以已完成步数恢复采样位置。训练数据、统计和启动条件见 [Sharpa 训练说明](training_configs/experiments/tomato_sharpa/README.md#可选逐时间步归一化相关噪声与-train-rtc)。
+逐时间步归一化、相关高斯噪声、Train RTC 和分组加权采样可与输入选项组合。四路输入要求所选数据包含 interaction 视频。切换输入后使用独立统计和实验名，训练数据、统计及各选项含义见 [Sharpa 训练说明](training_configs/experiments/tomato_sharpa/README.md#可选逐时间步归一化相关噪声与-train-rtc)。
 
-`visual_memory_v1` 和历史 checkpoint 保留用于归档及离线核对。当前训练入口拒绝读取历史 RGB 的旧配置。
+通过 `PI05_RGB_FRAME_CACHE` 指定可选图像缓存，缺失或无法匹配的缓存逐路读源视频。训练入口继续只使用当前帧。
 
 以下保留既有基线与数据说明。
 

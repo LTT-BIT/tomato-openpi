@@ -29,6 +29,15 @@ def build_contract(config: "cfg.TrainConfig", *, dataset_specs=None) -> dict:
             raise ValueError(f"Normalization provenance requires parquet data under {root / 'data'}")
         info = json.loads(metadata[0].read_text())
         files = {path.relative_to(root).as_posix(): reproducibility.file_sha256(path) for path in (*metadata, *parquet)}
+        if getattr(config.data.base_config, "prompt_mode", None) == "stage":
+            from openpi.training.current_rgb import stage_annotations
+
+            files.update(
+                {
+                    path.relative_to(root).as_posix(): reproducibility.file_sha256(path)
+                    for path in stage_annotations(root)
+                }
+            )
         datasets.append(
             {
                 "repo_id": spec.repo_id,

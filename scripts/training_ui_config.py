@@ -21,8 +21,10 @@ from openpi.subtasks.visual_memory import IMAGE_KEYS
 from openpi.training import config as train_config
 from openpi.training.current_rgb import CurrentRgbView
 from openpi.training.current_rgb import LeRobotCurrentRgbThreeDataConfig
+from openpi.training.current_rgb import fixed_global_prompt
 from openpi.training.delta_paper import PaperCurrentRgbThreeData
 from openpi.training.delta_paper import PaperSharpaCropData
+from openpi.training.delta_paper import PaperSharpaData
 from openpi.training.delta_paper_ui import paper_available
 from openpi.training.delta_paper_ui import paper_supports_weighted_sampling
 from openpi.training.delta_paper_ui import select_trial
@@ -65,7 +67,7 @@ TEXT_FIELDS = (
     "weight_path",
     "project_name",
 )
-DEFAULT_AB_MODULE = "training_configs.experiments.tomato_sharpa.subtasks.in_hand119_current_rgb"
+DEFAULT_AB_MODULE = "training_configs.experiments.tomato_sharpa.baseline.tomato_fr3_sharpa_fullft_v1"
 AB_LOCKED_FIELDS = (
     "dataset_root",
     "repo_id",
@@ -122,7 +124,7 @@ def baseline_catalog() -> list[dict]:
 def baseline_config(module: str):
     if module not in {item["id"] for item in baseline_catalog()}:
         raise ValueError("请选择仓库中已发布的 baseline")
-    return load_experiment(module)
+    return editable_input_config(load_experiment(module))
 
 
 def personal_catalog() -> list[dict]:
@@ -170,11 +172,13 @@ def source_config(module: str):
     if module in {item["id"] for item in baseline_catalog()}:
         return baseline_config(module)
     if module in {item["id"] for item in experiment_catalog()}:
-        return load_experiment(module)
+        return editable_input_config(load_experiment(module))
     path = source_path(module)
     config = config_from_source(path.read_text(), module, str(path))
     validate_config(config)
-    return replace(config, policy_metadata={**config.policy_metadata, "experiment_module": module})
+    return editable_input_config(
+        replace(config, policy_metadata={**config.policy_metadata, "experiment_module": module})
+    )
 
 
 # Run identity and storage selection are recorded per launch, not new training recipes.
@@ -195,11 +199,15 @@ def delta_supported(config) -> bool:
 
 def input_values(config):
     data = config.data.base_config
-    if not isinstance(data, CurrentRgbView):
+    if not isinstance(config.data, train_config.LeRobotFr3SharpaMultimodalDataConfig):
         return {}
     return {
-        "prompt_mode": "global" if data.global_prompt else "stage",
-        "video_views": data.video_views,
+        "prompt_mode": data.prompt_mode
+        if isinstance(data, CurrentRgbView)
+        else "stage"
+        if config.policy_metadata.get("subtask_variant") in ("b_coarse", "in_hand_b_coarse")
+        else "global",
+        "video_views": len(config.model.image_keys),
     }
 
 
@@ -212,14 +220,38 @@ def input_suffix(options):
     return "".join(f"_{part}" for part in parts)
 
 
-def apply_training_inputs(config, before, after):
-    if before == after:
+def editable_input_config(config):
+    options = input_values(config)
+    if not options or isinstance(config.data.base_config, CurrentRgbView):
         return config
-    global_prompt = GOAL if after["prompt_mode"] == "global" else None
+    # Existing archived assets stay usable until the user changes sources or inputs.
+    if config.policy_metadata.get("subtask_variant") or isinstance(config.data, PaperSharpaData):
+        return config
+    return replace(apply_training_inputs(config, options, options, force=True), name=config.name)
+
+
+def global_prompt_text(config):
+    return (
+        config.policy_metadata.get("global_prompt")
+        or fixed_global_prompt(config.data)
+        or (GOAL if config.policy_metadata["prompt_example"] in TASKS else config.policy_metadata["prompt_example"])
+    )
+
+
+def apply_training_inputs(config, before, after, *, force=False):
+    if before == after and not force:
+        return config
+    overall_prompt = global_prompt_text(config)
+    global_prompt = overall_prompt if after["prompt_mode"] == "global" else None
     camera_count = after["video_views"]
     current_fields = {field.name: getattr(config.data, field.name) for field in fields(config.data)}
-    current_fields["base_config"] = replace(
-        config.data.base_config, global_prompt=global_prompt, video_views=camera_count
+    current_fields.setdefault("interaction_mask_key", "observation.interaction_available")
+    base = config.data.base_config
+    current_fields["base_config"] = CurrentRgbView(
+        **{field.name: getattr(base, field.name) for field in fields(train_config.DataConfig)},
+        video_views=camera_count,
+        global_prompt=global_prompt,
+        prompt_mode=after["prompt_mode"],
     )
     trial = selected_trial(config)
     if camera_count == 4:
@@ -236,17 +268,26 @@ def apply_training_inputs(config, before, after):
         policy_metadata={
             **config.policy_metadata,
             **after,
+            "global_prompt": overall_prompt,
             "camera_keys": list(CAMERAS[:camera_count]),
             "visual_tokens": camera_count * 256,
+            "input_acceptance_report": None,
+            "bundle_sha256": None,
+            "subtask_variant": None,
+            "selection_sha256": None,
             "offline_roi_uses_future_annotation": camera_count == 4,
             "prompt_example": global_prompt or TASKS[1],
             "prompts": [global_prompt] if global_prompt else list(TASKS),
-            "prompt_source": "fixed_global_prompt" if global_prompt else "meta/tasks.jsonl",
+            "prompt_source": "fixed_global_prompt"
+            if global_prompt
+            else "annotations/subtasks/coarse or meta/tasks.jsonl",
         },
     )
 
 
 def locked_fields(config, trial, *, inputs_changed=False):
+    if input_values(config):
+        return []
     metadata = config.policy_metadata
     if metadata.get("subtask_variant") == "in_hand_b_coarse":
         editable = {"rtc_max_delay", "sampling_mode", "sampling_groups"}
@@ -305,8 +346,10 @@ def defaults(module: str) -> dict:
             "action_hz": config.data.action_hz,
             "cameras": config.policy_metadata["camera_keys"],
             "prompt": config.policy_metadata["prompt_example"],
-            "global_prompt": GOAL if input_values(config) else None,
-            "stage_prompt": TASKS[1] if input_values(config) else None,
+            "global_prompt": global_prompt_text(config) if input_values(config) else None,
+            "stage_prompt": "读取各数据集 annotations/subtasks/coarse，或逐帧 task_index"
+            if input_values(config)
+            else None,
             "task_view": asdict(config.data.base_config.task_view)
             if getattr(config.data.base_config, "task_view", None)
             else None,
@@ -324,7 +367,7 @@ def defaults(module: str) -> dict:
             "data_policy": config.policy_metadata.get("data_policy"),
             "locked_fields": locked_fields(config, values["paper_trial"]),
             "paper_available": paper_available(config),
-            "paper_weighted_sampling": paper_supports_weighted_sampling(config),
+            "paper_weighted_sampling": bool(input_values(config)) or paper_supports_weighted_sampling(config),
             "visual_memory": config.policy_metadata.get("visual_memory"),
             "bundle_missing": config.policy_metadata.get("subtask_variant") == "in_hand_b_coarse"
             and not config.policy_metadata.get("bundle_sha256"),
@@ -384,6 +427,17 @@ def apply_overrides(config, values: dict):
     ):
         raise ValueError("请选择阶段指令或全局 Prompt，以及三路或四路视频")
     inputs_changed = before_inputs != after_inputs
+    sources_changed = values.get("dataset_roots", [values["dataset_root"]]) != [
+        spec.root for spec in config.data.lerobot_datasets
+    ]
+    migrate_sampling = isinstance(config.data, PaperSharpaData) and values["sampling_mode"] != "epoch_shuffle"
+    if migrate_sampling and values["asset_id"] == config.data.assets.asset_id:
+        raise ValueError("旧版统计切换加权采样需要新的 asset_id，使用当前通用训练链路重新计算统计")
+    input_config = (
+        apply_training_inputs(config, before_inputs, after_inputs, force=sources_changed or migrate_sampling)
+        if before_inputs
+        else config
+    )
     if inputs_changed and values["asset_id"] == config.data.assets.asset_id:
         raise ValueError("切换训练指令或视频输入需要独立的统计 asset_id")
     locked = locked_fields(config, paper_trial, inputs_changed=inputs_changed)
@@ -404,10 +458,10 @@ def apply_overrides(config, values: dict):
     action_semantics = values.get("action_semantics", source_semantics)
     if action_semantics not in ("absolute", "delta"):
         raise ValueError("动作监督只能选择 absolute 或 delta")
-    if paper_trial != "none" and not paper_available(config):
+    if paper_trial != "none" and not paper_available(input_config):
         raise ValueError("逐时间步归一化和相关高斯噪声仅支持兼容的 30 Hz Sharpa π0.5 全参配置")
     validate_trial_options(
-        config,
+        input_config,
         paper_trial,
         action_semantics=action_semantics,
         sampling_mode=values["sampling_mode"],
@@ -520,6 +574,9 @@ def apply_overrides(config, values: dict):
         assets=replace(config.data.assets, assets_dir=paths["assets_dir"], asset_id=values["asset_id"]),
         **({"extra_delta_transform": action_semantics == "delta"} if delta_available else {}),
     )
+    dataset_changed = [str(Path(spec.root).resolve()) for spec in specs] != [
+        str(Path(spec.root).resolve()) for spec in config.data.lerobot_datasets
+    ]
     name = config.name
     if action_semantics != source_semantics:
         old, new = source_semantics, action_semantics
@@ -571,7 +628,23 @@ def apply_overrides(config, values: dict):
             "source_datasets": values["sources"],
         },
     )
-    result = apply_training_inputs(result, before_inputs, after_inputs)
+    result = apply_training_inputs(
+        result, before_inputs, after_inputs, force=bool(before_inputs) and (dataset_changed or migrate_sampling)
+    )
+    if dataset_changed and input_values(result):
+        result = replace(
+            result,
+            policy_metadata={
+                **result.policy_metadata,
+                "subtask_variant": None,
+                "bundle_sha256": None,
+                "selection_sha256": None,
+                "input_acceptance_report": None,
+                "rgb_frame_cache": None,
+                "training_episodes": None,
+                "training_frames": None,
+            },
+        )
     result = select_trial(config, result, paper_trial)
     validate_config(result)
     return result
@@ -603,14 +676,14 @@ def personal_source(module: str, owner: str, values: dict) -> str:
     return (
         "# UI 保存的个人配置；来源源码独立保存，避免依赖其他个人文件。\n"
         "from dataclasses import replace\n"
-        "from scripts.training_ui_config import apply_overrides, config_from_source\n"
+        "from scripts.training_ui_config import apply_overrides, config_from_source, editable_input_config\n"
         f"_SOURCE = {source!r}\n"
         f"_SOURCE_MODULE = {module!r}\n"
         f"_SOURCE_FILE = {str(path)!r}\n"
         f"_UI_VALUES = {pprint.pformat(values, width=100, sort_dicts=False)}\n"
         f"_UI_METADATA = {metadata!r}\n\n"
         "def build_config():\n"
-        "    original = config_from_source(_SOURCE, _SOURCE_MODULE, _SOURCE_FILE)\n"
+        "    original = editable_input_config(config_from_source(_SOURCE, _SOURCE_MODULE, _SOURCE_FILE))\n"
         "    config = apply_overrides(original, _UI_VALUES)\n"
         "    return replace(config, policy_metadata={**config.policy_metadata, **_UI_METADATA})\n"
     )

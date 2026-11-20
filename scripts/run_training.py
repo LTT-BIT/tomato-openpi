@@ -49,12 +49,15 @@ def resolve_experiment(module_name: str, overrides: list[str]) -> cfg.TrainConfi
     config = load_experiment(module_name)
     if args.ui_run is not None:
         from scripts.training_ui_config import apply_overrides
+        from scripts.training_ui_config import editable_input_config
         from scripts.training_ui_config import source_path
 
         record = json.loads(args.ui_run.read_text())
         path = source_path(module_name)
         if record["module"] != module_name or reproducibility.file_sha256(path) != record["config_sha256"]:
             raise ValueError("Run record does not match the configuration source")
+        if "prompt_mode" in record["values"]:
+            config = editable_input_config(config)
         config = apply_overrides(config, record["values"])
     resolved = tyro.cli(type(config), default=config, args=overrides)
     # A new model recipe must also regenerate its freeze filter and adapter contract.
@@ -151,6 +154,17 @@ def preflight(config: cfg.TrainConfig, *, require_norm: bool = True) -> dict:
     from openpi.training.current_rgb import fixed_global_prompt
 
     global_prompt = fixed_global_prompt(config.data)
+    if getattr(config.data.base_config, "prompt_mode", None) == "stage":
+        from types import SimpleNamespace
+
+        from openpi.training.current_rgb import StagePromptDataset
+
+        episodes = collection_layout([root])[0]["episodes"]
+        annotations = StagePromptDataset(
+            SimpleNamespace(root=root, meta=SimpleNamespace(episodes={row["episode_index"]: row for row in episodes}))
+        )
+        stage_prompts = [text for _, texts in annotations.segments.values() for text in texts]
+        prompts = list(dict.fromkeys(stage_prompts + (prompts if len(annotations.segments) < len(episodes) else [])))
     result = {
         "dataset_root": str(root),
         "dataset_repo_id": config.data.repo_id,

@@ -406,7 +406,7 @@ def test_ab_config_binds_selection_splits_and_preserves_cross_phase_windows(froz
         build("a_goal", selection_path=selection)
 
 
-def test_ab_ui_retains_all_data_and_rejects_dataset_or_supervision_changes(frozen_selection, tmp_path, monkeypatch):
+def test_ab_ui_allows_other_sources_without_changing_archived_recipe(frozen_selection, tmp_path, monkeypatch):
     from scripts import training_ui_config as editor
     from scripts.prepare_tomato_ab import build_plan
     from training_configs.experiments.tomato_sharpa.subtasks.common import build
@@ -419,17 +419,28 @@ def test_ab_ui_retains_all_data_and_rejects_dataset_or_supervision_changes(froze
     restored = editor.apply_overrides(config, values)
     assert restored == config
     assert editor.apply_overrides(config, {**values, "exp_name": "ui_new_run"}).data == config.data
-    for change in (
-        {"dataset_root": "/another_dataset"},
-        {"sampling_mode": "weighted_replacement"},
-        {"rtc_max_delay": 10},
-        {"action_semantics": "delta"},
-        {"asset_id": "old_stats"},
-    ):
-        with pytest.raises(ValueError, match="当前实验固定已验收"):
-            editor.apply_overrides(config, {**values, **change})
+    roots = [str(tmp_path / "new_A"), str(tmp_path / "new_B")]
+    changed = editor.apply_overrides(
+        config,
+        {
+            **values,
+            "dataset_root": roots[0],
+            "dataset_roots": roots,
+            "rtc_max_delay": 10,
+            "action_semantics": "delta",
+            "asset_id": "new_stats",
+            "sampling_mode": "weighted_replacement",
+            "sampling_groups": [{"name": "all", "episodes": [0, 1], "weight": 1}],
+        },
+    )
+    assert [spec.root for spec in changed.data.lerobot_datasets] == roots
+    assert getattr(changed.data.base_config, "task_view", None) is None
+    assert changed.model.rtc_max_delay == 10
+    assert changed.data.extra_delta_transform
+    assert config.data.base_config.task_view is not None
+    assert build("b_coarse", selection_path=selection) == config
     entries = editor.experiment_catalog()
-    assert entries[0]["id"] == editor.DEFAULT_AB_MODULE
+    assert editor.DEFAULT_AB_MODULE in {entry["id"] for entry in editor.baseline_catalog()}
     modules = {entry["id"].rsplit(".", 1)[1] for entry in entries}
     assert {"normal93_a_goal", "normal93_b_stage"} <= modules
 

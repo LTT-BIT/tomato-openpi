@@ -5,7 +5,7 @@ if (fragment.get('token')) { sessionStorage.setItem('training-token', fragment.g
 let sourceHash = null;
 let baseline = null, initial = null, protocol = null, currentJob = null, gpuData = [], browseTarget = null, browseState = null, loadingVersion = 0;
 let paperTrial = 'none', paperAutoDelta = false;
-let tomatoBaseline = null, featureSuffix = '';
+let featureSuffix = '';
 const fields = new Map();
 const terminal = new Set(['completed', 'failed', 'stopped', 'interrupted']);
 const statusNames = {queued:'等待中', running:'运行中', completed:'训练完成', failed:'失败', stopped:'已停止', interrupted:'已中断', orphaned:'管理进程中断，子进程仍运行'};
@@ -76,7 +76,7 @@ function fillForm(result) {
   paperTrial=initial.paper_trial||'none';
   paperAutoDelta=false;
   featureSuffix='';
-  $('training-input-options').classList.toggle('hidden',!('prompt_mode' in initial));
+  for(const id of ['prompt-mode','video-views'])$(id).disabled=!('prompt_mode' in initial);
   $('prompt-mode').value=initial.prompt_mode??'stage';
   $('video-views').value=String(initial.video_views??4);
   for(const [section,defs] of Object.entries(definitions)){
@@ -88,7 +88,6 @@ function fillForm(result) {
   $('sampling-mode').value=initial.sampling_mode;$('groups').replaceChildren();for(const group of initial.sampling_groups)addGroup(group);
   $('groups-panel').classList.toggle('hidden',initial.sampling_mode!=='weighted_replacement');
   syncPaperControls();
-  $('tomato-training').classList.toggle('hidden',!tomatoBaseline||baseline===tomatoBaseline);
   fields.get('exp_name').input.dispatchEvent(new Event('input'));updatePath();
 }
 function paperAlgorithm(){
@@ -111,7 +110,7 @@ function renderProtocol(){
     const episodeCount=protocol.training_episodes||93, frameCount=protocol.training_frames||410456;
     $('protocol').append(node('div',`${protocol.prompt_profile||'revision2'} · 全部${episodeCount}条 / ${frameCount}帧训练 · 无验证测试留出 · 无Agent · ${initial.action_horizon}步动作窗口`));
     $('protocol').append(node('div','训练环境：JAX=cuda · PREALLOCATE=false · MEM_FRACTION=0.90 · 公共NCCL 2.31.2'));
-    if(protocol.bundle_missing)$('protocol').append(node('div','当前机器缺少已准备的 119 条训练包。可预览配置，训练需设置 PI05_IN_HAND119_BUNDLE。'));
+    if(protocol.bundle_missing)$('protocol').append(node('div','来源配置的数据目录不存在，可在下方更换为实际数据目录。'));
     const texts=global?[]:Object.values(protocol.action_prompts||{});
     if(texts.length)for(const [i,text] of texts.entries())$('protocol').append(node('div',`${i+1}. ${text}`));
   }else if(protocol.task_view)$('protocol').append(node('div','保留来源配置的任务筛选 / prompt 规则（见最终配置）。'));
@@ -207,7 +206,7 @@ function updateFeatureSelection(){
 async function chooseBaseline(module){
   const version=++loadingVersion;$('start').disabled=true;
   try{const result=await api('/api/baseline?id='+encodeURIComponent(module));if(version!==loadingVersion)return;baseline=module;fillForm(result);for(const el of document.querySelectorAll('#baseline-list button, #personal-list button'))el.classList.toggle('selected',el.dataset.id===module);}
-  finally{if(version===loadingVersion)$('start').disabled=Boolean(protocol?.bundle_missing);}
+  finally{if(version===loadingVersion)$('start').disabled=false;}
 }
 function parseIds(text){
   if(!text.trim())return [];
@@ -341,7 +340,6 @@ async function browse(path){browseState=await api('/api/browse?path='+encodeURIC
 $('preview').addEventListener('click',()=>perform(()=>showPreview(false),$('preview')));
 for(const id of ['paper-timestamp','paper-correlated'])$(id).addEventListener('change',changePaperFeatures);
 for(const id of ['prompt-mode','video-views'])$(id).addEventListener('change',updateFeatureSelection);
-$('tomato-training').addEventListener('click',()=>perform(()=>chooseBaseline(tomatoBaseline)));
 $('check').addEventListener('click',()=>perform(()=>showPreview(true),$('check')));
 $('start').addEventListener('click',()=>perform(async()=>{const job=await api('/api/start',request());notice((job.creates_config?'已保存新配置':'已复用原配置')+'，本次实验已记录；数据检查通过后进入训练。');await refreshCatalog();await refreshJobs();await showJob(job.id);$('output-section').scrollIntoView({behavior:'smooth'});},$('start')));
 $('reset').addEventListener('click',()=>perform(()=>chooseBaseline(baseline),$('reset')));
@@ -362,7 +360,6 @@ $('browse-parent').addEventListener('click',()=>perform(()=>browse(browseState.p
 $('browse-select').addEventListener('click',()=>{browseTarget.value=browseTarget.id==='field-dataset_root'?appendDatasetPath(browseTarget.value,browseState.path):browseState.path;browseTarget.dispatchEvent(new Event('input'));browseTarget.dispatchEvent(new Event('change'));$('browser').close();});
 async function refreshCatalog(){
   const info=await api('/api/baselines');
-  tomatoBaseline=info.tomato_baseline;
   $('runtime').textContent=(info.host?'服务器：'+(info.server_label||info.host)+' · '+info.host+'\n':'')+info.repository+'\nPython: '+info.python;
   for(const [id,entries] of [['baseline-list',info.baselines],['personal-list',info.personal||[]]]){
     $(id).replaceChildren();
