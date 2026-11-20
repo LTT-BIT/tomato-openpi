@@ -5,6 +5,10 @@ import os
 from pathlib import Path
 
 SERVER_BASE_PARAMS = "/mnt/data/public_ckpt/pi05/pi05_base/params"
+CUDA_MEMORY_SETTINGS = {
+    "XLA_PYTHON_CLIENT_PREALLOCATE": "true",
+    "XLA_PYTHON_CLIENT_MEM_FRACTION": "0.90",
+}
 
 
 @dataclass(frozen=True)
@@ -52,7 +56,8 @@ def configure_environment() -> None:
     os.environ.pop("PI05_RUNTIME_DIR", None)
     os.environ.update({key: str(path) for key, path in paths.items()})
     os.environ["GIT_LFS_SKIP_SMUDGE"] = "1"
-    os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
+    for key, value in CUDA_MEMORY_SETTINGS.items():
+        os.environ.setdefault(key, value)
     for directory in (
         cache / "tmp",
         *(repository / name for name in ("data", "assets", "logs", "checkpoints", "wandb")),

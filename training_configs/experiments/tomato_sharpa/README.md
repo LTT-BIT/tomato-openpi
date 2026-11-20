@@ -275,7 +275,7 @@ bash scripts/python.sh -m scripts.check_tomato_ab --require-norm \
 
 UI服务单独监听27的127.0.0.1:8767，本地通过SSH转发到18767，不修改28既有UI。界面默认选择B阶段指令（全93条），A总体目标保留对照，默认W&B offline；固定数据、统计、horizon、手臂Delta/手部Absolute、无RTC和等权采样，训练参数显示batch512/FSDP8/8000步，打开页面不会启动训练。
 
-UI与CLI共用 `scripts/training_environment.py`：正式训练进程显式设置 `JAX_PLATFORMS=cuda`、所选 `CUDA_VISIBLE_DEVICES`、`XLA_PYTHON_CLIENT_PREALLOCATE=false`、`XLA_PYTHON_CLIENT_MEM_FRACTION=0.90`，不依赖登录shell默认值。公共 `scripts/python.sh` 负责环境和NCCL；UI服务和预检进程保持CPU。正式任务state.json记录实际训练环境变量。
+UI与专用CLI启动器通过 `scripts/training_environment.py` 共用显存配置，其默认值在 `training_configs/common.py` 的 `CUDA_MEMORY_SETTINGS`：正式训练进程显式设置 `JAX_PLATFORMS=cuda`、所选 `CUDA_VISIBLE_DEVICES`、`XLA_PYTHON_CLIENT_PREALLOCATE=true`、`XLA_PYTHON_CLIENT_MEM_FRACTION=0.90`，无需在启动UI前手动export。普通CLI从同一处取得显存默认值，并保留显式环境覆盖。调整比例时修改该统一配置并新启动训练；公共 `scripts/python.sh` 负责环境和NCCL，UI服务和预检进程保持CPU。正式任务state.json记录实际训练环境变量。已有训练进程保持启动时的设置；运行副本的源码在本轮结束后再更新，以保留断点续训的源码指纹一致性。
 
 ```bash
 # 在27现有工程启动独立UI（终端保持运行）

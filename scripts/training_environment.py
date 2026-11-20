@@ -2,10 +2,11 @@
 
 import os
 
+from training_configs.common import CUDA_MEMORY_SETTINGS
+
 CUDA_SETTINGS = {
     "JAX_PLATFORMS": "cuda",
-    "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
-    "XLA_PYTHON_CLIENT_MEM_FRACTION": "0.90",
+    **CUDA_MEMORY_SETTINGS,
 }
 
 

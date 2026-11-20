@@ -109,7 +109,7 @@ function renderProtocol(){
   if(protocol.subtask_variant){
     const episodeCount=protocol.training_episodes||93, frameCount=protocol.training_frames||410456;
     $('protocol').append(node('div',`${protocol.prompt_profile||'revision2'} · 全部${episodeCount}条 / ${frameCount}帧训练 · 无验证测试留出 · 无Agent · ${initial.action_horizon}步动作窗口`));
-    $('protocol').append(node('div','训练环境：JAX=cuda · PREALLOCATE=false · MEM_FRACTION=0.90 · 公共NCCL 2.31.2'));
+    $('protocol').append(node('div','训练环境：JAX=cuda · PREALLOCATE=true · MEM_FRACTION=0.90 · 公共NCCL 2.31.2'));
     if(protocol.bundle_missing)$('protocol').append(node('div','来源配置的数据目录不存在，可在下方更换为实际数据目录。'));
     const texts=global?[]:Object.values(protocol.action_prompts||{});
     if(texts.length)for(const [i,text] of texts.entries())$('protocol').append(node('div',`${i+1}. ${text}`));
