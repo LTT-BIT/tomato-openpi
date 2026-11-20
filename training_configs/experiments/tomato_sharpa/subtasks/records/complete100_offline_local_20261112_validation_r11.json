@@ -1,0 +1,1795 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-12",
+  "scope": "All100 offline local RGB preparation; no policy training or deployment",
+  "acceptance": {
+    "contract": {
+      "stream_contract": "offline_bidirectional_local_rgb_v6",
+      "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+      "generator_sha256": "a0d6270145bd07189688b6ab44099c6d68306113d61649e0415fd7049ae874f1",
+      "geometry_sha256": "a970c083b7830e0444feafffa3d4dfaa80c5139e9ced92f91d2b8c0c2cabb9ad",
+      "annotation_contract": {
+        "stream_contract": "offline_bidirectional_local_rgb_v6",
+        "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+        "generator_sha256": "9df26ef09e430b5d4857a376510f7caa9041bcbaaf6fc2ae7f2b6f0449db9384",
+        "geometry_sha256": "a970c083b7830e0444feafffa3d4dfaa80c5139e9ced92f91d2b8c0c2cabb9ad",
+        "parent_contract": {
+          "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+          "locator_sha256": "8b06ab9aa07e513e73d305b7c2f3ca5d060ee0a05ed5ab08a822df144a1d89fb",
+          "normalization_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+          "generator_sha256": "f95ee5207685a59d7925f47c8d24fb6ac769ff4fdb94a25cd977657ee866891f",
+          "selector_sha256": "8d967ccfee0caa9c8b321441960521b7575e3f9f609c61cd5c18fc3b93877bfa",
+          "locator_code_sha256": "05d9d66d97b1cade598f04958c613f0c107623fbc41dea7b4c848dfc0da4ba0a",
+          "stream_contract": "continuous_current_pixels_transport_v4",
+          "coverage_geometry_sha256": "dc14fe2e5f8e47118f474dbbb53da6881affd6956e5a628f29e70ddcd90669de",
+          "guarded_selector_sha256": "5875b0c0c7ea44ee4e450561417221da8737e4688eda423c196e787bbcc1163e",
+          "original_locator_code_sha256": "553806bd0ba857b8650640e526ddc0a71eb441e388c98823260afa26b927ee97",
+          "parent_locator_sha256": "19069cbd6fb9f1763798585685e3606bbe57e05f2a99ffdecd015e31bc04c305",
+          "geometry_sha256": "497007bc40735a8f9b04aefc8e5fc3fa6944582b124f8225d7a72ce2bc6414ac",
+          "grasp_calibration_sha256": "4dd34d428c0c1db682363dc442a64f109503331cfea96ee1d7e1df915cf145de"
+        },
+        "uses_future_frames_for_roi": true,
+        "offline_annotation_only": true,
+        "pixel_source": "same_current_native_frame",
+        "training_ready": false
+      },
+      "annotation_manifest_sha256": "b78107463c1301330be0d75be91ed174674e537ea17e64bb4ffda573bb1ad1a9",
+      "exception_review_sha256": "d9be810d0575802afc26cc0bba100ab90dec53eed401fb5b388c98058f033c3c",
+      "uses_future_frames_for_roi": true,
+      "offline_annotation_only": true,
+      "pixel_source": "same_current_native_frame",
+      "independent_semantic_quality_approved": false
+    },
+    "episodes": 100,
+    "frames": 425556,
+    "image_available_frames": 425556,
+    "local_crop_frames": 425556,
+    "full_view_fallback_frames": 0,
+    "black_frames": 0,
+    "pending_frames": 0,
+    "full_image_coverage": true,
+    "full_local_geometry_coverage": true,
+    "all_frames_decoded": true,
+    "center_steps_over_3pct": 0,
+    "scale_steps_over_2pct": 0,
+    "max_center_step_px": 3.8078865529319543,
+    "current_pixel_checks": 11691,
+    "visual_exception_reviewed_frames": 266,
+    "independent_semantic_accuracy_measured": false,
+    "training_ready": false,
+    "training_started": false,
+    "source_writes": false,
+    "scope": "100% frame/pixel/geometry/continuity acceptance against prepared annotations, not100% independently measured semantic accuracy or causal locator performance"
+  },
+  "AB_full_frame_audit": {
+    "frames": 425556,
+    "available": 425556,
+    "local": 425556,
+    "fallback": 0,
+    "mode_transitions": 0,
+    "AB_crop_video_hashes_checked": 200,
+    "AB_availability_frames_checked": 851112,
+    "longest_full_view_fallback_frames": 0,
+    "full_image_coverage_verified": true,
+    "mode_transition_smoothness_accepted": true
+  },
+  "actual_loader": {
+    "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+    "crop_manifest_sha256": "8dec591f6dfc9dad30cfa7774aea392837254d9e0007d2927088b2fb1e830194",
+    "base": {
+      "recordings": 100,
+      "frames": 425556,
+      "derived_video_hashes_checked": 600,
+      "original_sources_hash_unchanged": true,
+      "physical_columns_equal": true,
+      "phase_prompt_indices_verified": true,
+      "four_view_dataset_ready": false
+    },
+    "real_four_view_loader": {
+      "episodes": 100,
+      "samples": 300,
+      "invalid_mask_samples": 0,
+      "interaction_mask_key": "observation.interaction_available",
+      "full_image_coverage_verified": true,
+      "actual_crop_size": [
+        224,
+        224,
+        3
+      ],
+      "state_size": 58,
+      "action_window": [
+        50,
+        58
+      ],
+      "model_keys": [
+        "base_0_rgb",
+        "left_wrist_0_rgb",
+        "right_wrist_0_rgb",
+        "interaction_0_rgb"
+      ],
+      "normalized_token_lengths_match": true,
+      "independent_original_vector_window_reference": true,
+      "sampled_text_maximum": 221,
+      "all100_action_training": true
+    },
+    "final_normalization_contract_bound": false,
+    "roi_quality_accepted": false,
+    "training_ready": false,
+    "training_started": false,
+    "source_writes": false
+  },
+  "normalization_binding": {
+    "assets": [
+      {
+        "variant": "a_goal",
+        "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_offline_r11_delta_30hz",
+        "norm_stats_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+        "norm_metadata_sha256": "e04a1d8041adc365b7a7f75c4b9d13ac3f2187952cfc140f3d2b56bd3ee205ac",
+        "status": "verified"
+      },
+      {
+        "variant": "b_coarse",
+        "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_offline_r11_delta_30hz",
+        "norm_stats_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+        "norm_metadata_sha256": "cf32aa0680c6b6e13372f8816c7b30ddf4c0a18ad5bebda4fa19b968c7e2dbd4",
+        "status": "verified"
+      }
+    ],
+    "roi_quality_approved": false,
+    "training_started": false
+  },
+  "automatic_annotation_pending_before_review": 266,
+  "visual_exception_reviewed_frames": 266,
+  "right_hand_context_corrections": 52,
+  "visual_review": {
+    "reviewer": "coding_agent",
+    "independent": false,
+    "all266_exception_tiles_viewed": true,
+    "all52_corrected_actual_crop_tiles_viewed": true,
+    "all400_cross_recording_decoded_samples_viewed": true,
+    "native_ep85_frame1112_grid_viewed": true,
+    "ep48_comparison_frame800_viewed": true
+  },
+  "tests": {
+    "regression_passed": 167,
+    "final_preparation_gate_and_offline_checks_log": "/tmp/tomato_offline_final_checks_r11.log"
+  },
+  "formal_AB_quality_gate_closed": true,
+  "training_started": false,
+  "source_writes": false,
+  "deployment_modified": false,
+  "files": [
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/offline_export_manifest.json",
+      "sha256": "3392f33d046ba4ff0c078ce54bdac1b47dd6375b74ed8038cd7f6f9a4bbb313a"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/bundle_audit.json",
+      "sha256": "5a06e030c5d4f2d7da1c0cf7ad1df7e6b413c9309f4a8bb08f1669fcfd748d22"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_four_view_offline_local_candidate_r11/crop_manifest.json",
+      "sha256": "8dec591f6dfc9dad30cfa7774aea392837254d9e0007d2927088b2fb1e830194"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_four_view_offline_local_candidate_r11/bundle.json",
+      "sha256": "2e1564df2c166b6d2ed68d14b4c3a7a23d436e7be4bef984b25d71962329dee0"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_four_view_offline_local_candidate_check_r11.json",
+      "sha256": "059fd5656f4981cb327de1b9cc22ed0ee284386656e02e223dc80f8bea4d2f5d"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_annotations_r10/annotation_manifest.json",
+      "sha256": "b78107463c1301330be0d75be91ed174674e537ea17e64bb4ffda573bb1ad1a9"
+    },
+    {
+      "path": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_offline_roi_exception_review_20261112_r10.json",
+      "sha256": "d9be810d0575802afc26cc0bba100ab90dec53eed401fb5b388c98058f033c3c"
+    },
+    {
+      "path": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_derived_cleanup_20261112_r3.json",
+      "sha256": "c47ef360ad608bb6ab1f5f741847d125e3229ac702be1dfad2214b3c181e881e"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_comparison_r11/episode48_problem_comparison_23s_32s.mp4",
+      "sha256": "e0d3409da7f35bcb16b65978dc8aed2eff1cc1bead2378b2b9727b998c06f778"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_comparison_r11/episode48_problem_frame800.jpg",
+      "sha256": "e219233be3b87c521f1fff5c2781b8a156f092bbbb1dcec57612dddab4efcce2"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11/gallery_00.jpg",
+      "sha256": "4d0bc0f64f939e73aca1bf31ff24f9e9686308b74a5daebc8b3ceb875d6dba70"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11/gallery_01.jpg",
+      "sha256": "9902ca72894a7ca847d48ec17415ac999ba5ec91cc927cd57c57103966e1a3f1"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11/gallery_02.jpg",
+      "sha256": "02e758ce08b01dd588573886f94d3df4c9d0adf5bd56ffc38085d9131ca68d5f"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11/gallery_03.jpg",
+      "sha256": "f9fab93b57c39dbe1f05a6879ac72c67a5732d55247069f9696a44939cc9f6e8"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11/gallery_04.jpg",
+      "sha256": "fffd913c4dbcf298c78117235361b53b105d2f67316c4c3415d1b1b444a901d2"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11/gallery_05.jpg",
+      "sha256": "7d5d359e538e857d68a59e4bfaaaef723719c72e7bc1739454569ed449d0a4f1"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11/gallery_06.jpg",
+      "sha256": "03139bd1eda42bf7dc326bc85a71fc42329e77fdedbee51013e82f1b29261a4b"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11/gallery_07.jpg",
+      "sha256": "3aefb2e9e82f863b966616b16077cf4cdc2164a04c297b74cc5608cd99571c2b"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11/gallery_08.jpg",
+      "sha256": "316a9c1c9b95680c3cb16bdf52173df3dfc046a6b89bdbf6e52adeca4d1edc76"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11/gallery_09.jpg",
+      "sha256": "3633def3eb8d881c39a51420e133a173a7b76f5dcc29641f75f7fb6132572314"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11/samples.json",
+      "sha256": "395c8dd0c42dd5edcf4805ec0dedc5fee884d44f1e3ff2f1012f82d7b2351a94"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_context_review_r11/gallery_00.jpg",
+      "sha256": "d0642ce95d5d41c8af183fe0f432da80551237ed5f550721c2a76b1dfe8b58ae"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_context_review_r11/gallery_01.jpg",
+      "sha256": "bd7677310f4a978e6423f8f6aa16876d4d57b4bb0d9621178c787eeeaff39ce6"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_context_review_r11/gallery_02.jpg",
+      "sha256": "4d30dfed25998a83be2b77a6249afad62fe92feb6f6f12d8640f0fac801be5b8"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_context_review_r11/gallery_03.jpg",
+      "sha256": "208ab3937a22c28cc2d43d7dbe9ce74eb2dff9aed47ef7a62f6fbff500a8a1e9"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_context_review_r11/gallery_04.jpg",
+      "sha256": "46cf691047c6ceba5599cdea01f98bd0f507710691a9bed5706227d614e1131f"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_context_review_r11/samples.json",
+      "sha256": "773335d534a62fe0e8ac7293f3043cf51d45fdf0fe16b7360b8aa44e1a20b96a"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_offline_r11_delta_30hz/norm_stats.json",
+      "sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_offline_r11_delta_30hz/norm_metadata.json",
+      "sha256": "e04a1d8041adc365b7a7f75c4b9d13ac3f2187952cfc140f3d2b56bd3ee205ac"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_offline_r11_delta_30hz/norm_stats.json",
+      "sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_offline_r11_delta_30hz/norm_metadata.json",
+      "sha256": "cf32aa0680c6b6e13372f8816c7b30ddf4c0a18ad5bebda4fa19b968c7e2dbd4"
+    }
+  ],
+  "episode_receipts": [
+    {
+      "episode_index": 0,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000000/receipt.json",
+      "sha256": "66a71a6eb36ed907360555f4c39622c84d4b6580d417c94b7615b19fbcb20406",
+      "frames": 7658,
+      "current_pixel_max_mae": 2.4505207538604736,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 4,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000004/receipt.json",
+      "sha256": "885b7c2242ffcab3e4d9e25fb46cdd185106ae0e758735e05148dea6aff7ca33",
+      "frames": 5250,
+      "current_pixel_max_mae": 2.3845462799072266,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011627906976744186,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 8,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000008/receipt.json",
+      "sha256": "3f7e167dda57ac1ed6412d3210e440b80c2c8f2302a18ef8ff75d45c9a0c29b8",
+      "frames": 6726,
+      "current_pixel_max_mae": 2.6835272312164307,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 12,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000012/receipt.json",
+      "sha256": "3ae0d2dd71835f82c16630776c28164f70944becdd34da30dcedc3340cc1b8ff",
+      "frames": 4704,
+      "current_pixel_max_mae": 2.628394603729248,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.01171875,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 16,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000016/receipt.json",
+      "sha256": "6662fde25c34c4c23a8582d013eb9c4b3b8177f1767a710ee04b881a28eb11dd",
+      "frames": 4285,
+      "current_pixel_max_mae": 2.4594361782073975,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.01171875,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 20,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000020/receipt.json",
+      "sha256": "383bc126b7b96972d06cfc7974041c49b7ceee4e3714bcc2ac6cc43e16ed6a58",
+      "frames": 3850,
+      "current_pixel_max_mae": 2.3436968326568604,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011811023622047244,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 24,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000024/receipt.json",
+      "sha256": "2d98674f792fa0bd83731d4a1aeb345554d0174c822ed9edf9a1b0d37a7ad3fe",
+      "frames": 4990,
+      "current_pixel_max_mae": 2.502896547317505,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011673151750972763,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 28,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000028/receipt.json",
+      "sha256": "16be95c3bd4e1a481fb710e36f0597c9ca2567ea0f5fe8a36b944015bc53c3a5",
+      "frames": 4893,
+      "current_pixel_max_mae": 2.46871018409729,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011673151750972763,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 32,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000032/receipt.json",
+      "sha256": "aff9460e72f891a906e9d0442af017110a8ad9dd94e4a04ab321ef4e08fbe7af",
+      "frames": 4197,
+      "current_pixel_max_mae": 2.3383688926696777,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 36,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000036/receipt.json",
+      "sha256": "9a6f04802fad0878af394accf7cbbac45b3b1cd576551e7af8ae9f692c1b6ab7",
+      "frames": 3571,
+      "current_pixel_max_mae": 2.344374418258667,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 40,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000040/receipt.json",
+      "sha256": "0454dcd879cbbe3979ca79373829f276920ccb9da33e471e086ebf319c8cafa9",
+      "frames": 4722,
+      "current_pixel_max_mae": 2.423356533050537,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011583011583011582,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 44,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000044/receipt.json",
+      "sha256": "3f8a199bc14bccc167cf876ea2e87df58c3d35c3bfd78943425c3fd40085e701",
+      "frames": 3029,
+      "current_pixel_max_mae": 2.458592414855957,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011538461538461539,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 48,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000048/receipt.json",
+      "sha256": "dbd4654e5927b002f19cd9c46253aea27608e30e0beee1e145311fb18493927e",
+      "frames": 3189,
+      "current_pixel_max_mae": 2.2735304832458496,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011583011583011582,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 52,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000052/receipt.json",
+      "sha256": "4c979a3d6ac34a5742922dce21b5733d549822f09132bdab9a54c57a7cc9b83b",
+      "frames": 3345,
+      "current_pixel_max_mae": 2.374535083770752,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.01195219123505976,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 56,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000056/receipt.json",
+      "sha256": "ba9f234fe0b2d5d7d8d056a0c838d1ee8959164b5ef0e469b803a6852d84ccbd",
+      "frames": 2902,
+      "current_pixel_max_mae": 2.457416534423828,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 60,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000060/receipt.json",
+      "sha256": "cb75201add93ac5a80e9e063d7504b8ea6680882a25be94fcaee7b992c170185",
+      "frames": 2567,
+      "current_pixel_max_mae": 2.5374879837036133,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011904761904761904,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 64,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000064/receipt.json",
+      "sha256": "4474081296cdfb5fa9b6f7fd97a2e9e94d74ee3f3d0892413748e5ae135a3e7f",
+      "frames": 6177,
+      "current_pixel_max_mae": 2.5336415767669678,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 68,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000068/receipt.json",
+      "sha256": "c9983b5312ed08b5fbca8f646227b72ee80d3517685f797e0e02f47bdf1f4ef3",
+      "frames": 4301,
+      "current_pixel_max_mae": 2.284066677093506,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 72,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000072/receipt.json",
+      "sha256": "12b12d0562a999bb778d96b09df742ff78f02bd4e6ad8ab4ee184caea46c79c6",
+      "frames": 3834,
+      "current_pixel_max_mae": 2.456486463546753,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 76,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000076/receipt.json",
+      "sha256": "615669620c44271c3a05a5c37b7f40e6232d47e6e5653ad0defe1b3527852ab3",
+      "frames": 5665,
+      "current_pixel_max_mae": 2.3293607234954834,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.01171875,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 80,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000080/receipt.json",
+      "sha256": "cac2a2abea6d7a9c01df44d63eb4741a37d0510967780ec147531e55e56a3cae",
+      "frames": 6089,
+      "current_pixel_max_mae": 2.4946987628936768,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011904761904761904,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 84,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000084/receipt.json",
+      "sha256": "606f37cd8c47035eb186b947b9c72a48683da149d1788eca86a7c27e728d7da8",
+      "frames": 4570,
+      "current_pixel_max_mae": 2.4253759384155273,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011583011583011582,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 88,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000088/receipt.json",
+      "sha256": "6b3160d0e9bc810eb54f722765cb866d50517a016b273bb8de52292e1262a890",
+      "frames": 4079,
+      "current_pixel_max_mae": 2.6052029132843018,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 92,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000092/receipt.json",
+      "sha256": "d692167f5d777c00e20ba500b314253ff030c39c6231e4efe502694d0cf98f67",
+      "frames": 3539,
+      "current_pixel_max_mae": 2.3471248149871826,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011627906976744186,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 96,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard0/episode_000096/receipt.json",
+      "sha256": "5d515f7c0738627903c9e031dd196a72a55ac78875f24d4b11bff8fc830e5a42",
+      "frames": 3803,
+      "current_pixel_max_mae": 2.3557279109954834,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 1,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000001/receipt.json",
+      "sha256": "bfd20cfa1e92e4ac68b57beaccaaa008d9804f9757436e9a5b4f729af84cea5d",
+      "frames": 4542,
+      "current_pixel_max_mae": 2.574497699737549,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011583011583011582,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 5,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000005/receipt.json",
+      "sha256": "c4c5f2402003ec85ea3eeac6a365c999fb8dfa671a87bf79dd56abfef85d0e4e",
+      "frames": 5006,
+      "current_pixel_max_mae": 2.3770527839660645,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.012,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 9,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000009/receipt.json",
+      "sha256": "19c6a167669f0a849c9253d95a7cc063ff1278e997531327cf6832b45f9fd689",
+      "frames": 4427,
+      "current_pixel_max_mae": 2.3517818450927734,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011673151750972763,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 13,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000013/receipt.json",
+      "sha256": "5f0bb38ea3a07a06e9f0d28381c2759aa93cdad73334d5b2e0a5583bbd27f26e",
+      "frames": 3870,
+      "current_pixel_max_mae": 2.515040397644043,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011904761904761904,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 17,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000017/receipt.json",
+      "sha256": "3ca3274bc66c1e75958496ec3f43b1056800797ce4ee329cbd79b63b693cd5c3",
+      "frames": 4513,
+      "current_pixel_max_mae": 2.420121192932129,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011857707509881422,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 21,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000021/receipt.json",
+      "sha256": "45c5128350d9baec5cdb071fde676bb55493f02a0d4149fc111a1b437481ae07",
+      "frames": 6065,
+      "current_pixel_max_mae": 2.4599874019622803,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011627906976744186,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 25,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000025/receipt.json",
+      "sha256": "d6cbcee6c6ebff1409125f621c93355cb0ae40e799195c5b79f8589b87745147",
+      "frames": 4574,
+      "current_pixel_max_mae": 2.501607656478882,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011673151750972763,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 29,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000029/receipt.json",
+      "sha256": "bd7cbd634a5b26b7fdaf339e7b5613a4b867f30ef87ef829bfa0ca0052302a04",
+      "frames": 5371,
+      "current_pixel_max_mae": 2.4037654399871826,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011857707509881422,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 33,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000033/receipt.json",
+      "sha256": "a8b2d61c0a141fe4bff1c948892ee4cdad4aa90a38021264b42c1f254c0ea874",
+      "frames": 5019,
+      "current_pixel_max_mae": 2.4636545181274414,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011627906976744186,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 37,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000037/receipt.json",
+      "sha256": "595887f628bdb36fd0bbe76a427e0cc109d42b1c82d489cbdf6127743a4c6f15",
+      "frames": 5423,
+      "current_pixel_max_mae": 2.4409079551696777,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011538461538461539,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 41,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000041/receipt.json",
+      "sha256": "f82c73ff944bb6f01d5cea1ca7e4114a2c46a11414cb99756b4250f4eea9b834",
+      "frames": 3703,
+      "current_pixel_max_mae": 2.313091278076172,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 45,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000045/receipt.json",
+      "sha256": "bbe4dbf55093f34236bfda2555619f4e8356f8fd03de5330e4154d8ea3ccc114",
+      "frames": 3786,
+      "current_pixel_max_mae": 2.457190752029419,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 49,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000049/receipt.json",
+      "sha256": "1f6b6b2e137c9a333c8f7fec0fdf784744e8a38c88145b6f85b0d04670f438fc",
+      "frames": 3835,
+      "current_pixel_max_mae": 2.3339710235595703,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.01195219123505976,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 53,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000053/receipt.json",
+      "sha256": "2289608fe8121cd6c13286f79e7644fb66bc60757425f936b58217dad987c773",
+      "frames": 3848,
+      "current_pixel_max_mae": 2.4562273025512695,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011811023622047244,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 57,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000057/receipt.json",
+      "sha256": "e7e0f733bb75c22f2db0b20be9312e912062734494bed92a6a93f0695591d895",
+      "frames": 3369,
+      "current_pixel_max_mae": 2.491058111190796,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 61,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000061/receipt.json",
+      "sha256": "1f57222bfa9ebe1cf3521c0b415992dfdef81bb743d0f82d8a0d95ce9b981ccd",
+      "frames": 2760,
+      "current_pixel_max_mae": 2.478356122970581,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 65,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000065/receipt.json",
+      "sha256": "46bc3ad875b12fb1d410962e28d0974028ba274f172e6bcecad0c3596fd13f2f",
+      "frames": 7428,
+      "current_pixel_max_mae": 2.5519771575927734,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 69,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000069/receipt.json",
+      "sha256": "51f15138b3c42bb5f42ca0b875eb471d11eb7b6100c08dcdb9298b3762c98916",
+      "frames": 4980,
+      "current_pixel_max_mae": 2.4360318183898926,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 73,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000073/receipt.json",
+      "sha256": "a030230286205939db96e4b12094eefa42112420c31b6f6e9d4214bc257a9b84",
+      "frames": 3125,
+      "current_pixel_max_mae": 2.360119104385376,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011673151750972763,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 77,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000077/receipt.json",
+      "sha256": "68c3f1c3379a0c42f886c45ca24b5a80e5924990664c7bb5fe65ef8361363bd6",
+      "frames": 5224,
+      "current_pixel_max_mae": 2.4432332515716553,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011811023622047244,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 81,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000081/receipt.json",
+      "sha256": "49f37cacb539bb4c0a2e4306551e6207c1f4a74f5f18f151cfe57e3bf7f84ab2",
+      "frames": 4685,
+      "current_pixel_max_mae": 2.4000251293182373,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.8078865529319543,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011538461538461539,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 85,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000085/receipt.json",
+      "sha256": "5d2000c90b445cf86b1e7da2daa063fde609aea2dbc97072b62b683cb07aba25",
+      "frames": 3414,
+      "current_pixel_max_mae": 2.4017791748046875,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 89,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000089/receipt.json",
+      "sha256": "b956e0fbbb8837ff0b540a3c169bcbcc4aa440442a78c98426f222842b287b1a",
+      "frames": 2252,
+      "current_pixel_max_mae": 2.470045328140259,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 93,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000093/receipt.json",
+      "sha256": "57e39d2b49fa385af7bd8f84ba8e7fd052d8caeed9bbba52d25ecb04c19d93fb",
+      "frames": 3262,
+      "current_pixel_max_mae": 2.256988763809204,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 97,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard1/episode_000097/receipt.json",
+      "sha256": "bc752818e5c7cedc71ffc025f2eda701a1d039c0d42d2f4acd72a6e8647fe3cd",
+      "frames": 4091,
+      "current_pixel_max_mae": 2.3381564617156982,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 2,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000002/receipt.json",
+      "sha256": "36d1b9f3c2da86871896a94f6a7591896ae20ef5228b6156a6fbc9fac3f0377b",
+      "frames": 4016,
+      "current_pixel_max_mae": 2.495356321334839,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011811023622047244,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 6,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000006/receipt.json",
+      "sha256": "95b40d385e3406155e33f304e01bc69d58c71f2028448e73354da3aab306b7bc",
+      "frames": 5266,
+      "current_pixel_max_mae": 2.298588991165161,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011538461538461539,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 10,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000010/receipt.json",
+      "sha256": "540c585ed08dc62ced151d57f3fa81f0205dcbdba0046b4ca7de7b30879149a4",
+      "frames": 4593,
+      "current_pixel_max_mae": 2.4779176712036133,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 14,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000014/receipt.json",
+      "sha256": "e012d2cf55354d3d4f5f507440346fc819e0e92e62be891d004f39c360fbe607",
+      "frames": 5441,
+      "current_pixel_max_mae": 2.3959462642669678,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 18,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000018/receipt.json",
+      "sha256": "c31ae26c2e68862f5ca1c4269792d4ae9fc6d70836aa5af65a90ed31701d83a3",
+      "frames": 4212,
+      "current_pixel_max_mae": 2.412295341491699,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 22,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000022/receipt.json",
+      "sha256": "a870d369c65da8c10946bcc6a2b01e8b5126208a5bf8a2ffd16c795a322d3b7b",
+      "frames": 4807,
+      "current_pixel_max_mae": 2.3091983795166016,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 26,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000026/receipt.json",
+      "sha256": "a2ed719df0e7a0e67f979b63f18e0a5c48940b56a56a575ac4a93297cf66dbd2",
+      "frames": 3932,
+      "current_pixel_max_mae": 2.4266648292541504,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011583011583011582,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 30,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000030/receipt.json",
+      "sha256": "dad1c08d7f64cb0865f0f90da6acbe04e6f64e15f51d86c547101cf566bcff6e",
+      "frames": 4088,
+      "current_pixel_max_mae": 2.391953706741333,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011627906976744186,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 34,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000034/receipt.json",
+      "sha256": "2c700953977884592db4ece5341928a57a0014dd38b3e7fa72687f9ce0e66768",
+      "frames": 4512,
+      "current_pixel_max_mae": 2.3627631664276123,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011583011583011582,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 38,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000038/receipt.json",
+      "sha256": "c26f6566ecf21bba17bd010d48504dd30662f859870f2659ff857132b686c7f6",
+      "frames": 2821,
+      "current_pixel_max_mae": 2.4304447174072266,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.8078865529319543,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011857707509881422,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 42,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000042/receipt.json",
+      "sha256": "f7fd9d50e90ab267a714eaee79170237dc0508771c553c833c38277fb8633da3",
+      "frames": 2234,
+      "current_pixel_max_mae": 2.3550634384155273,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.01195219123505976,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 46,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000046/receipt.json",
+      "sha256": "cfc15e1cdc013b4ba4c218b2121a3cdd3af3dfb82d0218e3c44dbae6f639ec1b",
+      "frames": 4603,
+      "current_pixel_max_mae": 2.350360155105591,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011583011583011582,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 50,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000050/receipt.json",
+      "sha256": "b967453e16db4ec27f6dd9562ddb1ff874f83ffe66c94fdf0e4bc24bbd83a849",
+      "frames": 2331,
+      "current_pixel_max_mae": 2.3623976707458496,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011811023622047244,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 54,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000054/receipt.json",
+      "sha256": "867962ba25d4b4129fd25aa828de4c964d9578cfc5f369fd2205af0de895b086",
+      "frames": 3654,
+      "current_pixel_max_mae": 2.3207974433898926,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011857707509881422,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 58,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000058/receipt.json",
+      "sha256": "8ae4ff9938c2a2a08ee8a90de16028f43d0220a51cd12b424124ed366f4c4bae",
+      "frames": 3198,
+      "current_pixel_max_mae": 2.5352160930633545,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.01195219123505976,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 62,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000062/receipt.json",
+      "sha256": "dc42370da5caeb32a8cad96375d8cd133bc69e28a75e6104543560a9c91c32e6",
+      "frames": 3254,
+      "current_pixel_max_mae": 2.573401689529419,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011811023622047244,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 66,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000066/receipt.json",
+      "sha256": "d140ca92e9dc4f0b63ee308b4b84dc939b20d2b04447eab0d01e7d084451c32f",
+      "frames": 5474,
+      "current_pixel_max_mae": 2.653439998626709,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011764705882352941,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 70,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000070/receipt.json",
+      "sha256": "d681e6e87e5ba61ef66249e9bdbe595792b1507d3837f1ce2b6f13ce44d37dc8",
+      "frames": 6534,
+      "current_pixel_max_mae": 2.4554102420806885,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 74,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000074/receipt.json",
+      "sha256": "77a23facfcbfd45af1cd183e81ea6a7ac00d751ac7d70718b411d5f34b23debd",
+      "frames": 4226,
+      "current_pixel_max_mae": 2.4736926555633545,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 78,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000078/receipt.json",
+      "sha256": "26734c620634a0aa53d3761f8f43eb7ecffdc7769e979519fae70da8e5f509a3",
+      "frames": 5753,
+      "current_pixel_max_mae": 2.404416561126709,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011538461538461539,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 82,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000082/receipt.json",
+      "sha256": "852678fa71683ef54ce5aef1ab901c374aab11fabd3646f404e45b916ebecbfa",
+      "frames": 3464,
+      "current_pixel_max_mae": 2.295307159423828,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011583011583011582,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 86,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000086/receipt.json",
+      "sha256": "3b7d1f95e4c7c7449f39b91ee696fc203158f6a315dff2a2b0b41a233f73989e",
+      "frames": 2990,
+      "current_pixel_max_mae": 2.394252300262451,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 90,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000090/receipt.json",
+      "sha256": "e76d17da0075c3c83fc4742f6195a8ee799ce6af3ce7b5b0212ebc1f2ffa03d2",
+      "frames": 4697,
+      "current_pixel_max_mae": 2.3822743892669678,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.0,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 94,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000094/receipt.json",
+      "sha256": "be024e42482737f33cd418b0cf32bf62acffea2d8a57008a5943d354cd80e37a",
+      "frames": 2798,
+      "current_pixel_max_mae": 2.4329426288604736,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 98,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard2/episode_000098/receipt.json",
+      "sha256": "e7634bb1751c959b91bc9c7562069d0899863ca3241e6f426cf1ec838ffbf4ba",
+      "frames": 2773,
+      "current_pixel_max_mae": 2.3181800842285156,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 3,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000003/receipt.json",
+      "sha256": "ef0d0022a107f9ca51e8093b00252eed73ac1c6b3bc68128c3738ae26d6218ad",
+      "frames": 5350,
+      "current_pixel_max_mae": 2.45992112159729,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 7,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000007/receipt.json",
+      "sha256": "94d89e1c66f29443750c87f71dd041710c63f1ee85068dfc7d445b1084297eb4",
+      "frames": 5804,
+      "current_pixel_max_mae": 2.3673136234283447,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 11,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000011/receipt.json",
+      "sha256": "9f1998259c43c33d9bdadcaad9f773caa9820df0790fbd4871894212827cb997",
+      "frames": 5415,
+      "current_pixel_max_mae": 2.5552055835723877,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 15,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000015/receipt.json",
+      "sha256": "de7d1b17e85eb9905a4f52a44550466a835c57dfc035a70168b3263745e62ecd",
+      "frames": 5145,
+      "current_pixel_max_mae": 2.5388898849487305,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011627906976744186,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 19,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000019/receipt.json",
+      "sha256": "255a39a7ec1a588bdafe5dcc2e93b7bc7ce5e0f5a7be9fe72e4d7d5895e9cacd",
+      "frames": 3867,
+      "current_pixel_max_mae": 2.4072132110595703,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 23,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000023/receipt.json",
+      "sha256": "533f58b967530d2af87b141ecfa4e58f815bb166e6dbe0b3e242e5d835136844",
+      "frames": 4415,
+      "current_pixel_max_mae": 2.3867785930633545,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011673151750972763,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 27,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000027/receipt.json",
+      "sha256": "35f480ffd37dad3208f498b2d14679ec99e5eee9b9c855aa72278280417579e8",
+      "frames": 5566,
+      "current_pixel_max_mae": 2.3086071014404297,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011583011583011582,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 31,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000031/receipt.json",
+      "sha256": "b346ccf688c14d69876747acb565cc048ab773df6bff9240022b0f5fdf96a38e",
+      "frames": 6735,
+      "current_pixel_max_mae": 2.4781036376953125,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011627906976744186,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 35,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000035/receipt.json",
+      "sha256": "9b647b7e3d960d24ec5dae3052099b775265f48d32a6971728cce9461454dd1f",
+      "frames": 3953,
+      "current_pixel_max_mae": 2.356877088546753,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011673151750972763,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 39,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000039/receipt.json",
+      "sha256": "87e09917695bcc9030aca895e187bfc10bc1f1c8e2877ad773630821691c39ae",
+      "frames": 4068,
+      "current_pixel_max_mae": 2.520235538482666,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011764705882352941,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 43,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000043/receipt.json",
+      "sha256": "cb02854c390d5613f90812ebe3171ec536e88365171cf582bd636200ab657c7b",
+      "frames": 3486,
+      "current_pixel_max_mae": 2.419696092605591,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 47,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000047/receipt.json",
+      "sha256": "2793c66e28cc5a05bb49c0c66348be471a22c0db55c2fa1002640abc9665f959",
+      "frames": 2595,
+      "current_pixel_max_mae": 2.3280320167541504,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 51,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000051/receipt.json",
+      "sha256": "ede081ff82c292e561a3df6b0833480557781e5ecb96462d8d7c49f31d9e91c2",
+      "frames": 3225,
+      "current_pixel_max_mae": 2.4677135944366455,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011764705882352941,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 55,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000055/receipt.json",
+      "sha256": "cf2c00e69c014fc8f68e882086779c719df641a1827b73b8cb454c90d386a30f",
+      "frames": 3117,
+      "current_pixel_max_mae": 2.5083305835723877,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 59,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000059/receipt.json",
+      "sha256": "a40c96c560f0963ebd176db1c0caf1e7e9b6e7cdf654ab900181c3203593fef2",
+      "frames": 3652,
+      "current_pixel_max_mae": 2.4791135787963867,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011673151750972763,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 63,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000063/receipt.json",
+      "sha256": "1b900abac13662cc4776d46013bcfef8d0f3cae7d999560daed6dd85cc8e43f4",
+      "frames": 2685,
+      "current_pixel_max_mae": 2.488553524017334,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 67,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000067/receipt.json",
+      "sha256": "f98a73176a6a09230e4099c231d5bc05731060a4eb455206490678af9b631bb6",
+      "frames": 3229,
+      "current_pixel_max_mae": 2.474263906478882,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011583011583011582,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 71,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000071/receipt.json",
+      "sha256": "503d477d7466e2fcbdda57c35ed2cadd44772374996455aea91d7b64c3dad73f",
+      "frames": 5628,
+      "current_pixel_max_mae": 2.3868117332458496,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011811023622047244,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 75,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000075/receipt.json",
+      "sha256": "d143e8157b239ecb778a9a73d8b13e5d333609473a8a03384fd9c956b750742e",
+      "frames": 3758,
+      "current_pixel_max_mae": 2.419111490249634,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.01171875,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 79,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000079/receipt.json",
+      "sha256": "a75fd0300bc799ee6eb70581a5f6a22e425735362520760be1f30fd0d4f0003d",
+      "frames": 4978,
+      "current_pixel_max_mae": 2.288869857788086,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 83,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000083/receipt.json",
+      "sha256": "ae6abecbb8bad4ba1828f8904462d43ba340248e5aaa629747e06cc71322c70a",
+      "frames": 3847,
+      "current_pixel_max_mae": 2.4811861515045166,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011627906976744186,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 87,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000087/receipt.json",
+      "sha256": "8ebf8c1ef14d820c3cfbb61a7b12002ce2f6dc1b04b74b1623627fd031b525d4",
+      "frames": 2773,
+      "current_pixel_max_mae": 2.4786219596862793,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 91,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000091/receipt.json",
+      "sha256": "1711ec4b880caef2f7051dd1a5d33c26d8191d044da8d8daaa3665d0a2a3efcf",
+      "frames": 3297,
+      "current_pixel_max_mae": 2.228867769241333,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 95,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000095/receipt.json",
+      "sha256": "2a89ab8cc670780f26f45af8781cae43c5e087e0a7e4af8e51b09d860db7bc1a",
+      "frames": 3560,
+      "current_pixel_max_mae": 2.445697784423828,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011494252873563218,
+        "scale_steps_over_2pct": 0
+      }
+    },
+    {
+      "episode_index": 99,
+      "path": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/shard3/episode_000099/receipt.json",
+      "sha256": "f264dc27b90f36f509f77679b8eaaf99261f3cf2331c3bfc4e451598f2063405",
+      "frames": 3230,
+      "current_pixel_max_mae": 2.3087265491485596,
+      "geometry": {
+        "all_boxes_contained": true,
+        "uncovered_frames": [],
+        "max_center_step_px": 3.5355339059327378,
+        "center_steps_over_3pct": 0,
+        "max_scale_step_fraction": 0.011627906976744186,
+        "scale_steps_over_2pct": 0
+      }
+    }
+  ],
+  "limitations": [
+    "100% acceptance concerns completeness, containment of prepared annotations, bounded crop motion and current pixels; not independently measured semantic accuracy",
+    "Future frames are used for offline coordinate annotation and window planning; not an online causal locator",
+    "Agent history reader remains unimplemented and independent Agent evaluation cannot reuse all100 locator supervision",
+    "Formal policy training and target batch512 GPU memory preflight remain pending"
+  ]
+}

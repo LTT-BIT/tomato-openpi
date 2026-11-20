@@ -1,0 +1,3258 @@
+{
+  "version": "tomato-complete100-rgb-crop-preparation-v1",
+  "name": "tomato_complete100_rgb_crop_all_sources_v1",
+  "agent_manifest_sha256": "95679c2f4457701c3898e538b83883c27106aa3aa44c647ad046b92dd20410e1",
+  "agent_manifest": "/home/user/vjepa2_training/runs/tomato/complete100_20261111/dataset_manifest.json",
+  "data_policy": "all_sources",
+  "splits": {
+    "train": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99
+    ]
+  },
+  "episodes": [
+    {
+      "episode_index": 0,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1102_588_616_normal_lerobot",
+      "source_episode_index": 0,
+      "agent_episode_id": "0b509210e606316087c5ed7d",
+      "recording_group": "5c83746e032f4c70af823437b698f84c",
+      "length": 7658,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1102_588_616_normal_lerobot/annotations/subtasks/coarse/episode_000000.json",
+      "annotation_sha256": "867ea280b6271c35dd34aafb1e975f49f031f773717310f4d48b076f9c11e0a9",
+      "source_sha256": {
+        "data/chunk-000/episode_000000.parquet": "ee509370edcc31159c3a06f75d5fe1e2b93d34d73007593558bac78d8e51ca21",
+        "videos/chunk-000/observation.images.cam0/episode_000000.mp4": "a35f1413826632dbed29f38100f197005563527e96e7fda5e3837c397bd932b6",
+        "videos/chunk-000/observation.images.cam1/episode_000000.mp4": "6b135bf267a8d62dc927297877beed3b45b29ed6fea02c07c09c6d227827789a",
+        "videos/chunk-000/observation.images.cam2/episode_000000.mp4": "fe998048c17d0fc22521edd4a91bc09c196349983060748204e4dba3ea71ec50"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "80bc16d1d1e2ab3bf743123c9d0ff10ea3b44dc839a9caf5ed8654e708ca8660",
+        "meta/episodes.jsonl": "abe8ec0ff03f205575ae7e2767ee41dd476b2557443edf75d72ebf136ac1f90a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 1,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1102_588_616_normal_lerobot",
+      "source_episode_index": 1,
+      "agent_episode_id": "4b9725d5a798ea8ae1ea0e69",
+      "recording_group": "435fc6da99284d7ba15cf09193352c06",
+      "length": 4542,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1102_588_616_normal_lerobot/annotations/subtasks/coarse/episode_000001.json",
+      "annotation_sha256": "fd4410cd47e571c32e7b0cbbbabbec264a7d54fdda709528eb95d964337d6e45",
+      "source_sha256": {
+        "data/chunk-000/episode_000001.parquet": "15417ac2e7037eb5999071e82abd1c66a9dc74f4e4c689f9283bd26f3766448c",
+        "videos/chunk-000/observation.images.cam0/episode_000001.mp4": "2fd673f679050857c41e182fb66567874886e11277d5a7cab9d63c13fee8d7af",
+        "videos/chunk-000/observation.images.cam1/episode_000001.mp4": "3def0f0188aec6cc22376047d9eb2c75c00316008e50cc5c32ca56042cfdb71b",
+        "videos/chunk-000/observation.images.cam2/episode_000001.mp4": "66a3fcfe34cee45a8b5f5350086928b8c5bd5ce7a27e3537e915d98b8a81948a"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "80bc16d1d1e2ab3bf743123c9d0ff10ea3b44dc839a9caf5ed8654e708ca8660",
+        "meta/episodes.jsonl": "abe8ec0ff03f205575ae7e2767ee41dd476b2557443edf75d72ebf136ac1f90a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 2,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot",
+      "source_episode_index": 0,
+      "agent_episode_id": "3e645bf4e137d0f836c9d7ff",
+      "recording_group": "76354615cf9746758c5c7e6e5ab579d4",
+      "length": 4016,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/annotations/subtasks/coarse/episode_000000.json",
+      "annotation_sha256": "64e2f6bfa06b99f57ba29528580b8cf6c10ffb1dc3245502f448ab9fab6da446",
+      "source_sha256": {
+        "data/chunk-000/episode_000000.parquet": "dc91046b1caea319bbdc23f3d56c7ca557e997ff7b9cae24937d7c58aaf9de01",
+        "videos/chunk-000/observation.images.cam0/episode_000000.mp4": "0cacd52d242adc33e90e376840099f51a480a49719da2c4b8decd73cab8f2f1c",
+        "videos/chunk-000/observation.images.cam1/episode_000000.mp4": "bf15360b9312ffe717318e8b7db076c241a57e85ce1a806c652957f6db9b64ef",
+        "videos/chunk-000/observation.images.cam2/episode_000000.mp4": "6b772384b4e634967b91391a6f9afae5041c7032668a407248bca4decf7c2570"
+      },
+      "agent_split_provenance": "val",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "bd5a47912a02c6386a2f5e7dd7c16386c9ad020515260dd7d278eba38665aee0",
+        "meta/episodes.jsonl": "f98b8d741bc40f40c40b1c379f9e92580a24baf4e3c9f02269a03e9d2579fa7e"
+      },
+      "phase_label_status": "needs_resolution",
+      "phase_differences": [
+        {
+          "phase_index": 2,
+          "saved": {
+            "end_frame": 1813,
+            "end_seconds": 60.43333333333333,
+            "label": "return",
+            "reviewed": true,
+            "segment_index": 3,
+            "start_frame": 1674,
+            "start_seconds": 55.8,
+            "text": "Right hand returns the held object to the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 1853,
+            "end_seconds": 61.766666666666666,
+            "label": "return",
+            "reviewed": true,
+            "segment_index": 3,
+            "start_frame": 1674,
+            "start_seconds": 55.8,
+            "text": "Right hand returns the held object to the right plate"
+          }
+        },
+        {
+          "phase_index": 3,
+          "saved": {
+            "end_frame": 2199,
+            "end_seconds": 73.3,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 1813,
+            "start_seconds": 60.43333333333333,
+            "text": "Right fingers reposition the truss on the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 2227,
+            "end_seconds": 74.23333333333333,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 1853,
+            "start_seconds": 61.766666666666666,
+            "text": "Right fingers reposition the truss on the right plate"
+          }
+        },
+        {
+          "phase_index": 4,
+          "saved": {
+            "end_frame": 2434,
+            "end_seconds": 81.13333333333334,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 2199,
+            "start_seconds": 73.3,
+            "text": "Right hand grasps and lifts the truss to the center"
+          },
+          "agent_effective": {
+            "end_frame": 2430,
+            "end_seconds": 81.0,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 2227,
+            "start_seconds": 74.23333333333333,
+            "text": "Right hand grasps and lifts the truss to the center"
+          }
+        },
+        {
+          "phase_index": 5,
+          "saved": {
+            "end_frame": 3876,
+            "end_seconds": 129.2,
+            "label": "harvest",
+            "reviewed": true,
+            "segment_index": 6,
+            "start_frame": 2434,
+            "start_seconds": 81.13333333333334,
+            "text": "Right hand holds truss while left hand picks tomatoes into left basket"
+          },
+          "agent_effective": {
+            "end_frame": 3876,
+            "end_seconds": 129.2,
+            "label": "harvest",
+            "reviewed": true,
+            "segment_index": 6,
+            "start_frame": 2430,
+            "start_seconds": 81.0,
+            "text": "Right hand holds truss while left hand picks tomatoes into left basket"
+          }
+        }
+      ],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 3,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot",
+      "source_episode_index": 1,
+      "agent_episode_id": "8ade504fe3d1e43060e7ed6f",
+      "recording_group": "e826c474e80547d5a3b24e5eb0f30977",
+      "length": 5350,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/annotations/subtasks/coarse/episode_000001.json",
+      "annotation_sha256": "79889b12cebdd0e7c0f1e379e1e0f3dea4d2c90482bb355f641818c0470d97fc",
+      "source_sha256": {
+        "data/chunk-000/episode_000001.parquet": "a7b03bc376c3015fcc3ac49c122a477ac08c27acf3d868db06a7aa0b1efcedb1",
+        "videos/chunk-000/observation.images.cam0/episode_000001.mp4": "2b9b899a949cbc2182a2084c6c9600ea4956ab459b1eedf5609037925930c183",
+        "videos/chunk-000/observation.images.cam1/episode_000001.mp4": "20ee71de590a370483c7c4507db0ec149e45f6f2094c2076f9850902047f8ba9",
+        "videos/chunk-000/observation.images.cam2/episode_000001.mp4": "a9feb167e598d3fe7ba896e2d9391705c04370050de37993c9050e7e0d208826"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "bd5a47912a02c6386a2f5e7dd7c16386c9ad020515260dd7d278eba38665aee0",
+        "meta/episodes.jsonl": "f98b8d741bc40f40c40b1c379f9e92580a24baf4e3c9f02269a03e9d2579fa7e"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 4,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot",
+      "source_episode_index": 2,
+      "agent_episode_id": "27d8bc0413a42341c7e8c3e5",
+      "recording_group": "7d879f9d5d5a4be09beb55cf88591b0d",
+      "length": 5250,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/annotations/subtasks/coarse/episode_000002.json",
+      "annotation_sha256": "88f06ef9f62f5626b7f518c87da5e3960f1ab346c8ce34ae75068577eed64cba",
+      "source_sha256": {
+        "data/chunk-000/episode_000002.parquet": "765a7e45dfde724724c5f663131bcd72d56a9f3084c3566dc0bf8941e31c0822",
+        "videos/chunk-000/observation.images.cam0/episode_000002.mp4": "a0cd151e5ae85c377d26249ee61a545f819eb824cd40d055a82c57998f4acffc",
+        "videos/chunk-000/observation.images.cam1/episode_000002.mp4": "2e7bbf4f47ceb87f7ac86f86b9681430119e10092b639468f111d658cb3cbe74",
+        "videos/chunk-000/observation.images.cam2/episode_000002.mp4": "90d88bd6229497013c93c950f7a9eee26d6d457f4cc52dc5befdcc86d4fd3f6e"
+      },
+      "agent_split_provenance": "val",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "bd5a47912a02c6386a2f5e7dd7c16386c9ad020515260dd7d278eba38665aee0",
+        "meta/episodes.jsonl": "f98b8d741bc40f40c40b1c379f9e92580a24baf4e3c9f02269a03e9d2579fa7e"
+      },
+      "phase_label_status": "needs_resolution",
+      "phase_differences": [
+        {
+          "phase_index": 3,
+          "saved": {
+            "end_frame": 3249,
+            "end_seconds": 108.3,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 2474,
+            "start_seconds": 82.46666666666667,
+            "text": "Right fingers reposition the truss on the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 3288,
+            "end_seconds": 109.6,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 2474,
+            "start_seconds": 82.46666666666667,
+            "text": "Right fingers reposition the truss on the right plate"
+          }
+        },
+        {
+          "phase_index": 4,
+          "saved": {
+            "end_frame": 3582,
+            "end_seconds": 119.4,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 3249,
+            "start_seconds": 108.3,
+            "text": "Right hand grasps and lifts the truss to the center"
+          },
+          "agent_effective": {
+            "end_frame": 3582,
+            "end_seconds": 119.4,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 3288,
+            "start_seconds": 109.6,
+            "text": "Right hand grasps and lifts the truss to the center"
+          }
+        }
+      ],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 5,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot",
+      "source_episode_index": 3,
+      "agent_episode_id": "085f066dd8fed481bc79db0e",
+      "recording_group": "f53005fcd0124474963cf8a0f48a75eb",
+      "length": 5006,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/annotations/subtasks/coarse/episode_000003.json",
+      "annotation_sha256": "ef20e39f460cdb2600c1c341e587b60e46a51ff1e8606036ff38ef81cab76e05",
+      "source_sha256": {
+        "data/chunk-000/episode_000003.parquet": "23559fe0d5cff0d56317a423075a0319e80d6607d92538c10bc2781978490c94",
+        "videos/chunk-000/observation.images.cam0/episode_000003.mp4": "4dc1904e8f1dd7acbb2b223fa0295285d99405aba665ca0130e8a0fa243ea94d",
+        "videos/chunk-000/observation.images.cam1/episode_000003.mp4": "3a5765bae98457499d2d1e9a74d43dcc8603e4a7a8cbe4767321d89540383282",
+        "videos/chunk-000/observation.images.cam2/episode_000003.mp4": "8058deaab36ad42811940f57b1be56c3dff15547be9926839a214cb7f3195a7d"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "bd5a47912a02c6386a2f5e7dd7c16386c9ad020515260dd7d278eba38665aee0",
+        "meta/episodes.jsonl": "f98b8d741bc40f40c40b1c379f9e92580a24baf4e3c9f02269a03e9d2579fa7e"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 6,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot",
+      "source_episode_index": 4,
+      "agent_episode_id": "9c9c0e8ab7577ddfda0e3b7c",
+      "recording_group": "b0e4b49bfa1641beb783ec4a2e4e66ee",
+      "length": 5266,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/annotations/subtasks/coarse/episode_000004.json",
+      "annotation_sha256": "56651613b485ccfa9fb635d0190fa43ec3b9fd1679bc5990294b9cd7b0740b84",
+      "source_sha256": {
+        "data/chunk-000/episode_000004.parquet": "04ec639268d3967091665398eccba3beebd43c4b8b3bd5857e486679c78d51b2",
+        "videos/chunk-000/observation.images.cam0/episode_000004.mp4": "a073a09e25efb9977e2d0639921a1b4304c52cf0c2bb981d1e9ad72a3e7e9af6",
+        "videos/chunk-000/observation.images.cam1/episode_000004.mp4": "33915c95a16ea3d43a5bb7698cce34848b86ee03e5571f29846002dae0245b5e",
+        "videos/chunk-000/observation.images.cam2/episode_000004.mp4": "4dd97bcaa2222c5536e0c51c72a83721c98f6e15230c339c6c3fa079d61939f2"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "bd5a47912a02c6386a2f5e7dd7c16386c9ad020515260dd7d278eba38665aee0",
+        "meta/episodes.jsonl": "f98b8d741bc40f40c40b1c379f9e92580a24baf4e3c9f02269a03e9d2579fa7e"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 7,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot",
+      "source_episode_index": 5,
+      "agent_episode_id": "d07358493ee75a94905924f0",
+      "recording_group": "6b8eb1ba3f3843e2b952e7a2228dedd1",
+      "length": 5804,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/annotations/subtasks/coarse/episode_000005.json",
+      "annotation_sha256": "6463fc3088b322a73d79e5f95b4f6aee1d377f1cae4fa6b09f23fb29f908ebf8",
+      "source_sha256": {
+        "data/chunk-000/episode_000005.parquet": "413a6901a4178fed5fe752846d205eb34b6785b6c130e7e608b5c5a6297cac40",
+        "videos/chunk-000/observation.images.cam0/episode_000005.mp4": "2d6fb38ebe2a4c80b6f434aa05edff8de86c9cd621e9b6142714af676e3481db",
+        "videos/chunk-000/observation.images.cam1/episode_000005.mp4": "250483754034291231a85fbcac2f3d1b24d29343176c4fa32b73225f4d8426d1",
+        "videos/chunk-000/observation.images.cam2/episode_000005.mp4": "8956e6d002c030b0e2e33db29fe6749a7719411590dc795ee349910e44add160"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "bd5a47912a02c6386a2f5e7dd7c16386c9ad020515260dd7d278eba38665aee0",
+        "meta/episodes.jsonl": "f98b8d741bc40f40c40b1c379f9e92580a24baf4e3c9f02269a03e9d2579fa7e"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 8,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot",
+      "source_episode_index": 6,
+      "agent_episode_id": "103a8a84aaf072aa2fe0b703",
+      "recording_group": "582a9d90ba1246fb948a32cba6a70ab3",
+      "length": 6726,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1103_620_642_normal_lerobot/annotations/subtasks/coarse/episode_000006.json",
+      "annotation_sha256": "3be8c48f01790cc0dc4727fa25105db6aeeffa763104954cef7d9d957f45b166",
+      "source_sha256": {
+        "data/chunk-000/episode_000006.parquet": "33ef4545212942dee756e2a3be74c566ad5414f69eaeed95210cc4e19a23a0e8",
+        "videos/chunk-000/observation.images.cam0/episode_000006.mp4": "446549438305a5bd7cf729a9f56a3462a92e28bd555fa592e3640bc94f542426",
+        "videos/chunk-000/observation.images.cam1/episode_000006.mp4": "28d3753724422364347bf0fbb376ab89fc3676c6077792ff081024e5609a9df2",
+        "videos/chunk-000/observation.images.cam2/episode_000006.mp4": "8292c206ee0314b4eee430ff330d3dca57739eae9d57ec65ffe7730a075b6628"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "bd5a47912a02c6386a2f5e7dd7c16386c9ad020515260dd7d278eba38665aee0",
+        "meta/episodes.jsonl": "f98b8d741bc40f40c40b1c379f9e92580a24baf4e3c9f02269a03e9d2579fa7e"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 9,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 0,
+      "agent_episode_id": "d1bea10cbee2dcf0a031297f",
+      "recording_group": "0c4d5c84112d4f1f993877f6b854eaa0",
+      "length": 4427,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000000.json",
+      "annotation_sha256": "a31bc56d0f3849d6337d6fad77221e7ecefb5dd824ed99958c812ff8fe89453a",
+      "source_sha256": {
+        "data/chunk-000/episode_000000.parquet": "7961479040c0d7d97fe95f9d36362fee238362d9ff4d42082f09151c16d764a0",
+        "videos/chunk-000/observation.images.cam0/episode_000000.mp4": "1286ab088208a39a2657ccf56d38d95197cfe7e460db4611100116c2bae75d61",
+        "videos/chunk-000/observation.images.cam1/episode_000000.mp4": "bec569cf06d5e69062edfa89b8daf823da2d3c9b6b03982941680ac82916d74e",
+        "videos/chunk-000/observation.images.cam2/episode_000000.mp4": "b7d5e9504d07188a2bb7685bf8c567db8e8510a791c72dd4833a1146c42ad493"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 10,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 1,
+      "agent_episode_id": "f6b755a9ea4607d8c2cc21d7",
+      "recording_group": "f36134a910264a68b3ebc3be473d2e15",
+      "length": 4593,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000001.json",
+      "annotation_sha256": "4be87ead383bfe0232e9015e8fe5b87d952df4cec713e947466d28db30e931dd",
+      "source_sha256": {
+        "data/chunk-000/episode_000001.parquet": "27c13277449c0404b25cc699b7088ad340673ca48375141b22e4bac917211731",
+        "videos/chunk-000/observation.images.cam0/episode_000001.mp4": "be68f8a3140da4a9b839527f9c81ae802d395acda2c8f82a3bfbcb482dd49497",
+        "videos/chunk-000/observation.images.cam1/episode_000001.mp4": "d1c7f1dee5281f8aa1524cfcae2260c40e25eb1a77b0b953638aa229658bfe5d",
+        "videos/chunk-000/observation.images.cam2/episode_000001.mp4": "d9d5ae20ebe8535a9c50ea4a40a1e097a4f1a6e6887f2f13a8b4c5a1c63b8e85"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 11,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 2,
+      "agent_episode_id": "0b12ac0fda9d7cd77dee6e60",
+      "recording_group": "2c30455ce7794b87af8b0a60af0a0dab",
+      "length": 5415,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000002.json",
+      "annotation_sha256": "109708e7d940abb8a44e64d9e61297c3ce4805a97efc9128152a4566551e9e3d",
+      "source_sha256": {
+        "data/chunk-000/episode_000002.parquet": "b6da932d18fbb3eb9de2bffce8cfdfe4942611e3c5de813ad162cdf7e18cf30a",
+        "videos/chunk-000/observation.images.cam0/episode_000002.mp4": "c79be8a3201310c7988397474fa4513115b7ed482ff9afa0f65634e66a976cf4",
+        "videos/chunk-000/observation.images.cam1/episode_000002.mp4": "16e2b20481c92aa6ff6399f8f3aa81a4a47b7ec94e54dcba3311997577e983dc",
+        "videos/chunk-000/observation.images.cam2/episode_000002.mp4": "67f595b1ae745e4ca9bbfd44cf911689edb20cb03c7308544ce1c12b89e082cb"
+      },
+      "agent_split_provenance": "val",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "needs_resolution",
+      "phase_differences": [
+        {
+          "phase_index": 2,
+          "saved": {
+            "end_frame": 2424,
+            "end_seconds": 80.8,
+            "label": "return",
+            "reviewed": true,
+            "segment_index": 3,
+            "start_frame": 2216,
+            "start_seconds": 73.86666666666666,
+            "text": "Right hand returns the held object to the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 2420,
+            "end_seconds": 80.66666666666667,
+            "label": "return",
+            "reviewed": true,
+            "segment_index": 3,
+            "start_frame": 2216,
+            "start_seconds": 73.86666666666666,
+            "text": "Right hand returns the held object to the right plate"
+          }
+        },
+        {
+          "phase_index": 3,
+          "saved": {
+            "end_frame": 2975,
+            "end_seconds": 99.16666666666667,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 2424,
+            "start_seconds": 80.8,
+            "text": "Right fingers reposition the truss on the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 2974,
+            "end_seconds": 99.13333333333334,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 2420,
+            "start_seconds": 80.66666666666667,
+            "text": "Right fingers reposition the truss on the right plate"
+          }
+        },
+        {
+          "phase_index": 4,
+          "saved": {
+            "end_frame": 3408,
+            "end_seconds": 113.6,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 2975,
+            "start_seconds": 99.16666666666667,
+            "text": "Right hand grasps and lifts the truss to the center"
+          },
+          "agent_effective": {
+            "end_frame": 3413,
+            "end_seconds": 113.76666666666667,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 2974,
+            "start_seconds": 99.13333333333334,
+            "text": "Right hand grasps and lifts the truss to the center"
+          }
+        },
+        {
+          "phase_index": 5,
+          "saved": {
+            "end_frame": 5267,
+            "end_seconds": 175.56666666666666,
+            "label": "harvest",
+            "reviewed": true,
+            "segment_index": 6,
+            "start_frame": 3408,
+            "start_seconds": 113.6,
+            "text": "Right hand holds truss while left hand picks tomatoes into left basket"
+          },
+          "agent_effective": {
+            "end_frame": 5267,
+            "end_seconds": 175.56666666666666,
+            "label": "harvest",
+            "reviewed": true,
+            "segment_index": 6,
+            "start_frame": 3413,
+            "start_seconds": 113.76666666666667,
+            "text": "Right hand holds truss while left hand picks tomatoes into left basket"
+          }
+        }
+      ],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 12,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 3,
+      "agent_episode_id": "344622e0733da880525eec9b",
+      "recording_group": "b8b78d4a14144ab1b441a100b880929a",
+      "length": 4704,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000003.json",
+      "annotation_sha256": "0e57db58ad60790e3d5ec1db443c4ec1be9868d0876e2f59f557bfa12ee75acb",
+      "source_sha256": {
+        "data/chunk-000/episode_000003.parquet": "73cfb06c21896e715f9dc4a52274a5d410aecdba08aca6883f850bae823dabb9",
+        "videos/chunk-000/observation.images.cam0/episode_000003.mp4": "0ff8e1b5a2fadc53e0c93344857092ed0cc1b097f3e2e77e2320425baf8a77b2",
+        "videos/chunk-000/observation.images.cam1/episode_000003.mp4": "1cfa7e0f855deb0d9b716714b86be9161b8a2b53e19c49dd2509bc71b3097384",
+        "videos/chunk-000/observation.images.cam2/episode_000003.mp4": "5b28a5aec1f35e5e71b55119a2737ff53cf43b5f04c14acf4f1585624b6d3525"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 13,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 4,
+      "agent_episode_id": "2d40905a7613700a333446b9",
+      "recording_group": "9e19bb249db04f8781577bc3ad22d753",
+      "length": 3870,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000004.json",
+      "annotation_sha256": "33f5e66795b631654e3b54fd61c7ca98e641c7d397818c85721bf2ccc05d1bdf",
+      "source_sha256": {
+        "data/chunk-000/episode_000004.parquet": "e2e911e2cab08dc693f7ddd214a591dc2eef3388c23e4ae7b501cbaf9b3bb228",
+        "videos/chunk-000/observation.images.cam0/episode_000004.mp4": "6639fff58d81c777b916400d8ad52d56a9023516612290ce3b30f1fc611f7023",
+        "videos/chunk-000/observation.images.cam1/episode_000004.mp4": "fba2b576232c5ece992b1a5610395dd95c5faee39a465413ddc22f58fcc84a5c",
+        "videos/chunk-000/observation.images.cam2/episode_000004.mp4": "cd928b6b270070c45ab0c1adc1151bf5578321a08e0ec28350fcccab3d5e5999"
+      },
+      "agent_split_provenance": "test",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 14,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 5,
+      "agent_episode_id": "ff4170cf447a7d7367a9cf4e",
+      "recording_group": "8b6950279df34fe898952c53644aa458",
+      "length": 5441,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000005.json",
+      "annotation_sha256": "3b079c25bc087d9471d063ecaa9e3f8f45d3e6cd497d5a48eb6ae7beb0846bde",
+      "source_sha256": {
+        "data/chunk-000/episode_000005.parquet": "b8bbdbf7c5829e460ffae85d6ed6293831d7091cecb4c4da3527bf7b7b287b0d",
+        "videos/chunk-000/observation.images.cam0/episode_000005.mp4": "c87ecca48edf5250157fec8a0eb7d1e5907812b63d37114e424dee4340167b15",
+        "videos/chunk-000/observation.images.cam1/episode_000005.mp4": "76de58b83f3f9c41d9a822adbd0700bcd0276ee3e8b9e37f605653e3d0fe2daa",
+        "videos/chunk-000/observation.images.cam2/episode_000005.mp4": "de38131c39272f00de10f2b970bc9cb5cae1df55d775844073e0a45ba9b19dbe"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 15,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 6,
+      "agent_episode_id": "d72a1dc017f3ae8ed1a433e1",
+      "recording_group": "b200c493aea6474fbdc4e114a9650bd3",
+      "length": 5145,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000006.json",
+      "annotation_sha256": "c7e2eee01cd5bbd27381bb6a1edef298bce68a6ab8d0d98436a6c7e2b53c235c",
+      "source_sha256": {
+        "data/chunk-000/episode_000006.parquet": "9bea0d489f07cb0880d9981dd540703943a04683f76a1deb9b47c9afcb006c07",
+        "videos/chunk-000/observation.images.cam0/episode_000006.mp4": "caace88c32d4d9474bf8b1c9f4e1368a225af5c41353778201e437548debbe75",
+        "videos/chunk-000/observation.images.cam1/episode_000006.mp4": "624c069af8e6c4e85c5a369722be979b1f9e6c6fdc92bb968845316eb559af5d",
+        "videos/chunk-000/observation.images.cam2/episode_000006.mp4": "f46de488096e41bd358b1a6a11eace96b204e4e120804c259ed060d3aa79e756"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 16,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 7,
+      "agent_episode_id": "61c420843f11ca54bfe804ee",
+      "recording_group": "1b2e1a577afa442cb057c595cf27c48f",
+      "length": 4285,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000007.json",
+      "annotation_sha256": "64b6044cceda07ad70f19899f39910de4ba1324550b3a5aa1ec18d493ffb3ac7",
+      "source_sha256": {
+        "data/chunk-000/episode_000007.parquet": "f4f0cd85f6a1dd3498434662b63f13eade3f606af57c40f533783e9b5bda6b08",
+        "videos/chunk-000/observation.images.cam0/episode_000007.mp4": "66d9174eb8ac8a4358fde675aae1a0608126ac1d7463b24374c9a4c90ce07414",
+        "videos/chunk-000/observation.images.cam1/episode_000007.mp4": "86d6151649821ba0fcf41832f4f4669715cec36b9f5dfc9f11a3e1e0326e1061",
+        "videos/chunk-000/observation.images.cam2/episode_000007.mp4": "c5b065ef4a57704e800276ba1c574aa71b578ab343d42cafa53b263116904a36"
+      },
+      "agent_split_provenance": "val",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "needs_resolution",
+      "phase_differences": [
+        {
+          "phase_index": 3,
+          "saved": {
+            "end_frame": 2722,
+            "end_seconds": 90.73333333333333,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 2328,
+            "start_seconds": 77.6,
+            "text": "Right fingers reposition the truss on the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 2712,
+            "end_seconds": 90.4,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 2328,
+            "start_seconds": 77.6,
+            "text": "Right fingers reposition the truss on the right plate"
+          }
+        },
+        {
+          "phase_index": 4,
+          "saved": {
+            "end_frame": 3020,
+            "end_seconds": 100.66666666666667,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 2722,
+            "start_seconds": 90.73333333333333,
+            "text": "Right hand grasps and lifts the truss to the center"
+          },
+          "agent_effective": {
+            "end_frame": 3020,
+            "end_seconds": 100.66666666666667,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 2712,
+            "start_seconds": 90.4,
+            "text": "Right hand grasps and lifts the truss to the center"
+          }
+        }
+      ],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 17,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 8,
+      "agent_episode_id": "2949e71f692973e6db8b3af8",
+      "recording_group": "7f2b191c99d14bf1834641e867dfa66e",
+      "length": 4513,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000008.json",
+      "annotation_sha256": "a34a49a89c91a3eba3d6cdcd48f984b102a3fdf780621a5599f2c26c2a14724f",
+      "source_sha256": {
+        "data/chunk-000/episode_000008.parquet": "d2b9935f5bdba4913d93b6b042409ad7edebc68b2c501f603bf2c81d98bca78b",
+        "videos/chunk-000/observation.images.cam0/episode_000008.mp4": "9fcc041bf69324dc6b4cc38cb07a4244a844477e17a01c388686a73aae3059bc",
+        "videos/chunk-000/observation.images.cam1/episode_000008.mp4": "b338215d90df73540ac42ca958c16ab6694dfb5cdca5811ddde1fdf3a79866fb",
+        "videos/chunk-000/observation.images.cam2/episode_000008.mp4": "fee413ddda63aee126532c9b788b6ec4fe044b99ff81497caebffe98303c10a0"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 18,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 9,
+      "agent_episode_id": "5b82f4bb76e70d8bf12c0798",
+      "recording_group": "9a90a945e77e49aabb7a3d4e44246155",
+      "length": 4212,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000009.json",
+      "annotation_sha256": "ece74cd377bfa49fd37c358efdb3900cae8f7ec5844859aadea3466b450f7564",
+      "source_sha256": {
+        "data/chunk-000/episode_000009.parquet": "8850a739c2d495d03edc6c8cba74558a87d909d26be84363f26dc19d5293c29e",
+        "videos/chunk-000/observation.images.cam0/episode_000009.mp4": "233bdbd3a3ff95c4515718b6effbecd0ab2a7dd315cdb5f0a47f4a6d600b0fdf",
+        "videos/chunk-000/observation.images.cam1/episode_000009.mp4": "54238b8adc1151700239287f5eef9f24ef8723cf69e2520243cd133cc40157da",
+        "videos/chunk-000/observation.images.cam2/episode_000009.mp4": "96023ba2ef5d39c9593bda733952cf81b288793a38465a56bc182fd979cbb72d"
+      },
+      "agent_split_provenance": "val",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "needs_resolution",
+      "phase_differences": [
+        {
+          "phase_index": 3,
+          "saved": {
+            "end_frame": 2725,
+            "end_seconds": 90.83333333333333,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 1884,
+            "start_seconds": 62.8,
+            "text": "Right fingers reposition the truss on the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 2709,
+            "end_seconds": 90.3,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 1884,
+            "start_seconds": 62.8,
+            "text": "Right fingers reposition the truss on the right plate"
+          }
+        },
+        {
+          "phase_index": 4,
+          "saved": {
+            "end_frame": 2973,
+            "end_seconds": 99.1,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 2725,
+            "start_seconds": 90.83333333333333,
+            "text": "Right hand grasps and lifts the truss to the center"
+          },
+          "agent_effective": {
+            "end_frame": 2973,
+            "end_seconds": 99.1,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 2709,
+            "start_seconds": 90.3,
+            "text": "Right hand grasps and lifts the truss to the center"
+          }
+        }
+      ],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 19,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 10,
+      "agent_episode_id": "3f1099b1a9f1e73f50cc8e69",
+      "recording_group": "d673201bbf804640a75110175bbe0b45",
+      "length": 3867,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000010.json",
+      "annotation_sha256": "3fe015a4dd8ddc9114894c5ae174030d373cad832717a6d164fe7b4c8e1224de",
+      "source_sha256": {
+        "data/chunk-000/episode_000010.parquet": "482296fdd307dbb33cc17ddeb0a1b2739bef7cb84fe830c02b8d7240a643babc",
+        "videos/chunk-000/observation.images.cam0/episode_000010.mp4": "4935c35b165704f409a72132e79efc8d8dc1c7e2e182a4fdc280a28909adca9d",
+        "videos/chunk-000/observation.images.cam1/episode_000010.mp4": "36b1f87fc3e3b759613a854666a3d51c5ed6e5baa11ff1bd91a7a905a95ccbc4",
+        "videos/chunk-000/observation.images.cam2/episode_000010.mp4": "24348e2e6b204c058026b170e09c4114c7956b7be8e98a3b237884cb0ae2db76"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 20,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 11,
+      "agent_episode_id": "d181578c7dec775708be158e",
+      "recording_group": "e2772eb099e84674a0b6f46f3a89db22",
+      "length": 3850,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000011.json",
+      "annotation_sha256": "86de7c09e8ef4f59bca4346c9cae924ab21c754a47fa036c775f1a734b3f4770",
+      "source_sha256": {
+        "data/chunk-000/episode_000011.parquet": "e65015dd751c5c4e64ea152936d49e2bbd0a4e518b7db10171ccdaa14cafde5e",
+        "videos/chunk-000/observation.images.cam0/episode_000011.mp4": "cf9b66c6126134f713b8596e442422701c8efd16568fef6c5bc35989aee6e224",
+        "videos/chunk-000/observation.images.cam1/episode_000011.mp4": "e2a5bd93d39fea13f9ea862992f6ead9572ca519001871901dac195d32d9c2fa",
+        "videos/chunk-000/observation.images.cam2/episode_000011.mp4": "92bb8eba354d57273059ab794ba4f56c77881738f212d8ed4e5d8a4f171fba86"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 21,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 12,
+      "agent_episode_id": "7eb896d2ddfc03a18e8b6cdb",
+      "recording_group": "eb03aa84529944808c05efa24179f45f",
+      "length": 6065,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000012.json",
+      "annotation_sha256": "91d340965ee30b8c5c65d77664840e4f830f789c768a0a6df32f50568437fcfe",
+      "source_sha256": {
+        "data/chunk-000/episode_000012.parquet": "48bfe0078506c92a0c5e312f7ff609d731410bb067b749afbc100be4f1b1025c",
+        "videos/chunk-000/observation.images.cam0/episode_000012.mp4": "ae67d1d41a34f8f73b1240b0bf6327167455dcdfafecb3bf574ac416c4019273",
+        "videos/chunk-000/observation.images.cam1/episode_000012.mp4": "3ee9e72ae8ddfd8996f64d14233db831afdf04c6f7d64e9b973dfa5432cf6b96",
+        "videos/chunk-000/observation.images.cam2/episode_000012.mp4": "8c23929e6914a181e930cdbcb318ae7542bb128b9b9f2b89b8568769f50c385d"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 22,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 13,
+      "agent_episode_id": "c88604cfdfe181263bb04bd9",
+      "recording_group": "5d8ad555472e4581a1768e9c27eb03e2",
+      "length": 4807,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000013.json",
+      "annotation_sha256": "93c7fdd56ea7ad279b9065a94c1e8bc4e820df117be27d2c302176998c7bb4f9",
+      "source_sha256": {
+        "data/chunk-000/episode_000013.parquet": "a59de3caa9f9973285cb6e5ffe6863ff15df2dcf57333a5f937e05b60309703f",
+        "videos/chunk-000/observation.images.cam0/episode_000013.mp4": "def2d3d1bd81d0f1b0ff431bdf4f36307770fcbca3bcc4c98eb347cdd6738c05",
+        "videos/chunk-000/observation.images.cam1/episode_000013.mp4": "48fadea25995c1597587eb904720052b2e546f8a0e9a91c25d1efadf0d94d016",
+        "videos/chunk-000/observation.images.cam2/episode_000013.mp4": "38084019ca491d0c35323e2f26ad3eb9f0d0e28f13e8a58fcfc06de3b53dd93b"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 23,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 14,
+      "agent_episode_id": "7d3563e229737ee222cdea43",
+      "recording_group": "15cf727eaed2406fb2ea6dc7fd4e52e9",
+      "length": 4415,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000014.json",
+      "annotation_sha256": "983bc4fa53e9832252e12443ebf4ad4e26f6bcdee035fd7b17f92c8f80e98238",
+      "source_sha256": {
+        "data/chunk-000/episode_000014.parquet": "bf3ed3a754f74d81970b66f0500d0c68500ec652e8fb6ca891cc6c596a9f2cc4",
+        "videos/chunk-000/observation.images.cam0/episode_000014.mp4": "1e9deacc60021a02713167e56da59498221463fbb4e903b7aea47c1c4eb6065b",
+        "videos/chunk-000/observation.images.cam1/episode_000014.mp4": "20e6cd15cb3ede50525b01d7d20a42b131b637bf2241f3817f8e9d6481eaf6a8",
+        "videos/chunk-000/observation.images.cam2/episode_000014.mp4": "997ce487e5ee41bef8927f5991d46b42df5f932ba6671f071b4ec47a93b95dad"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 24,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot",
+      "source_episode_index": 15,
+      "agent_episode_id": "63242061de4993d281f7e41f",
+      "recording_group": "e33257a2421b4f03b0d786ed7bda4699",
+      "length": 4990,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1104_652_697_normal_lerobot/annotations/subtasks/coarse/episode_000015.json",
+      "annotation_sha256": "3b58b2988d33401d9c7d91dd24284e9a8c84566f675dcc24acea5053ae4d7147",
+      "source_sha256": {
+        "data/chunk-000/episode_000015.parquet": "1206ae24da87f783b51103786bef580fe3bada239651fb5ec6ac7ef6c75abbdf",
+        "videos/chunk-000/observation.images.cam0/episode_000015.mp4": "515fb8fa0ec478707d78dce73e4b66c1c8679b9d52b2897eb7689cb6e0695bd6",
+        "videos/chunk-000/observation.images.cam1/episode_000015.mp4": "aa3268e4b093740b3f221c1a5758ce709e07e636e00da1f6307c8346315b4a33",
+        "videos/chunk-000/observation.images.cam2/episode_000015.mp4": "7bab1498b9701977e87bbc0efa9a809828c12a9e76884d7fdba061c901478b80"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "722eb73c8a19292560c50ed48602e89e645a04bc9698edf91ab64a99a8e8f3ee",
+        "meta/episodes.jsonl": "40e94696eb18b060fd5e7158ba6c32b92e6ff8371643c035c45cfc47752b8cfb"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 25,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 0,
+      "agent_episode_id": "14ee7fa242865e1d2d940612",
+      "recording_group": "bb378a3fc949476d98a5a21b68a157c5",
+      "length": 4574,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000000.json",
+      "annotation_sha256": "4a93e8da1106f6bc090edab3cfaeb33d09d7a4938f9c5ceb0de9bca599b7d3c0",
+      "source_sha256": {
+        "data/chunk-000/episode_000000.parquet": "6a9fffeccdfb9cd9fb1cf19c2795843cead0dbdf015d77dd609dfca30c79cd9d",
+        "videos/chunk-000/observation.images.cam0/episode_000000.mp4": "e6d714ea2afdb2c8d74ce3c100d2fe7fb5dbf4e689b3b9946b6f26e7fc98f9d2",
+        "videos/chunk-000/observation.images.cam1/episode_000000.mp4": "d3bea762fbb079a28fdd67d23159ee2e4064d201c2251f25646b32590a477311",
+        "videos/chunk-000/observation.images.cam2/episode_000000.mp4": "702fb034460717a5e7397d61d454b86622730853faad68666bf9d5dfacff74f3"
+      },
+      "agent_split_provenance": "test",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 26,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 1,
+      "agent_episode_id": "67e1ef837772900ad398f54a",
+      "recording_group": "f6e25ffdb2744acf95fc92f22815f319",
+      "length": 3932,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000001.json",
+      "annotation_sha256": "48a655a2debc043c9bf2df9c4eceaf59b7844ac697d493f59ae36aaae7727103",
+      "source_sha256": {
+        "data/chunk-000/episode_000001.parquet": "b804510612a698b18973bf28a1ad871a1b2ff438de7892ac9fe4f457e50accb8",
+        "videos/chunk-000/observation.images.cam0/episode_000001.mp4": "ca4198a9dd8c13d926ec521a699a726b9ac6625bff1a51a306e14adde634c117",
+        "videos/chunk-000/observation.images.cam1/episode_000001.mp4": "d91cdc5faab51c4bff15926f437fa2a17f46ff375a1862370b833aac9287a644",
+        "videos/chunk-000/observation.images.cam2/episode_000001.mp4": "cab795d5376e388efee1a9fdb2791ddf00421f1ff7459402a57a7517fd39d551"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 27,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 2,
+      "agent_episode_id": "aca9760a87c0f6d9bd7592f2",
+      "recording_group": "97b0a0e7b27140cc933c1c6f8bc7ca1f",
+      "length": 5566,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000002.json",
+      "annotation_sha256": "ac13f38d05cd13635a69e4f187b453f046144a847b5af84d7fb62c3a0952ae5f",
+      "source_sha256": {
+        "data/chunk-000/episode_000002.parquet": "fae0dba5d10763b1d3904fb5c3d3cbe43fce89489ee24f4cbcaea390b46abde1",
+        "videos/chunk-000/observation.images.cam0/episode_000002.mp4": "6d619c4eee643b7c833ab31b941c04e9062819c2dc0fd8c31ecf55b8d1700672",
+        "videos/chunk-000/observation.images.cam1/episode_000002.mp4": "e28d1eac49d17cfd919205336875bb66c8d3d47d76921b758011ebd336a0ed85",
+        "videos/chunk-000/observation.images.cam2/episode_000002.mp4": "c275446dd5613fb721ad380753d8e4bf62f4e6c5eef0a91d74a3c0e6df9c5c35"
+      },
+      "agent_split_provenance": "test",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 28,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 3,
+      "agent_episode_id": "ed68fecbe1e0ad9233f0b7e3",
+      "recording_group": "19e729d039fc41c587f597f857099965",
+      "length": 4893,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000003.json",
+      "annotation_sha256": "d6c3816e85b904090bdef0820c5f13a4f67ca50d2e1d2ae92009e56c7b4b1148",
+      "source_sha256": {
+        "data/chunk-000/episode_000003.parquet": "f90d5c93a96c946b4a0fe94148e6ecd4d25e8191ae64abe5796d9d9c87e0a2c7",
+        "videos/chunk-000/observation.images.cam0/episode_000003.mp4": "7cb7cf226dd0402fe1e18833d9b4137cc4066519c4bd4ea44ec5a0a93bf32bd8",
+        "videos/chunk-000/observation.images.cam1/episode_000003.mp4": "2758a4273c190671026e074c30d35536ff27a1d70b78ad2c3faa2dd33e43a459",
+        "videos/chunk-000/observation.images.cam2/episode_000003.mp4": "258904c9c190e0691c5992520d49e7a7e8593293e3101629160e62da633db751"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 29,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 4,
+      "agent_episode_id": "f53f0b6fb7f3888f87a0f8ff",
+      "recording_group": "7bedea6b1c034982bf1cec5050ad2dc3",
+      "length": 5371,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000004.json",
+      "annotation_sha256": "a144b16699679e341ab853261fa7b544229cf909679b4aa95875972787e3139d",
+      "source_sha256": {
+        "data/chunk-000/episode_000004.parquet": "b8fd267e008d0cbb7da3f295fd329332fbd5f46b364ebeb406be5ce727a92eda",
+        "videos/chunk-000/observation.images.cam0/episode_000004.mp4": "58f539897d287531c6c885da887c416fcba643548f738c554bfec1cb35a52a64",
+        "videos/chunk-000/observation.images.cam1/episode_000004.mp4": "220aa25de880ba99bab768bf81f4ea8fe7dc029e703d3786759f4cfd8d87504c",
+        "videos/chunk-000/observation.images.cam2/episode_000004.mp4": "4d847af8dc7d87059ff875f57edd9d5bfd5ceaacc72dbbe6ed5bfc4f445943e8"
+      },
+      "agent_split_provenance": "val",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "needs_resolution",
+      "phase_differences": [
+        {
+          "phase_index": 2,
+          "saved": {
+            "end_frame": 1987,
+            "end_seconds": 66.23333333333333,
+            "label": "return",
+            "reviewed": true,
+            "segment_index": 3,
+            "start_frame": 1889,
+            "start_seconds": 62.96666666666667,
+            "text": "Right hand returns the held object to the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 1986,
+            "end_seconds": 66.2,
+            "label": "return",
+            "reviewed": true,
+            "segment_index": 3,
+            "start_frame": 1889,
+            "start_seconds": 62.96666666666667,
+            "text": "Right hand returns the held object to the right plate"
+          }
+        },
+        {
+          "phase_index": 3,
+          "saved": {
+            "end_frame": 2888,
+            "end_seconds": 96.26666666666667,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 1987,
+            "start_seconds": 66.23333333333333,
+            "text": "Right fingers reposition the truss on the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 2846,
+            "end_seconds": 94.86666666666666,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 1986,
+            "start_seconds": 66.2,
+            "text": "Right fingers reposition the truss on the right plate"
+          }
+        },
+        {
+          "phase_index": 4,
+          "saved": {
+            "end_frame": 3198,
+            "end_seconds": 106.6,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 2888,
+            "start_seconds": 96.26666666666667,
+            "text": "Right hand grasps and lifts the truss to the center"
+          },
+          "agent_effective": {
+            "end_frame": 3198,
+            "end_seconds": 106.6,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 2846,
+            "start_seconds": 94.86666666666666,
+            "text": "Right hand grasps and lifts the truss to the center"
+          }
+        },
+        {
+          "phase_index": 5,
+          "saved": {
+            "end_frame": 5262,
+            "end_seconds": 175.4,
+            "label": "harvest",
+            "reviewed": true,
+            "segment_index": 6,
+            "start_frame": 3198,
+            "start_seconds": 106.6,
+            "text": "Right hand holds truss while left hand picks tomatoes into left basket"
+          },
+          "agent_effective": {
+            "end_frame": 5263,
+            "end_seconds": 175.43333333333334,
+            "label": "harvest",
+            "reviewed": true,
+            "segment_index": 6,
+            "start_frame": 3198,
+            "start_seconds": 106.6,
+            "text": "Right hand holds truss while left hand picks tomatoes into left basket"
+          }
+        },
+        {
+          "phase_index": 6,
+          "saved": {
+            "end_frame": 5371,
+            "end_seconds": 179.03333333333333,
+            "label": "return",
+            "reviewed": true,
+            "segment_index": 7,
+            "start_frame": 5262,
+            "start_seconds": 175.4,
+            "text": "Right hand returns the held object to the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 5371,
+            "end_seconds": 179.03333333333333,
+            "label": "return",
+            "reviewed": true,
+            "segment_index": 7,
+            "start_frame": 5263,
+            "start_seconds": 175.43333333333334,
+            "text": "Right hand returns the held object to the right plate"
+          }
+        }
+      ],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 30,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 5,
+      "agent_episode_id": "9f21d91289b732800d9e8659",
+      "recording_group": "f0911f9ed7414ad3853ccdbc25e8078b",
+      "length": 4088,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000005.json",
+      "annotation_sha256": "938dad68eb384d06159713e95263058e3f99e4443d64527962a67b44763d8fb5",
+      "source_sha256": {
+        "data/chunk-000/episode_000005.parquet": "a4b0208d6a5da9467d90bd3185f86f670502789a519ccf9838575b34a232a6e0",
+        "videos/chunk-000/observation.images.cam0/episode_000005.mp4": "134f894d644e17703a136f744d97d09063d729ca4cec49572657c115e26bd248",
+        "videos/chunk-000/observation.images.cam1/episode_000005.mp4": "5ff75865b80f314a370cf99322d9f4b8309ca0f7699c1278a61ac53f54f185e0",
+        "videos/chunk-000/observation.images.cam2/episode_000005.mp4": "17a41e7c917e893a32c3dbfd7c7baf8a9d76878086e69ad8b477b1509335db8e"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 31,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 6,
+      "agent_episode_id": "de33521b3d36212c2f4fc651",
+      "recording_group": "2256d59c5b8d4dbba5bb13f06bde7e00",
+      "length": 6735,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000006.json",
+      "annotation_sha256": "e865dfde263b63c062ebddcd3d3eb44208de3bd8f7d89df589a7e887ae9218f3",
+      "source_sha256": {
+        "data/chunk-000/episode_000006.parquet": "5351836c89bd79449b20fc005d67b80bd32da46040647bcc828235e1fc21ea91",
+        "videos/chunk-000/observation.images.cam0/episode_000006.mp4": "fe5127dae451e6969e364549e94d7df47775ec73fd82cf0613094fea76dda3e9",
+        "videos/chunk-000/observation.images.cam1/episode_000006.mp4": "57a4162f471882c032bd8aa035500ba8bcdf20d0f5bb8e23abcf06709b671b47",
+        "videos/chunk-000/observation.images.cam2/episode_000006.mp4": "9a224c3ec7906d3006358738804f387821e64081d6edd4c2f9e05702d5c52b7e"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 32,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 7,
+      "agent_episode_id": "dbe7c3fd1f63c53dd300df07",
+      "recording_group": "d7c0fe71a6ce4330a65beaf26c41c820",
+      "length": 4197,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000007.json",
+      "annotation_sha256": "77417f250eaa0d9c5922072373478002fe3f38a45a84100b089704962a916a4e",
+      "source_sha256": {
+        "data/chunk-000/episode_000007.parquet": "01d61b6f814c7f6ad410af430b5f96db48f768ca85d6daa16d4d76177056c8ad",
+        "videos/chunk-000/observation.images.cam0/episode_000007.mp4": "f6eb4f6f1f18ff24db15ab37355c40da00d58374b0ed5f67e300d9c3946502a2",
+        "videos/chunk-000/observation.images.cam1/episode_000007.mp4": "e839d926746591ebb2c2b5cd426753cb4427df8d45fa90c96614fd29f65fa5d2",
+        "videos/chunk-000/observation.images.cam2/episode_000007.mp4": "ef3bcd7139f0c283626720e8ba44d09580563b419f1932fbff592e4e14d4d68b"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 33,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 8,
+      "agent_episode_id": "de9661b37822f64b8de35247",
+      "recording_group": "9c6fd4d27e9e4713819c96a88264c853",
+      "length": 5019,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000008.json",
+      "annotation_sha256": "1249aba2dabadd8934bc4aca762cc2138c09b3dc3eb792646175152ba5122e3a",
+      "source_sha256": {
+        "data/chunk-000/episode_000008.parquet": "5c41c8b0586dd66fc78f6f65c161250a8bc7aedda7fa5701b75b6f33273123a1",
+        "videos/chunk-000/observation.images.cam0/episode_000008.mp4": "324ff484e030a57b6b0ef7aba480305b23a8d532f7c9361d81ce96eabb2a4677",
+        "videos/chunk-000/observation.images.cam1/episode_000008.mp4": "8d4ebaa1ca3ce89220d2a86b9c541680e5c24d86c525d9fea41b5d4b29cbc9ee",
+        "videos/chunk-000/observation.images.cam2/episode_000008.mp4": "f565881018bca573bce0cc4ef4ad34a744301e2cab9cc530950ad7ea03972988"
+      },
+      "agent_split_provenance": "test",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 34,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 9,
+      "agent_episode_id": "b1455b4921f8a1c35562c08c",
+      "recording_group": "1ae08349f74447428c83b42863ddd33e",
+      "length": 4512,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000009.json",
+      "annotation_sha256": "b1944bffaf9ec0c2099c51be15b1d54bbff33b42ac6bf893e0a417cb775018af",
+      "source_sha256": {
+        "data/chunk-000/episode_000009.parquet": "a74a2e3d1de44ae1674016d843615fcd770fe552450dde9f62aa24f1d46db085",
+        "videos/chunk-000/observation.images.cam0/episode_000009.mp4": "c8d9b2d70737e39b3e786d1b9dd18f64e72044550cf85353121d134daa391341",
+        "videos/chunk-000/observation.images.cam1/episode_000009.mp4": "a7b776284ccd570d5aaa23c47f00caa5d4c25014fbd424c36605535ac948ca70",
+        "videos/chunk-000/observation.images.cam2/episode_000009.mp4": "5beacee9a921aa8f8c865274a65fd4c7946b0c44e342b17e5f9eece875f60120"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 35,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 10,
+      "agent_episode_id": "b8fe452a236b169213200aa2",
+      "recording_group": "7e7664e1f87f46c79c74a49b7ac7e531",
+      "length": 3953,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000010.json",
+      "annotation_sha256": "abce9a4709160448f4ca34f93c84bd98176b985f3adf3f2c48f0d01e783b66c2",
+      "source_sha256": {
+        "data/chunk-000/episode_000010.parquet": "78dffb7473837075a5c66aa1d55d134b671469ab75c2e1db09ca576527e60ea8",
+        "videos/chunk-000/observation.images.cam0/episode_000010.mp4": "32161bdec261783c40762fef512694d8091dc9a0d72f5aba90a33a08f3b1c1db",
+        "videos/chunk-000/observation.images.cam1/episode_000010.mp4": "a7d3b0588a79f36449ebd9899e5e6f0409d1e7167e068707fa8d8ab8db66c902",
+        "videos/chunk-000/observation.images.cam2/episode_000010.mp4": "56b4b66d26554cec7be88cd91cdc3d01a67419c3d7617d350e4357ac43ab1649"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 36,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 11,
+      "agent_episode_id": "8432adc20e1292edecedeb42",
+      "recording_group": "e5b435cf5e6442a2bfb0046bc163bb6a",
+      "length": 3571,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000011.json",
+      "annotation_sha256": "fa2e622f951deb0db932be21c0821447b2e99bcfd5a74a5a39de1f6bc15baa3e",
+      "source_sha256": {
+        "data/chunk-000/episode_000011.parquet": "94657978d2f8d6aa59f016bb24d5d3357ceed8df6cb7d98ae14c6021d39ae020",
+        "videos/chunk-000/observation.images.cam0/episode_000011.mp4": "41a0681ce8dba124b29571c2141ca63af9e9a2e1cf11ebe4818d188da1e600ce",
+        "videos/chunk-000/observation.images.cam1/episode_000011.mp4": "8616a8083912e1ed984dcd30137f40cdb94708ee33a468936ce9609bb2a531b6",
+        "videos/chunk-000/observation.images.cam2/episode_000011.mp4": "e5d8cb181cd2fa00abcfab3a4752d59fccc17ec5268803b861b55ab64b98729f"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 37,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 12,
+      "agent_episode_id": "4c9ff33b07c0820e6aba1e54",
+      "recording_group": "40d26db9982f4d508076f5686d38d664",
+      "length": 5423,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000012.json",
+      "annotation_sha256": "20c33358f75cf9ee0029650922f8c22ee531a767a7e54ba3404bc1cb2b4a6947",
+      "source_sha256": {
+        "data/chunk-000/episode_000012.parquet": "def3bad1824452cbeb52de2b172941b0c5e9f7b46bcd2afe04fc728dee01bb3b",
+        "videos/chunk-000/observation.images.cam0/episode_000012.mp4": "7da6cafabc2eb88a976892422b9398dd4605b0609714ac5a46275d377679cf55",
+        "videos/chunk-000/observation.images.cam1/episode_000012.mp4": "80d60f038d32f5902228a1a81981c95319f335e3283a3eaecc5f9fae21463654",
+        "videos/chunk-000/observation.images.cam2/episode_000012.mp4": "ab5bbc6258a145e82526fd2529e1bfbdaefbb1409c28ed98749eeee380f8f163"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 38,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 13,
+      "agent_episode_id": "9b6a525ea6d7921f8c103e91",
+      "recording_group": "5215e4140cd046888b4a2d0188bba720",
+      "length": 2821,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000013.json",
+      "annotation_sha256": "cf2d8d1de96e2ad7ae803de1f0d6603236b64d70ac35e979472facf07b262210",
+      "source_sha256": {
+        "data/chunk-000/episode_000013.parquet": "0a50899b055584d53cb8f865aa4b365b34c81ee9494645eac163f46a7b293734",
+        "videos/chunk-000/observation.images.cam0/episode_000013.mp4": "0798d476e2c903e4c85bde9f119fd6ab0f94fc74e62b03dcd06f67eac2c89339",
+        "videos/chunk-000/observation.images.cam1/episode_000013.mp4": "6b3caf1adce5d82ab52054bd8157cb25642dc70677ab7168d368af8dd6a935ab",
+        "videos/chunk-000/observation.images.cam2/episode_000013.mp4": "1231becb820a1eff87d970ecc6901170cccf68ab6ec3e6a9d60c8d05820c63ed"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 39,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 14,
+      "agent_episode_id": "1d4c5ee4582ce6410382e380",
+      "recording_group": "477ba193a59d4309bce161ecb82f0a23",
+      "length": 4068,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000014.json",
+      "annotation_sha256": "5d6229d73eac4316ec6cd1c60c046615be3e6e7a2e0f21f8be2ff7d32fae8f1b",
+      "source_sha256": {
+        "data/chunk-000/episode_000014.parquet": "46f8fb385ef7c41a7b8592d8b8bdd98e148faf84c3259f4e6a40a8c4c66a754f",
+        "videos/chunk-000/observation.images.cam0/episode_000014.mp4": "932534866f92ab332887bf84b4773a1cb624761d648b44976bdb2bdfe64da705",
+        "videos/chunk-000/observation.images.cam1/episode_000014.mp4": "42f46efd4e569e8d75859162af20116c7aad0778f6687b6472311c32413532ef",
+        "videos/chunk-000/observation.images.cam2/episode_000014.mp4": "c8425b87eee1a183fca9e3e03724c343ab673b8f69ee7ca48672f5fa382b825f"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 40,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 15,
+      "agent_episode_id": "a39c9672d4e8a8ae72caed2a",
+      "recording_group": "2903463c46534789a1d5c1cf4b8ad455",
+      "length": 4722,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000015.json",
+      "annotation_sha256": "7f5854e0a9149eab4b26ad196b1fefdaa3845d47e5f223eb911a7196e0bcbd42",
+      "source_sha256": {
+        "data/chunk-000/episode_000015.parquet": "481aff87992f48f57ac8e29d72c5a671e8fee4cda4d84d6d73be7ebb9044ab64",
+        "videos/chunk-000/observation.images.cam0/episode_000015.mp4": "35b079955f39a5c2169e32f3a565200d621398321eed873aa3a36fca30ad8f12",
+        "videos/chunk-000/observation.images.cam1/episode_000015.mp4": "4bbe233d9a652225153c2e07bb8606d0759c61855a99db59e2c962cf3fa792cd",
+        "videos/chunk-000/observation.images.cam2/episode_000015.mp4": "3dacc180625eabd9c734494d5177a44657737ca8ee7751b1668d2e85b0543c7a"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 41,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 16,
+      "agent_episode_id": "b67c7d9f85b3dc569478ac0d",
+      "recording_group": "b693693c0fd34115989b89177cbe78c2",
+      "length": 3703,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000016.json",
+      "annotation_sha256": "d20c15add7f56ceeb988503e182b66393b0b44c0329597e0c99ba72f6d1b85b8",
+      "source_sha256": {
+        "data/chunk-000/episode_000016.parquet": "9891d89ef2ed98dca321e0a972e5e7cf0e2bed59c79a19a706fa5efb432efa1b",
+        "videos/chunk-000/observation.images.cam0/episode_000016.mp4": "a72f9a4e77e32eb1614ac3f27117ca3ff224c30a4e7fe1121982ce86dc45f0d5",
+        "videos/chunk-000/observation.images.cam1/episode_000016.mp4": "64145837c0158bf76820711a72f14d66582b8d90fb85e368bbd6511ddc56648e",
+        "videos/chunk-000/observation.images.cam2/episode_000016.mp4": "11ad6d672b58744d0e811728b2f9fab9b34e0107f1e83d41b8f48bdb93070b3c"
+      },
+      "agent_split_provenance": "test",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 42,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 17,
+      "agent_episode_id": "15820aaaae4a64d0e4580be9",
+      "recording_group": "34a4b430af2c4fd6a1912ff03628ef3f",
+      "length": 2234,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000017.json",
+      "annotation_sha256": "5a9af87380ef119020c89268f49da9f4f865664429614f81fde591aac2561987",
+      "source_sha256": {
+        "data/chunk-000/episode_000017.parquet": "f005fb8047bf087db7d2a8b50ebc4d509b7790431c3601dce617d5468dcb9565",
+        "videos/chunk-000/observation.images.cam0/episode_000017.mp4": "f6682812fb67288a63941d9972a2e969535605dd71ea00051c43bf939c31832f",
+        "videos/chunk-000/observation.images.cam1/episode_000017.mp4": "02effa97b6f673e1a38cde98f0af143bf48fd94d4b105168694d93a978c56c3f",
+        "videos/chunk-000/observation.images.cam2/episode_000017.mp4": "ac599190dded1035bbaf026864c4c0025b5b777024b478faec3bbcaa47cfbe48"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 43,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot",
+      "source_episode_index": 18,
+      "agent_episode_id": "cee68551ce98f618fba875f7",
+      "recording_group": "32f9ed66d86b4ade8d669406e5d8fe20",
+      "length": 3486,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_702_739_normal_lerobot/annotations/subtasks/coarse/episode_000018.json",
+      "annotation_sha256": "fbf4e9d4d041eac8f2e1afac501418121d4014be0c609ef9c417f02109c1b4e5",
+      "source_sha256": {
+        "data/chunk-000/episode_000018.parquet": "64effad7101f83df815b795d33f8e0f2795342152fe42df4ae63127db99e0124",
+        "videos/chunk-000/observation.images.cam0/episode_000018.mp4": "4e1859137ba29f8e1f53a6ed8b584e08270433d59e6a66bef83f51b08601107c",
+        "videos/chunk-000/observation.images.cam1/episode_000018.mp4": "f112352d855bd56672cc709833ea0ffb4a3331ba5c9570dbc901deb54c0a1ce6",
+        "videos/chunk-000/observation.images.cam2/episode_000018.mp4": "f338c97104f4972b9d780938303c375c888143e754dfa8d80186acf568166a38"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "00dbfd6d09425d11f83917d801d8144baaa260fb907ae6dc498e998aedfafba5",
+        "meta/episodes.jsonl": "339f1683ae671493165b23ba61affc417a193805efe043afc431ff9d2b7eb870"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 44,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 0,
+      "agent_episode_id": "073a1eb5be5d51450840a443",
+      "recording_group": "c4735706f30843569cc2693c5802fae4",
+      "length": 3029,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000000.json",
+      "annotation_sha256": "d99a88d9023e299f03be31f5ec3d0aeea4bdf12dcbee824fc03c56fc15e358df",
+      "source_sha256": {
+        "data/chunk-000/episode_000000.parquet": "a4b4a30aea4bb532062a5e8a124b16651709020509e935cf1fdc36c77d45571b",
+        "videos/chunk-000/observation.images.cam0/episode_000000.mp4": "6bc178fb78f91cfede22aea1093d60e8f5f3c1e0db71985b6205560c1be85990",
+        "videos/chunk-000/observation.images.cam1/episode_000000.mp4": "2e0ec561d4982d46b8eb618ea2e003575634a984576fdf8566660a8c4478a3cb",
+        "videos/chunk-000/observation.images.cam2/episode_000000.mp4": "82ae38ffe6ed8676b473b7958e6804a6f56defd615696b8ebb89b3e8cf822469"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 45,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 1,
+      "agent_episode_id": "97c75a6f3542d9376afe601c",
+      "recording_group": "26e5fdf1f6fc4f36b56aaeeb12164385",
+      "length": 3786,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000001.json",
+      "annotation_sha256": "a6f416ba483770d41e9b195cbc0c4a3ea8db8cc0b797dcdf2ce4bb6c42a53acb",
+      "source_sha256": {
+        "data/chunk-000/episode_000001.parquet": "55413b39321fdb2dd454af2b3ef6161104ec946697629c94d955f38fb87a8130",
+        "videos/chunk-000/observation.images.cam0/episode_000001.mp4": "09d977a3fde87043d58bc829be85bbacc9fe7bea846f294ebb03b9dc7de6498d",
+        "videos/chunk-000/observation.images.cam1/episode_000001.mp4": "2427d09e979c3185aaf1f59504d2d180cd4d32a48856a0425a7c5d1878ac4a60",
+        "videos/chunk-000/observation.images.cam2/episode_000001.mp4": "3c334614b145bc02f749d295dd11c7e1d441a7f00566b99382b7573429301189"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 46,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 2,
+      "agent_episode_id": "3d7275d5e6bb3a8616e1a618",
+      "recording_group": "26a781329cd64ac2b99e19c41fb02f10",
+      "length": 4603,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000002.json",
+      "annotation_sha256": "2265570502f51fee648000fb8f42f7664fcc8d93a22c0b8477645b39fd388a29",
+      "source_sha256": {
+        "data/chunk-000/episode_000002.parquet": "a1712980fee2bf82146f17e2d7d0f4b44e9b77fba9b276b8bbb43f05d8641dbb",
+        "videos/chunk-000/observation.images.cam0/episode_000002.mp4": "80baa550c304eb32b1bd224e4e5ff50cc6649d66fad33c303e286380b8cfcffb",
+        "videos/chunk-000/observation.images.cam1/episode_000002.mp4": "af52637e2b93d802993098f47823310e39ec694db7dc56be04f3f3bcd4976f28",
+        "videos/chunk-000/observation.images.cam2/episode_000002.mp4": "118efbb4632e3c912db4463b89074db579acaa6827a2e011392453210c797445"
+      },
+      "agent_split_provenance": "test",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 47,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 3,
+      "agent_episode_id": "230e8c6ed49b9b37c8acce18",
+      "recording_group": "bc59ee7fef2848b9bfc7197815bdffc7",
+      "length": 2595,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000003.json",
+      "annotation_sha256": "b3b70265acc6604e290df93f33903713f579eb88ef31c47b448048bedcd73860",
+      "source_sha256": {
+        "data/chunk-000/episode_000003.parquet": "b0c400549ed8e40f63957cfe8db78a4ac9923f7eb49b954ddbfe722c827d0cf1",
+        "videos/chunk-000/observation.images.cam0/episode_000003.mp4": "fd388bbc2b7903ab3a40ab76c7c04f71e03c09f025dbb54695f6e4ec8f5df791",
+        "videos/chunk-000/observation.images.cam1/episode_000003.mp4": "1cb0fb0512e1460b74fea656156ad24f7b6300da8432ef914b86170624d87aac",
+        "videos/chunk-000/observation.images.cam2/episode_000003.mp4": "1c193f9a862556fc8672822bd04b30d8a8280399984b47e65195d1ae8ed526b2"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 48,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 4,
+      "agent_episode_id": "b2eca7ff88a204b94a54f9ad",
+      "recording_group": "db91f18699b244b2a14687f538c00340",
+      "length": 3189,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000004.json",
+      "annotation_sha256": "1563fd77bd863e3618a02067e5a85fb5cdc2cde784e54b0cb3005137040d72ef",
+      "source_sha256": {
+        "data/chunk-000/episode_000004.parquet": "e7ce2a249ec40ead64e6839dc0708f6bb172b5e9a6a0c4c3576e6ff40bbb642d",
+        "videos/chunk-000/observation.images.cam0/episode_000004.mp4": "e8893a0750654bce124b1b16fb5c397faa474a12fa7e203ee827517874079927",
+        "videos/chunk-000/observation.images.cam1/episode_000004.mp4": "92b8cdc302403eeda4ea096e59087e282ceb54e397092f5f595d3e38f3406594",
+        "videos/chunk-000/observation.images.cam2/episode_000004.mp4": "e67a9ac99ea5d051a868305ca1fa3c78e80a27df9693a8e10573e35d158f6eff"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 49,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 5,
+      "agent_episode_id": "b511575e467a89f83439d27b",
+      "recording_group": "a2d3cd24f74e4ec1ba30f1a6abc81193",
+      "length": 3835,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000005.json",
+      "annotation_sha256": "a358c13a2dc88127ea14219387c0b6b3626d3fc5fce2815ff8d96863cc6c422d",
+      "source_sha256": {
+        "data/chunk-000/episode_000005.parquet": "8d4feb6d0d616a4385202b99fd57410cee86f54dece04ee093bd512463c1d6b2",
+        "videos/chunk-000/observation.images.cam0/episode_000005.mp4": "e303dc884da3c33ae35deee1621b23e561f89dd47e6752b93672fc5cd77438e8",
+        "videos/chunk-000/observation.images.cam1/episode_000005.mp4": "97f775200273df4162b7896f522c0a8797d5031d309a89d1b780c30c6de25072",
+        "videos/chunk-000/observation.images.cam2/episode_000005.mp4": "454d3cb125ff8ac9d1b75dc170431ca21b324423d6673172ae02c5e88cbc25c4"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 50,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 6,
+      "agent_episode_id": "b061c777f9dffefec63764ad",
+      "recording_group": "f4b8c842064840e1af56f7f5fe749345",
+      "length": 2331,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000006.json",
+      "annotation_sha256": "a50a863707588e338cc64736203b63dab106b23d39057d2663c9c501ae9926ad",
+      "source_sha256": {
+        "data/chunk-000/episode_000006.parquet": "e052b6ed158c41991f85b47caba0ce5968f5598096ebfc65de98dfd22b1381b8",
+        "videos/chunk-000/observation.images.cam0/episode_000006.mp4": "5f693197a4dd834a0f0cbbdb3c68347c19e609670daaae45ead347e3e02b3dbc",
+        "videos/chunk-000/observation.images.cam1/episode_000006.mp4": "1b016153e6ac2f660531cf9de782c6894ca936d312d04fddcf8a7e2ca796f54e",
+        "videos/chunk-000/observation.images.cam2/episode_000006.mp4": "b870c5da9db358e79a335c393d1326b019b242ab3cac83e4b6dfde6f33b3b4e1"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 51,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 7,
+      "agent_episode_id": "e2152a831799c3d337126635",
+      "recording_group": "0d9d11aa369a49d7879f1bb5d911fc96",
+      "length": 3225,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000007.json",
+      "annotation_sha256": "7ebd56f9c352218298eafd0ddac72d42b2334edf11e975ceca0845db7029a550",
+      "source_sha256": {
+        "data/chunk-000/episode_000007.parquet": "f36450b4dbe5e3a44b8cdb8d7b1a49535eaf794cc3c63fd5df5c789cdf40ebb5",
+        "videos/chunk-000/observation.images.cam0/episode_000007.mp4": "6a8aed4608e31156220415fa472b4fc27a9b6f4c4dd257a89339245d1eefca55",
+        "videos/chunk-000/observation.images.cam1/episode_000007.mp4": "5e62f549f41f47246e6d966d7b5b7c1e0e86bc1e0c48b2d3e35d6b6a2b616a30",
+        "videos/chunk-000/observation.images.cam2/episode_000007.mp4": "207491dc370a289e284f3c7ac0a02b53fb61cd13f441249f0402f452a9df7494"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 52,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 8,
+      "agent_episode_id": "d389af5083c2be3171413850",
+      "recording_group": "3e6465da9c424af6aa3d5bbe5fca25a0",
+      "length": 3345,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000008.json",
+      "annotation_sha256": "53f9bc220ac85d156274a5121ad0cd02d26020526961c09517884082204c1972",
+      "source_sha256": {
+        "data/chunk-000/episode_000008.parquet": "8d4d6376d6ace187c7892058fb0670170fe733c397c9c1f230fa8db10aaa0b9c",
+        "videos/chunk-000/observation.images.cam0/episode_000008.mp4": "7640e511d03c6d96a91382b7caf510d13a28145d8cdfb57b280c23c394a97b42",
+        "videos/chunk-000/observation.images.cam1/episode_000008.mp4": "5a029b93643c467890a702cb2df9c36e95afe044fe61673ed2844563694509c5",
+        "videos/chunk-000/observation.images.cam2/episode_000008.mp4": "03a4fb747ef3be8bb612075a53705ebd2c6841244f809ea95694802b1947cf02"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 53,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 10,
+      "agent_episode_id": "e1ec4ab1d4f49e5af9ceeecc",
+      "recording_group": "08145c5d72af443dad2b3c80c3541b49",
+      "length": 3848,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000010.json",
+      "annotation_sha256": "0d3d686bc8b3e66f016ed2df1360916e76b2a993b076ddf0f17bba0a18dc9348",
+      "source_sha256": {
+        "data/chunk-000/episode_000010.parquet": "3c9447e28e005495fbf65707394b0e91401a46570d452a9a87472a6fce3e81e5",
+        "videos/chunk-000/observation.images.cam0/episode_000010.mp4": "30849b7bc84aef5245dcb167c0b2a64690be6c2bfa5004f3fdf0d157ae528c78",
+        "videos/chunk-000/observation.images.cam1/episode_000010.mp4": "064732d459fa5a1b64c332d8906f7d461dea1dcaaefaa937ec08bb0fa3cbd93a",
+        "videos/chunk-000/observation.images.cam2/episode_000010.mp4": "d28300712e7662cd5b92224ebdd46d1319af883eb1cd94fe08ec8ede8398fcb0"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 54,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 11,
+      "agent_episode_id": "fd6dfb44c2138b3055a6d6c1",
+      "recording_group": "6a3a33cde77a47aea4f3d4c0e3882c56",
+      "length": 3654,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000011.json",
+      "annotation_sha256": "979b8e5ffc1e5bde9ec6523176b64e38eed21255f0f7bfe3d8f6e859513b0ea5",
+      "source_sha256": {
+        "data/chunk-000/episode_000011.parquet": "9c30b62300ae2591ea05af82a5f54ac5dad6439cee501cc5c467469782361669",
+        "videos/chunk-000/observation.images.cam0/episode_000011.mp4": "6d3b1f058c8ef6339d1bf42e72869562a0204770e321c99e94c04d2a7528e5d6",
+        "videos/chunk-000/observation.images.cam1/episode_000011.mp4": "2e645bd346427da0d2b2b5046736de73d629edec6718fa21cb3a65265cb4d656",
+        "videos/chunk-000/observation.images.cam2/episode_000011.mp4": "8567b805548163ae55a53e8631d362550963598a36c922c6035e2dae459b0cea"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 55,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 12,
+      "agent_episode_id": "06bd3a309be22e14f6be9f6f",
+      "recording_group": "45954bb22f4149f496592e7c4c377e52",
+      "length": 3117,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000012.json",
+      "annotation_sha256": "393e42b342a18127a5c5e833be69649cd6fbdc3155aabe7622cd77e4e7b0d845",
+      "source_sha256": {
+        "data/chunk-000/episode_000012.parquet": "12d1f914642b6fdf533cfc425377dc994ca6297249e720ecf037159e7fcdeb55",
+        "videos/chunk-000/observation.images.cam0/episode_000012.mp4": "585b08c6549b21a5b0e636842a33c0aa39aa25bd5047e81441573ff5dd5964da",
+        "videos/chunk-000/observation.images.cam1/episode_000012.mp4": "ef819e4c80d710cbf9c5be247da1b4e071eed42562dbd57fd87bd7e03c2722ec",
+        "videos/chunk-000/observation.images.cam2/episode_000012.mp4": "fdec804aee48be563c676af5017c7584ef7d9ab0497aaf5ddc287111ec46310d"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 56,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 13,
+      "agent_episode_id": "e3adedca7fbd8c8793dcd441",
+      "recording_group": "48dd84ffc94443e2aa98807238327d71",
+      "length": 2902,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000013.json",
+      "annotation_sha256": "4a9143f4127f2e0e2c64d4bf1535d23d99c69e2b02856677e133a484bdcdd0c2",
+      "source_sha256": {
+        "data/chunk-000/episode_000013.parquet": "aa15be7de69916e53a6b41b811188e716573031ff45d527702fe958219f75a15",
+        "videos/chunk-000/observation.images.cam0/episode_000013.mp4": "f28b163cb10a726ad37e613e9541ed518aec48a6d006707df83fa6f6c4fc2aea",
+        "videos/chunk-000/observation.images.cam1/episode_000013.mp4": "ad08a7d023e315d0f3b558e043f8d0d8d55b83a24466a6477e1c28628e722f85",
+        "videos/chunk-000/observation.images.cam2/episode_000013.mp4": "0f81840be0f3a8aaf8be9351b8f6895f3b584ddb66fe07a875a728c0f1675617"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 57,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 14,
+      "agent_episode_id": "6f4bafb382eecb2e2bdc528b",
+      "recording_group": "ad8ff4147a9a40748709d65a94c1fb14",
+      "length": 3369,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000014.json",
+      "annotation_sha256": "416dc51d60da8830ba53c8a34d26a4cce86861a8e5843b152dd58bcf1210e3bb",
+      "source_sha256": {
+        "data/chunk-000/episode_000014.parquet": "86da063452e44b9860b1b4c85d92c76e9a1816dbfc392a0b936887a098beb2bf",
+        "videos/chunk-000/observation.images.cam0/episode_000014.mp4": "02f929953b4f394f8cf301fe58e7d56fdabbd92c5dc6b8937cee8e26291639af",
+        "videos/chunk-000/observation.images.cam1/episode_000014.mp4": "3e570baec7881178e03d90ad21d15fe2eb454e699abfe844326387b98ae89b5f",
+        "videos/chunk-000/observation.images.cam2/episode_000014.mp4": "f1d21421918ca18c7f575655d3bacd09196383e4ae503a631902a01b29d341a6"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 58,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 15,
+      "agent_episode_id": "3e40d77b8301aa4141042ffe",
+      "recording_group": "03c4f749f53e4ceca32a1b73c8dbbf54",
+      "length": 3198,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000015.json",
+      "annotation_sha256": "b41f72e91498de12b2f9c4f947836a89e0c24cf9a9ce8bba90a8f4a0e874732c",
+      "source_sha256": {
+        "data/chunk-000/episode_000015.parquet": "ff2e65d26a2eec782d72f966c085e90023409e138643f7894e7e8cc7a1216d14",
+        "videos/chunk-000/observation.images.cam0/episode_000015.mp4": "02192416c0092b983636e656a576c1231107f888aa4d42c30744f0197137ab63",
+        "videos/chunk-000/observation.images.cam1/episode_000015.mp4": "5aeb4ca102053238edb81a8e909a8f6a665a0bedb844b5f78bce073cf8c716bc",
+        "videos/chunk-000/observation.images.cam2/episode_000015.mp4": "9d3dbe2bff93fa204a2dfc6b5e8452c76e2ac3899abf70b71850ea3e04fcea85"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 59,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 16,
+      "agent_episode_id": "24f5f11d06768bae4e8ff1de",
+      "recording_group": "666d070f4a194cefae4bf7e9437710c7",
+      "length": 3652,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000016.json",
+      "annotation_sha256": "bee6acc6053e1f03a10446a94eb7b0f50a735436a39bd93af9813ee3343f63f2",
+      "source_sha256": {
+        "data/chunk-000/episode_000016.parquet": "7fd1a4fbb8db6de3654bffc779320a8445a7b6e02c057cd3f796764e50abbb30",
+        "videos/chunk-000/observation.images.cam0/episode_000016.mp4": "b965c36d2f1ff296d3d488dcf15e81f44f165ca9482ed1cd6de28796188497f0",
+        "videos/chunk-000/observation.images.cam1/episode_000016.mp4": "23ebf65ad78fc75740637378e415ea5da63489b82e0bae9114be78e38a7b9e1c",
+        "videos/chunk-000/observation.images.cam2/episode_000016.mp4": "a4d902299eef2e7851d671d49508862e7974486357f0a0753f9b8c8769df6277"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 60,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 17,
+      "agent_episode_id": "e00eabcc5afc0a1fb422e819",
+      "recording_group": "ffdd92b4f7924956acd476e88f2ff1a6",
+      "length": 2567,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000017.json",
+      "annotation_sha256": "9e4b7b172c4bbcf928e0b382dac6d5523cfd22c99b68baf7f95896194e3e5a2c",
+      "source_sha256": {
+        "data/chunk-000/episode_000017.parquet": "c888d63e69cebcc9661f06a105b451aa3df69bbf91000710d86a5e7813921a18",
+        "videos/chunk-000/observation.images.cam0/episode_000017.mp4": "3495fe99e2418861ad8557a3ab99ccd7cbc4dbef05d968f65664111f90a179dd",
+        "videos/chunk-000/observation.images.cam1/episode_000017.mp4": "23d0b1ec807cd82276910388a64d4fa9cf6492b920e9538620c2c730fa3318fe",
+        "videos/chunk-000/observation.images.cam2/episode_000017.mp4": "3d8d990e8c55eacd72f8ad07fbd0ed734df3972317713c11573df59b3a36d1aa"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 61,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 18,
+      "agent_episode_id": "fb5a964ebdb9c086f6d999a0",
+      "recording_group": "963bef134ce54ad29733a761d8fd5948",
+      "length": 2760,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000018.json",
+      "annotation_sha256": "2953adc79ae64818515651e077d0f1627c93c1ebbdd376791a2d4d7277a94f96",
+      "source_sha256": {
+        "data/chunk-000/episode_000018.parquet": "7e1c694d7a04cf8ce3faff0dfcd8c817907ba0cf8f2c8fdf08a42c1ee844f3cf",
+        "videos/chunk-000/observation.images.cam0/episode_000018.mp4": "7287fe0ec020859d935accd48073752d8c130ff91b35acbec829285f6028d10f",
+        "videos/chunk-000/observation.images.cam1/episode_000018.mp4": "a8bfcfc24ce7d2a3d97315a3ca8665fe2ca67b5de21255527419e3e965fa140b",
+        "videos/chunk-000/observation.images.cam2/episode_000018.mp4": "102b8d32955e9a69df7b2092af57ac0a3791d0466f0caf668d63c2f7672086a6"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 62,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal",
+      "source_episode_index": 19,
+      "agent_episode_id": "4b395537f6949f0e45986170",
+      "recording_group": "3b7d153b61764f4b9920e382f7f1083b",
+      "length": 3254,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1106_740_796_normal/annotations/subtasks/coarse/episode_000019.json",
+      "annotation_sha256": "be8b7640524ff68acf5adf9dc8d0ecebfe21046c4e22a784e69d3fd87d5e28aa",
+      "source_sha256": {
+        "data/chunk-000/episode_000019.parquet": "f10262fed464308aa682d57b8116e80990f0b937760a45f3912400b0f5f3eb64",
+        "videos/chunk-000/observation.images.cam0/episode_000019.mp4": "c605f4d997f16c5665892bbf8a75989162a75006bd5013101eadbd02201b34b5",
+        "videos/chunk-000/observation.images.cam1/episode_000019.mp4": "3018449f46b7eb866779652e75efe5fea5c11641adf264c7c0ee857bdcf03faa",
+        "videos/chunk-000/observation.images.cam2/episode_000019.mp4": "1cb372ff9ad6130cb26821dd39328f7ddcbb9436f1396873849773aa7074b5c5"
+      },
+      "agent_split_provenance": "test",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "8998de7e40e395ed920b1aa051ee977d9132d9e7a6108cb7569b56ce04a6d72d",
+        "meta/episodes.jsonl": "9956518d7ce05702f6582b3e939cca576c9924c8013ad37ebce931c602afcb5a"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 63,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1107_783_783_normal",
+      "source_episode_index": 0,
+      "agent_episode_id": "a8b23394b642f0bb769a0391",
+      "recording_group": "5befbcd6c7f143028144b68d754c6883",
+      "length": 2685,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/A/1107_783_783_normal/annotations/subtasks/coarse/episode_000000.json",
+      "annotation_sha256": "66b4431c3d08b810a7a3ecc8f22793fe8bd58118f4428d8beb152b5c4cce3b77",
+      "source_sha256": {
+        "data/chunk-000/episode_000000.parquet": "38da5690a898addc45d759d7a03585749d0654c8ae5533cd57391bb2749b5bea",
+        "videos/chunk-000/observation.images.cam0/episode_000000.mp4": "f594a7ceba79c6c96196c9bafb24b0d94e50737c490745ceb3344cf74fa73ec2",
+        "videos/chunk-000/observation.images.cam1/episode_000000.mp4": "54db0d24cf8a6c27a65448fae050310c865837be55f06c5ad838758f0d85bff4",
+        "videos/chunk-000/observation.images.cam2/episode_000000.mp4": "2e8328bb67212d16e65e75a9a5ab0f6093819500298579b83aeebb192346d243"
+      },
+      "agent_split_provenance": "val",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "21eb3cb412375eb9ea8d588d1d2c95592cebef63f51976e79d6205420527db50",
+        "meta/episodes.jsonl": "1ac5666ef7eb19a52dd76d305e9fd7d034383c24bc40c4c231a25286560caff6"
+      },
+      "phase_label_status": "needs_resolution",
+      "phase_differences": [
+        {
+          "phase_index": 3,
+          "saved": {
+            "end_frame": 1949,
+            "end_seconds": 64.96666666666667,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 1204,
+            "start_seconds": 40.13333333333333,
+            "text": "Right fingers reposition the truss on the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 1958,
+            "end_seconds": 65.26666666666667,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 1204,
+            "start_seconds": 40.13333333333333,
+            "text": "Right fingers reposition the truss on the right plate"
+          }
+        },
+        {
+          "phase_index": 4,
+          "saved": {
+            "end_frame": 2114,
+            "end_seconds": 70.46666666666667,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 1949,
+            "start_seconds": 64.96666666666667,
+            "text": "Right hand grasps and lifts the truss to the center"
+          },
+          "agent_effective": {
+            "end_frame": 2114,
+            "end_seconds": 70.46666666666667,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 1958,
+            "start_seconds": 65.26666666666667,
+            "text": "Right hand grasps and lifts the truss to the center"
+          }
+        }
+      ],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 64,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1103_604_632_normal_lerobot",
+      "source_episode_index": 0,
+      "agent_episode_id": "a6e2dd33f14a2e356e8652af",
+      "recording_group": "cc129554ec8340dab7716bdd1a772a5a",
+      "length": 6177,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1103_604_632_normal_lerobot/annotations/subtasks/coarse/episode_000000.json",
+      "annotation_sha256": "c061b99771f3445f0c93603400dc7684abc3f3583d2a5b67655687fefeee2f55",
+      "source_sha256": {
+        "data/chunk-000/episode_000000.parquet": "b9f59d6b028e6adbc9ea831ce2a2fff58307581d4adf86d98c22cbc87f7e35de",
+        "videos/chunk-000/observation.images.cam0/episode_000000.mp4": "98ea4d44adc5b24f1acbd143781e418c2bcd4aa2e567b480f12f6c1f37262b02",
+        "videos/chunk-000/observation.images.cam1/episode_000000.mp4": "15c3db72d9e37ab8bcae70aed5b0c0e8831aa5b6cfe53d024e382d13ec143a8a",
+        "videos/chunk-000/observation.images.cam2/episode_000000.mp4": "b1bcf7e6e028b8d883d5409f7a4a836bca01c1f92b9ee9ab4e3c91636ac46168"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "889d74f559f8eb39bbf7308a2dfc89621464b3ff3781705718c2623bb20f4025",
+        "meta/episodes.jsonl": "fa8746963280e765f4f36582e17581e77fb9a484d2ffdb345b1fa670fcd86e8d"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 65,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1103_604_632_normal_lerobot",
+      "source_episode_index": 1,
+      "agent_episode_id": "28cca87cdffd5bdf45603c13",
+      "recording_group": "031906d13dc3439a82f379aee2ed5273",
+      "length": 7428,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1103_604_632_normal_lerobot/annotations/subtasks/coarse/episode_000001.json",
+      "annotation_sha256": "7750634a6c1261ea3bbf7183656bc218d22a277cedab1310e7f3e5be9eb25e96",
+      "source_sha256": {
+        "data/chunk-000/episode_000001.parquet": "52e1fd6bdc4783c9723bca2dca74091c4f08b850141edab17b398e3ee52dd079",
+        "videos/chunk-000/observation.images.cam0/episode_000001.mp4": "093b025b5a0f9ee6fd598ad8529e26b479c0e37cd7b4e37a58850a77d93a7f7f",
+        "videos/chunk-000/observation.images.cam1/episode_000001.mp4": "dbbbd54460960709a6e1631b0b3bfbff98683fe8ef2168f7824308a65be432b6",
+        "videos/chunk-000/observation.images.cam2/episode_000001.mp4": "5abcb6f8eb370a6a9a1dabb4fd9b445f00c40413dce7ac359dd008569ebbee11"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "889d74f559f8eb39bbf7308a2dfc89621464b3ff3781705718c2623bb20f4025",
+        "meta/episodes.jsonl": "fa8746963280e765f4f36582e17581e77fb9a484d2ffdb345b1fa670fcd86e8d"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 66,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1103_604_632_normal_lerobot",
+      "source_episode_index": 2,
+      "agent_episode_id": "159cf4ab98c53cd4b0e6d075",
+      "recording_group": "0340d869ea074774b09441f2339cec30",
+      "length": 5474,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1103_604_632_normal_lerobot/annotations/subtasks/coarse/episode_000002.json",
+      "annotation_sha256": "866ed24255f94ebd8a028760abf0202925228401e2aea3ee32cbe5d3ca97d94c",
+      "source_sha256": {
+        "data/chunk-000/episode_000002.parquet": "5df40641e20df647bfa0cd7effc905ce6ebb51930606975c2cfc435697c985e5",
+        "videos/chunk-000/observation.images.cam0/episode_000002.mp4": "05e52fcefa176d977240fd77bcd0f4d02c516641c18a0cf672e1dfb547ab5847",
+        "videos/chunk-000/observation.images.cam1/episode_000002.mp4": "1eaf1e8321dc414661d93929eb9a9bca2212c46c642aaaa07feaab06129eeace",
+        "videos/chunk-000/observation.images.cam2/episode_000002.mp4": "71bc5e90440ef2b90a31f70bd17c4bec7499d9a2f206f50be034b4ff3fe731de"
+      },
+      "agent_split_provenance": "test",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "889d74f559f8eb39bbf7308a2dfc89621464b3ff3781705718c2623bb20f4025",
+        "meta/episodes.jsonl": "fa8746963280e765f4f36582e17581e77fb9a484d2ffdb345b1fa670fcd86e8d"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 67,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1103_604_632_normal_lerobot",
+      "source_episode_index": 3,
+      "agent_episode_id": "1cd23a36e2494854403af270",
+      "recording_group": "2ca332c2796249bf86bee08f90e8e0d6",
+      "length": 3229,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1103_604_632_normal_lerobot/annotations/subtasks/coarse/episode_000003.json",
+      "annotation_sha256": "3275bbd51eadfaa67f34315f7abc86dcc6d62a0b5c8b900b7a0fa743fc601806",
+      "source_sha256": {
+        "data/chunk-000/episode_000003.parquet": "9671be3ab0a7235e3a67f533106e3702116feaabe32621d120ac374c585763bd",
+        "videos/chunk-000/observation.images.cam0/episode_000003.mp4": "354bdf8b64db3961af85de477d92a884011895f322da72e34c6c38bad5d49f82",
+        "videos/chunk-000/observation.images.cam1/episode_000003.mp4": "12f926cb7bff7f0d7fb5821262ed46e3be629801b5943488b6d87a15528c4f3b",
+        "videos/chunk-000/observation.images.cam2/episode_000003.mp4": "75ff19005ee3526a103f40f98d46c95423baa90624a4e564eb450e2e6712bb56"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "889d74f559f8eb39bbf7308a2dfc89621464b3ff3781705718c2623bb20f4025",
+        "meta/episodes.jsonl": "fa8746963280e765f4f36582e17581e77fb9a484d2ffdb345b1fa670fcd86e8d"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 68,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1103_604_632_normal_lerobot",
+      "source_episode_index": 4,
+      "agent_episode_id": "d960895f8962550cb7520398",
+      "recording_group": "20ad614dc0de475d9c04f2f26d110386",
+      "length": 4301,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1103_604_632_normal_lerobot/annotations/subtasks/coarse/episode_000004.json",
+      "annotation_sha256": "02bc3024d725f4d3d7bbee18e46393a021d1895245986b128b67319c2c67a96a",
+      "source_sha256": {
+        "data/chunk-000/episode_000004.parquet": "39d487001ecafc0ffbf00230d805397e96037d93e64782df072c0dba6cfc5249",
+        "videos/chunk-000/observation.images.cam0/episode_000004.mp4": "51bf7f9252a674c4879d920c98a389865aab72e19bc363ce1bcff47f63c4e66d",
+        "videos/chunk-000/observation.images.cam1/episode_000004.mp4": "77a87f868e9bfc39a753bf27eebbdafaff37d69ef2f8ce8491b541189d9dccc3",
+        "videos/chunk-000/observation.images.cam2/episode_000004.mp4": "05ceadeba6990bdb9993628de6a48af03a8b563f33e6260f4e8245f1c3d143d4"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "889d74f559f8eb39bbf7308a2dfc89621464b3ff3781705718c2623bb20f4025",
+        "meta/episodes.jsonl": "fa8746963280e765f4f36582e17581e77fb9a484d2ffdb345b1fa670fcd86e8d"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 69,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 0,
+      "agent_episode_id": "3e21882f6ad765c8134e8042",
+      "recording_group": "b7cf52379f064a20aa1035b9c57843d9",
+      "length": 4980,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000000.json",
+      "annotation_sha256": "acf8e389f81573cb70e2b36b3457bbe39790d8a5980d6b0d04899e4d9cf98177",
+      "source_sha256": {
+        "data/chunk-000/episode_000000.parquet": "4f17ae888ef4943a59379d26e4ec767ac14a081614459cba4ab1fbe7ba5d04e9",
+        "videos/chunk-000/observation.images.cam0/episode_000000.mp4": "89da2afd9ebff51b14e3701b3684284c4cb732658095d60a571f3976410ec41c",
+        "videos/chunk-000/observation.images.cam1/episode_000000.mp4": "b72f49e599fa0855aa2e62fede3ffa9bf90c4a5ad744a5499c214902f195c991",
+        "videos/chunk-000/observation.images.cam2/episode_000000.mp4": "2dcb71bab4c1697c7fcfb11ca721bfec1cc1b88875ac8f7fa9d2ff7fff23ec61"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 70,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 1,
+      "agent_episode_id": "35b98fead313ad3adb9e2263",
+      "recording_group": "209695586e5d42a092580087e8595080",
+      "length": 6534,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000001.json",
+      "annotation_sha256": "63fe41dd3dddd89f136c5e18f12cd33c417dccff305e6c76ca8090e8714762c9",
+      "source_sha256": {
+        "data/chunk-000/episode_000001.parquet": "d315e95337a9a0bd68091e569e5cd1600f34a9c4e5223874ad6d040203771018",
+        "videos/chunk-000/observation.images.cam0/episode_000001.mp4": "fc17b880603734cc78e387c5927de03b3b4851b84a2c06d20feead869b3ce6f6",
+        "videos/chunk-000/observation.images.cam1/episode_000001.mp4": "5e5b4221e1a2faaf6c11661c44ab1d0798f3603da6e11527bbfcf431b338c502",
+        "videos/chunk-000/observation.images.cam2/episode_000001.mp4": "92871c3d67be87b1ca5a2b835c1c9a77b684c8e2869f0464c9c0331be157c5a5"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 71,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 2,
+      "agent_episode_id": "27a8a232843038617b0882e6",
+      "recording_group": "57c0a74671b647f7945837489275283a",
+      "length": 5628,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000002.json",
+      "annotation_sha256": "408f0c20e63a6941eb2eb07d63356b62bbd9aaba8fa74ffeecc8da1ebb71a1e0",
+      "source_sha256": {
+        "data/chunk-000/episode_000002.parquet": "9503a4c4055f9eaf1a614a9f3fc6f2ce46c45e847ec1807bba595add31761ef1",
+        "videos/chunk-000/observation.images.cam0/episode_000002.mp4": "a2ec6101c0b68fa8460864a19424ce916a343d1637f7cdd089c417b033fa7248",
+        "videos/chunk-000/observation.images.cam1/episode_000002.mp4": "b92e388144a1ce8eba88c4676f58251152690ef44f228f2e84f8e9854e701370",
+        "videos/chunk-000/observation.images.cam2/episode_000002.mp4": "038fe403e1e5ed5540a80dfc5d6600fa1f119ea48e735eb706e2f741c8f47b43"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 72,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 3,
+      "agent_episode_id": "97fc506c9bd49bf5a3cbe879",
+      "recording_group": "ccfc3dc266ef4161b5620a74f9065287",
+      "length": 3834,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000003.json",
+      "annotation_sha256": "b31e2ff31f525d8d9cd6d52ff4bdb90bbed7ac6c40a5c2c044e93bf110a6325a",
+      "source_sha256": {
+        "data/chunk-000/episode_000003.parquet": "0c5bdb2fd90b1b6228fdb399d1e91e68b60a98b4c1ee77090c155f1040262425",
+        "videos/chunk-000/observation.images.cam0/episode_000003.mp4": "48b6d2ec99960adc545137e2d635d5eba046cc693f0c379bf4634e743f8b13d8",
+        "videos/chunk-000/observation.images.cam1/episode_000003.mp4": "810361061f14e5eca0317098a08e52dbb98a4efbf79813f7954e80c4ef4032c0",
+        "videos/chunk-000/observation.images.cam2/episode_000003.mp4": "f3034bc0609f79009f91f5a7067fbea32981f92db7aa3547aa49d0dea9ae0a41"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 73,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 4,
+      "agent_episode_id": "c2ab0294242e464ac8d8b6c5",
+      "recording_group": "3c153e6888614010895ac4158fb3733e",
+      "length": 3125,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000004.json",
+      "annotation_sha256": "127e1de733a07379f8fa59c6ab6a0997c13ea98eb0679b60d22968270e678786",
+      "source_sha256": {
+        "data/chunk-000/episode_000004.parquet": "bddba88f0050d46a5418260342e488951a7c7fa8e2046bc0af7c1e1b2cc8f0f7",
+        "videos/chunk-000/observation.images.cam0/episode_000004.mp4": "7cce6fb164714c8f378f3aacb6fc13b6ec6e9c3d4be39ff4820cea3362048ab7",
+        "videos/chunk-000/observation.images.cam1/episode_000004.mp4": "8998828e41e3e3675b6a42a46d2dd79d2d76091cf5de7a202484a964c0ed421e",
+        "videos/chunk-000/observation.images.cam2/episode_000004.mp4": "61ac8e8153fb20364818916a06b9eeef93b356b27ebede39eae3436ac19a9204"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 74,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 5,
+      "agent_episode_id": "42fdcb9b923d9a6ed5df8625",
+      "recording_group": "1d82688b0f8c4a6d8c12d82f07561e51",
+      "length": 4226,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000005.json",
+      "annotation_sha256": "0a4d5376a540cd008af1b438816ab7bda212d2f07a800664ae9585453f1e1400",
+      "source_sha256": {
+        "data/chunk-000/episode_000005.parquet": "b1d3dc74e9172cc115011e199b85c81f9816cb892fbaca41bd5d521ff2e29d5e",
+        "videos/chunk-000/observation.images.cam0/episode_000005.mp4": "53b00dfe73f8939cd366e1a3d0d337bbbd35e794a4429e336271830807c8ec9d",
+        "videos/chunk-000/observation.images.cam1/episode_000005.mp4": "0cc6874ea59574f5c05988b348bba41875876cf89f0624bd227cb60ccbac7a67",
+        "videos/chunk-000/observation.images.cam2/episode_000005.mp4": "b5a3d7de0579a87190b16483ebeb77d8a0dde0c2439e220abd735810a926e848"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 75,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 6,
+      "agent_episode_id": "5c169e31b2d5c4ba6af1152b",
+      "recording_group": "e8c88bdc015b4be6bee7e90f8c94e86a",
+      "length": 3758,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000006.json",
+      "annotation_sha256": "83654ae265002a468cfe86a76de07e5decf1f8142a2c9a9d75c9dcc74f1745f2",
+      "source_sha256": {
+        "data/chunk-000/episode_000006.parquet": "346042198996f2869bd86d0ca21d0de1ed94b22630933c07f4142dd5121a4076",
+        "videos/chunk-000/observation.images.cam0/episode_000006.mp4": "7c8799b788ec7ed41e1e6bf4fae25cac1300b11fc20cf534b9fc656821494bd5",
+        "videos/chunk-000/observation.images.cam1/episode_000006.mp4": "6f6a8141186c1c293abaa4e1df7bd41f9b2b4329054d000b73d13f19ba7335a9",
+        "videos/chunk-000/observation.images.cam2/episode_000006.mp4": "d857f70f28205b8abc79bf33c4b29e57707fd877b141b543ba988b42147d13ca"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 76,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 7,
+      "agent_episode_id": "11e2f1fe404b5eeca714c786",
+      "recording_group": "270fddd8068a436cb140f81a338eee6c",
+      "length": 5665,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000007.json",
+      "annotation_sha256": "c4eb71004a6a5ad4817182b024ee03ab5ca1adf0422b10615f9666d426197833",
+      "source_sha256": {
+        "data/chunk-000/episode_000007.parquet": "ec350a92c64472af94c8a3b67dc9131461fa1699cbec1f36312b47c7ae98ef72",
+        "videos/chunk-000/observation.images.cam0/episode_000007.mp4": "d123a724faa7359482b21fe1a5c93b4f866558eef55ce549bb58c2d168afb0a7",
+        "videos/chunk-000/observation.images.cam1/episode_000007.mp4": "791d86443a9e29aaf054dd9763f281b999617a0330f7d72044df32abc72d84bf",
+        "videos/chunk-000/observation.images.cam2/episode_000007.mp4": "29fb4edae984084740b72898c2aa9192ae81dce1a1a8a2d1ac9103939d1ba3bc"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 77,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 8,
+      "agent_episode_id": "ae8648d89618a1cc243fd08e",
+      "recording_group": "4cffd838ea0e4b81af120d4236bbeb93",
+      "length": 5224,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000008.json",
+      "annotation_sha256": "6444b17c045388c9a8e9756d131f9af401551c9c4aab30c2c352f1e74f3249db",
+      "source_sha256": {
+        "data/chunk-000/episode_000008.parquet": "122c61ac0f38493ce439d57ba31d0cd8e5e0bdeab2e7861e7e3852d079e8eaf4",
+        "videos/chunk-000/observation.images.cam0/episode_000008.mp4": "8935410321d9ac7a8a4ec1199ad8880cf652c6a8d537ff9d03d50cbdae2f6008",
+        "videos/chunk-000/observation.images.cam1/episode_000008.mp4": "cf0f2c502fc262a4fe73f1add01662782b3550c76a45644fda8f9faf2ecd98a5",
+        "videos/chunk-000/observation.images.cam2/episode_000008.mp4": "fdd548b9b5a6590692f27c58987f7966a417b383c1c23b2a80f17141e8e44224"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 78,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 9,
+      "agent_episode_id": "b961a9f4fb17a36a803b1a81",
+      "recording_group": "7880e2a6f1524495b95fe052249fc434",
+      "length": 5753,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000009.json",
+      "annotation_sha256": "fe71cc1d3f1484efbfef51e8472d99aa52c7c4f73f9e550ff6eaccb164f5e0e4",
+      "source_sha256": {
+        "data/chunk-000/episode_000009.parquet": "441b1d2f6dde154a18528e85ee37d9d0c641d754d24113416fa823b0c99dad70",
+        "videos/chunk-000/observation.images.cam0/episode_000009.mp4": "d8c2db0b54c2b36f09b9027f34bd542685b4ab452b96ddbb2ad7db6e9f9a0b37",
+        "videos/chunk-000/observation.images.cam1/episode_000009.mp4": "36a15c43d15cd8600726b4a7b628dfbc71594c4c68dc85990195a636322edf06",
+        "videos/chunk-000/observation.images.cam2/episode_000009.mp4": "6e399c9b98b82212b5b81d90041538942cfc3869c41721117614a03d65150a72"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 79,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 10,
+      "agent_episode_id": "ac4f2f10de4532e9dab3017d",
+      "recording_group": "2c7dea1400834c86bd057bf60f0db9e2",
+      "length": 4978,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000010.json",
+      "annotation_sha256": "bba9336d57231f4119fb4abeed929f8ee4fc67bd4b8af6628a3c6a768e4a8e8c",
+      "source_sha256": {
+        "data/chunk-000/episode_000010.parquet": "f83922f20b5f2d0475744665ff871887b683dbcdb3855c2e8f6b6fa1321a202d",
+        "videos/chunk-000/observation.images.cam0/episode_000010.mp4": "532124a64ef2c78263775eecd26292817eddce97444367181391dadd943ac1c9",
+        "videos/chunk-000/observation.images.cam1/episode_000010.mp4": "d4282d75c1296f3eadc304c96d82150fba30c34083933a2067c703447faac6e5",
+        "videos/chunk-000/observation.images.cam2/episode_000010.mp4": "55a641f60fb8ac577ff9bcca9b37bdc91cc12d9a365b21068b14a2fb6ea92dc4"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 80,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot",
+      "source_episode_index": 11,
+      "agent_episode_id": "00c45ede978c60868ef794d5",
+      "recording_group": "0e2221c7c284497098d5f1e509d36171",
+      "length": 6089,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1104_637_701_normal_lerobot/annotations/subtasks/coarse/episode_000011.json",
+      "annotation_sha256": "47e6436ec902c7d8b40d32fdf79edf515e02a530ec7bc57f8fb820c7cf01e580",
+      "source_sha256": {
+        "data/chunk-000/episode_000011.parquet": "cd70533d9222ea57f746a2553e3b4e5cdb097c853505e1829394fcb78c6634b9",
+        "videos/chunk-000/observation.images.cam0/episode_000011.mp4": "8588bd17a5a7e8d4af9dd1b3742bd63c3b22773bf328fcc021a8903fcf919a0d",
+        "videos/chunk-000/observation.images.cam1/episode_000011.mp4": "f04f88c4909ac5a1f9a3cbfa06b88fc99ac028d4e3225ef8ac4a7b0aeb1a2cd6",
+        "videos/chunk-000/observation.images.cam2/episode_000011.mp4": "0c0cd8717cb6442d5bfeb6e592ab7c2f6de214bb32bf5dfb68e548e1e8589c05"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "f82400609c4942be4f489683672fca0abfada2c4089a53dc59dd695c1664630a",
+        "meta/episodes.jsonl": "078f26f2051a0336f780a9efb091b5951250175a3ce7fade925e7e036cb0a3d1"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 81,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1105_703_713_normal_lerobot",
+      "source_episode_index": 0,
+      "agent_episode_id": "134ac3106b3dc875a778e01f",
+      "recording_group": "7ed15b57f5fc4643a0333cfd99c1edd6",
+      "length": 4685,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1105_703_713_normal_lerobot/annotations/subtasks/coarse/episode_000000.json",
+      "annotation_sha256": "9e3f49a657959d5cb8852e2139c2cea018c1c5d7b240b78f8c901a1a2fbe6844",
+      "source_sha256": {
+        "data/chunk-000/episode_000000.parquet": "76ad4115988e31214133a34bfef5e8ee509f597122e57da6cfb132aee43c7c5a",
+        "videos/chunk-000/observation.images.cam0/episode_000000.mp4": "4673c2e42c071d6224705575b54225fde4a209c0830cfc7ef5aeec372ee4af13",
+        "videos/chunk-000/observation.images.cam1/episode_000000.mp4": "6a27b4b2ade1ab7ef81c00c2a86505166ea6ecfabdf8560660cc17c39a34af97",
+        "videos/chunk-000/observation.images.cam2/episode_000000.mp4": "c09c632cc94ce3d08bb95c3afab970cda6d6250b66c520f217e316cb15247720"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "40635f5244837bb05a24338b0eaba17e04d266dc8f6f213bd84e0b3cc936dfac",
+        "meta/episodes.jsonl": "e844a08c89c62ff3df2f1139d168470f3de03c25b669ce94d6d7048421953652"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 82,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal",
+      "source_episode_index": 0,
+      "agent_episode_id": "ff10daee7cfe93395fea8669",
+      "recording_group": "45ece5143b704a3fb609c2e4a8c5c8d2",
+      "length": 3464,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal/annotations/subtasks/coarse/episode_000000.json",
+      "annotation_sha256": "317d6a15996e5ebef20cdaab941be4cca7e54b3e6b5b10fc2fa815191f10b8df",
+      "source_sha256": {
+        "data/chunk-000/episode_000000.parquet": "25c8a4353a4b640a6a1d663e91b66af3366efeb913b942110904e8c7319f8636",
+        "videos/chunk-000/observation.images.cam0/episode_000000.mp4": "62312ed0a94ae355e2a247605b31693bb8ef8049af418849382dbd927a059186",
+        "videos/chunk-000/observation.images.cam1/episode_000000.mp4": "21e48e86b338cf105f680ef1a1417b97df32d21f6cb6aa074856ba5c7288dfe3",
+        "videos/chunk-000/observation.images.cam2/episode_000000.mp4": "8fc5bd7e4b13ed48916dcc3b542ba82ff7edf96cadc9af6b431a1d9f2a9bb43c"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "54634b9b9f5896b0448f3cef9490291bfa66dd3e6776ff535773b90e351112d5",
+        "meta/episodes.jsonl": "587f509b119c1a26c1f9750fcbefccb564c2f01dd18b1e27a2bc324b4d914600"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 83,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal",
+      "source_episode_index": 1,
+      "agent_episode_id": "5049c3974e64cbcd114c66fb",
+      "recording_group": "bcd0001b7394475e9a178740c81cc79d",
+      "length": 3847,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal/annotations/subtasks/coarse/episode_000001.json",
+      "annotation_sha256": "920260443e842bbb35207b7be58e8c1a2440d7dc59e2a76c377491cbfa08d2e4",
+      "source_sha256": {
+        "data/chunk-000/episode_000001.parquet": "8af3bb9ea3bea4d98e1d76bf613a3d27fb634f15daa817a6e9828cc0c27910ef",
+        "videos/chunk-000/observation.images.cam0/episode_000001.mp4": "fbb9b79ddc97fd9d24ff652c708001df20222e114ca4f3795bb0c86d8ed4e6aa",
+        "videos/chunk-000/observation.images.cam1/episode_000001.mp4": "d99ec39fbbc76a5b5e3d39d185b7fc991a044e135f87c2b422b063e7f384106e",
+        "videos/chunk-000/observation.images.cam2/episode_000001.mp4": "15665aafb805df520123c39299804d9b28bfbae40b29848ed92b594c96d3ef40"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "54634b9b9f5896b0448f3cef9490291bfa66dd3e6776ff535773b90e351112d5",
+        "meta/episodes.jsonl": "587f509b119c1a26c1f9750fcbefccb564c2f01dd18b1e27a2bc324b4d914600"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 84,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal",
+      "source_episode_index": 2,
+      "agent_episode_id": "ba1ce3010a03ead623453a51",
+      "recording_group": "30246f5f7f0f45dba996e3cc3adbcd25",
+      "length": 4570,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal/annotations/subtasks/coarse/episode_000002.json",
+      "annotation_sha256": "950e98804a8be65175a7f8b8a4fbcafcdaea5fe012c72df76f84e7ce2b5168ce",
+      "source_sha256": {
+        "data/chunk-000/episode_000002.parquet": "01fba51419ef5028e6f74c265411ce8ad5a6d6b0bc105f779b8baa41916b1e8d",
+        "videos/chunk-000/observation.images.cam0/episode_000002.mp4": "7902db27f8da99fa1f0ff6ed00b39341c90cfcafc557ebc18bd5deef84b137a2",
+        "videos/chunk-000/observation.images.cam1/episode_000002.mp4": "ff45958fda44ae0d46dc3f9d704836e2ba6af2dddc78d8f69940c5ef464c2831",
+        "videos/chunk-000/observation.images.cam2/episode_000002.mp4": "4326c0751cbe7480ac78b50fdfb4bb9e3f6e143217bc13745befb87cebd7490a"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "54634b9b9f5896b0448f3cef9490291bfa66dd3e6776ff535773b90e351112d5",
+        "meta/episodes.jsonl": "587f509b119c1a26c1f9750fcbefccb564c2f01dd18b1e27a2bc324b4d914600"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 85,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal",
+      "source_episode_index": 3,
+      "agent_episode_id": "f03638673202370a5d2581c1",
+      "recording_group": "6ad08a7f55384561bfcc1fc4806ae613",
+      "length": 3414,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal/annotations/subtasks/coarse/episode_000003.json",
+      "annotation_sha256": "9c2c348d4c3867761bf34f66358da0379c7891989016fb782c8e307d4897d1c5",
+      "source_sha256": {
+        "data/chunk-000/episode_000003.parquet": "e29976ecc6c70459d4ca95e490dec339d1203020c3ee780eda8b18b3c1169448",
+        "videos/chunk-000/observation.images.cam0/episode_000003.mp4": "b815601941a166617b146335172c4e21794f84253bb0d1850003131a073f5a50",
+        "videos/chunk-000/observation.images.cam1/episode_000003.mp4": "d8828f1b3fd08bfe592fb6846c5346536d0d49474ea04cc93c61682369c89132",
+        "videos/chunk-000/observation.images.cam2/episode_000003.mp4": "b226245b355a40d33684c0aa34ed38de82ff12436fcd3612cfb7ea4f7c6ad43c"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "54634b9b9f5896b0448f3cef9490291bfa66dd3e6776ff535773b90e351112d5",
+        "meta/episodes.jsonl": "587f509b119c1a26c1f9750fcbefccb564c2f01dd18b1e27a2bc324b4d914600"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 86,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal",
+      "source_episode_index": 4,
+      "agent_episode_id": "e80436dea962fa58288fd8f9",
+      "recording_group": "651eb2271bae4971a62273985ed85c2d",
+      "length": 2990,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal/annotations/subtasks/coarse/episode_000004.json",
+      "annotation_sha256": "4b64e72b2f5274e1b747c9f8b133b27f77b341c45c5c786d57d156152ed9c373",
+      "source_sha256": {
+        "data/chunk-000/episode_000004.parquet": "25951ac24698d5682e47666808cb5a161be95784870a7f833ddd80c89c57e2b3",
+        "videos/chunk-000/observation.images.cam0/episode_000004.mp4": "af8135884c997058b644dacba78b3a8111f93a1ac7f9b6dfde35157010595f33",
+        "videos/chunk-000/observation.images.cam1/episode_000004.mp4": "43346b12ad5b80eda46eba77c61ca708e90b4ddeba7de52b314f237e751cd3ed",
+        "videos/chunk-000/observation.images.cam2/episode_000004.mp4": "0b17f851d48eece1082575182924779fec71db1b485b2ec3ff23d06cae8462b5"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "54634b9b9f5896b0448f3cef9490291bfa66dd3e6776ff535773b90e351112d5",
+        "meta/episodes.jsonl": "587f509b119c1a26c1f9750fcbefccb564c2f01dd18b1e27a2bc324b4d914600"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 87,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal",
+      "source_episode_index": 5,
+      "agent_episode_id": "d0f8727d35eced697dcf79fe",
+      "recording_group": "471c02da39ac4fa7ba4fcd140f9cb1ed",
+      "length": 2773,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal/annotations/subtasks/coarse/episode_000005.json",
+      "annotation_sha256": "c8ab7d1086a70bf97b65058409154fb0b1c8c90f3ceaadcb0e833b94e7e7c87e",
+      "source_sha256": {
+        "data/chunk-000/episode_000005.parquet": "1d719d80206589377eee2b9eafad391b21b826e67bd4bb37d6d062ef1ac4c478",
+        "videos/chunk-000/observation.images.cam0/episode_000005.mp4": "9ca4dc055d6e9931915bf48febc1f5f14104e6535f4d37cad5c32d7bb950c605",
+        "videos/chunk-000/observation.images.cam1/episode_000005.mp4": "8209760cd34199a56e297fd2503d4096af63bd12929ee6209c847d62f05a2516",
+        "videos/chunk-000/observation.images.cam2/episode_000005.mp4": "80e1330c0428997256ed894c81fa7366a1eeaeae048765646fd0a1e08bd78560"
+      },
+      "agent_split_provenance": "val",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "54634b9b9f5896b0448f3cef9490291bfa66dd3e6776ff535773b90e351112d5",
+        "meta/episodes.jsonl": "587f509b119c1a26c1f9750fcbefccb564c2f01dd18b1e27a2bc324b4d914600"
+      },
+      "phase_label_status": "needs_resolution",
+      "phase_differences": [
+        {
+          "phase_index": 3,
+          "saved": {
+            "end_frame": 1943,
+            "end_seconds": 64.76666666666667,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 1438,
+            "start_seconds": 47.93333333333333,
+            "text": "Right fingers reposition the truss on the right plate"
+          },
+          "agent_effective": {
+            "end_frame": 1968,
+            "end_seconds": 65.6,
+            "label": "adjust",
+            "reviewed": true,
+            "segment_index": 4,
+            "start_frame": 1438,
+            "start_seconds": 47.93333333333333,
+            "text": "Right fingers reposition the truss on the right plate"
+          }
+        },
+        {
+          "phase_index": 4,
+          "saved": {
+            "end_frame": 2127,
+            "end_seconds": 70.9,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 1943,
+            "start_seconds": 64.76666666666667,
+            "text": "Right hand grasps and lifts the truss to the center"
+          },
+          "agent_effective": {
+            "end_frame": 2127,
+            "end_seconds": 70.9,
+            "label": "pickup",
+            "reviewed": true,
+            "segment_index": 5,
+            "start_frame": 1968,
+            "start_seconds": 65.6,
+            "text": "Right hand grasps and lifts the truss to the center"
+          }
+        }
+      ],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 88,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal",
+      "source_episode_index": 6,
+      "agent_episode_id": "8b8c1da3e272c90d0725c677",
+      "recording_group": "59fe475f41454fedb1d5a229292e569c",
+      "length": 4079,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal/annotations/subtasks/coarse/episode_000006.json",
+      "annotation_sha256": "23cfe04636c0137b259669a21d71507940429276f6a238fe67805bafdc562828",
+      "source_sha256": {
+        "data/chunk-000/episode_000006.parquet": "9c898dbae89fcbb9cf28f2d6409a736b0efdb818d0c31930c38738534e253856",
+        "videos/chunk-000/observation.images.cam0/episode_000006.mp4": "195638c37cc5edb18f9343b29c5745a86e9f7061f164d5359bc0e9af96e48410",
+        "videos/chunk-000/observation.images.cam1/episode_000006.mp4": "66b472d9c0e202d0fe4e232aa859a953e2a8d67d7d144779d65aab973ee73704",
+        "videos/chunk-000/observation.images.cam2/episode_000006.mp4": "3cf7af1020215c7a825d145ce18fd0a28181a68fd34d45ff0c13e8558ebc57a8"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "54634b9b9f5896b0448f3cef9490291bfa66dd3e6776ff535773b90e351112d5",
+        "meta/episodes.jsonl": "587f509b119c1a26c1f9750fcbefccb564c2f01dd18b1e27a2bc324b4d914600"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 89,
+      "dataset": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal",
+      "source_episode_index": 7,
+      "agent_episode_id": "ec2a42cb31563737fc34db99",
+      "recording_group": "db6fb478cff64df893f81e390d436662",
+      "length": 2252,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_subtasks_normal_20261107/B/1106_750_791_normal/annotations/subtasks/coarse/episode_000007.json",
+      "annotation_sha256": "a1a9f5bc206fa526f299bf06f4745860d0a8d3a5d87d5bb401a9d1844b04db8e",
+      "source_sha256": {
+        "data/chunk-000/episode_000007.parquet": "2e5be37aaa32f0d62099625a7a0758fd2d66171121392ee01eec32009a9095fd",
+        "videos/chunk-000/observation.images.cam0/episode_000007.mp4": "d7acb853d628d2f9dcd92313fcc0e5fc23293578f45f0b1318eb434f1e82b1fd",
+        "videos/chunk-000/observation.images.cam1/episode_000007.mp4": "8e7a2d511f5c09df2eedc0b54e3204ebf8787396f7dc5d99d577d65d049e03c8",
+        "videos/chunk-000/observation.images.cam2/episode_000007.mp4": "f77850ce479c5ad2c83d5b475647c59c2e137b1a7aec5a571e9023ad417cb1df"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "54634b9b9f5896b0448f3cef9490291bfa66dd3e6776ff535773b90e351112d5",
+        "meta/episodes.jsonl": "587f509b119c1a26c1f9750fcbefccb564c2f01dd18b1e27a2bc324b4d914600"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 90,
+      "dataset": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal",
+      "source_episode_index": 1,
+      "agent_episode_id": "f5f45674ba11f7f1c266776b",
+      "recording_group": "9d82f039d8504a8aa888aff08074a5b4",
+      "length": 4697,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal/annotations/subtasks/coarse/episode_000001.json",
+      "annotation_sha256": "247f228aa6bdfe3daf1db5a858a526b830fa84c26c402b2294c4794e2b797ffe",
+      "source_sha256": {
+        "data/chunk-000/episode_000001.parquet": "e20ac075c2bc14f1076c77b348e662c1bcff193344ec1eeb097184ba96e83a9d",
+        "videos/chunk-000/observation.images.cam0/episode_000001.mp4": "fe205f26916c0969371cf06e674b2fc57124faa54621b2b3940d23223a372c60",
+        "videos/chunk-000/observation.images.cam1/episode_000001.mp4": "1d80d71b726f19fd88fc858269376b0b770f1364eccbc2f42a1e8e90eded4618",
+        "videos/chunk-000/observation.images.cam2/episode_000001.mp4": "d09ce63619aa90916c695af07b177446e4348fdc820ffce67f9042dbbb3088f3"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "126c4544570cb093a65e747119e11fb5c1205a3a38d74d60175212a587d889ea",
+        "meta/episodes.jsonl": "2d6f819b41624297c1616566f5ccbbeedbee0438679460683b64036154d50b64"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 91,
+      "dataset": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal",
+      "source_episode_index": 2,
+      "agent_episode_id": "943dd481c0f37b921a3912b4",
+      "recording_group": "b6cda8f38ada48f293f1f43b7fc8373c",
+      "length": 3297,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal/annotations/subtasks/coarse/episode_000002.json",
+      "annotation_sha256": "6027b60011f0a63da92b40689ed53af5ee05f16e362ef73397301134a3f80570",
+      "source_sha256": {
+        "data/chunk-000/episode_000002.parquet": "ff8c2a80a6ae62c29adfdd09a9a86bfa5d3e3e30cfc3d0662f63331fbe5ecfea",
+        "videos/chunk-000/observation.images.cam0/episode_000002.mp4": "0c0a27d4f44e4ce806ec4481f4c6d68e86e0002cec17d7d5d0bce15dea9d236a",
+        "videos/chunk-000/observation.images.cam1/episode_000002.mp4": "81f2c24d465ed3558c4bcca55ae076f4c0fd557da88ce8abadff22f10a381318",
+        "videos/chunk-000/observation.images.cam2/episode_000002.mp4": "4576a5d125a97dcd90be21c3effdd84f3cfb710999a9a65d757dda967079f17c"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "126c4544570cb093a65e747119e11fb5c1205a3a38d74d60175212a587d889ea",
+        "meta/episodes.jsonl": "2d6f819b41624297c1616566f5ccbbeedbee0438679460683b64036154d50b64"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 92,
+      "dataset": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal",
+      "source_episode_index": 3,
+      "agent_episode_id": "32cba3eecb1d98e78b914611",
+      "recording_group": "ab41cacd1b154778849b002cfde263dc",
+      "length": 3539,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal/annotations/subtasks/coarse/episode_000003.json",
+      "annotation_sha256": "f2bb777fcea2e61c625a684861f26a166047f1229d8c1d2088636c2993446e20",
+      "source_sha256": {
+        "data/chunk-000/episode_000003.parquet": "be390832971dbd37f332f398ffc9069112af21622e2e3a92c74bbf481c148640",
+        "videos/chunk-000/observation.images.cam0/episode_000003.mp4": "a69e3df1e2acc8184c4712dbf94d1f44d4c4583d15c4dc1e48088d6ba620dc54",
+        "videos/chunk-000/observation.images.cam1/episode_000003.mp4": "15cc709d9c1a9a09130aeb3998eda8441f8baf0233ce4a0ae17f04c9b4b0602d",
+        "videos/chunk-000/observation.images.cam2/episode_000003.mp4": "9a301725248e0f332daed1126bd2f0c0aa691be034f006e7b0e1dedec8fffbd9"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "126c4544570cb093a65e747119e11fb5c1205a3a38d74d60175212a587d889ea",
+        "meta/episodes.jsonl": "2d6f819b41624297c1616566f5ccbbeedbee0438679460683b64036154d50b64"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 93,
+      "dataset": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal",
+      "source_episode_index": 4,
+      "agent_episode_id": "d11360e8662efcc1e2972811",
+      "recording_group": "100189b6fc7541afbe8ed11a0c62fa22",
+      "length": 3262,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal/annotations/subtasks/coarse/episode_000004.json",
+      "annotation_sha256": "2f76a109e3598ed3f8547a9cfeec9fb1adacf2a9a6c84dde072fb0a75835eacc",
+      "source_sha256": {
+        "data/chunk-000/episode_000004.parquet": "6bc6d49c264075afdd2eb8424c99527374e76b6fa275c0a43db61815d6fd67c3",
+        "videos/chunk-000/observation.images.cam0/episode_000004.mp4": "f602139475d2239dd510495d6b5d8968be7f52480595a375062e5b48c5d8be10",
+        "videos/chunk-000/observation.images.cam1/episode_000004.mp4": "2519f8450af034845df7983a5f5c9dfea7c51cbb1e371d720918f532b26e8fd4",
+        "videos/chunk-000/observation.images.cam2/episode_000004.mp4": "a9a4064f28950f4ec7a21152eb43210bd7813534797f7fb9ff810c09de9b95a9"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "126c4544570cb093a65e747119e11fb5c1205a3a38d74d60175212a587d889ea",
+        "meta/episodes.jsonl": "2d6f819b41624297c1616566f5ccbbeedbee0438679460683b64036154d50b64"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 94,
+      "dataset": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal",
+      "source_episode_index": 5,
+      "agent_episode_id": "603c11bbee3eec719e38973e",
+      "recording_group": "414680f4bdbb42afb8976f8163a45eb8",
+      "length": 2798,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal/annotations/subtasks/coarse/episode_000005.json",
+      "annotation_sha256": "8dbe6a993ac07199f24230ba21c5ec591353c4cf2fc1eb6b838cb45ad6203141",
+      "source_sha256": {
+        "data/chunk-000/episode_000005.parquet": "5060fb907eca7da6163403340f38d61ece37c4844ce229f805e60287a9aee242",
+        "videos/chunk-000/observation.images.cam0/episode_000005.mp4": "8746ca125f4014d0aef93b6caed9733db4fa8d6004538867b5bf1c73db7d4530",
+        "videos/chunk-000/observation.images.cam1/episode_000005.mp4": "34dcf3161db55c574df19b056da9bf93c329555fb6233a182b5bf192776ba738",
+        "videos/chunk-000/observation.images.cam2/episode_000005.mp4": "540c04684c2e92ca2fb0a6a848603ff609ae5987c3a9ac3cd6d594eacf101414"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "126c4544570cb093a65e747119e11fb5c1205a3a38d74d60175212a587d889ea",
+        "meta/episodes.jsonl": "2d6f819b41624297c1616566f5ccbbeedbee0438679460683b64036154d50b64"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 95,
+      "dataset": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal",
+      "source_episode_index": 6,
+      "agent_episode_id": "da9a9ee05f8293df1591d448",
+      "recording_group": "e9f631dd459a4699b51e8a210747d693",
+      "length": 3560,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal/annotations/subtasks/coarse/episode_000006.json",
+      "annotation_sha256": "74ae64b108d1a09881c25d1445ea710c35832439067e871ead1c6af53831eb6a",
+      "source_sha256": {
+        "data/chunk-000/episode_000006.parquet": "b143392506dc5a8af4cb64669845771e9bf50b837c9a302a5a9e520ce6f8c1a1",
+        "videos/chunk-000/observation.images.cam0/episode_000006.mp4": "bccae77c05ec69ba02344a6387224ce069b97f36358a45b01151f19577b5a171",
+        "videos/chunk-000/observation.images.cam1/episode_000006.mp4": "f94447140afb184b2248fb836a02966f06485a143ce4284e7d9f4cd3bb8ee154",
+        "videos/chunk-000/observation.images.cam2/episode_000006.mp4": "dda7f6efbba7b39226cef769fafa1ab6124a235e2730571e105231748e75873d"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "126c4544570cb093a65e747119e11fb5c1205a3a38d74d60175212a587d889ea",
+        "meta/episodes.jsonl": "2d6f819b41624297c1616566f5ccbbeedbee0438679460683b64036154d50b64"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 96,
+      "dataset": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal",
+      "source_episode_index": 7,
+      "agent_episode_id": "d7386f672b184f6fd3ce826c",
+      "recording_group": "0b75cbb15ab347d1957f5b503b6c0a79",
+      "length": 3803,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_independent10_20261109/A/1109_783_818_normal/annotations/subtasks/coarse/episode_000007.json",
+      "annotation_sha256": "4c65f3c5f54f9e137f50739fc2ab9fa40156f57919d0830da3b0465028a9f204",
+      "source_sha256": {
+        "data/chunk-000/episode_000007.parquet": "1014544bbda05436a1861fc480a34e31fae87e3ce472cd93dbe9042d4a910f30",
+        "videos/chunk-000/observation.images.cam0/episode_000007.mp4": "d4602c589b8bc949ce1699fdb113e71d7b0d96c0775467e53048ec9854c46200",
+        "videos/chunk-000/observation.images.cam1/episode_000007.mp4": "d5ce5b27db454b7c2283bdc742dad21a198bdd0b8746d349f451017ee9cbdf65",
+        "videos/chunk-000/observation.images.cam2/episode_000007.mp4": "554ef996fb0ad7ec53e8596a832a38710c1ddd087be2f09248e67f4f2ad5be1d"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "126c4544570cb093a65e747119e11fb5c1205a3a38d74d60175212a587d889ea",
+        "meta/episodes.jsonl": "2d6f819b41624297c1616566f5ccbbeedbee0438679460683b64036154d50b64"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 97,
+      "dataset": "/home/user/datasets/tomato_independent10_20261109/B/1109_696_811_normal",
+      "source_episode_index": 1,
+      "agent_episode_id": "6d19dc89e407f785df4ee2c6",
+      "recording_group": "40a09925ecca4a80a20d75b6d954401e",
+      "length": 4091,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_independent10_20261109/B/1109_696_811_normal/annotations/subtasks/coarse/episode_000001.json",
+      "annotation_sha256": "bce98689a8b8bac83e85cc2e01da51d28cbf8bbb5154485d71e611d315dc8780",
+      "source_sha256": {
+        "data/chunk-000/episode_000001.parquet": "f82c2fbf0922c06c5fcede4dafc80733dec94dff6b8916256be5bb226498b135",
+        "videos/chunk-000/observation.images.cam0/episode_000001.mp4": "a89ae20b23d25d95ae554ab5b2c090920882cce02f6ce454668ec0db524e7e8a",
+        "videos/chunk-000/observation.images.cam1/episode_000001.mp4": "4fc14abea0c7bfcc7d7fcad274f5e3eb96461d7d0c6b4dc9e35f72c623b1ddaa",
+        "videos/chunk-000/observation.images.cam2/episode_000001.mp4": "5f4cd36baf115818757e4c01abe799fdc7826fcc682236d19f4706f5b4bc787d"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "b942a41c1bff181b014d8f6287fde723255fc97aba0b92a428de2bf4eb071f9a",
+        "meta/episodes.jsonl": "3a2eb8e0a9c92d475e4b429a26e2e054504a4be74b76b0148155cc6f8ec00081"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 98,
+      "dataset": "/home/user/datasets/tomato_independent10_20261109/B/1109_696_811_normal",
+      "source_episode_index": 2,
+      "agent_episode_id": "a81e13951489b866c2710d81",
+      "recording_group": "d41b53c254f44184928bc21d4b4aee27",
+      "length": 2773,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_independent10_20261109/B/1109_696_811_normal/annotations/subtasks/coarse/episode_000002.json",
+      "annotation_sha256": "26334b52d8d2ec7ed54cd5b92d811fd07271c3f60fa0f2c13fe2fe74369f4ad0",
+      "source_sha256": {
+        "data/chunk-000/episode_000002.parquet": "4927a0b4569469f152b64e9acdae5d67c41bfeafb625fa8b8492dbb5aff2d11c",
+        "videos/chunk-000/observation.images.cam0/episode_000002.mp4": "acdbd68a82250702e400283118a81e341923dc6993d5299909d397719f4b0d34",
+        "videos/chunk-000/observation.images.cam1/episode_000002.mp4": "8e90c201a402e595364fbec5979736d107dc3907e48b1e03dd7116269175ed05",
+        "videos/chunk-000/observation.images.cam2/episode_000002.mp4": "3316d7ce896d14525c6b9ed21f29def6c7f304df175ab11d18adda9f10acd738"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "b942a41c1bff181b014d8f6287fde723255fc97aba0b92a428de2bf4eb071f9a",
+        "meta/episodes.jsonl": "3a2eb8e0a9c92d475e4b429a26e2e054504a4be74b76b0148155cc6f8ec00081"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    },
+    {
+      "episode_index": 99,
+      "dataset": "/home/user/datasets/tomato_independent10_20261109/B/1109_696_811_normal",
+      "source_episode_index": 3,
+      "agent_episode_id": "72b720c740242be509750414",
+      "recording_group": "3c29c0c5dde3471583caec540be40cbb",
+      "length": 3230,
+      "fps": 30,
+      "annotation": "/home/user/datasets/tomato_independent10_20261109/B/1109_696_811_normal/annotations/subtasks/coarse/episode_000003.json",
+      "annotation_sha256": "d6adfbfd9247b95a28daac4f03a112cbfd4533b9c8d7c24c876a72c4cab5e307",
+      "source_sha256": {
+        "data/chunk-000/episode_000003.parquet": "a064a2eb50424a01a5efbb21b530e9ad24366596dc9b2b0380f62751ee492967",
+        "videos/chunk-000/observation.images.cam0/episode_000003.mp4": "2ef0d0edc712f6fe2b93f605130ceaef349f2eb1e228f9574e9496615cdf8ae0",
+        "videos/chunk-000/observation.images.cam1/episode_000003.mp4": "ff6654307225d3c654fbd917843663a84a06c069e00fc590898b0aa325428ee4",
+        "videos/chunk-000/observation.images.cam2/episode_000003.mp4": "25d475cb40e634976866031fe1a399d3e9c2789078e9c64d634606e9b20d4ba7"
+      },
+      "agent_split_provenance": "train",
+      "action_split": "train",
+      "metadata_sha256": {
+        "meta/info.json": "b942a41c1bff181b014d8f6287fde723255fc97aba0b92a428de2bf4eb071f9a",
+        "meta/episodes.jsonl": "3a2eb8e0a9c92d475e4b429a26e2e054504a4be74b76b0148155cc6f8ec00081"
+      },
+      "phase_label_status": "saved_matches_agent",
+      "phase_differences": [],
+      "roi_coverage": "not_prepared"
+    }
+  ],
+  "source_files_verified": true,
+  "training_ready": false,
+  "phase_label_resolution_required": 8,
+  "phase_label_policy": "resolve saved-vs-effective differences before materializing stage prompts",
+  "normalization": "pending: recompute on all100 with new action/data identity",
+  "roi": "pending: full per-frame coverage/provenance; existing preview is partial",
+  "agent_split_changed": false,
+  "deployment_modified": false
+}

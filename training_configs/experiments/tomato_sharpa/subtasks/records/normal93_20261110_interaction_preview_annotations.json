@@ -1,0 +1,328 @@
+{
+  "schema_version": 1,
+  "paper": "https://arxiv.org/html/2610.20064v2#A1.SS4",
+  "source_episode": 89,
+  "source_recording": "B/1106_750_791_normal/episode_000004",
+  "fps": 30,
+  "source_size": [
+    640,
+    400
+  ],
+  "annotation_method": "Human visual interpretation by coding agent; approximate component rectangles at selected keyframes, linear interpolation offline between both endpoints. No detector, tracker, learned foveation, or online claims. Not independently reviewed ground-truth labels. Harvest clip covers first pluck; basket transport is outside this interaction scope.",
+  "source_sha256": {
+    "cam0": "af8135884c997058b644dacba78b3a8111f93a1ac7f9b6dfde35157010595f33",
+    "cam1": "43346b12ad5b80eda46eba77c61ca708e90b4ddeba7de52b314f237e751cd3ed",
+    "cam2": "0b17f851d48eece1082575182924779fec71db1b485b2ec3ff23d06cae8462b5"
+  },
+  "clips": [
+    {
+      "name": "pickup_right_hand_truss",
+      "start": 0,
+      "end": 168,
+      "roles": [
+        "right_hand",
+        "truss"
+      ],
+      "show_frames": [
+        83
+      ],
+      "keyframes": [
+        {
+          "frame": 0,
+          "boxes": {
+            "right_hand": [
+              425,
+              230,
+              500,
+              310
+            ],
+            "truss": [
+              400,
+              270,
+              450,
+              295
+            ]
+          }
+        },
+        {
+          "frame": 30,
+          "boxes": {
+            "right_hand": [
+              420,
+              230,
+              500,
+              310
+            ],
+            "truss": [
+              400,
+              270,
+              445,
+              295
+            ]
+          }
+        },
+        {
+          "frame": 60,
+          "boxes": {
+            "right_hand": [
+              420,
+              230,
+              500,
+              310
+            ],
+            "truss": [
+              400,
+              270,
+              445,
+              295
+            ]
+          }
+        },
+        {
+          "frame": 90,
+          "boxes": {
+            "right_hand": [
+              420,
+              218,
+              497,
+              293
+            ],
+            "truss": [
+              402,
+              259,
+              453,
+              280
+            ]
+          }
+        },
+        {
+          "frame": 120,
+          "boxes": {
+            "right_hand": [
+              378,
+              222,
+              470,
+              285
+            ],
+            "truss": [
+              358,
+              270,
+              428,
+              287
+            ]
+          }
+        },
+        {
+          "frame": 150,
+          "boxes": {
+            "right_hand": [
+              338,
+              217,
+              433,
+              290
+            ],
+            "truss": [
+              320,
+              275,
+              404,
+              302
+            ]
+          }
+        },
+        {
+          "frame": 167,
+          "boxes": {
+            "right_hand": [
+              338,
+              213,
+              436,
+              288
+            ],
+            "truss": [
+              320,
+              273,
+              403,
+              302
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "harvest_first_pluck",
+      "start": 225,
+      "end": 315,
+      "roles": [
+        "right_hand",
+        "left_hand",
+        "truss_and_picked_fruit"
+      ],
+      "show_frames": [
+        270
+      ],
+      "keyframes": [
+        {
+          "frame": 225,
+          "boxes": {
+            "right_hand": [
+              340,
+              202,
+              445,
+              280
+            ],
+            "left_hand": [
+              198,
+              220,
+              300,
+              305
+            ],
+            "truss_and_picked_fruit": [
+              320,
+              265,
+              405,
+              292
+            ]
+          }
+        },
+        {
+          "frame": 240,
+          "boxes": {
+            "right_hand": [
+              340,
+              202,
+              445,
+              280
+            ],
+            "left_hand": [
+              208,
+              250,
+              334,
+              345
+            ],
+            "truss_and_picked_fruit": [
+              320,
+              265,
+              405,
+              292
+            ]
+          }
+        },
+        {
+          "frame": 255,
+          "boxes": {
+            "right_hand": [
+              340,
+              202,
+              445,
+              280
+            ],
+            "left_hand": [
+              210,
+              245,
+              344,
+              339
+            ],
+            "truss_and_picked_fruit": [
+              320,
+              265,
+              405,
+              292
+            ]
+          }
+        },
+        {
+          "frame": 270,
+          "boxes": {
+            "right_hand": [
+              340,
+              202,
+              445,
+              280
+            ],
+            "left_hand": [
+              221,
+              235,
+              346,
+              333
+            ],
+            "truss_and_picked_fruit": [
+              320,
+              265,
+              405,
+              292
+            ]
+          }
+        },
+        {
+          "frame": 285,
+          "boxes": {
+            "right_hand": [
+              340,
+              202,
+              445,
+              280
+            ],
+            "left_hand": [
+              225,
+              238,
+              337,
+              333
+            ],
+            "truss_and_picked_fruit": [
+              310,
+              265,
+              405,
+              295
+            ]
+          }
+        },
+        {
+          "frame": 300,
+          "boxes": {
+            "right_hand": [
+              340,
+              202,
+              445,
+              280
+            ],
+            "left_hand": [
+              211,
+              225,
+              308,
+              323
+            ],
+            "truss_and_picked_fruit": [
+              280,
+              265,
+              405,
+              295
+            ]
+          }
+        },
+        {
+          "frame": 314,
+          "boxes": {
+            "right_hand": [
+              340,
+              202,
+              445,
+              280
+            ],
+            "left_hand": [
+              188,
+              218,
+              270,
+              293
+            ],
+            "truss_and_picked_fruit": [
+              240,
+              265,
+              405,
+              295
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -11,10 +11,28 @@ import pytest
 
 from examples.fr3_wuji import compute_norm_stats
 from openpi import transforms
+from openpi.policies import lemon_policy
 from openpi.shared import normalize
 from openpi.training import config as cfg
 from scripts import run_training
 from training_configs import common
+
+
+def test_task_vector_statistics_opt_in_is_explicit():
+    class TaskVectorInputs(lemon_policy.LemonInputs):
+        vector_statistics_image_independent = True
+
+    class InheritedVectorInputs(TaskVectorInputs):
+        pass
+
+    class UnreviewedInputs(transforms.DataTransformFn):
+        def __call__(self, data):
+            return data
+
+    assert compute_norm_stats.supports_vector_statistics(lemon_policy.LemonInputs())
+    assert compute_norm_stats.supports_vector_statistics(TaskVectorInputs())
+    assert not compute_norm_stats.supports_vector_statistics(InheritedVectorInputs())
+    assert not compute_norm_stats.supports_vector_statistics(UnreviewedInputs())
 
 
 @pytest.mark.parametrize("all_constant", [False, True])

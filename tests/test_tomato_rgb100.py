@@ -1,0 +1,257 @@
+import copy
+import json
+from pathlib import Path
+
+import pytest
+
+from openpi.subtasks.rgb100 import audit_tokens
+from openpi.subtasks.rgb100 import digest
+from openpi.subtasks.rgb100 import freeze_selection
+from openpi.subtasks.rgb100 import full_text
+from openpi.subtasks.rgb100 import resolve_saved_labels
+from openpi.subtasks.rgb100 import sequence_slots
+from openpi.subtasks.rgb100 import write_new
+from openpi.subtasks.tomato import COARSE_SEQUENCE
+from openpi.subtasks.tomato import SOURCE_ACTION_NAMES
+from openpi.subtasks.tomato import SOURCE_STATE_NAMES
+
+
+def manifest(tmp_path):
+    rows = []
+    for i in range(100):
+        root = tmp_path / str(i)
+        rows.append(
+            {
+                "episode_id": str(i),
+                "source_recording_id": f"source{i}",
+                "fps": 30,
+                "length": 7,
+                "episode_index": i,
+                "dataset_root": str(root),
+                "parquet": str(root / "state.parquet"),
+                "videos": [str(root / f"{c}.mp4") for c in range(3)],
+                "input_sha256": {"state.parquet": "hash", **{f"{c}.mp4": "hash" for c in range(3)}},
+                "split": "val" if i < 8 else "train",
+                "info": {
+                    "fps": 30,
+                    "features": {
+                        "observation.state": {"shape": [116], "names": list(SOURCE_STATE_NAMES)},
+                        "action": {"shape": [58], "names": list(SOURCE_ACTION_NAMES)},
+                    },
+                },
+                "annotation": {
+                    "path": str(root / "annotation.json"),
+                    "sha256": "hash",
+                    "segments": [
+                        {"label": c, "start_frame": j, "end_frame": j + 1, "reviewed": True}
+                        for j, c in enumerate(COARSE_SEQUENCE)
+                    ],
+                },
+            }
+        )
+    return {"episodes": rows}
+
+
+def freeze(tmp_path, m):
+    p = tmp_path / "manifest.json"
+    p.write_text(json.dumps(m))
+    return freeze_selection(p, verify_sources=False)
+
+
+def test_all100_training_does_not_inherit_agent_holdout(tmp_path):
+    r = freeze(tmp_path, manifest(tmp_path))
+    assert r["splits"] == {"train": list(range(100))}
+    assert all(e["action_split"] == "train" for e in r["episodes"])
+    assert r["episodes"][0]["agent_split_provenance"] == "val"
+    assert not r["training_ready"]
+    assert not r["source_files_verified"]
+    assert all(e["phase_label_status"] == "not_verified" for e in r["episodes"])
+
+
+@pytest.mark.parametrize("change", ["count", "duplicate", "three_stage", "gap", "schema", "hash"])
+def test_selection_rejects_identity_and_label_damage(tmp_path, change):
+    m = manifest(tmp_path)
+    e = m["episodes"][0]
+    if change == "count":
+        m["episodes"].pop()
+    if change == "duplicate":
+        m["episodes"][1]["source_recording_id"] = e["source_recording_id"]
+    if change == "three_stage":
+        e["annotation"]["segments"] = e["annotation"]["segments"][:3]
+    if change == "gap":
+        e["annotation"]["segments"][1]["start_frame"] = 2
+    if change == "schema":
+        e["info"]["features"]["action"]["names"].reverse()
+    if change == "hash":
+        del e["input_sha256"]["0.mp4"]
+    with pytest.raises(ValueError, match="Exactly100|Duplicate|schema|required|checksum|coverage"):
+        freeze(tmp_path, m)
+
+
+def test_saved_vs_agent_boundary_conflicts_are_explicit_not_silently_applied(tmp_path, monkeypatch):
+    from openpi.subtasks import rgb100
+
+    m = manifest(tmp_path)
+    for e in m["episodes"]:
+        p = Path(e["annotation"]["path"])
+        p.parent.mkdir()
+        saved = copy.deepcopy(e["annotation"]["segments"])
+        # Preserve seven contiguous phases while changing one effective boundary.
+        for j, r in enumerate(saved):
+            r["start_frame"] = j * 2
+            r["end_frame"] = (j + 1) * 2
+        e["length"] = 14
+        e["annotation"]["segments"] = copy.deepcopy(saved)
+        p.write_text(json.dumps({"segments": saved}))
+        (p.parent / "meta").mkdir()
+        (p.parent / "meta/info.json").write_text(json.dumps({**e["info"], "codebase_version": "v2.1"}))
+        (p.parent / "meta/episodes.jsonl").write_text(
+            json.dumps(
+                {"episode_index": e["episode_index"], "length": 14, "source_recording_id": e["source_recording_id"]}
+            )
+            + "\n"
+        )
+    m["episodes"][0]["annotation"]["segments"][0]["end_frame"] = 3
+    m["episodes"][0]["annotation"]["segments"][1]["start_frame"] = 3
+    monkeypatch.setattr(rgb100, "digest", lambda path: "hash")
+    p = tmp_path / "manifest.json"
+    p.write_text(json.dumps(m))
+    r = freeze_selection(p)
+    assert r["phase_label_resolution_required"] == 1
+    assert len(r["episodes"][0]["phase_differences"]) == 2
+    assert not r["training_ready"]
+    assert json.loads(Path(m["episodes"][0]["annotation"]["path"]).read_text())["segments"][0]["end_frame"] == 2
+
+
+def test_sequence_lengths_separate_text_history_and_action_positions():
+    assert sequence_slots(views=3)["prefix_plus_action_slots"] == 1074
+    assert sequence_slots()["prefix_plus_action_slots"] == 1330
+    assert sequence_slots(history_tokens=32)["prefix_plus_action_slots"] == 1362
+    assert sequence_slots(history_tokens=64)["prefix_plus_action_slots"] == 1394
+    assert sequence_slots(text_capacity=320)["prefix_plus_action_slots"] == 1394
+
+
+def test_complete_text_preserves_state_and_memory_without_truncation():
+    text = full_text("right_hand\nmove", [255] * 58, "x " * 1000)
+    assert text.startswith("Task: right hand move Memory:")
+    assert text.count("255") == 58
+    assert text.endswith(";\nAction: ")
+    with pytest.raises(ValueError, match="state bins"):
+        full_text("move", [255] * 57)
+    with pytest.raises(ValueError, match="state bins"):
+        full_text("move", [256] * 58)
+
+
+def test_actual_distribution_requires_unique_observations_and_one_normalization():
+    # Synthetic tokenizer only checks audit plumbing; real SP run is separate.
+    def encode(text, *, add_bos=False):
+        return list(text) + (list("B") if add_bos else [])
+
+    row = {"action": "pickup", "observation_id": "e:1", "normalization_sha256": "new100", "state_bins": [255] * 58}
+    r = audit_tokens(encode, tokenizer_sha256="synthetic", normalized_rows=[row])
+    assert r["real_distribution"]["rows"] == 1
+    assert r["real_distribution"]["exceeds_256"] == 1
+    assert not r["truncation_performed"]
+    with pytest.raises(ValueError, match="Duplicate real observation"):
+        audit_tokens(encode, tokenizer_sha256="synthetic", normalized_rows=[row, row])
+    other = {**row, "observation_id": "e:2", "normalization_sha256": "old93"}
+    with pytest.raises(ValueError, match="mix normalization identities"):
+        audit_tokens(encode, tokenizer_sha256="synthetic", normalized_rows=[row, other])
+
+
+def test_receipts_cannot_overwrite_existing_files(tmp_path):
+    p = tmp_path / "receipt.json"
+    write_new(p, {"original": True})
+    with pytest.raises(FileExistsError):
+        write_new(p, {"replacement": True})
+    assert json.loads(p.read_text()) == {"original": True}
+
+
+def resolution_fixture(tmp_path):
+    s = freeze(tmp_path, manifest(tmp_path))
+    s["source_files_verified"] = True
+    for row in s["episodes"]:
+        row["length"] = 21
+        saved = [
+            {"label": c, "start_frame": j * 3, "end_frame": (j + 1) * 3, "reviewed": True}
+            for j, c in enumerate(COARSE_SEQUENCE)
+        ]
+        p = Path(row["annotation"])
+        p.parent.mkdir()
+        p.write_text(
+            json.dumps(
+                {
+                    "segments": saved,
+                    "source": {
+                        "source_recording_id": row["recording_group"],
+                        "episode_index": row["source_episode_index"],
+                        "length": 21,
+                        "fps": 30,
+                    },
+                }
+            )
+        )
+        row["annotation_sha256"] = digest(p)
+        row["phase_differences"] = []
+    row = s["episodes"][0]
+    saved = json.loads(Path(row["annotation"]).read_text())["segments"]
+    effective = copy.deepcopy(saved)
+    effective[0]["end_frame"] = 4
+    effective[1]["start_frame"] = 4
+    row["phase_differences"] = [{"phase_index": i, "saved": saved[i], "agent_effective": effective[i]} for i in (0, 1)]
+    proposals = {
+        "status": "provisional_user_review_not_source_labels",
+        "truth_proposals": {
+            "0": [
+                {
+                    "original_boundary_frame": 3,
+                    "boundary_frame_reconstructed_from_visible_time": 4,
+                    "source_annotation_sha256": row["annotation_sha256"],
+                    "transition": "pickup->harvest",
+                    "captured_status": "pending_human_review",
+                }
+            ]
+        },
+    }
+    sp, pp = tmp_path / "selection.json", tmp_path / "proposals.json"
+    sp.write_text(json.dumps(s))
+    pp.write_text(json.dumps(proposals))
+    return sp, pp
+
+
+def test_resolution_uses_saved_boundaries_and_retains_proposals_without_source_edits(tmp_path):
+    sp, pp = resolution_fixture(tmp_path)
+    before = digest(sp)
+    r, plan = resolve_saved_labels(sp, pp)
+    assert r["phase_label_resolution_required"] == 0
+    assert r["boundary_resolution"]["recordings"] == r["boundary_resolution"]["boundaries"] == 1
+    assert r["episodes"][0]["training_segments"][0]["end_frame"] == 3
+    assert r["episodes"][0]["phase_differences"][0]["agent_effective"]["end_frame"] == 4
+    assert not r["training_ready"]
+    assert plan["data_policy"] == "all_sources"
+    assert len(plan["episodes"]) == 100
+    assert digest(sp) == before
+    assert plan["episodes"][0]["episode_index"] == r["episodes"][0]["source_episode_index"]
+
+
+@pytest.mark.parametrize("damage", ["missing_proposal", "changed_source", "content_change", "unverified", "duplicate"])
+def test_resolution_refuses_unknown_differences_and_changed_source(tmp_path, damage):
+    sp, pp = resolution_fixture(tmp_path)
+    s = json.loads(sp.read_text())
+    p = json.loads(pp.read_text())
+    if damage == "missing_proposal":
+        p["truth_proposals"] = {}
+    if damage == "changed_source":
+        Path(s["episodes"][0]["annotation"]).write_text("{}")
+    if damage == "content_change":
+        s["episodes"][0]["phase_differences"][0]["agent_effective"]["reviewed"] = False
+    if damage == "unverified":
+        s["source_files_verified"] = False
+    if damage == "duplicate":
+        s["episodes"][1]["agent_episode_id"] = "0"
+    sp.write_text(json.dumps(s))
+    pp.write_text(json.dumps(p))
+    with pytest.raises(
+        ValueError, match="Verified|provisional|Duplicate|Saved|no longer matches|boundary difference|Non-boundary"
+    ):
+        resolve_saved_labels(sp, pp)

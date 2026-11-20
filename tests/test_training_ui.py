@@ -323,6 +323,8 @@ def test_preflight_missing_and_existing_norm(workspace, monkeypatch):
 
 @pytest.mark.parametrize("memory_settings", [None, ("false", "0.70")])
 def test_worker_sequences_cpu_preparation_and_gpu_training(workspace, fake_launch, monkeypatch, memory_settings):
+    from scripts.training_environment import CUDA_SETTINGS
+
     keys = ("XLA_PYTHON_CLIENT_PREALLOCATE", "XLA_PYTHON_CLIENT_MEM_FRACTION")
     for key in keys:
         monkeypatch.delenv(key, raising=False)
@@ -342,8 +344,8 @@ def test_worker_sequences_cpu_preparation_and_gpu_training(workspace, fake_launc
     assert calls[-1][2]["JAX_PLATFORMS"] == "cuda"
     assert calls[-1][2]["CUDA_VISIBLE_DEVICES"] == "GPU-test0"
     assert calls[-1][1][-2:] == ["--wandb-mode", "offline"]
-    expected = dict(zip(keys, memory_settings or ("true", "0.90"), strict=True))
-    assert {key: calls[-1][2][key] for key in keys} == expected
+    expected = {**CUDA_SETTINGS, "CUDA_VISIBLE_DEVICES": "GPU-test0"}
+    assert {key: calls[-1][2][key] for key in expected} == expected
     saved = ui.read_job(state["id"])
     assert saved["status"] == "completed"
     assert saved["training_environment"] == expected

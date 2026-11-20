@@ -58,9 +58,10 @@ def test_independent_augmentation_preserves_flow_randomness(monkeypatch):
     random_normal = jax.random.normal
     random_beta = jax.random.beta
 
-    def preprocess(rng, observation, *, train):
+    def preprocess(rng, observation, *, train, image_keys):
         observed.append(jax.random.key_data(rng))
         assert train
+        assert image_keys == _model.IMAGE_KEYS
         return observation
 
     def normal(*args, **kwargs):

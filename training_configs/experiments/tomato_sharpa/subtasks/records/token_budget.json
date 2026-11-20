@@ -1,0 +1,58 @@
+{
+  "tokenizer_sha256": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+  "state_dim": 58,
+  "max_token_len": 256,
+  "discrete_bins": [
+    -1,
+    255
+  ],
+  "all_uniform_bins_checked": true,
+  "mixed_state_cases": 800,
+  "seed": 42,
+  "prompts": [
+    {
+      "prompt": "Harvest all tomatoes into the left basket and return stem to right plate.",
+      "max_input_tokens": 256
+    },
+    {
+      "prompt": "Right hand grasps and lifts the truss to the center",
+      "max_input_tokens": 254
+    },
+    {
+      "prompt": "Right hand holds truss while left hand picks tomatoes into left basket",
+      "max_input_tokens": 255
+    },
+    {
+      "prompt": "Right hand returns the held object to the right plate",
+      "max_input_tokens": 253
+    },
+    {
+      "prompt": "Right fingers reposition the truss on the right plate",
+      "max_input_tokens": 252
+    }
+  ],
+  "action_prompts": {
+    "pickup": "Right hand grasps and lifts the truss to the center",
+    "harvest": "Right hand holds truss while left hand picks tomatoes into left basket",
+    "return": "Right hand returns the held object to the right plate",
+    "adjust": "Right fingers reposition the truss on the right plate"
+  },
+  "phases": [
+    "pickup_1",
+    "harvest_1",
+    "return_truss",
+    "adjust",
+    "pickup_2",
+    "harvest_2",
+    "return_stem"
+  ],
+  "phase_prompts": [
+    "Right hand grasps and lifts the truss to the center",
+    "Right hand holds truss while left hand picks tomatoes into left basket",
+    "Right hand returns the held object to the right plate",
+    "Right fingers reposition the truss on the right plate",
+    "Right hand grasps and lifts the truss to the center",
+    "Right hand holds truss while left hand picks tomatoes into left basket",
+    "Right hand returns the held object to the right plate"
+  ]
+}

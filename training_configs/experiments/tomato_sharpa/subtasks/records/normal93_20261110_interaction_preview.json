@@ -1,0 +1,55 @@
+{
+  "scope": "offline manually annotated/interpolated preview, not model ROI prediction or policy evaluation",
+  "baseline": "B unchanged; no training; no input pipeline changes",
+  "sources": {
+    "cam0": {
+      "path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/data/tomato_truss_normal93_20261109_annotation_r2_all_sources_v2/b_coarse/videos/chunk-000/observation.images.cam0/episode_000089.mp4",
+      "sha256": "af8135884c997058b644dacba78b3a8111f93a1ac7f9b6dfde35157010595f33"
+    },
+    "cam1": {
+      "path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/data/tomato_truss_normal93_20261109_annotation_r2_all_sources_v2/b_coarse/videos/chunk-000/observation.images.cam1/episode_000089.mp4",
+      "sha256": "43346b12ad5b80eda46eba77c61ca708e90b4ddeba7de52b314f237e751cd3ed"
+    },
+    "cam2": {
+      "path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/data/tomato_truss_normal93_20261109_annotation_r2_all_sources_v2/b_coarse/videos/chunk-000/observation.images.cam2/episode_000089.mp4",
+      "sha256": "0b17f851d48eece1082575182924779fec71db1b485b2ec3ff23d06cae8462b5"
+    }
+  },
+  "annotation_sha256": "4eb20369cbe9c5ccfdbce542937df44e1aadd5ab751ea7e787119157c619e826",
+  "frames": 258,
+  "fps": 30,
+  "clips": [
+    {
+      "name": "pickup_right_hand_truss",
+      "start": 0,
+      "end_exclusive": 168,
+      "frames": 168
+    },
+    {
+      "name": "harvest_first_pluck",
+      "start": 225,
+      "end_exclusive": 315,
+      "frames": 90
+    }
+  ],
+  "linear_magnification_range": [
+    1.6580310880829014,
+    4.475524475524476
+  ],
+  "annotation_method": "Visual box selection by coding agent; approximate component rectangles at selected keyframes, linear interpolation offline between both endpoints. No detector, tracker, learned foveation, or online claims. Not independently reviewed ground-truth labels. Harvest clip covers first pluck; basket transport is outside this interaction scope.",
+  "paper": "https://arxiv.org/html/2610.20064v2#A1.SS4",
+  "code_sha256": "570ba2764f27161956e9a998bdceee2b1d73da70bc82dbe5c0b5e7e304ae9bfa",
+  "verification": {
+    "source_timestamps_aligned": 774,
+    "saved_full_views_pixel_equal": 774,
+    "native_crops_pixel_equal": 258,
+    "resized_crops_pixel_equal": 258,
+    "encoded_video_frames": 258,
+    "tests": "19 passed (9 crop + 10 existing prompt probe)",
+    "code_sha256": "570ba2764f27161956e9a998bdceee2b1d73da70bc82dbe5c0b5e7e304ae9bfa"
+  },
+  "server": "28",
+  "output_directory": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/outputs/normal93_interaction_preview_28_20261110_v2",
+  "annotation_file": "normal93_20261110_interaction_preview_annotations.json",
+  "no_training": true
+}

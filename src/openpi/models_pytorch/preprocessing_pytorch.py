@@ -54,7 +54,7 @@ def preprocess_observation_pytorch(
             image = image / 2.0 + 0.5
 
             # Apply PyTorch-based augmentations
-            if "wrist" not in key:
+            if "wrist" not in key and key != "interaction_0_rgb":
                 # Geometric augmentations for non-wrist cameras
                 height, width = image.shape[1:3]
 

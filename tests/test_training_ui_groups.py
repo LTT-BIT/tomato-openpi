@@ -1,9 +1,11 @@
 """Group recovery must use explicit conversion input provenance, never old recording IDs."""
 
+import hashlib
 import json
 
 import pytest
 
+from scripts.training_ui_groups import detect_bundle_groups
 from scripts.training_ui_groups import detect_groups
 
 
@@ -84,3 +86,27 @@ def test_summary_mismatch_is_rejected(dataset):
     write_json(dataset / "meta/info.json", {"codebase_version": "v2.1", "total_episodes": 3, "total_frames": 59})
     with pytest.raises(ValueError, match="info.json"):
         detect_groups(str(dataset))
+
+
+def test_bundle_grouping_uses_prepared_ids_and_excludes_short_paper_episodes(tmp_path):
+    root = tmp_path / "b_coarse"
+    episodes = [{"episode_index": i, "length": length} for i, length in [(0, 4), (1, 2), (2, 8)]]
+    write_json(root / "meta/info.json", {"total_episodes": 3, "total_frames": 14})
+    (root / "meta/episodes.jsonl").write_text("\n".join(json.dumps(row) for row in episodes))
+    mapping = [
+        {**row, "source_episode_index": 42, "source_dataset": f"/history/subtask-roi/{side}/batch{i}"}
+        for i, (row, side) in enumerate(zip(episodes, "ABB", strict=True))
+    ]
+    manifest = tmp_path / "bundle.json"
+    write_json(manifest, {"mapping": mapping})
+    checksum = hashlib.sha256(manifest.read_bytes()).hexdigest()
+    result = detect_bundle_groups(str(root), checksum, horizon=3)
+    assert result["episodes"] == 2
+    assert result["eligible_windows"] == 8
+    assert [(group["name"], group["episodes"], group["eligible_windows"]) for group in result["groups"]] == [
+        ("A", [0], 2),
+        ("B", [2], 6),
+    ]
+    assert detect_bundle_groups(str(root), checksum, horizon=1)["eligible_windows"] == 14
+    with pytest.raises(ValueError, match="来源记录已变化"):
+        detect_bundle_groups(str(root), "stale_hash", horizon=3)

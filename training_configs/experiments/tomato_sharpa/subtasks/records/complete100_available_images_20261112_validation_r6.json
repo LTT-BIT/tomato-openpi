@@ -1,0 +1,899 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-12",
+  "scope": "All100 current RGB availability; not improved localization or smooth fallback certification",
+  "result": {
+    "contract": {
+      "stream_contract": "current_rgb_local_or_full_fallback_v5",
+      "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+      "generator_sha256": "53325d3abf462e21b6122668f2763ec8c0754f90928a6dd1d8684297133fa5b2",
+      "parent_contract": {
+        "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+        "locator_sha256": "8b06ab9aa07e513e73d305b7c2f3ca5d060ee0a05ed5ab08a822df144a1d89fb",
+        "normalization_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+        "generator_sha256": "f95ee5207685a59d7925f47c8d24fb6ac769ff4fdb94a25cd977657ee866891f",
+        "selector_sha256": "8d967ccfee0caa9c8b321441960521b7575e3f9f609c61cd5c18fc3b93877bfa",
+        "locator_code_sha256": "05d9d66d97b1cade598f04958c613f0c107623fbc41dea7b4c848dfc0da4ba0a",
+        "stream_contract": "continuous_current_pixels_transport_v4",
+        "coverage_geometry_sha256": "dc14fe2e5f8e47118f474dbbb53da6881affd6956e5a628f29e70ddcd90669de",
+        "guarded_selector_sha256": "5875b0c0c7ea44ee4e450561417221da8737e4688eda423c196e787bbcc1163e",
+        "original_locator_code_sha256": "553806bd0ba857b8650640e526ddc0a71eb441e388c98823260afa26b927ee97",
+        "parent_locator_sha256": "19069cbd6fb9f1763798585685e3606bbe57e05f2a99ffdecd015e31bc04c305",
+        "geometry_sha256": "497007bc40735a8f9b04aefc8e5fc3fa6944582b124f8225d7a72ce2bc6414ac",
+        "grasp_calibration_sha256": "4dd34d428c0c1db682363dc442a64f109503331cfea96ee1d7e1df915cf145de"
+      },
+      "fallback_policy": "current_full_view_with_aspect_preserving_letterbox",
+      "uses_future_frames_for_roi": false,
+      "preserves_parent_local_validity": true
+    },
+    "episodes": 100,
+    "frames": 425556,
+    "image_available_frames": 425556,
+    "local_roi_valid_frames": 415987,
+    "full_view_fallback_frames": 9569,
+    "full_image_coverage": true,
+    "full_roi_coverage": false,
+    "training_ready": false,
+    "black_frames": 0,
+    "all_frames_decoded": true,
+    "current_pixel_checks": 11691,
+    "source_writes": false,
+    "training_started": false,
+    "limitation": "Fallback changes field of view; smooth transitions and independent semantic accuracy are not certified."
+  },
+  "AB_verification": {
+    "frames": 425556,
+    "available": 425556,
+    "local": 415987,
+    "fallback": 9569,
+    "mode_transitions": 2678,
+    "AB_crop_video_hashes_checked": 200,
+    "AB_availability_frames_checked": 851112,
+    "longest_full_view_fallback_frames": 107,
+    "full_image_coverage_verified": true,
+    "mode_transition_smoothness_accepted": false
+  },
+  "actual_loader": {
+    "selection_sha256": "15be3021fd71bf701ada068709138cc2cb56dfa5750cca936db136d8c26c1000",
+    "crop_manifest_sha256": "f8b97c24fb6f139b6d97dad1cee868a63869e2a40a7cdce227b8b34e7e3ad0c0",
+    "base": {
+      "recordings": 100,
+      "frames": 425556,
+      "derived_video_hashes_checked": 600,
+      "original_sources_hash_unchanged": true,
+      "physical_columns_equal": true,
+      "phase_prompt_indices_verified": true,
+      "four_view_dataset_ready": false
+    },
+    "real_four_view_loader": {
+      "episodes": 100,
+      "samples": 300,
+      "invalid_mask_samples": 0,
+      "interaction_mask_key": "observation.interaction_available",
+      "full_image_coverage_verified": true,
+      "actual_crop_size": [
+        224,
+        224,
+        3
+      ],
+      "state_size": 58,
+      "action_window": [
+        50,
+        58
+      ],
+      "model_keys": [
+        "base_0_rgb",
+        "left_wrist_0_rgb",
+        "right_wrist_0_rgb",
+        "interaction_0_rgb"
+      ],
+      "normalized_token_lengths_match": true,
+      "independent_original_vector_window_reference": true,
+      "sampled_text_maximum": 221,
+      "all100_action_training": true
+    },
+    "final_normalization_contract_bound": false,
+    "roi_quality_accepted": false,
+    "training_ready": false,
+    "training_started": false,
+    "source_writes": false
+  },
+  "normalization_binding": {
+    "assets": [
+      {
+        "variant": "a_goal",
+        "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_available_r6_delta_30hz",
+        "norm_stats_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+        "norm_metadata_sha256": "33a8f31bc7e47b9ac531d6b123a5db381092beef4997264cdbf1b9ac6536cbc4",
+        "status": "verified"
+      },
+      {
+        "variant": "b_coarse",
+        "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_available_r6_delta_30hz",
+        "norm_stats_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+        "norm_metadata_sha256": "54b6a9f4c841571d6495494f31a1d5f2431c7439015764cd92046c258deb3b88",
+        "status": "verified"
+      }
+    ],
+    "roi_quality_approved": false,
+    "training_started": false
+  },
+  "tests": {
+    "regression_passed": 155,
+    "normalization_passed": 5,
+    "final_preparation_and_gate_passed": 10,
+    "logs": [
+      "/tmp/tomato_available_full_tests.log",
+      "/tmp/tomato_available_norm_tests.log",
+      "/tmp/tomato_available_final_tests.log"
+    ]
+  },
+  "visual_review": {
+    "reviewer": "coding_agent",
+    "frames": [
+      750,
+      751,
+      752,
+      800,
+      858,
+      859
+    ],
+    "episode": 48,
+    "finding": "Current RGB preserved; full-view transitions visibly change scale; smoothness not accepted"
+  },
+  "formal_AB_quality_gate_rejects_candidate": true,
+  "training_started": false,
+  "deployment_modified": false,
+  "source_writes": false,
+  "files": [
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/availability_manifest.json",
+      "sha256": "52d8e9715f28a8f9dca2e0c9163216cdd1c2c416f4f5428d268d8eac834841c1"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/bundle_audit.json",
+      "sha256": "e4293e2e2f4fe78efe0caee3d7928b7b92861719d89124db5ea820914e1c435e"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_four_view_available_candidate_r6/crop_manifest.json",
+      "sha256": "f8b97c24fb6f139b6d97dad1cee868a63869e2a40a7cdce227b8b34e7e3ad0c0"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_four_view_available_candidate_r6/bundle.json",
+      "sha256": "64ff8a9d0799dce2812fe32a68d0a1e99c085488162d64e1d527cc455e956335"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_four_view_available_candidate_check_r6.json",
+      "sha256": "3fba9ffd6cb4a2f52357d5c4437bbc7e900fd9e39f126ad95c014f2e7ebcb568"
+    },
+    {
+      "path": "/home/user/datasets/derived/tomato_complete100_available_review_r6/transition_ep48.jpg",
+      "sha256": "c6f37a8ff163d236804f4fa92821d415efbf8024dbc4ffe124267affc701d8d2"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_available_r6_delta_30hz/norm_stats.json",
+      "sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_available_r6_delta_30hz/norm_metadata.json",
+      "sha256": "33a8f31bc7e47b9ac531d6b123a5db381092beef4997264cdbf1b9ac6536cbc4"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_available_r6_delta_30hz/norm_stats.json",
+      "sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83"
+    },
+    {
+      "path": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_available_r6_delta_30hz/norm_metadata.json",
+      "sha256": "54b6a9f4c841571d6495494f31a1d5f2431c7439015764cd92046c258deb3b88"
+    }
+  ],
+  "episode_receipts": [
+    {
+      "episode_index": 0,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000000/receipt.json",
+      "sha256": "06c22c7a2aca07f82652441bee7e2f900c0dec2753f7dc0c2632541420ddb23b",
+      "frames": 7658,
+      "max_encoded_pixel_mae": 2.4577221870422363
+    },
+    {
+      "episode_index": 4,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000004/receipt.json",
+      "sha256": "a740b64868e7c7789a3f88bc99103f31895a2c42d99522e2f1e805b950ca5bfa",
+      "frames": 5250,
+      "max_encoded_pixel_mae": 2.273324489593506
+    },
+    {
+      "episode_index": 8,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000008/receipt.json",
+      "sha256": "619fbdbf09aaa9084f4c6e05dbb90d12686924da571310ec6bc064734ca3323f",
+      "frames": 6726,
+      "max_encoded_pixel_mae": 2.4727957248687744
+    },
+    {
+      "episode_index": 12,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000012/receipt.json",
+      "sha256": "56e4f64e8c983cf7460f25a0aea1043ce5b1797ab0a8e646b2e0a19ae13e3eb6",
+      "frames": 4704,
+      "max_encoded_pixel_mae": 2.452766180038452
+    },
+    {
+      "episode_index": 16,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000016/receipt.json",
+      "sha256": "a6dc33b0545e0749fba6972917109f8dc1a2a83ed7bc244d7edbf417da7f4f1f",
+      "frames": 4285,
+      "max_encoded_pixel_mae": 2.4598612785339355
+    },
+    {
+      "episode_index": 20,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000020/receipt.json",
+      "sha256": "ad2d7a0435a5a3bb0d58e6bfc2f514297f4ab44469225985cf65f06739857c73",
+      "frames": 3850,
+      "max_encoded_pixel_mae": 2.3909904956817627
+    },
+    {
+      "episode_index": 24,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000024/receipt.json",
+      "sha256": "f1b1ae6062ef9192b3bfdf5b760e970764f71118fb3dd41d8814a0837dc9a36e",
+      "frames": 4990,
+      "max_encoded_pixel_mae": 2.3340108394622803
+    },
+    {
+      "episode_index": 28,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000028/receipt.json",
+      "sha256": "cb2381bd6c642e12a91be90b00e7e4faa4ff97b08bbca830fe9add6bef867dd1",
+      "frames": 4893,
+      "max_encoded_pixel_mae": 2.36714768409729
+    },
+    {
+      "episode_index": 32,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000032/receipt.json",
+      "sha256": "d0d7e05ee1c88f774f97bf2ac1d862bcc0854d443d6eb6e17c655c47c0f00e37",
+      "frames": 4197,
+      "max_encoded_pixel_mae": 2.3472378253936768
+    },
+    {
+      "episode_index": 36,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000036/receipt.json",
+      "sha256": "52f21de111beb12cccfd5ce905797d432e6007fc2fd08ac42d63939f65d7b04e",
+      "frames": 3571,
+      "max_encoded_pixel_mae": 2.2350525856018066
+    },
+    {
+      "episode_index": 40,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000040/receipt.json",
+      "sha256": "2dbe2eba1e9b73cb33d70ed8bb34d31a7bc682c117fc8aeaaa567edd08844225",
+      "frames": 4722,
+      "max_encoded_pixel_mae": 2.3607234954833984
+    },
+    {
+      "episode_index": 44,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000044/receipt.json",
+      "sha256": "44dedf8cb77d7861f05e1c40a18bdcc6b33926160343ce5178303c120a6fd3c3",
+      "frames": 3029,
+      "max_encoded_pixel_mae": 2.4464616775512695
+    },
+    {
+      "episode_index": 48,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000048/receipt.json",
+      "sha256": "deb65685331bab6dcaf1bb52a5e0ed08870fbc5762a21bbd1312b6252dc67988",
+      "frames": 3189,
+      "max_encoded_pixel_mae": 2.194734573364258
+    },
+    {
+      "episode_index": 52,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000052/receipt.json",
+      "sha256": "64afc23d35671d12cf675023375fbe33906c5965359847cd1b23c50c32155293",
+      "frames": 3345,
+      "max_encoded_pixel_mae": 2.5088820457458496
+    },
+    {
+      "episode_index": 56,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000056/receipt.json",
+      "sha256": "044ee74c00566645b04a391e90e3527cff82b18dbb5b927428919b80d2ee0e26",
+      "frames": 2902,
+      "max_encoded_pixel_mae": 2.381045341491699
+    },
+    {
+      "episode_index": 60,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000060/receipt.json",
+      "sha256": "df049bb35dafce45c7c5a3ff7d854150f116fafd5fc126a4a94202084287e97e",
+      "frames": 2567,
+      "max_encoded_pixel_mae": 2.343935966491699
+    },
+    {
+      "episode_index": 64,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000064/receipt.json",
+      "sha256": "7f31ac861b1ca17198b2a23062ab345d75889c80468f900ed093af1b7d33aaf5",
+      "frames": 6177,
+      "max_encoded_pixel_mae": 2.4256019592285156
+    },
+    {
+      "episode_index": 68,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000068/receipt.json",
+      "sha256": "b407f01cc3ee4be123241702b16bb5003e6c95e4b2801f1b01ceb9bbc3cbd17c",
+      "frames": 4301,
+      "max_encoded_pixel_mae": 2.2420811653137207
+    },
+    {
+      "episode_index": 72,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000072/receipt.json",
+      "sha256": "03280dc6afe5b43673bc7042018a77e0df2bf3b25da9c40dad93684db4ba47f9",
+      "frames": 3834,
+      "max_encoded_pixel_mae": 2.337611675262451
+    },
+    {
+      "episode_index": 76,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000076/receipt.json",
+      "sha256": "952751270806049240bd9f15f87911665759ea5cb61aaf9385cdffca39c93675",
+      "frames": 5665,
+      "max_encoded_pixel_mae": 2.2531955242156982
+    },
+    {
+      "episode_index": 80,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000080/receipt.json",
+      "sha256": "4eae634e90946f74b1101e936900f7f821e682c3dca3c029ea901aecad491fb6",
+      "frames": 6089,
+      "max_encoded_pixel_mae": 2.34769606590271
+    },
+    {
+      "episode_index": 84,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000084/receipt.json",
+      "sha256": "f06cb81fcd88253a8f8c2394787f7d3325299177f1671fd7b65618a04cf8bd05",
+      "frames": 4570,
+      "max_encoded_pixel_mae": 2.4110662937164307
+    },
+    {
+      "episode_index": 88,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000088/receipt.json",
+      "sha256": "246933f96bdb5608ddabf1be2311056121c4a3c8e019f0a2dc4ffdd051e2e6fa",
+      "frames": 4079,
+      "max_encoded_pixel_mae": 2.532844305038452
+    },
+    {
+      "episode_index": 92,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000092/receipt.json",
+      "sha256": "979924cf2d0500fb216d9f22d8c9ffbe5208537c0be2f4f64ae92b3a7ef7868c",
+      "frames": 3539,
+      "max_encoded_pixel_mae": 2.314067840576172
+    },
+    {
+      "episode_index": 96,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard0/episode_000096/receipt.json",
+      "sha256": "53ede80e2754fbf1342faacf27f779c9c19803a96d0d1cc719ff20b3d77a50e7",
+      "frames": 3803,
+      "max_encoded_pixel_mae": 2.3082549571990967
+    },
+    {
+      "episode_index": 1,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000001/receipt.json",
+      "sha256": "1fa60be3edfcbbb16e5acb7b7199bac0a40be66b247c9289668f546a977642c5",
+      "frames": 4542,
+      "max_encoded_pixel_mae": 2.5034213066101074
+    },
+    {
+      "episode_index": 5,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000005/receipt.json",
+      "sha256": "6bccb13c4a2f05972cd284e16b358bd3a6aadfd009de8ba43dbfe0ec0fd205fe",
+      "frames": 5006,
+      "max_encoded_pixel_mae": 2.2989675998687744
+    },
+    {
+      "episode_index": 9,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000009/receipt.json",
+      "sha256": "9f3e5e43d901910b103a9569c7b66136edda0255dd1f11b6a21331be5b004d74",
+      "frames": 4427,
+      "max_encoded_pixel_mae": 2.3367013931274414
+    },
+    {
+      "episode_index": 13,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000013/receipt.json",
+      "sha256": "7fb0c5ee23fc3ab24ab3229cf14642f8910b945f33dc12af284e8e61874c84da",
+      "frames": 3870,
+      "max_encoded_pixel_mae": 2.518548011779785
+    },
+    {
+      "episode_index": 17,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000017/receipt.json",
+      "sha256": "1683932d7088be13a06c48fccfbcb6b3a382b38c8300a0cad780ce76f6dba887",
+      "frames": 4513,
+      "max_encoded_pixel_mae": 2.4331817626953125
+    },
+    {
+      "episode_index": 21,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000021/receipt.json",
+      "sha256": "d86dec7878a8f0d85a8f1be574541a988066faf3b8bde2b72dc94ab36e1cdbd4",
+      "frames": 6065,
+      "max_encoded_pixel_mae": 2.252026319503784
+    },
+    {
+      "episode_index": 25,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000025/receipt.json",
+      "sha256": "493bb15135ae28b5b38cf1a7b13d2401b0360675a5125431cc696eddbedd4058",
+      "frames": 4574,
+      "max_encoded_pixel_mae": 2.2517738342285156
+    },
+    {
+      "episode_index": 29,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000029/receipt.json",
+      "sha256": "585ecd64e8cf34f37366f4468735b2445eecbab6612ddbd57644af177489eca6",
+      "frames": 5371,
+      "max_encoded_pixel_mae": 2.1690051555633545
+    },
+    {
+      "episode_index": 33,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000033/receipt.json",
+      "sha256": "bff0deb9f40975a370e04072fe8bbc8a2efbc71e42cd2906a78a497506269298",
+      "frames": 5019,
+      "max_encoded_pixel_mae": 2.4118900299072266
+    },
+    {
+      "episode_index": 37,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000037/receipt.json",
+      "sha256": "d1483c85516b891b651ec4b0a11e2bc74ef865843bad0fe597746fe29bfe874f",
+      "frames": 5423,
+      "max_encoded_pixel_mae": 2.482780694961548
+    },
+    {
+      "episode_index": 41,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000041/receipt.json",
+      "sha256": "a89699abb28aa3cd09d2bf8de83e275f69fa11c8d58078db400abd679dd2aa7d",
+      "frames": 3703,
+      "max_encoded_pixel_mae": 2.2626953125
+    },
+    {
+      "episode_index": 45,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000045/receipt.json",
+      "sha256": "1eb668f09fe6d34fd65366bf4fec95bb62a93fef6ad95bc4ae649f20b3cc35a2",
+      "frames": 3786,
+      "max_encoded_pixel_mae": 2.412182569503784
+    },
+    {
+      "episode_index": 49,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000049/receipt.json",
+      "sha256": "1854ecc0d4a5963fdd496c8a0e98048582d9a39d2fde4a10aef74395ecfa629e",
+      "frames": 3835,
+      "max_encoded_pixel_mae": 2.3863933086395264
+    },
+    {
+      "episode_index": 53,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000053/receipt.json",
+      "sha256": "e0779166d4622bc73af68a532951d1991bfca12db1ce23580c24c32cbfb5f6c0",
+      "frames": 3848,
+      "max_encoded_pixel_mae": 2.4023571014404297
+    },
+    {
+      "episode_index": 57,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000057/receipt.json",
+      "sha256": "f8806e0124eb9103fd6b35cbd02f4270df7a85111ed29924fd4053b258f274ba",
+      "frames": 3369,
+      "max_encoded_pixel_mae": 2.3666892051696777
+    },
+    {
+      "episode_index": 61,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000061/receipt.json",
+      "sha256": "b3aace6f72fbffa3850ba611c34394fdeea63726178790cffe1b9f2a615a71e9",
+      "frames": 2760,
+      "max_encoded_pixel_mae": 2.453669786453247
+    },
+    {
+      "episode_index": 65,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000065/receipt.json",
+      "sha256": "3851a12e1fc13f38e661876b657d01875906f4c8cf88ee64fd9996ea9d0a9d52",
+      "frames": 7428,
+      "max_encoded_pixel_mae": 2.440044403076172
+    },
+    {
+      "episode_index": 69,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000069/receipt.json",
+      "sha256": "cd76a0fe6479ad187b590fcc0686e35b0a51bfb0fea59392b2bb2844e22e8fec",
+      "frames": 4980,
+      "max_encoded_pixel_mae": 2.3930563926696777
+    },
+    {
+      "episode_index": 73,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000073/receipt.json",
+      "sha256": "93850ef9f2e2aa33ae3c337a91aa502fec1a645dcd1fe6160ce9b67f1ad2a395",
+      "frames": 3125,
+      "max_encoded_pixel_mae": 2.4958479404449463
+    },
+    {
+      "episode_index": 77,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000077/receipt.json",
+      "sha256": "3e0ee4439c68590e0aad8a93651cdf55dcb4f65cc641e91eb761d806c68c2425",
+      "frames": 5224,
+      "max_encoded_pixel_mae": 2.3572492599487305
+    },
+    {
+      "episode_index": 81,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000081/receipt.json",
+      "sha256": "e8ab22ec94cd34e5d0dcf351b65600be24f287f801650226308ded7ec8b67e00",
+      "frames": 4685,
+      "max_encoded_pixel_mae": 2.4773597717285156
+    },
+    {
+      "episode_index": 85,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000085/receipt.json",
+      "sha256": "6a32df2d1d2a5fad6fd06627f6a658c45324a341b8618313f88dc855d477e80d",
+      "frames": 3414,
+      "max_encoded_pixel_mae": 2.429521322250366
+    },
+    {
+      "episode_index": 89,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000089/receipt.json",
+      "sha256": "26122cc83c5973c3131e50e189e78cebddef554f02cd9378f26f4596e152bdf6",
+      "frames": 2252,
+      "max_encoded_pixel_mae": 2.49898362159729
+    },
+    {
+      "episode_index": 93,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000093/receipt.json",
+      "sha256": "b4b126787b01e6bf55f8199f70c47eacca8e3dcf00d79beadce5101cfc1604c2",
+      "frames": 3262,
+      "max_encoded_pixel_mae": 2.2419283390045166
+    },
+    {
+      "episode_index": 97,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard1/episode_000097/receipt.json",
+      "sha256": "3b927ff252090633791a8da54671346c2bb1606668c83d8bdde51696e426c2b8",
+      "frames": 4091,
+      "max_encoded_pixel_mae": 2.1840388774871826
+    },
+    {
+      "episode_index": 2,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000002/receipt.json",
+      "sha256": "03acb84989b3ddb086244ec294bcf2d94eaab966ff5756c3a4bbb1bdbd11eb7f",
+      "frames": 4016,
+      "max_encoded_pixel_mae": 2.432025909423828
+    },
+    {
+      "episode_index": 6,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000006/receipt.json",
+      "sha256": "2c1322b86f5c865f0429a57333164475c783f30a72d2f4abf51e477f74b1ce81",
+      "frames": 5266,
+      "max_encoded_pixel_mae": 2.236135482788086
+    },
+    {
+      "episode_index": 10,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000010/receipt.json",
+      "sha256": "5f5ccae2f8ad09e8c88b4185f3a0c5c5ee2e6e9d4bb1464d09b8039cc983e7bd",
+      "frames": 4593,
+      "max_encoded_pixel_mae": 2.356013536453247
+    },
+    {
+      "episode_index": 14,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000014/receipt.json",
+      "sha256": "42bc2e1679d1cf1d96859aa51e2d198bd1c44867a86407c314ce2f13c50620a0",
+      "frames": 5441,
+      "max_encoded_pixel_mae": 2.3369274139404297
+    },
+    {
+      "episode_index": 18,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000018/receipt.json",
+      "sha256": "80a77c2b7997284524cffd70d73bb9824ec735c01e6aa8cfe4ff9ac80176374f",
+      "frames": 4212,
+      "max_encoded_pixel_mae": 2.383483409881592
+    },
+    {
+      "episode_index": 22,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000022/receipt.json",
+      "sha256": "0447ae482f73338d70144ce499d7fcb29be8492b6780332006e5b9d205e7e5b9",
+      "frames": 4807,
+      "max_encoded_pixel_mae": 2.2489635944366455
+    },
+    {
+      "episode_index": 26,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000026/receipt.json",
+      "sha256": "62e49009b815571cf7e0f4851f5615ca59fc7a3eef2f937ea07065e7391f82a2",
+      "frames": 3932,
+      "max_encoded_pixel_mae": 2.3408403396606445
+    },
+    {
+      "episode_index": 30,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000030/receipt.json",
+      "sha256": "1b016d83959f6f4d56362efaddef2dc5a2454292a6f0534e844bd49ef564f9cc",
+      "frames": 4088,
+      "max_encoded_pixel_mae": 2.303983211517334
+    },
+    {
+      "episode_index": 34,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000034/receipt.json",
+      "sha256": "abdc30331a29d177990aeccd2758194e7e1c6b602a224cc4d84704a7c48fdceb",
+      "frames": 4512,
+      "max_encoded_pixel_mae": 2.167105197906494
+    },
+    {
+      "episode_index": 38,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000038/receipt.json",
+      "sha256": "d3361be6f6a91f6205beb88015ce7ba022a0b9d58349b25ce2991643978de4f5",
+      "frames": 2821,
+      "max_encoded_pixel_mae": 2.2255194187164307
+    },
+    {
+      "episode_index": 42,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000042/receipt.json",
+      "sha256": "a4a4b51410b5454106dd5f38552dae1c454eafe38738b2c23ddd5cbafdcf4c52",
+      "frames": 2234,
+      "max_encoded_pixel_mae": 2.354565382003784
+    },
+    {
+      "episode_index": 46,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000046/receipt.json",
+      "sha256": "0014e36bfa58d99e39ceb3cc7d873f2df7f591a66002bf7e282c967f0a89195a",
+      "frames": 4603,
+      "max_encoded_pixel_mae": 2.434171676635742
+    },
+    {
+      "episode_index": 50,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000050/receipt.json",
+      "sha256": "861303934d0bb9cb5b544ccea162f802b61a14b6cc0d36249b1503016b3fc8ef",
+      "frames": 2331,
+      "max_encoded_pixel_mae": 2.4227054119110107
+    },
+    {
+      "episode_index": 54,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000054/receipt.json",
+      "sha256": "cc9c6078d326a881e5e73a7af92f395dd018aca7bcb987e8508c9357a37ced7a",
+      "frames": 3654,
+      "max_encoded_pixel_mae": 2.3032925128936768
+    },
+    {
+      "episode_index": 58,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000058/receipt.json",
+      "sha256": "665f9953e19c4eac6d763a78eab901712b91f7ecda04458de0e0eac5c92611f4",
+      "frames": 3198,
+      "max_encoded_pixel_mae": 2.4423296451568604
+    },
+    {
+      "episode_index": 62,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000062/receipt.json",
+      "sha256": "7ffe3bcdaf625f605377b40851ab690f93948b573394544a659fa2318e07c4f6",
+      "frames": 3254,
+      "max_encoded_pixel_mae": 2.555318593978882
+    },
+    {
+      "episode_index": 66,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000066/receipt.json",
+      "sha256": "b1ccc88504e197d26738574013e491f534c0c7c06296265a42bff9445deff6de",
+      "frames": 5474,
+      "max_encoded_pixel_mae": 2.4581539630889893
+    },
+    {
+      "episode_index": 70,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000070/receipt.json",
+      "sha256": "69e1839d0b8d381bb7c19a32a514f94b2e56c9161ea86d88ea5027725dd52e03",
+      "frames": 6534,
+      "max_encoded_pixel_mae": 2.3182597160339355
+    },
+    {
+      "episode_index": 74,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000074/receipt.json",
+      "sha256": "194da3920cd9c803232d7ac69e51cea56ab72535f275ebcc5f524a36ce9691c0",
+      "frames": 4226,
+      "max_encoded_pixel_mae": 2.4750146865844727
+    },
+    {
+      "episode_index": 78,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000078/receipt.json",
+      "sha256": "2c6418909013a43cc582e386ba8deff21a354752a03f339b57e6460ff786ad74",
+      "frames": 5753,
+      "max_encoded_pixel_mae": 2.417145013809204
+    },
+    {
+      "episode_index": 82,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000082/receipt.json",
+      "sha256": "b8f2db36a4bb92c24ec4c5b315b9f6f55c1d44e3cdeb5794acbef36d6150ab0f",
+      "frames": 3464,
+      "max_encoded_pixel_mae": 2.251521348953247
+    },
+    {
+      "episode_index": 86,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000086/receipt.json",
+      "sha256": "87e3d79ac740bef397932f3dbf29b22ea82ad0b0a132701dc04b499629c35488",
+      "frames": 2990,
+      "max_encoded_pixel_mae": 2.5939559936523438
+    },
+    {
+      "episode_index": 90,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000090/receipt.json",
+      "sha256": "90dca6888b1f48b40f670bddd231ea8fa72588ef9f737188c18f2373e815e947",
+      "frames": 4697,
+      "max_encoded_pixel_mae": 2.2042343616485596
+    },
+    {
+      "episode_index": 94,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000094/receipt.json",
+      "sha256": "c044b1ca2f0e5f1fdfd5ff5e6bf421e56e7abdaec937ae28e7fea6b7de4e39ed",
+      "frames": 2798,
+      "max_encoded_pixel_mae": 2.232647657394409
+    },
+    {
+      "episode_index": 98,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard2/episode_000098/receipt.json",
+      "sha256": "bc32f29d8a3bf93c86024ceb3fee58771a23cbab737f9f38b5e08497decb16e4",
+      "frames": 2773,
+      "max_encoded_pixel_mae": 2.2878799438476562
+    },
+    {
+      "episode_index": 3,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000003/receipt.json",
+      "sha256": "d131f925b4408981db86ee2ca79e87e6151c3bab1ad3676327f3886c536b486f",
+      "frames": 5350,
+      "max_encoded_pixel_mae": 2.4303650856018066
+    },
+    {
+      "episode_index": 7,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000007/receipt.json",
+      "sha256": "56bfeee655fc5d6b8c0927d2dcc9487d644215a7ae68e20486f1e32758f2e497",
+      "frames": 5804,
+      "max_encoded_pixel_mae": 2.3716185092926025
+    },
+    {
+      "episode_index": 11,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000011/receipt.json",
+      "sha256": "f44d66977ff346bb54af0d5de03f8a5249249c0a61c05a369698ddd917c42cb1",
+      "frames": 5415,
+      "max_encoded_pixel_mae": 2.4452991485595703
+    },
+    {
+      "episode_index": 15,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000015/receipt.json",
+      "sha256": "5f8049e956ab218960e220c864cd88df46e82861b47e27a7d2a168a42d7df91e",
+      "frames": 5145,
+      "max_encoded_pixel_mae": 2.4483749866485596
+    },
+    {
+      "episode_index": 19,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000019/receipt.json",
+      "sha256": "41040a2e005eee130f0c436c1dae4dbe9ff3282ac17c3e3611186188fe3043d0",
+      "frames": 3867,
+      "max_encoded_pixel_mae": 2.3854498863220215
+    },
+    {
+      "episode_index": 23,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000023/receipt.json",
+      "sha256": "1c735bd383253d0ba4221db2fc4cd58b958e405585be05835984a53f64f445a9",
+      "frames": 4415,
+      "max_encoded_pixel_mae": 2.326869487762451
+    },
+    {
+      "episode_index": 27,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000027/receipt.json",
+      "sha256": "5e326ac17ffa1ebbf9442119010a031c7c2c5aa99936a6561cbbbf058004edf4",
+      "frames": 5566,
+      "max_encoded_pixel_mae": 2.3581526279449463
+    },
+    {
+      "episode_index": 31,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000031/receipt.json",
+      "sha256": "086245482999c318387000db03d5af6e91bc5dff2f9ce80b33affa5f6948c664",
+      "frames": 6735,
+      "max_encoded_pixel_mae": 2.398749828338623
+    },
+    {
+      "episode_index": 35,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000035/receipt.json",
+      "sha256": "19dbfe27b983a62566d8444ec753a6594854b4193db7ac04e0ed3f8553469f5c",
+      "frames": 3953,
+      "max_encoded_pixel_mae": 2.5619685649871826
+    },
+    {
+      "episode_index": 39,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000039/receipt.json",
+      "sha256": "ee42dd089fd49bc4a992ea8231ee1412bf9d9053f1d70425a6ea3467bb197ad7",
+      "frames": 4068,
+      "max_encoded_pixel_mae": 2.2592341899871826
+    },
+    {
+      "episode_index": 43,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000043/receipt.json",
+      "sha256": "a4a5752cb304633b92a4495b8b3a833900a7023833db41827dc9d0af3d4795f4",
+      "frames": 3486,
+      "max_encoded_pixel_mae": 2.297459602355957
+    },
+    {
+      "episode_index": 47,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000047/receipt.json",
+      "sha256": "c178650898550cfb149fc97a0ee367dac34ee8d91ef8b162c42829eca8ee8b8d",
+      "frames": 2595,
+      "max_encoded_pixel_mae": 2.2740354537963867
+    },
+    {
+      "episode_index": 51,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000051/receipt.json",
+      "sha256": "c0614818db908d239cf0f8314cd4573badb630f0b8f269fc12d29773a4c8664e",
+      "frames": 3225,
+      "max_encoded_pixel_mae": 2.391256093978882
+    },
+    {
+      "episode_index": 55,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000055/receipt.json",
+      "sha256": "98a1bb2f415c8c96863c61c56f16b33a4ec08517c05fb9ae7155cd0ecbf45349",
+      "frames": 3117,
+      "max_encoded_pixel_mae": 2.361215114593506
+    },
+    {
+      "episode_index": 59,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000059/receipt.json",
+      "sha256": "1082fc474d2449e0fc6af926679ac4d9fb5fe85ed267bbf487c3449a7749259e",
+      "frames": 3652,
+      "max_encoded_pixel_mae": 2.368589162826538
+    },
+    {
+      "episode_index": 63,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000063/receipt.json",
+      "sha256": "ab55f74f55bd459ee759ae35c816c52d453f8fb1a6330f2652817d872ce84a9a",
+      "frames": 2685,
+      "max_encoded_pixel_mae": 2.529024600982666
+    },
+    {
+      "episode_index": 67,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000067/receipt.json",
+      "sha256": "c0846202d36d9c1bf0c7c19901d9796077f3f1aff2ce1531e729dbb175608374",
+      "frames": 3229,
+      "max_encoded_pixel_mae": 2.548980951309204
+    },
+    {
+      "episode_index": 71,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000071/receipt.json",
+      "sha256": "15df8baf3d4084a52cfa097276c987908c294d109880ac4783259dbdc510b199",
+      "frames": 5628,
+      "max_encoded_pixel_mae": 2.36531400680542
+    },
+    {
+      "episode_index": 75,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000075/receipt.json",
+      "sha256": "141020faec030cb96472ef0a0d7fb993f42947b10bfb972637d314d8f23b9f71",
+      "frames": 3758,
+      "max_encoded_pixel_mae": 2.323547840118408
+    },
+    {
+      "episode_index": 79,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000079/receipt.json",
+      "sha256": "ee5a07083f86f21a1f9913322999d74dc106f6e3d9043491172d9c65c81dfc2b",
+      "frames": 4978,
+      "max_encoded_pixel_mae": 2.2977254390716553
+    },
+    {
+      "episode_index": 83,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000083/receipt.json",
+      "sha256": "d5e2d2af34dd575a376eb387aaec3376229b2c3f22df406d4f8d0aa6dfa84a74",
+      "frames": 3847,
+      "max_encoded_pixel_mae": 2.528552770614624
+    },
+    {
+      "episode_index": 87,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000087/receipt.json",
+      "sha256": "66c98c332eee09c0d8aec71d5340e0d5eaf5e286fa71a2cc756cb4e814394eae",
+      "frames": 2773,
+      "max_encoded_pixel_mae": 2.441990852355957
+    },
+    {
+      "episode_index": 91,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000091/receipt.json",
+      "sha256": "3a5857fc207f2491fa05c84be5f318811b7a2714ab9c1a7b91ddaf5d20d39159",
+      "frames": 3297,
+      "max_encoded_pixel_mae": 2.4620933532714844
+    },
+    {
+      "episode_index": 95,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000095/receipt.json",
+      "sha256": "984d223445868750261a815d298833f9b7aa3c083830a0560376d66c10b8e780",
+      "frames": 3560,
+      "max_encoded_pixel_mae": 2.347377300262451
+    },
+    {
+      "episode_index": 99,
+      "path": "/home/user/datasets/derived/tomato_complete100_available_candidates_r6/shard3/episode_000099/receipt.json",
+      "sha256": "745695be973c86be9d1619ff1b53d888309f5c904b54fadd6f16d11fcce245dc",
+      "frames": 3230,
+      "max_encoded_pixel_mae": 2.3292410373687744
+    }
+  ],
+  "limitations": [
+    "9569 frames still lack reliable local ROI and use current full-view fallback",
+    "2678 local/full transitions can cause visible zoom changes",
+    "Independent semantic accuracy and transition smoothness unapproved",
+    "Target batch512 GPU memory preflight remains pending",
+    "All100 locator contains Agent test supervision; not independent Agent evaluation"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "review_complete": false,
+  "episodes": [
+    {
+      "dataset": "/absolute/path/to/1102_normal_lerobot",
+      "episode_index": 0,
+      "annotation": "/absolute/path/to/reviewed/coarse.json",
+      "recording_namespace": "acquisition identity shared by normal and speedup",
+      "recording_group": "original rosbag identity shared by normal and speedup"
+    }
+  ]
+}

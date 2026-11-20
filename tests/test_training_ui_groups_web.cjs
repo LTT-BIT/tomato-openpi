@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const {test} = require('node:test');
 
 class Element {
-  constructor(tag) { this.tag=tag; this.children=[]; this.dataset={}; this.value=''; this.classList={add(){},remove(){}}; }
+  constructor(tag) { this.tag=tag; this.children=[]; this.dataset={}; this.value=''; this.classList={add(){},remove(){},toggle(){}}; }
   append(...children) { this.children.push(...children); }
   replaceChildren(...children) { this.children=children; }
   addEventListener() {}
@@ -59,7 +59,7 @@ test('loading an existing group preserves its episode order',()=>{
   assert.equal(run('groupInputs()[0].episodes'),'5,0,2');
 });
 
-for(const mutation of ["fields.get('dataset_root').input.value='/new'",'loadingVersion++',"$('sampling-mode').value='epoch_shuffle'","addGroup({name:'manual',weight:2,episodes:[9]})"]){
+for(const mutation of ["fields.get('dataset_root').input.value='/new'",'loadingVersion++',"$('sampling-mode').value='epoch_shuffle'","paperTrial='t3'","addGroup({name:'manual',weight:2,episodes:[9]})"]){
   test('in-flight result cannot overwrite changed input: '+mutation,async()=>{
     const {context,run}=setup(); context.result=detected;
     run('let finish; api=()=>new Promise(resolve=>{finish=resolve})');
@@ -69,6 +69,12 @@ for(const mutation of ["fields.get('dataset_root').input.value='/new'",'loadingV
     assert.equal(run('JSON.stringify(groupInputs())'),changed);
   });
 }
+
+test('target percentages normalize relative weights and reject zero weights',()=>{
+  const {run}=setup();
+  assert.equal(run("JSON.stringify(groupShares([{weight:7},{weight:3}]))"),'[0.7,0.3]');
+  assert.equal(run("JSON.stringify(groupShares([{weight:7},{weight:0}]))"),'[]');
+});
 
 test('stop from a task row targets that job, including download/preparation stages',async()=>{
   const {context,run}=setup(); context.calls=[];context.confirm=()=>true;
@@ -129,13 +135,15 @@ test('four-mode summary shows effective RTC and Paper details only for Paper',()
   const {run,elements}=setup();
   elements.set('protocol',new Element('div'));
   run(`initial={rtc_max_delay:0,action_semantics:'absolute',assets_dir:'/assets',asset_id:'ordinary'};
-    protocol={action_dim:58,model_action_dim:58,action_hz:30,model_family:'pi05',prompt:'Pick tomato.'};
+    protocol={action_dim:58,model_action_dim:58,action_hz:30,cameras:['base','left','right'],prompt:'Pick tomato.'};
     fields.set('rtc_max_delay',{input:{value:10}});renderProtocol();`);
   let text=elements.get('protocol').children.map(el=>el.textContent).join('\n');
   assert.match(text,/普通 π0.5.*RTC 最大延迟 10/);
   assert.doesNotMatch(text,/beta=/);
   assert.match(text,/\/assets\/ordinary/);
-  run(`protocol.model_family='Paper';protocol.paper_algorithm={mode:'timestamp_zscore_arms',beta:.5,asset_sha256:'fixture-hash'};renderProtocol();`);
+  run(`paperTrial='t3';initial.paper_trial='t3';
+    fields.set('assets_dir',{input:{value:initial.assets_dir}});fields.set('asset_id',{input:{value:initial.asset_id}});
+    protocol.paper_algorithm={mode:'timestamp_zscore_arms',beta:.5,asset_sha256:'fixture-hash'};renderProtocol();`);
   text=elements.get('protocol').children.map(el=>el.textContent).join('\n');
   assert.match(text,/Paper 专用配置.*RTC 最大延迟 10/);
   assert.match(text,/timestamp_zscore_arms.*beta=0.5.*fixture-hash/);
@@ -144,27 +152,27 @@ test('four-mode summary shows effective RTC and Paper details only for Paper',()
 test('Paper action selector disables absolute without affecting ordinary baseline',()=>{
   const {run,context}=setup();
   context.container=new Element('div');
-  run(`initial={action_semantics:'delta'};protocol={delta_available:true,paper_algorithm:{mode:'timestamp_zscore_arms'}};
+  run(`paperTrial='t1';initial={action_semantics:'delta'};protocol={delta_available:true,paper_algorithm:{mode:'timestamp_zscore_arms'}};
     addField(container,['action_semantics','监督','action-semantics'],'delta','delta');`);
   assert.equal(run("fields.get('action_semantics').input.querySelector('[value=absolute]').disabled"),true);
-  run(`protocol={delta_available:true};addField(container,['action_semantics','监督','action-semantics'],'absolute','absolute');`);
+  run(`paperTrial='none';protocol={delta_available:true};addField(container,['action_semantics','监督','action-semantics'],'absolute','absolute');`);
   assert.notEqual(run("fields.get('action_semantics').input.querySelector('[value=absolute]').disabled"),true);
 });
 
 test('GUI checkboxes select T1/T2/T3, lock sampling, rotate assets and restore native mode',()=>{
   const {run,elements,context}=setup();
-  for(const id of ['paper-timestamp','paper-correlated','paper-help','protocol','groups-panel'])elements.set(id,new Element('div'));
+  for(const id of ['paper-timestamp','paper-correlated','paper-fields','paper-summary','protocol','groups-panel','discover-datasets','new-stats','detect-groups','group-source-help'])elements.set(id,new Element('div'));
   elements.get('sampling-mode').append(Object.assign(new Element('option'),{value:'weighted_replacement'}));
   run(`initial={paper_trial:'none',asset_id:'ordinary',assets_dir:'/assets'};
-    protocol={paper_available:true,action_dim:58,model_action_dim:58,action_hz:30,prompt:'Pick tomato.'};
-    for(const [key,value] of Object.entries({exp_name:'run01',asset_id:'ordinary',assets_dir:'/assets',rtc_max_delay:'10'}))fields.set(key,{input:{value}});
+    protocol={paper_available:true,action_dim:58,model_action_dim:58,action_hz:30,cameras:['base','left','right'],prompt:'Pick tomato.'};
+    for(const [key,value] of Object.entries({exp_name:'run01',asset_id:'ordinary',assets_dir:'/assets',rtc_max_delay:'10'}))fields.set(key,{input:Object.assign(document.createElement('input'),{value})});
     `);
   const input=new Element('select');input.value='absolute';input.append(Object.assign(new Element('option'),{value:'absolute'}));
   context.inputForTest=input;
-  run("fields.set('action_semantics',{input:inputForTest});independentStats=()=>{fields.get('asset_id').input.value='independent_paper_'+paperChoice};");
+  run("fields.set('action_semantics',{input:inputForTest});independentStats=()=>{fields.get('asset_id').input.value='independent_paper_'+paperTrial};");
   elements.get('paper-timestamp').checked=true;
   run('changePaperFeatures()');
-  assert.equal(run('paperChoice'),'t1');
+  assert.equal(run('paperTrial'),'t1');
   assert.equal(input.value,'delta');
   assert.equal(input.querySelector('[value=absolute]').disabled,true);
   assert.equal(elements.get('sampling-mode').value,'epoch_shuffle');
@@ -172,11 +180,11 @@ test('GUI checkboxes select T1/T2/T3, lock sampling, rotate assets and restore n
   assert.equal(run('paperAlgorithm().beta'),0);
   assert.match(run("fields.get('asset_id').input.value"),/paper_t1$/);
   elements.get('paper-correlated').checked=true;run('changePaperFeatures()');
-  assert.equal(run('paperChoice'),'t3');assert.equal(run('paperAlgorithm().beta'),.5);
+  assert.equal(run('paperTrial'),'t3');assert.equal(run('paperAlgorithm().beta'),.5);
   elements.get('paper-timestamp').checked=false;run('changePaperFeatures()');
-  assert.equal(run('paperChoice'),'t2');assert.equal(run('paperAlgorithm().mode'),'global_quantile');
+  assert.equal(run('paperTrial'),'t2');assert.equal(run('paperAlgorithm().mode'),'global_quantile');
   elements.get('paper-correlated').checked=false;run('changePaperFeatures()');
-  assert.equal(run('paperChoice'),'none');assert.equal(run('paperAlgorithm()'),null);
+  assert.equal(run('paperTrial'),'none');assert.equal(run('paperAlgorithm()'),null);
   assert.equal(input.querySelector('[value=absolute]').disabled,false);
   assert.equal(run("fields.get('asset_id').input.value"),'ordinary');
   assert.equal(run('request().values.paper_trial'),'none');

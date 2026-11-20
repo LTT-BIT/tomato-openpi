@@ -1,0 +1,117 @@
+{
+  "date": "2026-11-09",
+  "host": "27",
+  "branch": "tomato-subtasks-ab-train",
+  "config_commit": "ab74381",
+  "checker_sha256": "2dbcfec91111677e40dceaabcda6e8cf3024077961143eabec3c4016a2b6c481",
+  "status": "passed",
+  "data_policy": "all_sources",
+  "episodes": 93,
+  "frames": 410456,
+  "splits": {
+    "train": 93
+  },
+  "training_action_semantics": "delta_arm_joint_target_absolute_hand",
+  "verification_report": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/outputs/normal93_annotation_r2_delta_verification.json",
+  "verification_report_sha256": "ea69af0c9fde5c8f014046e4ab6567248ef928bd0f632020278554e4c7063913",
+  "variants": {
+    "a_goal": {
+      "training_episodes": 93,
+      "training_frames": 410456,
+      "norm_stats_path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/assets/tomato_truss_normal93_20261109_annotation_r2_all_sources_v2_a_goal_v1_delta_30hz/norm_stats.json",
+      "norm_stats_sha256": "3f82a27ba53cb6a0553886d453c8e05ccb466354d131ee9c956cd0a12637350a",
+      "norm_provenance": "verified",
+      "batch": {
+        "state": [
+          1,
+          58
+        ],
+        "actions": [
+          1,
+          50,
+          58
+        ],
+        "tokens": [
+          1,
+          256
+        ],
+        "images": {
+          "base_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ],
+          "left_wrist_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ],
+          "right_wrist_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ]
+        }
+      },
+      "phase_boundary_supervision_checked": true
+    },
+    "b_coarse": {
+      "training_episodes": 93,
+      "training_frames": 410456,
+      "norm_stats_path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/assets/tomato_truss_normal93_20261109_annotation_r2_all_sources_v2_b_coarse_v1_delta_30hz/norm_stats.json",
+      "norm_stats_sha256": "3f82a27ba53cb6a0553886d453c8e05ccb466354d131ee9c956cd0a12637350a",
+      "norm_provenance": "verified",
+      "batch": {
+        "state": [
+          1,
+          58
+        ],
+        "actions": [
+          1,
+          50,
+          58
+        ],
+        "tokens": [
+          1,
+          256
+        ],
+        "images": {
+          "base_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ],
+          "left_wrist_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ],
+          "right_wrist_0_rgb": [
+            1,
+            224,
+            224,
+            3
+          ]
+        }
+      },
+      "phase_boundary_supervision_checked": true
+    }
+  },
+  "training_started": false,
+  "model_weights_loaded": false,
+  "gpu_capacity_verified": false,
+  "tests": {
+    "python": 82,
+    "javascript": 12
+  },
+  "ui": {
+    "default": "B stage prompt + arm Delta / hand Absolute",
+    "statistics": "verified",
+    "selected_gpus": 8
+  }
+}

@@ -76,6 +76,13 @@ def save_state(
             extra_assets = getattr(data_config, "save_extra_assets", None)
             if extra_assets is not None:
                 extra_assets(directory / data_config.asset_id)
+        memory = getattr(data_config, "visual_memory", None)
+        if memory is not None:
+            import json
+
+            (directory / "visual_memory_contract.json").write_text(
+                json.dumps({**memory.contract(), "training_checkpoint": True}, sort_keys=True, indent=2)
+            )
 
     # Split params that can be used for inference into a separate item.
     with at.disable_typechecking():

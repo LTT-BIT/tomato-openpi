@@ -1,0 +1,162 @@
+{
+  "checked_at": "2026-11-09T12:07:27.796097+08:00",
+  "host": "28",
+  "branch": "tomato-subtasks-ab-train",
+  "code_commit": "b38d4a9e712cf25c0919a22a4483c593880631b3",
+  "status": "CPU pretraining checks passed; CUDA capacity check pending occupied GPUs",
+  "primary_variant": "b",
+  "control_variant": "a",
+  "data_policy": "all_sources",
+  "training_episodes": 93,
+  "training_frames": 410456,
+  "annotation_revision": 2,
+  "corrected_final_phase_frames": 82,
+  "training_started": false,
+  "deployment_modified": false,
+  "automatic_start_or_queue": false,
+  "gpu_capacity_verified": false,
+  "source_hashes_rechecked": true,
+  "disk_free_bytes": 823367041024,
+  "weight_check": {
+    "status": "passed",
+    "weight_loader": "PartialCheckpointWeightLoader",
+    "params_path": "/mnt/data/public_ckpt/pi05/pi05_base/params",
+    "model_action_dim": 58,
+    "model_action_horizon": 50,
+    "parameter_leaves": 51,
+    "loaded_leaves": 48,
+    "fresh_projection_leaves": {
+      "action_in_proj/kernel": {
+        "shape": [
+          58,
+          1024
+        ],
+        "dtype": "float32"
+      },
+      "action_out_proj/bias": {
+        "shape": [
+          58
+        ],
+        "dtype": "float32"
+      },
+      "action_out_proj/kernel": {
+        "shape": [
+          1024,
+          58
+        ],
+        "dtype": "float32"
+      }
+    },
+    "trainable_parameter_leaves": 51,
+    "frozen_parameter_leaves": 0,
+    "checkpoint_metadata_sha256": "250d0ad0f6540a5e4bdd70442d6864cef729724f2d23e2dd2cc669563a668d70",
+    "validation_device": "cpu",
+    "training_started": false,
+    "optimizer_created": false
+  },
+  "training_graph_check": {
+    "status": "passed",
+    "batch_size": 64,
+    "fsdp_devices": 8,
+    "abstract_devices": [
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu"
+    ],
+    "loss_shape": [],
+    "optimizer_and_gradient_trace": "passed",
+    "parameters_updated": false,
+    "actual_forward_backward_executed": false,
+    "gpu_capacity_verified": false,
+    "training_started": false
+  },
+  "wandb_check": {
+    "status": "passed",
+    "mode": "offline",
+    "version": "0.28.0",
+    "run_id": "etbi0z01",
+    "run_directory": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/wandb/offline-run-20261109_040340-etbi0z01/files",
+    "training_started": false
+  },
+  "reports": {
+    "weights": {
+      "path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/outputs/normal93_annotation_r2_weight_preflight.json",
+      "sha256": "aaa08ca55454a805b37a15f75afa4e0ee9efc5000ae5a98044235fa0a1fcbd73"
+    },
+    "training_graph": {
+      "path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/outputs/normal93_annotation_r2_training_graph_preflight.json",
+      "sha256": "edafacbe8b4a028a87a95fe49fab971bd3eaa708aa9aeb3311d59635d8d539df"
+    },
+    "wandb": {
+      "path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/outputs/normal93_annotation_r2_wandb_preflight.json",
+      "sha256": "ef37e2eba286a455250a18e09cfdfabc6cd976a75b7d216fab8f97dcd8d91792"
+    }
+  },
+  "variants": {
+    "b": {
+      "module": "training_configs.experiments.tomato_sharpa.subtasks.normal93_b_stage",
+      "exp_name": "tomato_truss_normal93_20261109_annotation_r2_all_sources_v2_b_coarse_v1_s42",
+      "checkpoint_dir": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/checkpoints/pi05_sharpa_tomato_truss_normal93_20261109_annotation_r2_all_sources_v2_b_coarse_fullft_v1/tomato_truss_normal93_20261109_annotation_r2_all_sources_v2_b_coarse_v1_s42",
+      "preflight_snapshot": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/logs/normal93_preflight/20261109_120503_021072_b.json",
+      "preflight_snapshot_sha256": "86b131c85669a4188814ed5ab7f882eea22a965e4df9eaedfcf74f576014721f",
+      "gpu_status": "GPU 0,1,2,3,4,5,6,7 occupied; training was not started. Existing processes were not changed.",
+      "norm_stats_sha256": "50de51c1374b1c470bafc30c7be81e035ec998c3e18ec707ff928bd7078c0597"
+    },
+    "a": {
+      "module": "training_configs.experiments.tomato_sharpa.subtasks.normal93_a_goal",
+      "exp_name": "tomato_truss_normal93_20261109_annotation_r2_all_sources_v2_a_goal_v1_s42",
+      "checkpoint_dir": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/checkpoints/pi05_sharpa_tomato_truss_normal93_20261109_annotation_r2_all_sources_v2_a_goal_fullft_v1/tomato_truss_normal93_20261109_annotation_r2_all_sources_v2_a_goal_v1_s42",
+      "preflight_snapshot": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/logs/normal93_preflight/20261109_120535_291898_a.json",
+      "preflight_snapshot_sha256": "93a2476fb46f179f48603f693f9469c9c6fa4edf5bf6eec73ce0ba33ba1ac439",
+      "gpu_status": "GPU 0,1,2,3,4,5,6,7 occupied; training was not started. Existing processes were not changed.",
+      "norm_stats_sha256": "50de51c1374b1c470bafc30c7be81e035ec998c3e18ec707ff928bd7078c0597"
+    }
+  },
+  "training_parameters": {
+    "batch_size": 64,
+    "fsdp_devices": 8,
+    "num_train_steps": 30000,
+    "num_workers": 8,
+    "seed": 42,
+    "model_seed": 42,
+    "data_seed": 42001,
+    "augmentation_seed": 42002,
+    "lr_schedule": {
+      "fields": {
+        "decay_lr": 2.5e-06,
+        "decay_steps": 30000,
+        "peak_lr": 2.5e-05,
+        "warmup_steps": 1000
+      },
+      "type": "openpi.training.optimizer.CosineDecaySchedule"
+    },
+    "optimizer": {
+      "fields": {
+        "b1": 0.9,
+        "b2": 0.95,
+        "clip_gradient_norm": 1.0,
+        "eps": 1e-08,
+        "weight_decay": 1e-10
+      },
+      "type": "openpi.training.optimizer.AdamW"
+    },
+    "sampling_mode": "epoch_shuffle",
+    "save_interval": 2000,
+    "keep_period": 10000
+  },
+  "tests": [
+    {
+      "scope": "entry, GPU guards, subtasks, original launcher",
+      "passed": 54
+    },
+    {
+      "scope": "entry, published configs, Sharpa loader, normalization",
+      "passed": 64
+    }
+  ]
+}

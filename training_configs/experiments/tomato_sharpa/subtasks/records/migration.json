@@ -1,0 +1,32 @@
+{
+  "source": "/home/user/lemon_vjepa2_training_20261106",
+  "source_is_git_checkout": false,
+  "sha256": {
+    "tools/train_lemon_vjepa_phase.py": "baa66894ab6208e06e59823cc978eb9075e8ddcb1b820d224ca5553a8a1e666c",
+    "tools/serve_lemon_phase_agent.py": "c49afdfcd3cc5510c2a7699e556c41f4a76e9ee9b603a50722e282dda9d7a6c4",
+    "tools/lemon_phase_model.py": "f0da0e0dfef15cc26b17f9125900bb61287f27214f28288fb1a2dfa4a57f3613",
+    "experiment_results/training_config.json": "9964ee9a1421de501b2c5bcfd7d1304f1addf92783dae7211952ac3b8da29e70"
+  },
+  "adapted": [
+    "causal history sampling",
+    "three-camera V-JEPA encoder features",
+    "frozen encoder and phase head",
+    "original-recording grouped split",
+    "training-only feature normalization"
+  ],
+  "tomato_contract": {
+    "state_dim": 58,
+    "phase_occurrences": 7,
+    "clip_frames": 16,
+    "history_hz": 10
+  },
+  "excluded": [
+    "lemon task labels",
+    "lemon classification weights",
+    "UR joint ordering",
+    "legacy image-model server",
+    "robot command execution"
+  ],
+  "training_started": false,
+  "gpu_or_model_inference_verified": false
+}

@@ -8,12 +8,14 @@ import jax.numpy as jnp
 
 from openpi.models.pi0 import Pi0
 from openpi.models.pi0_config import Pi0Config
+from openpi.models.pi0_visual_memory import Pi0VisualMemory
+from openpi.models.pi0_visual_memory import VisualMemoryConfig
 from openpi.shared import delta_paper as paper
 from openpi.training.weight_loaders import PartialCheckpointWeightLoader
 
 
 @dataclass(frozen=True)
-class PaperPi0Config(Pi0Config):
+class PaperNoiseConfig:
     paper_asset_dir: str = ""
     paper_asset_sha256: str | None = None
     paper_mode: str = "global_quantile"
@@ -31,11 +33,20 @@ class PaperPi0Config(Pi0Config):
         ):
             raise ValueError("Paper model requires Pi0.5, 58D actions and valid mode/beta")
 
+    def load_pytorch(self, train_config, weight_path):
+        raise ValueError("Delta paper experiments are JAX-only")
+
+
+@dataclass(frozen=True)
+class PaperPi0Config(PaperNoiseConfig, Pi0Config):
     def create(self, rng):
         return PaperPi0(self, rngs=nnx.Rngs(rng))
 
-    def load_pytorch(self, train_config, weight_path):
-        raise ValueError("Delta paper experiments are JAX-only; PyTorch is not implemented")
+
+@dataclass(frozen=True)
+class PaperVisualMemoryConfig(PaperNoiseConfig, VisualMemoryConfig):
+    def create(self, rng):
+        return PaperVisualMemory(self, rngs=nnx.Rngs(rng))
 
 
 @dataclass(frozen=True)
@@ -50,7 +61,7 @@ class PaperWeightLoader(PartialCheckpointWeightLoader):
         return result
 
 
-class PaperPi0(Pi0):
+class PaperNoise:
     def __init__(self, config, *, rngs):
         if not config.paper_asset_sha256:
             raise ValueError("Compute matching paper statistics and reload configuration before model creation")
@@ -74,3 +85,11 @@ class PaperPi0(Pi0):
             return value
         flat = value.reshape(*shape[:-2], self.action_horizon * self.action_dim)
         return (flat @ self.paper_noise_cholesky.value.T).reshape(shape)
+
+
+class PaperPi0(PaperNoise, Pi0):
+    pass
+
+
+class PaperVisualMemory(PaperNoise, Pi0VisualMemory):
+    pass

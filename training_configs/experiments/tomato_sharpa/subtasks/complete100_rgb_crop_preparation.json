@@ -1,0 +1,251 @@
+{
+  "version": "tomato-complete100-rgb-crop-preparation-v5-offline-local",
+  "status": "all100_offline_local_frame_geometry_and_continuity_acceptance_passed",
+  "training_recipe": "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop",
+  "derived_base_bundle": "/home/user/datasets/derived/tomato_complete100_saved_labels_r1_base_ab",
+  "roi_worklist": "/home/user/datasets/derived/tomato_complete100_roi_worklist_r2/worklist.json",
+  "existing_roi_preview": "/home/user/datasets/derived/tomato_complete100_roi_preview_r1",
+  "data_policy": "all100_action_training",
+  "selection": "records/complete100_rgb_crop_20261111_saved_labels_r1.json",
+  "source_plan": "records/complete100_rgb_crop_20261111_source_plan_r1.json",
+  "label_policy": "saved_reviewed_subtask; Agent provisional boundaries are audit-only",
+  "unresolved_phase_label_recordings": 0,
+  "token_audit": "records/complete100_rgb_crop_20261111_token_budget.json",
+  "rgb_only": true,
+  "image_keys": [
+    "base_0_rgb",
+    "left_wrist_0_rgb",
+    "right_wrist_0_rgb",
+    "interaction_0_rgb"
+  ],
+  "source_camera_mapping": {
+    "base_0_rgb": "cam0",
+    "left_wrist_0_rgb": "cam2",
+    "right_wrist_0_rgb": "cam1"
+  },
+  "interaction_source": "explicit per-frame source_camera; native RGB crop with context",
+  "roi_metadata_required": [
+    "source_camera",
+    "source_size",
+    "interaction_box",
+    "crop_box",
+    "timestamp",
+    "available_at",
+    "valid",
+    "generation_mode",
+    "display_crop_box",
+    "left_hand_mcp_fe_mean",
+    "left_grasp_state_confirmed",
+    "carry_evidence",
+    "image_available",
+    "local_roi_valid",
+    "input_mode",
+    "input_box",
+    "fallback_reason"
+  ],
+  "roi_context_scale": 1.5,
+  "image_resolution": [
+    224,
+    224
+  ],
+  "state_dimension": 58,
+  "action_dimension": 58,
+  "action_horizon": 50,
+  "action_semantics": "delta_14_arm_absolute_44_hand",
+  "max_token_len": 256,
+  "scheme1": {
+    "memory_to_agent": true,
+    "memory_to_pi05": false,
+    "visual_tokens": 1024,
+    "text_slots": 256,
+    "prefix_slots": 1280,
+    "implementation_scope": "Four current images/state/prompt for pi05; Agent learned history reader remains unimplemented"
+  },
+  "scheme2": {
+    "status": "unimplemented_design_candidates",
+    "learned_history_token_candidates": [
+      32,
+      64
+    ],
+    "text_memory_capacity_candidate": 320
+  },
+  "normalization": "recomputed_all100_delta14_absolute44_forward50_and_bound_to_actual_four_view_AB",
+  "training_hyperparameters": "batch512 steps8000 FSDP8 and original LR retained; target batch memory acceptance pending",
+  "training_started": false,
+  "four_view_model_adapter_implemented": true,
+  "automatic_roi_implemented": true,
+  "deployment_modified": false,
+  "roi_annotation_policy": {
+    "first_version_method": "manual_offline_keyframes_with_interpolation",
+    "reference_annotations": "records/normal93_20261110_interaction_preview_annotations.json",
+    "annotation_target": "task-relevant hands and held/manipulated object or immediate contact region",
+    "exclude_from_tight_box": [
+      "robot arm links",
+      "unrelated hand",
+      "unrelated fruit in collection tray"
+    ],
+    "include_context_when_relevant": [
+      "local support or placement contact region"
+    ],
+    "geometry": "tight union of component boxes; 1.5x square context crop using existing square_box",
+    "detector_probe_is_training_roi": false,
+    "review_policy": "inspect native keyframes and intervening frames; add keys at motion/contact changes; do not extrapolate uncovered intervals",
+    "full_coverage_completed": false,
+    "online_roi_capability_claimed": false
+  },
+  "manual_roi_progress": {
+    "annotation": "records/complete100_episode86_manual_roi_20261111_r3.json",
+    "full_recording_geometry_candidates": 1,
+    "total_recordings": 100,
+    "geometry_covered_frames": 2990,
+    "remaining_unannotated_frames": 422566,
+    "new_frames_since_original_preview": 2732,
+    "review_export": "/home/user/datasets/derived/tomato_complete100_episode86_manual_review_r3",
+    "crop_export": "/home/user/datasets/derived/tomato_complete100_episode86_manual_roi_r3",
+    "keyframes": 134,
+    "reviewed_keyframes_and_midpoints": 248,
+    "independent_human_review": false,
+    "full_temporal_review_completed": false,
+    "training_bundle_materialized": false,
+    "role": "Single-recording manual supervision/reference for experimental detector; not a full100 manual annotation claim"
+  },
+  "roi_automation_development": {
+    "status": "all100_transport_repair_temporal_and_input_checks_passed",
+    "locator": "/home/user/datasets/derived/tomato_roi_locator_hard_case_repair_r2",
+    "manual_supervision": {
+      "selection_episode_index": 86,
+      "native_source_episode_index": 4,
+      "keyframes": 134
+    },
+    "current_inputs": [
+      "current native cam0 RGB",
+      "current measured116 state",
+      "past/current hand-fruit motion, RGB/flow/background and grasp confirmations"
+    ],
+    "inference_phase_labels": false,
+    "inference_future_frames": false,
+    "automatic_target_acquisition": true,
+    "automatic_reacquisition": true,
+    "automatic_role_switching": "current measured grasp plus past/current coherent hand-fruit motion; no stationary-color acquisition or stale foreground re-seeding",
+    "bulk100_generation_enabled": true,
+    "training_ready": false,
+    "earlier_failed_LK_probe": "/home/user/datasets/derived/tomato_complete100_episode86_causal_track_probe_r2",
+    "grasp_calibration": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_roi_grasp_state_calibration_20261112_r1.json",
+    "original_locator": "/home/user/datasets/derived/tomato_roi_locator_experiment_r2",
+    "hard_case_annotations": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_roi_hard_cases_20261112_r1.json",
+    "hard_case_frames": 12,
+    "hard_case_recordings": 8,
+    "roi_supervision_agent_test_overlap": [
+      27,
+      66
+    ],
+    "scope": "All100 pi05 action data; do not use this all100 ROI locator as an independent Agent holdout preprocessing model"
+  },
+  "default_annotated_crop_exporter": "scripts.export_tomato_manual_crops",
+  "review_export_policy": "sample and failure diagnosis; not mandatory for every bulk export",
+  "timing_result": "records/complete100_roi_timing_and_tracking_20261111_r1.json",
+  "training_recipes": [
+    "training_configs.experiments.tomato_sharpa.subtasks.complete100_a_crop",
+    "training_configs.experiments.tomato_sharpa.subtasks.complete100_b_crop"
+  ],
+  "derived_four_view_bundle": "/home/user/datasets/derived/tomato_complete100_four_view_offline_local_candidate_r11",
+  "roi_candidates": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11",
+  "normalization_assets": {
+    "a": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_a_saved_labels_r1_offline_r11_delta_30hz",
+    "b": "/home/user/tomato-openpi/assets/tomato_complete100_rgb_crop_b_saved_labels_r1_offline_r11_delta_30hz"
+  },
+  "normalization_statistics_sha256": "cadfda5b116b16f66a5b739825bd6a16321be2c09b714bef481bf4c19064cf83",
+  "actual_token_distribution": {
+    "a_goal": {
+      "rows": 425556,
+      "p50": 211,
+      "p95": 220,
+      "maximum": 233,
+      "exceeds_256": 0
+    },
+    "b_coarse": {
+      "rows": 425556,
+      "p50": 209,
+      "p95": 219,
+      "maximum": 231,
+      "exceeds_256": 0
+    }
+  },
+  "actual_token_audit_paths": [
+    "/home/user/datasets/derived/tomato_complete100_vector_stats_r1/receipt.json",
+    "/home/user/datasets/derived/tomato_complete100_goal_token_audit_r1/receipt.json"
+  ],
+  "automatic_roi_status": "Historical causal r5 detector remains unchanged; latest offline training annotations use bidirectional RGB tracking, exception review and future-aware local window planning",
+  "candidate_coverage": {
+    "episodes": 100,
+    "frames": 425556,
+    "algorithm_valid_frames": 425556,
+    "algorithm_invalid_frames": 0,
+    "all_frames_enumerated": true,
+    "full_roi_coverage": true,
+    "training_ready": false,
+    "invalid_policy": "Every frame uses current native RGB local crop; no global fallback;266 exceptions have explicit coding-agent visual review",
+    "algorithm_valid_fraction": 1.0,
+    "full_image_coverage": true,
+    "image_available_frames": 425556,
+    "full_view_fallback_frames": 0,
+    "validity_scope": "100% coverage of prepared offline annotation boxes, not independent semantic accuracy"
+  },
+  "quality_diagnostics": {
+    "temporal_audit": "/home/user/datasets/derived/tomato_complete100_transport_audit_r5/audit.json",
+    "semantic_audit": "/home/user/datasets/derived/tomato_complete100_transport_audit_r5/semantic_review.json",
+    "sampled_visual_review": "/home/user/datasets/derived/tomato_complete100_offline_visual_review_r11",
+    "potential_role_mismatch_frames": 0,
+    "independent_accuracy_evaluated": false,
+    "phase_labels_not_used_for_generation": true,
+    "failure_and_regression_review": "/home/user/datasets/derived/tomato_complete100_transport_failure_review_r5",
+    "scope": "r5 selection diagnostics retained as history; r11 current frame/geometry/continuity checks passed, independent semantic accuracy not certified",
+    "offline_export": "/home/user/datasets/derived/tomato_complete100_offline_local_candidates_r11/offline_export_manifest.json",
+    "exception_visual_review": "/home/user/datasets/derived/tomato_complete100_offline_pending_review_r10",
+    "corrected_context_visual_review": "/home/user/datasets/derived/tomato_complete100_offline_context_review_r11"
+  },
+  "full_model_gpu_benchmark": "/home/user/datasets/derived/tomato_complete100_four_view_gpu_benchmark_r3/receipt.json",
+  "roi_single_frame_benchmark": "/home/user/datasets/derived/tomato_complete100_transport_b1_benchmark_r5_isolated/receipt.json",
+  "actual_loader_verification": "/home/user/datasets/derived/tomato_complete100_four_view_offline_local_candidate_check_r11.json",
+  "agent_history_reader_trained": false,
+  "roi_context_scale_semantics": "1.5 desired context with symmetric .8% scale envelope and feasible offline centers; all local squares220..380px; no global fallback",
+  "temporal_stream_quality_accepted": true,
+  "semantic_quality_accepted": false,
+  "training_ready": false,
+  "latest_validation": "/home/user/tomato-openpi/training_configs/experiments/tomato_sharpa/subtasks/records/complete100_offline_local_20261112_validation_r11.json",
+  "roi_provenance_binding": "Per-frame gzip index is SHA-bound to the episode receipt, whose contract includes generator/selector/geometry/weights/calibration identities; signature is not duplicated on every frame.",
+  "candidate_training_bundle_materialized": true,
+  "roi_temporal_cache_is_agent_memory": false,
+  "pi05_explicit_memory_tokens": false,
+  "training_image_requirement": {
+    "every_step_required": true,
+    "expected_frames": 425556,
+    "mask_source": "observation.interaction_available",
+    "local_quality_source": "observation.interaction_valid",
+    "fallback_policy": "No global fallback in this offline training export",
+    "full_roi_coverage_required_for_image_availability": false,
+    "local_or_full_transition_quality_accepted": true,
+    "offline_future_annotation": true,
+    "causal_deployment_locator": false
+  },
+  "offline_roi_preparation": {
+    "annotations": "/home/user/datasets/derived/tomato_complete100_offline_annotations_r10",
+    "exception_review": "records/complete100_offline_roi_exception_review_20261112_r10.json",
+    "exception_frames_reviewed": 266,
+    "added_right_hand_context_frames": 52,
+    "pixel_source": "same_current_native_frame",
+    "uses_future_frames_for_coordinates": true,
+    "window_available_after": "end_of_recording",
+    "source_frame_state_action_alignment_preserved": true,
+    "independent_all_frame_semantic_accuracy_measured": false,
+    "technical_acceptance_fraction": 1.0,
+    "technical_acceptance_scope": [
+      "all_frames_available",
+      "annotated_interaction_box_containment",
+      "center_step_at_most_3pct_previous_side",
+      "scale_step_at_most_2pct",
+      "no_global_fallback",
+      "no_black_frames"
+    ]
+  }
+}

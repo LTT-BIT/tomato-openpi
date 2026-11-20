@@ -15,13 +15,23 @@ from openpi.training import norm_provenance
 from openpi.training.dataset_collection import collection_layout
 from openpi.training.dataset_collection import validate_collection_features
 from openpi.training.delta_paper import PaperDataView
+from openpi.training.delta_paper import PaperNormalizationConfig
 from openpi.training.delta_paper import PaperSharpaData
+from openpi.training.sampling import PLAN_MODES
+from openpi.training.sampling import complete_window_count
+from openpi.training.visual_memory_options import current_frame_transforms
 
 
 def compute(config, *, batch_size=128):
     data = config.data
-    if not isinstance(data, PaperSharpaData) or config.sampling_mode != "epoch_shuffle" or batch_size < 1:
-        raise ValueError("Paper statistics require its own data adapter, epoch_shuffle and positive batch size")
+    if (
+        not isinstance(data, PaperNormalizationConfig | PaperSharpaData)
+        or config.sampling_mode not in PLAN_MODES
+        or batch_size < 1
+    ):
+        raise ValueError(
+            "Paper statistics require its own data adapter, deterministic sampling and positive batch size"
+        )
     with new_artifact_directory(data.asset_directory(config.assets_dirs)) as output:
         _compute(config, batch_size=batch_size, output=output)
 
@@ -32,22 +42,29 @@ def _compute(config, *, batch_size, output):
     validate_collection_features([item["info"] for item in layout])
     if any(item["info"]["fps"] != 30 for item in layout):
         raise ValueError("Paper episode metadata/FPS mismatch")
-    total = sum(max(0, row["length"] - horizon + 1) for item in layout for row in item["episodes"])
+    total = sum(complete_window_count(row["length"], horizon) for item in layout for row in item["episodes"])
     source_reports = [
         {
             "repo_id": spec.repo_id,
             "root": item["root"],
             "frames": item["info"]["total_frames"],
             "episodes": item["info"]["total_episodes"],
-            "training_windows": sum(max(0, row["length"] - horizon + 1) for row in item["episodes"]),
+            "training_windows": sum(complete_window_count(row["length"], horizon) for row in item["episodes"]),
         }
         for spec, item in zip(data.lerobot_datasets, layout, strict=True)
     ]
     if total < 2:
         raise ValueError("Paper statistics require at least two complete training windows")
     contract = norm_provenance.build_contract(config)
-    repack, vectors = data.create_vector_transforms(config.model)
-    vector = transforms.compose([*repack.inputs, *vectors.inputs])
+    actual_repack, actual_vectors = data.create_vector_transforms(config.model)
+    training_vector = transforms.compose([*actual_repack.inputs, *actual_vectors.inputs])
+    memory = getattr(config.model, "memory", None)
+    if memory is not None:
+        repack, vectors = current_frame_transforms(data, config.model)
+        vector = transforms.compose([*repack.inputs, *vectors.inputs])
+    else:
+        vector = training_vector
+    interaction_mask_key = getattr(data, "interaction_mask_key", None)
     cameras = config.policy_metadata["camera_keys"]
     dummy = np.zeros((1, 1, 3), np.uint8)
     source_view = PaperDataView(
@@ -56,7 +73,10 @@ def _compute(config, *, batch_size, output):
         lerobot_datasets=data.lerobot_datasets,
         action_hz=30,
         prompt_from_task=True,
-        video_backend="pyav",
+        video_backend=data.video_backend,
+        visual_memory=memory,
+        history_mask_key=interaction_mask_key,
+        global_prompt=getattr(data, "global_prompt", None),
     )
     reference = data_loader.create_torch_dataset(source_view, horizon, config.model, sampling_mode="epoch_shuffle")
     if len(reference) != total:
@@ -78,7 +98,7 @@ def _compute(config, *, batch_size, output):
         root, info = Path(item["root"]), item["info"]
         for episode in sorted(item["episodes"], key=lambda row: row["episode_index"]):
             index, length = episode["episode_index"], episode["length"]
-            count = max(0, length - horizon + 1)
+            count = complete_window_count(length, horizon)
             if not count:
                 continue
             path = root / info["data_path"].format(episode_chunk=index // info["chunks_size"], episode_index=index)
@@ -97,6 +117,7 @@ def _compute(config, *, batch_size, output):
                     "observation.state": state[rows],
                     "action": action[rows[:, None] + np.arange(horizon)],
                     "prompt": "",
+                    **({interaction_mask_key: np.False_} if interaction_mask_key else {}),
                     **dict.fromkeys(cameras, dummy),
                 }
                 values = vector(inputs)
@@ -110,7 +131,7 @@ def _compute(config, *, batch_size, output):
                     sampled[low:high] = values["actions"][chosen[low:high] - offset - start]
                 for local in (0, count // 2, count - 1):
                     if start <= local < start + len(rows):
-                        actual = vector(reference[offset + local])
+                        actual = training_vector(reference[offset + local])
                         for key in stats:
                             np.testing.assert_array_equal(actual[key], values[key][local - start])
                         checked += 1
@@ -176,7 +197,7 @@ def _compute(config, *, batch_size, output):
         "norm_stats_sha256": digest,
         "bundle_sha256": paper.sha256(output / paper.BUNDLE),
         "source_contract": contract,
-        "prompt_source": "meta/tasks.jsonl",
+        "prompt_source": "fixed_global_prompt" if source_view.global_prompt else "meta/tasks.jsonl",
         "config_name": config.name,
     }
     (output / paper.MANIFEST).write_text(json.dumps(metadata, indent=2) + "\n")

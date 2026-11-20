@@ -11,6 +11,7 @@ import re
 from typing import TYPE_CHECKING
 
 import wandb
+from wandb.sdk.lib.runid import generate_id
 
 from openpi.shared.local_storage import atomic_write_json
 
@@ -33,7 +34,7 @@ def session(config: "TrainConfig", *, resuming: bool, start_step: int):
         raise ValueError("WANDB_MODE must be online or offline")
     checkpoint = Path(config.checkpoint_dir)
     anchor = checkpoint / "wandb_id.txt"
-    run_id = wandb.util.generate_id()
+    run_id = generate_id()
     root_id = anchor.read_text().strip() if resuming else run_id
     if not re.fullmatch(r"[A-Za-z0-9_-]+", root_id):
         raise ValueError("Invalid or empty checkpoint wandb_id.txt")
