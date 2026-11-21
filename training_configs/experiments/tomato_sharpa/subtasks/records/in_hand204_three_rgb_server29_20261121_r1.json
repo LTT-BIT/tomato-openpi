@@ -1,0 +1,102 @@
+{
+  "checked_at": "2026-11-21T17:53:11.355203+08:00",
+  "server": "29",
+  "host": "dsw-933214-7b994fd987-hthtg",
+  "status": "running",
+  "job_id": "64b58323d7b950f7b7ef5a8e4caa6863",
+  "child_pid": 1127598,
+  "child_start": "8866715",
+  "worker_pid": 1127418,
+  "worker_start": "8866048",
+  "gpus": [
+    "GPU-9371c7ed-df4b-e320-54ec-02807c367501",
+    "GPU-2f1625c1-e403-b2a5-9f02-63b699e5b6a5",
+    "GPU-c96bb37e-399b-b9af-9995-b0460fbb2ab5",
+    "GPU-5875c2f2-fa30-81cd-f074-bf652c54d6cb",
+    "GPU-d1c1fdc3-25b7-0196-da68-a60f6bb09cbb",
+    "GPU-e9b79451-e630-c54f-f38c-59b56d4356e0",
+    "GPU-d9191384-c22b-6317-7d95-575a7e7ae0a4",
+    "GPU-72795825-64a4-d5b1-ef05-f3e6d86fd764"
+  ],
+  "runtime_root": "/mnt/data/users/mengxiang/workspace/training_runtimes/in_hand204_three_rgb_f4d9f16",
+  "runtime_source_commit": "f4d9f16d7f676c7d7dc42128772b3741ce51b9db",
+  "shared_checkout_commit": "1826aebc8fd345f5c93f32722fc69ff11e0ccb0e",
+  "previous_queue": {
+    "job_id": "e182a1d559ba50f4b7f1e2dba4692546",
+    "status": "stopped",
+    "child_pid": null
+  },
+  "four_view27": {
+    "job_id": "dcb792446ccb40e4b2350271d861d960",
+    "status": "running",
+    "child_pid": 3413691,
+    "child_start": "164571452"
+  },
+  "exp_name": "tomato_in_hand204_b_three_rgb_delta_v3_r1_s42_b256_s20000_c5000_after_crop_1120",
+  "checkpoint_dir": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/checkpoints/pi05_sharpa_in_hand204_b_three_rgb_fullft_delta_v3_r1/tomato_in_hand204_b_three_rgb_delta_v3_r1_s42_b256_s20000_c5000_after_crop_1120",
+  "manifest": "/mnt/data/users/mengxiang/workspace/training_runtimes/in_hand204_three_rgb_f4d9f16/logs/pi05_sharpa_in_hand204_b_three_rgb_fullft_delta_v3_r1/tomato_in_hand204_b_three_rgb_delta_v3_r1_s42_b256_s20000_c5000_after_crop_1120/20261121_174920_138070_1127598.json",
+  "initial_weights": "/mnt/data/public_ckpt/pi05/pi05_base/params",
+  "wandb_mode": "offline",
+  "settings": {
+    "batch_size": 256,
+    "num_train_steps": 20000,
+    "fsdp_devices": 8,
+    "save_interval": 5000,
+    "keep_period": 5000,
+    "resume": false,
+    "overwrite": false
+  },
+  "data": {
+    "episodes": 204,
+    "frames": 588734,
+    "rgb_views": 3,
+    "visual_tokens": 768,
+    "max_text_tokens": 256,
+    "subtasks": "same four prompts and five-phase labels",
+    "original_data_deleted": false,
+    "original_data_payload_modified": false,
+    "interaction_videos_retained": true
+  },
+  "acceptance": {
+    "report": "/mnt/data/users/mengxiang/workspace/training_runtimes/in_hand204_three_rgb_f4d9f16/logs/in_hand204_three_rgb/accepted.json",
+    "sha256": "9702fa4a47c41d671ab8ad3753307188401b4588e2ca5eeddbf43f37125ffce0",
+    "status": "three_rgb204_accepted",
+    "model_samples_checked": 612,
+    "phase_boundary_samples_checked": 2040
+  },
+  "launcher": {
+    "path": "/mnt/data/users/mengxiang/workspace/code/tomato-openpi-sharpa/logs/in_hand204_three_rgb/launch_three_rgb29.py",
+    "sha256": "0b73cc422a977b02e30a2dddbe7d4c74eb2dd68b9a4e10ca3ad88a91f710466a"
+  },
+  "metrics": [
+    "Step 0: grad_norm=1.5564, loss=1.5553, param_norm=1802.2983, sampling/consumed_samples=256.0000, sampling/consumed_unique_frames=256.0000, sampling/consumed_coverage=0.0004",
+    "Step 10: grad_norm=1.5523, loss=1.5750, param_norm=1802.2987, sampling/consumed_samples=2816.0000, sampling/consumed_unique_frames=2816.0000, sampling/consumed_coverage=0.0048"
+  ],
+  "gpu_inventory": "0, GPU-9371c7ed-df4b-e320-54ec-02807c367501, 33417 MiB, 100 %\n1, GPU-2f1625c1-e403-b2a5-9f02-63b699e5b6a5, 33413 MiB, 100 %\n2, GPU-c96bb37e-399b-b9af-9995-b0460fbb2ab5, 33413 MiB, 100 %\n3, GPU-5875c2f2-fa30-81cd-f074-bf652c54d6cb, 33413 MiB, 100 %\n4, GPU-d1c1fdc3-25b7-0196-da68-a60f6bb09cbb, 33413 MiB, 100 %\n5, GPU-e9b79451-e630-c54f-f38c-59b56d4356e0, 33413 MiB, 100 %\n6, GPU-d9191384-c22b-6317-7d95-575a7e7ae0a4, 33413 MiB, 100 %\n7, GPU-72795825-64a4-d5b1-ef05-f3e6d86fd764, 33413 MiB, 100 %\n",
+  "ui": {
+    "local_url": "http://127.0.0.1:18770/",
+    "remote_port": 8769
+  },
+  "verification": {
+    "gpu_cuda_probe_devices": 8,
+    "gpu_cuda_probe_values": [
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "first_loss": 1.5553,
+    "first_grad_norm": 1.5564,
+    "metrics_finite": true,
+    "training_from_completed_step": 0,
+    "old_queue_worker_exited_verified_on_27": true,
+    "running_learner_and_input_code_changed": false,
+    "steady_speed_estimate": "pending; early progress still includes initialization and compilation",
+    "observed_progress_step": 16,
+    "logged_metrics_finite": true
+  }
+}
