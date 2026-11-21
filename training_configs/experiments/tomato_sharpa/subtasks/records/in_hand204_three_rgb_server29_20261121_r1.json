@@ -98,5 +98,19 @@
     "steady_speed_estimate": "pending; early progress still includes initialization and compilation",
     "observed_progress_step": 16,
     "logged_metrics_finite": true
+  },
+  "ui_presentation_correction": {
+    "date": "2026-11-21",
+    "old_default_baseline": "normal93_b_stage",
+    "actual_training_module_unchanged": true,
+    "default_baseline": "training_configs.experiments.tomato_sharpa.subtasks.in_hand204_b_three_rgb",
+    "display_name": "29 · 204条三路RGB＋subtask · 2026-11-21 17:49启动",
+    "stored_experiment_id_unchanged": true,
+    "old_suffix_meaning": "after_crop_1120 originated from queue preparation on November 20; actual launch November 21",
+    "training_pid_unchanged": 1127598,
+    "ui_only_external_wrapper": "logs/in_hand204_three_rgb/three29_ui.py",
+    "ui_wrapper_sha256": "7c5d680f98295f8db2261ae84a35337071db487c1064dae836574b9b57ac3f46",
+    "duplicate_start_disabled": true,
+    "verification": "catalog/defaults APIs and browser agree on 204 three RGB batch256/20000 steps; step50 loss1.3779 grad0.8714 finite"
   }
 }
